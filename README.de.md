@@ -21,6 +21,16 @@ Voraussetzungen sind Node.js ab 24.11 und pnpm 9.15.4, wie im Originalprojekt fe
 npx --yes pnpm@9.15.4 install --frozen-lockfile
 ```
 
+## Deutsche Version installieren
+
+Unter Windows kann die deutsche Version mit PowerShell eingerichtet werden. Dafür müssen Git und Node.js 24.11 oder neuer installiert sein:
+
+```powershell
+irm https://raw.githubusercontent.com/DonTucci/paperclip-de/fork/deutsch/install-de.ps1 | iex
+```
+
+Die Dateien werden unter `%LOCALAPPDATA%\Paperclip-DE` eingerichtet. Anschliessend startet `corepack pnpm@9.15.4 dev:once` die lokale deutsche Version. Das Skript lädt bei einer bestehenden Installation nur den aktuellen Stand des deutschen Branches nach.
+
 Unter Windows kann das ursprüngliche Postinstall-Skript `scripts/link-plugin-dev-sdk.mjs` ohne Berechtigung für symbolische Verknüpfungen scheitern. Die vorhandene produktive Instanz darf nicht als Entwicklungsdatenbank verwendet werden. Für Tests ist ein eigener Datenordner und ein freier Port erforderlich; Einzelheiten stehen in `doc/DEVELOPING.md`.
 
 Der vorhandene Start über `npx paperclipai run` verwendet weiterhin das veröffentlichte Originalpaket. Diese lokale Quellkopie stellt die laufende Instanz nicht automatisch um.
