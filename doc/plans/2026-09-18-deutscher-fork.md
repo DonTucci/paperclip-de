@@ -29,6 +29,10 @@ Die Trennung vom bestehenden Übersetzungskatalog des Originals verhindert, dass
 
 Merge-Konflikte werden nicht automatisch aufgelöst. Wiederholte Läufe verwenden denselben Update-Branch und erzeugen keine doppelten Pull Requests.
 
+## Veröffentlichungsstrategie
+
+`fork/deutsch` bleibt die fortlaufende Integrationslinie. Geprüfte Stände erhalten bei Bedarf eigene Tags im Format `de-v2026.916.0`. Eine Veröffentlichung erfolgt manuell nach erfolgreichem Prüfworkflow; automatische Paket- und Cloud-Veröffentlichungen des Originals werden nicht ungeprüft übernommen.
+
 ## Abnahme vor GitHub
 
 - 6'033 Katalogeinträge je Sprache geprüft
@@ -46,4 +50,4 @@ Vom Server gelieferte Ankündigungen, Benutzertexte, Agentenausgaben, Plugins un
 
 ## Verbleibender Veröffentlichungsschritt
 
-Der GitHub-Fork ist eingerichtet, `origin` gesetzt, `fork/deutsch` veröffentlicht und als Standardbranch gesetzt. Beide Fork-Workflows sind auf GitHub aktiv; ein manueller Prüf-Lauf dient als erste Funktionskontrolle. Die produktive Installation wird erst danach getrennt und mit vorheriger Datensicherung umgestellt.
+Der GitHub-Fork ist eingerichtet, `origin` gesetzt, `fork/deutsch` veröffentlicht und als Standardbranch gesetzt. Beide Fork-Workflows sind auf GitHub aktiv; ein manueller Prüf-Lauf ist erfolgreich abgeschlossen. Die Veröffentlichungsstrategie ist dokumentiert. Die produktive Installation wird erst danach getrennt und mit vorheriger Datensicherung umgestellt.

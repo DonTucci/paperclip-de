@@ -48,6 +48,10 @@ GitHub Actions sind aktiviert; `fork/deutsch` ist der Standardbranch. Der Update
 
 Die Übernahme eines Updates und die Umstellung einer laufenden Installation erfolgen erst nach Prüfung der Änderungen und einer Datensicherung.
 
+## Veröffentlichungsstrategie
+
+Der Branch `fork/deutsch` bleibt die fortlaufende Integrationslinie. Nach jedem geprüften Upstream-Update kann daraus ein eigener Release-Tag wie `de-v2026.916.0` erstellt werden. Releases werden erst nach bestandenem Prüfworkflow manuell veröffentlicht; automatische Paket- oder Cloud-Veröffentlichungen des Originalprojekts werden im Fork nicht ungeprüft übernommen.
+
 ## Geprüfter Stand
 
 - Katalog: 6'033 Schlüssel je Sprache, identische Platzhalter, Schweizer Schreibweise bestanden.
