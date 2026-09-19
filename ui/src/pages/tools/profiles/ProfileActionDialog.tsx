@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { AlertTriangle } from "lucide-react";
 import type { ToolProfileWithDetails } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
@@ -34,19 +35,19 @@ export function ProfileActionDialog({
   const defaultDeleteBlocked = kind === "delete" && profile.summary.isCompanyDefault;
   const copy = {
     archive: {
-      title: "Archive profile",
+      title: tf("auto.2962d868f4ace180"),
       body: `This profile stops applying to ${profile.summary.appliesToAgentCount} ${profile.summary.appliesToAgentCount === 1 ? "agent" : "agents"}. You can restore it later.`,
       confirm: "Archive",
       action: onArchive,
     },
     restore: {
-      title: "Restore profile",
+      title: tf("auto.ec01a812bd883b04"),
       body: "This profile will be active again and can be assigned to agents.",
       confirm: "Restore",
       action: onRestore,
     },
     delete: {
-      title: "Delete profile",
+      title: tf("auto.47311af432a79c40"),
       body: defaultDeleteBlocked
         ? "This profile is the organization default. Reassign the organization default to another profile before deleting it."
         : `This permanently deletes the profile and removes ${profile.summary.assignmentCount} ${profile.summary.assignmentCount === 1 ? "assignment" : "assignments"}.`,
@@ -65,11 +66,11 @@ export function ProfileActionDialog({
         {defaultDeleteBlocked ? (
           <div className="flex gap-3 rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>Choose another access profile and make it the organization default first.</span>
+            <span>{tf("auto.29f96b1eae210632")}</span>
           </div>
         ) : null}
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose}>{tf("text.Cancel")}</Button>
           <Button
             variant={kind === "delete" ? "destructive" : "default"}
             disabled={pending || defaultDeleteBlocked}

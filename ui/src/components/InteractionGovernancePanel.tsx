@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Fragment } from "react";
 import {
   ISSUE_THREAD_INTERACTION_KINDS,
@@ -239,19 +240,19 @@ export function InteractionGovernancePanel({
   return (
     <div className="space-y-4" data-testid="company-settings-interaction-governance-section">
       <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-        Interaction governance
+        {tf("auto.55a23137de6cd800")}
       </div>
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
           Thread interactions are open by default:{" "}
-          <span className="font-medium text-foreground">Anyone</span> in the organization — the
+          <span className="font-medium text-foreground">{tf("auto.8d486bb2d3f85d1b")}</span> in the organization — the
           board or any agent, including the one that asked — can respond. Narrow a kind
           only when you need to.{" "}
-          <span className="font-medium text-foreground">Default policy</span> is the
+          <span className="font-medium text-foreground">{tf("auto.8cca8b216a06c5f7")}</span> is the
           audience new cards get when the requester does not ask for one;{" "}
-          <span className="font-medium text-foreground">Cap</span> narrows every request of
+          <span className="font-medium text-foreground">{tf("auto.1257ac04471db97b")}</span> narrows every request of
           that kind and can never widen one. Tool-approval confirmations always stay{" "}
-          <span className="font-medium text-foreground">Human only</span>.
+          <span className="font-medium text-foreground">{tf("auto.de7c8fff477b3cb8")}</span>.
         </p>
         {/*
          * Responsive: below `sm` the row collapses to a single column so the
@@ -262,13 +263,13 @@ export function InteractionGovernancePanel({
          */}
         <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-x-4 sm:gap-y-2.5">
           <div className="hidden text-xs font-medium text-muted-foreground uppercase tracking-wide sm:block">
-            Kind
+            {tf("auto.f5387f9bb6ed7031")}
           </div>
           <div className="hidden text-xs font-medium text-muted-foreground uppercase tracking-wide sm:block">
-            Default policy
+            {tf("auto.8cca8b216a06c5f7")}
           </div>
           <div className="hidden text-xs font-medium text-muted-foreground uppercase tracking-wide sm:block">
-            Cap
+            {tf("auto.1257ac04471db97b")}
           </div>
           {ISSUE_THREAD_INTERACTION_KINDS.map((kind) => {
             const entry = governance[kind] ?? {};

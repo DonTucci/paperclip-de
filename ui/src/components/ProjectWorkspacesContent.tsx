@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ExecutionWorkspace } from "@paperclipai/shared";
@@ -52,7 +53,7 @@ export function ProjectWorkspacesContent({
   });
 
   if (summaries.length === 0) {
-    return <p className="text-sm text-muted-foreground">No non-default workspace activity yet.</p>;
+    return <p className="text-sm text-muted-foreground">{tf("auto.ee79d00cbbbb4c01")}</p>;
   }
 
   const activeSummaries = summaries.filter((summary) => summary.executionWorkspaceStatus !== "cleanup_failed");
@@ -77,7 +78,7 @@ export function ProjectWorkspacesContent({
         {cleanupFailedSummaries.length > 0 ? (
           <div className="space-y-2">
             <div className="text-xs font-medium uppercase tracking-(--tracking-caps) text-muted-foreground">
-              Cleanup attention needed
+              {tf("auto.f11c45b2a2da2cb8")}
             </div>
             <div className="space-y-3">
               {cleanupFailedSummaries.map((summary) => (

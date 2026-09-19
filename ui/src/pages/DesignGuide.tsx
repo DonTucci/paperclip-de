@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { AgentChatPicker } from "@/components/AgentChatPicker";
 import { TaskChatProjectCreatedCard } from "@/components/task-chat/TaskChatProjectCreatedCard";
 import { AnnouncementCard } from "@/components/AnnouncementCard";
@@ -258,7 +259,7 @@ const DESIGN_GUIDE_DEGRADED_OUTPUTS: IssueWorkProduct[] = [
 const DESIGN_GUIDE_TASK = {
   id: "design-guide-task",
   identifier: "PAP-427",
-  title: "Reconcile the navigation model across operator surfaces",
+  title: tf("auto.8172a52d8c2f75be"),
   status: "in_progress",
   priority: "medium",
   blockerAttention: false,
@@ -277,7 +278,7 @@ const DESIGN_GUIDE_COMPOSIO_ROWS: ComposioServiceRow[] = [
   {
     toolkitSlug: "github",
     name: "GitHub",
-    description: "Issues, pull requests, and repository actions",
+    description: tf("auto.f711a56ac322f851"),
     logoUrl: null,
     state: "connected",
     connectedAccountStatus: "ACTIVE",
@@ -288,7 +289,7 @@ const DESIGN_GUIDE_COMPOSIO_ROWS: ComposioServiceRow[] = [
   {
     toolkitSlug: "hubspot",
     name: "HubSpot",
-    description: "CRM contacts and deals",
+    description: tf("auto.9101916adeb1b0a8"),
     logoUrl: null,
     state: "attention",
     connectedAccountStatus: "EXPIRED",
@@ -299,7 +300,7 @@ const DESIGN_GUIDE_COMPOSIO_ROWS: ComposioServiceRow[] = [
   {
     toolkitSlug: "slack",
     name: "Slack",
-    description: "Channels and messages",
+    description: tf("auto.a019c936e5e5e8dc"),
     logoUrl: null,
     state: "pending",
     connectedAccountStatus: "INITIALIZING",
@@ -310,7 +311,7 @@ const DESIGN_GUIDE_COMPOSIO_ROWS: ComposioServiceRow[] = [
   {
     toolkitSlug: "gmail",
     name: "Gmail",
-    description: "Read and send mail",
+    description: tf("auto.42c7ea669863524b"),
     logoUrl: null,
     state: "not_connected",
     connectedAccountStatus: null,
@@ -471,8 +472,8 @@ function TaskExecutionControlsExample() {
         onCancel={() => setDialogMode("cancel")} onRestore={() => setDialogMode("restore")} />
     </div>
     <p className="text-sm text-muted-foreground">{running ? "Running: type to switch Stop to Send." : "Paused: resume from the menu."}</p>
-    <TaskChatProjectCreatedCard item={{ id: "design-project", kind: "project_created", projectId: "example-project", name: "Onboarding improvements", description: "Help new teams reach their first useful result.", timestamp: "2026-09-11T00:00:00Z", repositories: [{ id: "1", name: "paperclipai/paperclip", url: "https://github.com/paperclipai/paperclip" }] }} />
-    {!running ? <TaskChatMarker item={{ id: "design-cancelled", kind: "marker", variant: "interrupted", tone: "neutral", label: "Run cancelled", detail: "The run was cancelled before returning an answer.", collapsible: true }} /> : null}
+    <TaskChatProjectCreatedCard item={{ id: "design-project", kind: "project_created", projectId: "example-project", name: "Onboarding improvements", description: tf("auto.dc595637ac4a436d"), timestamp: "2026-09-11T00:00:00Z", repositories: [{ id: "1", name: "paperclipai/paperclip", url: "https://github.com/paperclipai/paperclip" }] }} />
+    {!running ? <TaskChatMarker item={{ id: "design-cancelled", kind: "marker", variant: "interrupted", tone: "neutral", label: tf("auto.2d34c9f19f5402b3"), detail: "The run was cancelled before returning an answer.", collapsible: true }} /> : null}
     <TaskChatComposer pause={!running ? { scope: "subtree", onResume: () => setDialogMode("resume") } : null} onAdd={async () => {}} workMode="standard" stopScope="subtree" onStop={running ? async () => setRunning(false) : undefined} />
     <TaskTreeControlDialog open={dialogMode !== null} onOpenChange={(open) => { if (!open) setDialogMode(null); }}
       mode={dialogMode ?? "cancel"} scope="subtree" affectedCount={3} affectedAgentCount={2} loading={false} pending={false} valid
@@ -504,10 +505,10 @@ export function DesignGuide() {
     "This is an editable description. Click to edit it — the textarea auto-sizes to fit the content without layout shift."
   );
   const [filters, setFilters] = useState<FilterValue[]>([
-    { key: "status", label: "Status", value: "Active" },
+    { key: "status", label: tf("text.Status"), value: "Active" },
     // PAP-411: priority filter demo row suppressed while SHOW_TASK_PRIORITY_UI is off.
     ...(SHOW_TASK_PRIORITY_UI
-      ? [{ key: "priority", label: "Priority", value: "High" } as FilterValue]
+      ? [{ key: "priority", label: tf("text.Priority"), value: "High" } as FilterValue]
       : []),
   ]);
   const [allowExternal, setAllowExternal] = useState(false);
@@ -518,21 +519,21 @@ export function DesignGuide() {
     <div className="space-y-10 max-w-4xl">
       {/* Page header */}
       <div>
-        <h2 className="text-xl font-bold">Design Guide</h2>
+        <h2 className="text-xl font-bold">{tf("auto.fb85946778ba8b3e")}</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Every component, style, and pattern used across Paperclip.
+          {tf("auto.11b92d42c772a484")}
         </p>
       </div>
 
       {/* ============================================================ */}
       {/*  COVERAGE                                                     */}
       {/* ============================================================ */}
-      <Section title="Component Coverage">
+      <Section title={tf("auto.0ce7e43e9b66e6fc")}>
         <p className="text-sm text-muted-foreground">
-          This page should be updated when new UI primitives or app-level patterns ship.
+          {tf("auto.87a2a492ec7c2c06")}
         </p>
         <div className="grid gap-6 md:grid-cols-2">
-          <SubSection title="UI primitives">
+          <SubSection title={tf("auto.8d9de12fe1ebc864")}>
             <div className="flex flex-wrap gap-2">
               {[
                 "avatar", "badge", "breadcrumb", "button", "card", "checkbox", "collapsible",
@@ -545,7 +546,7 @@ export function DesignGuide() {
               ))}
             </div>
           </SubSection>
-          <SubSection title="App components">
+          <SubSection title={tf("auto.3513abbd3ffdf8d9")}>
             <div className="flex flex-wrap gap-2">
               {[
                 "StatusBadge", "StatusIcon", "PriorityIcon", "EntityRow", "EmptyState", "MetricCard",
@@ -563,7 +564,7 @@ export function DesignGuide() {
         </div>
       </Section>
 
-      <Section title="Announcements">
+      <Section title={tf("auto.fe02680f247961a1")}>
         <div className="grid gap-4 md:grid-cols-2">
           <AnnouncementCard announcement={announcementAnimationPreview} imageSrc="/announcement-preview.svg" animationSrc={announcementAnimationPreviewSrc} onDismiss={() => {}} />
           <AnnouncementCard announcement={announcementPreview} imageSrc="/announcement-preview.svg" onDismiss={() => {}} />
@@ -571,36 +572,36 @@ export function DesignGuide() {
         </div>
       </Section>
 
-      <Section title="Task Execution Controls">
+      <Section title={tf("auto.c914f18daf836c24")}>
         <TaskExecutionControlsExample />
       </Section>
 
-      <Section title="Task Collection">
+      <Section title={tf("auto.dad6954248daa008")}>
         <p className="max-w-prose text-sm text-muted-foreground">
           CollectionToolbar owns shared geometry while each page owns its state and behavior.
           The canonical task row is opt-in during migration: status leads, unread work uses
           title emphasis, metadata remains stable, and the task identifier trails.
         </p>
         <CollectionToolbar
-          context={<span className="text-sm font-medium">Recent tasks</span>}
-          search={<Input aria-label="Search task collection example" placeholder="Search tasks..." />}
-          controls={<Button variant="outline" size="sm">Filter</Button>}
-          actions={<Button size="sm">New task</Button>}
-          feedback={<span className="text-xs text-muted-foreground">1 task · Updated newest first</span>}
+          context={<span className="text-sm font-medium">{tf("auto.7b940d847536b182")}</span>}
+          search={<Input aria-label={tf("auto.386bdeb611f05b04")} placeholder={tf("auto.c1af8370c5f68986")} />}
+          controls={<Button variant="outline" size="sm">{tf("text.Filter")}</Button>}
+          actions={<Button size="sm">{tf("text.New task")}</Button>}
+          feedback={<span className="text-xs text-muted-foreground">{tf("auto.2d381e3ed912161c")}</span>}
         />
         <div className="overflow-hidden rounded-lg border border-border">
           <IssueRow
             issue={DESIGN_GUIDE_TASK}
             presentation="task"
             unreadState="visible"
-            metadata={<span className="text-xs text-muted-foreground">Updated 12m ago</span>}
-            actions={<Button variant="ghost" size="xs">More</Button>}
+            metadata={<span className="text-xs text-muted-foreground">{tf("auto.6991a5b75f2f410a")}</span>}
+            actions={<Button variant="ghost" size="xs">{tf("auto.d47d7cb0e4f8fd2b")}</Button>}
           />
         </div>
       </Section>
 
-      <Section title="Theme Toggle">
-        <SubSection title="Variants">
+      <Section title={tf("auto.cafbda6ab5494a0c")}>
+        <SubSection title={tf("auto.63d2643b059ee912")}>
           <div className="flex max-w-sm flex-col items-start gap-3">
             <ThemeToggle />
             <ThemeToggle variant="menu-action" />
@@ -612,8 +613,8 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  COLORS                                                       */}
       {/* ============================================================ */}
-      <Section title="Colors">
-        <SubSection title="Core">
+      <Section title={tf("auto.88c45d9e526c08dd")}>
+        <SubSection title={tf("auto.70ea1983c983deac")}>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Swatch name="Background" cssVar="--background" />
             <Swatch name="Foreground" cssVar="--foreground" />
@@ -630,14 +631,14 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="Sidebar">
+        <SubSection title={tf("auto.f7efa7bc1fc535ab")}>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Swatch name="Sidebar" cssVar="--sidebar" />
             <Swatch name="Sidebar border" cssVar="--sidebar-border" />
           </div>
         </SubSection>
 
-        <SubSection title="Chart">
+        <SubSection title={tf("auto.3e5b90ae053ff3e7")}>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Swatch name="Chart 1" cssVar="--chart-1" />
             <Swatch name="Chart 2" cssVar="--chart-2" />
@@ -651,7 +652,7 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  TYPOGRAPHY                                                   */}
       {/* ============================================================ */}
-      <Section title="Runner activity">
+      <Section title={tf("auto.4da41ca2c54f9911")}>
         <TaskChatRunnerActivityGroup item={{ id: "design-runner-activity", kind: "activity_phase", active: true, summary: "", interstitial: { id: "design-runner-commentary", kind: "message", author: "agent", text: "I’ll inspect the activity feed and check the layout.", interstitial: true }, items: [
           { id: "design-runner-read", kind: "tool", name: "read", target: "TaskChatRunnerTurn.tsx", status: "completed", detail: "Found the activity groups." },
           { id: "design-runner-check", kind: "tool", name: "exec_command", target: "pnpm check:token-gates", status: "in_progress" },
@@ -662,34 +663,34 @@ export function DesignGuide() {
         ] }} />
       </Section>
 
-      <Section title="Typography">
+      <Section title={tf("auto.cab94aba84f97f7f")}>
         <div className="space-y-3">
-          <h2 className="text-xl font-bold">Page Title — text-xl font-bold</h2>
-          <h2 className="text-lg font-semibold">Section Title — text-lg font-semibold</h2>
+          <h2 className="text-xl font-bold">{tf("auto.330ad43ba422cf58")}</h2>
+          <h2 className="text-lg font-semibold">{tf("auto.7ea638dc6fd93edc")}</h2>
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Section Heading — text-sm font-semibold uppercase tracking-wide
+            {tf("auto.42b0aa5754c7aff7")}
           </h3>
-          <p className="text-sm font-medium">Card Title — text-sm font-medium</p>
-          <p className="text-sm font-semibold">Card Title Alt — text-sm font-semibold</p>
-          <p className="text-sm">Body text — text-sm</p>
+          <p className="text-sm font-medium">{tf("auto.3791e01e57285cca")}</p>
+          <p className="text-sm font-semibold">{tf("auto.893bc7d76711d4b7")}</p>
+          <p className="text-sm">{tf("auto.dd4663cc6f27d0d7")}</p>
           <p className="text-sm text-muted-foreground">
-            Muted description — text-sm text-muted-foreground
+            {tf("auto.258b5dfff1a3b8ad")}
           </p>
           <p className="text-xs text-muted-foreground">
-            Tiny label — text-xs text-muted-foreground
+            {tf("auto.96b05260cf611f07")}
           </p>
           <p className="text-sm font-mono text-muted-foreground">
-            Mono identifier — text-sm font-mono text-muted-foreground
+            {tf("auto.49119ceec8d8f60d")}
           </p>
-          <p className="text-2xl font-bold">Large stat — text-2xl font-bold</p>
-          <p className="font-mono text-xs">Log/code text — font-mono text-xs</p>
+          <p className="text-2xl font-bold">{tf("auto.056eb9dda0bfbaed")}</p>
+          <p className="font-mono text-xs">{tf("auto.92c7b7d0ef3754ac")}</p>
         </div>
       </Section>
 
       {/* ============================================================ */}
       {/*  SPACING & RADIUS                                             */}
       {/* ============================================================ */}
-      <Section title="Radius">
+      <Section title={tf("auto.6fe0661c82d10d34")}>
         <div className="flex items-end gap-4 flex-wrap">
           {[
             ["sm", "var(--radius-sm)"],
@@ -712,28 +713,28 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  BUTTONS                                                      */}
       {/* ============================================================ */}
-      <Section title="Buttons">
-        <SubSection title="Variants">
+      <Section title={tf("auto.d452583a74d0e772")}>
+        <SubSection title={tf("auto.63d2643b059ee912")}>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="default">Default</Button>
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="outline">Outline</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button variant="destructive">Destructive</Button>
-            <Button variant="link">Link</Button>
+            <Button variant="default">{tf("text.Default")}</Button>
+            <Button variant="secondary">{tf("auto.62f2ccfffcc5103e")}</Button>
+            <Button variant="outline">{tf("auto.eabbf3abaf8d98ab")}</Button>
+            <Button variant="ghost">{tf("auto.df1bc4984a055e10")}</Button>
+            <Button variant="destructive">{tf("auto.c3e58a73609d1094")}</Button>
+            <Button variant="link">{tf("auto.a6a32dbc5618ea39")}</Button>
           </div>
         </SubSection>
 
-        <SubSection title="Sizes">
+        <SubSection title={tf("auto.74a3978d10045c73")}>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button size="xs">Extra Small</Button>
-            <Button size="sm">Small</Button>
-            <Button size="default">Default</Button>
-            <Button size="lg">Large</Button>
+            <Button size="xs">{tf("auto.c7b3e43848e28867")}</Button>
+            <Button size="sm">{tf("auto.5263293fc202649b")}</Button>
+            <Button size="default">{tf("text.Default")}</Button>
+            <Button size="lg">{tf("auto.ab80540d98d27456")}</Button>
           </div>
         </SubSection>
 
-        <SubSection title="Icon buttons">
+        <SubSection title={tf("auto.19cccce848ccb3a9")}>
           <div className="flex items-center gap-2 flex-wrap">
             <Button variant="ghost" size="icon-xs"><Search /></Button>
             <Button variant="ghost" size="icon-sm"><Search /></Button>
@@ -742,19 +743,19 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="With icons">
+        <SubSection title={tf("auto.1f71f4bc7203e22d")}>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button><Plus /> New Issue</Button>
-            <Button variant="outline"><Upload /> Upload</Button>
-            <Button variant="destructive"><Trash2 /> Delete</Button>
-            <Button size="sm"><Plus /> Add</Button>
+            <Button><Plus /> {tf("auto.03a81df699d65e22")}</Button>
+            <Button variant="outline"><Upload /> {tf("text.Upload")}</Button>
+            <Button variant="destructive"><Trash2 /> {tf("text.Delete")}</Button>
+            <Button size="sm"><Plus /> {tf("text.Add")}</Button>
           </div>
         </SubSection>
 
-        <SubSection title="States">
+        <SubSection title={tf("auto.2f6e9daec8e9b3b3")}>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button disabled>Disabled</Button>
-            <Button variant="outline" disabled>Disabled Outline</Button>
+            <Button disabled>{tf("text.Disabled")}</Button>
+            <Button variant="outline" disabled>{tf("auto.bbf6b43dcd5536e8")}</Button>
           </div>
         </SubSection>
       </Section>
@@ -762,14 +763,14 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  BADGES                                                       */}
       {/* ============================================================ */}
-      <Section title="Badges">
-        <SubSection title="Variants">
+      <Section title={tf("auto.185d8ef0ae5ea9b8")}>
+        <SubSection title={tf("auto.63d2643b059ee912")}>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="default">Default</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="outline">Outline</Badge>
-            <Badge variant="destructive">Destructive</Badge>
-            <Badge variant="ghost">Ghost</Badge>
+            <Badge variant="default">{tf("text.Default")}</Badge>
+            <Badge variant="secondary">{tf("auto.62f2ccfffcc5103e")}</Badge>
+            <Badge variant="outline">{tf("auto.eabbf3abaf8d98ab")}</Badge>
+            <Badge variant="destructive">{tf("auto.c3e58a73609d1094")}</Badge>
+            <Badge variant="ghost">{tf("auto.df1bc4984a055e10")}</Badge>
           </div>
         </SubSection>
       </Section>
@@ -777,8 +778,8 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  STATUS BADGES & ICONS                                        */}
       {/* ============================================================ */}
-      <Section title="Status System">
-        <SubSection title="StatusBadge (all statuses)">
+      <Section title={tf("auto.4805331bace6a93c")}>
+        <SubSection title={tf("auto.7640ba1e93309f72")}>
           <div className="flex items-center gap-2 flex-wrap">
             {[
               "active", "running", "paused", "idle", "archived", "planned",
@@ -792,7 +793,7 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="IssueStatusBadge (brand chip + glyph — PAP-75)">
+        <SubSection title={tf("auto.4f561819fd6f1039")}>
           <div className="flex items-center gap-2 flex-wrap">
             {["backlog", "todo", "in_progress", "in_review", "done", "blocked", "cancelled"].map(
               (s) => (
@@ -802,7 +803,7 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="StatusIcon (interactive)">
+        <SubSection title={tf("auto.f24d0f6de5e70c13")}>
           <div className="flex items-center gap-3 flex-wrap">
             {["backlog", "todo", "in_progress", "in_review", "done", "cancelled", "blocked"].map(
               (s) => (
@@ -821,7 +822,7 @@ export function DesignGuide() {
 
         {/* PAP-411: PriorityIcon showcase gated behind SHOW_TASK_PRIORITY_UI per board decision. */}
         {SHOW_TASK_PRIORITY_UI && (
-        <SubSection title="PriorityIcon (interactive)">
+        <SubSection title={tf("auto.7effddf508b2aa4a")}>
           <div className="flex items-center gap-3 flex-wrap">
             {["critical", "high", "medium", "low"].map((p) => (
               <div key={p} className="flex items-center gap-1.5">
@@ -837,7 +838,7 @@ export function DesignGuide() {
         </SubSection>
         )}
 
-        <SubSection title="Agent status dots">
+        <SubSection title={tf("auto.5c9ee51cc3eeb084")}>
           <div className="flex items-center gap-4 flex-wrap">
             {(["running", "active", "paused", "error", "archived"] as const).map((label) => (
               <div key={label} className="flex items-center gap-2">
@@ -850,7 +851,7 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="Run invocation badges">
+        <SubSection title={tf("auto.2b04ef6c4916e132")}>
           <div className="flex items-center gap-2 flex-wrap">
             {[
               ["timer", "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"],
@@ -865,21 +866,21 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="IssueReferencePill">
+        <SubSection title={tf("auto.88d5a36ca55d4817")}>
           <p className="text-xs text-muted-foreground">
             Used wherever a task is referenced — in markdown, the Related Work tab, and activity summaries.
-            Pass <code className="font-mono">status</code> to show the target issue&apos;s state at a glance.
-            Use <code className="font-mono">variant="property"</code> for compact badges with direct navigation.
-            Pass <code className="font-mono">onRemove</code> for a separate blocker removal control with reserved space.
-            Use <code className="font-mono">strikethrough</code> for &quot;removed&quot; contexts.
+            Pass <code className="font-mono">{tf("auto.073c1634c496cdb6")}</code> to show the target issue&apos;s state at a glance.
+            Use <code className="font-mono">{tf("auto.208e32e5b387eb4e")}</code> for compact badges with direct navigation.
+            Pass <code className="font-mono">{tf("auto.05c1bb8c62c4c737")}</code> for a separate blocker removal control with reserved space.
+            Use <code className="font-mono">{tf("auto.5c88563291c7da6a")}</code> for &quot;removed&quot; contexts.
           </p>
           <div className="flex items-center gap-2 flex-wrap">
-            <IssueReferencePill issue={{ id: "demo-1", identifier: "PAP-123", title: "Identifier only — no status yet" }} />
-            <IssueReferencePill issue={{ id: "demo-2", identifier: "PAP-456", title: "With in_progress status", status: "in_progress" }} />
-            <IssueReferencePill issue={{ id: "demo-3", identifier: "PAP-789", title: "Done status", status: "done" }} />
-            <IssueReferencePill issue={{ id: "demo-4", identifier: "PAP-101", title: "Blocked status", status: "blocked" }} />
-            <IssueReferencePill onRemove={() => window.alert("Blocker removed")} issue={{ id: "demo-blocker", identifier: "PAP-303", title: "Hover or focus to remove blocker", status: "in_review" }} />
-            <IssueReferencePill strikethrough issue={{ id: "demo-5", identifier: "PAP-202", title: "Removed (strikethrough)", status: "todo" }} />
+            <IssueReferencePill issue={{ id: "demo-1", identifier: "PAP-123", title: tf("auto.ceaa35d03a952280") }} />
+            <IssueReferencePill issue={{ id: "demo-2", identifier: "PAP-456", title: tf("auto.b0a7b6dfa9f1596a"), status: "in_progress" }} />
+            <IssueReferencePill issue={{ id: "demo-3", identifier: "PAP-789", title: tf("auto.a2c1d162e2e5af9c"), status: "done" }} />
+            <IssueReferencePill issue={{ id: "demo-4", identifier: "PAP-101", title: tf("auto.31b37cb6b7a814b1"), status: "blocked" }} />
+            <IssueReferencePill onRemove={() => window.alert(tf("auto.e7925435ba2c2aef"))} issue={{ id: "demo-blocker", identifier: "PAP-303", title: tf("auto.7407b822df2f2549"), status: "in_review" }} />
+            <IssueReferencePill strikethrough issue={{ id: "demo-5", identifier: "PAP-202", title: tf("auto.009f6b18d38ce66b"), status: "todo" }} />
           </div>
         </SubSection>
       </Section>
@@ -887,55 +888,55 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  AGENT CAPSULE                                                */}
       {/* ============================================================ */}
-      <Section title="Agent Capsule">
+      <Section title={tf("auto.4588fb04c37813c8")}>
         <p className="text-sm text-muted-foreground max-w-prose">
           The brand &quot;capsule is the agent&quot; motif. A single agent reads as a tall
           pill that moves through three states as it comes to life. The online fill uses
-          the live brand agent-gradient tokens (<code className="font-mono">--agent-Na</code> →{" "}
-          <code className="font-mono">--agent-Nb</code>); <code className="font-mono">prefers-reduced-motion</code>{" "}
+          the live brand agent-gradient tokens (<code className="font-mono">{tf("auto.c8c6138a51d30a82")}</code> →{" "}
+          <code className="font-mono">{tf("auto.408dccb11ac4ae75")}</code>); <code className="font-mono">{tf("auto.9f005b166d57745e")}</code>{" "}
           skips the liquid rise and pulses and renders the final state.
         </p>
-        <SubSection title="States">
+        <SubSection title={tf("auto.2f6e9daec8e9b3b3")}>
           <div className="flex items-end gap-10">
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="slot" />
-              <span className="text-xs text-muted-foreground">slot</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.6558838331b742a6")}</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="configured" />
-              <span className="text-xs text-muted-foreground">configured</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.20158224750041d6")}</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="online" gradient={5} />
-              <span className="text-xs text-muted-foreground">online</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.f6fc84c9f21c2490")}</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="online" gradient={5} glow="blue" />
-              <span className="text-xs text-muted-foreground">online · blue glow</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.4d1505f281f0d31e")}</span>
             </div>
           </div>
         </SubSection>
-        <SubSection title="Sizes">
+        <SubSection title={tf("auto.74a3978d10045c73")}>
           <div className="flex items-end gap-8">
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="online" size="sm" gradient={1} />
-              <span className="text-xs text-muted-foreground">sm</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.5af308bec132bd49")}</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="online" size="md" gradient={4} />
-              <span className="text-xs text-muted-foreground">md</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.21262a3cb5337627")}</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="online" size="lg" gradient={8} />
-              <span className="text-xs text-muted-foreground">lg</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.0e6ba33f8bc8f415")}</span>
             </div>
             <div className="flex flex-col items-center gap-2">
               <AgentCapsule state="online" size={{ width: 28, height: 96 }} gradient={6} />
-              <span className="text-xs text-muted-foreground">custom px</span>
+              <span className="text-xs text-muted-foreground">{tf("auto.a051fd3454861a6f")}</span>
             </div>
           </div>
         </SubSection>
-        <SubSection title="Gradients">
+        <SubSection title={tf("auto.ab64614fdfe4f15b")}>
           <div className="flex items-end gap-3 flex-wrap">
             {Array.from({ length: AGENT_GRADIENT_COUNT }, (_, i) => (
               <div key={i} className="flex flex-col items-center gap-1.5">
@@ -950,38 +951,38 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  FORM ELEMENTS                                                */}
       {/* ============================================================ */}
-      <Section title="Form Elements">
+      <Section title={tf("auto.87340ea44c3d8e31")}>
         <div className="grid gap-6 md:grid-cols-2">
-          <SubSection title="Input">
-            <Input placeholder="Default input" />
-            <Input placeholder="Disabled input" disabled className="mt-2" />
+          <SubSection title={tf("text.Input")}>
+            <Input placeholder={tf("auto.6364c7ae20cb3b83")} />
+            <Input placeholder={tf("auto.4ba876c7aa2c93d1")} disabled className="mt-2" />
           </SubSection>
 
-          <SubSection title="Textarea">
-            <Textarea placeholder="Write something..." />
+          <SubSection title={tf("auto.467065a16a2e9fc8")}>
+            <Textarea placeholder={tf("auto.ff2fd355e960a31c")} />
           </SubSection>
 
-          <SubSection title="Checkbox & Label">
+          <SubSection title={tf("auto.cdc3eb592253857c")}>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Checkbox id="check1" defaultChecked />
-                <Label htmlFor="check1">Checked item</Label>
+                <Label htmlFor="check1">{tf("auto.81085a7f9027efcc")}</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Checkbox id="check2" />
-                <Label htmlFor="check2">Unchecked item</Label>
+                <Label htmlFor="check2">{tf("auto.0b21710e717fd336")}</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Checkbox id="check3" disabled />
-                <Label htmlFor="check3">Disabled item</Label>
+                <Label htmlFor="check3">{tf("auto.40b3f9be22366117")}</Label>
               </div>
             </div>
           </SubSection>
 
-          <SubSection title="Inline Editor">
+          <SubSection title={tf("auto.3485cc646e1ea0c3")}>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Title (single-line)</p>
+                <p className="text-xs text-muted-foreground mb-1">{tf("auto.03d397b729e3e303")}</p>
                 <InlineEditor
                   value={inlineTitle}
                   onSave={setInlineTitle}
@@ -990,7 +991,7 @@ export function DesignGuide() {
                 />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Body text (single-line)</p>
+                <p className="text-xs text-muted-foreground mb-1">{tf("auto.fc872109e5fd64e5")}</p>
                 <InlineEditor
                   value={inlineText}
                   onSave={setInlineText}
@@ -999,13 +1000,13 @@ export function DesignGuide() {
                 />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Description (multiline, auto-sizing)</p>
+                <p className="text-xs text-muted-foreground mb-1">{tf("auto.5926a0e426e01c76")}</p>
                 <InlineEditor
                   value={inlineDesc}
                   onSave={setInlineDesc}
                   as="p"
                   className="text-sm text-muted-foreground"
-                  placeholder="Add a description..."
+                  placeholder={tf("auto.eed0f05bd942078d")}
                   multiline
                 />
               </div>
@@ -1017,33 +1018,33 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  SELECT                                                       */}
       {/* ============================================================ */}
-      <Section title="Select">
+      <Section title={tf("auto.2a78025de6aae5e7")}>
         <div className="grid gap-6 md:grid-cols-2">
-          <SubSection title="Default size">
+          <SubSection title={tf("auto.5cbce0f8801347fc")}>
             <Select value={selectValue} onValueChange={setSelectValue}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder={tf("auto.f4d3c2a2e248dc55")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="backlog">Backlog</SelectItem>
-                <SelectItem value="todo">Todo</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="in_review">In Review</SelectItem>
-                <SelectItem value="done">Done</SelectItem>
+                <SelectItem value="backlog">{tf("status.backlog")}</SelectItem>
+                <SelectItem value="todo">{tf("auto.4ff402d768211082")}</SelectItem>
+                <SelectItem value="in_progress">{tf("auto.b4cc4b07c300103a")}</SelectItem>
+                <SelectItem value="in_review">{tf("auto.2677214a9268a547")}</SelectItem>
+                <SelectItem value="done">{tf("text.Done")}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">Current value: {selectValue}</p>
           </SubSection>
-          <SubSection title="Small trigger">
+          <SubSection title={tf("auto.bf7c66283dfd81f5")}>
             <Select defaultValue="high">
               <SelectTrigger size="sm" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="critical">{tf("auto.427dd2969bd140be")}</SelectItem>
+                <SelectItem value="high">{tf("auto.c4ebc6d4a5832cd9")}</SelectItem>
+                <SelectItem value="medium">{tf("auto.8e588cd187741f1c")}</SelectItem>
+                <SelectItem value="low">{tf("auto.f793de205ead5ac3")}</SelectItem>
               </SelectContent>
             </Select>
           </SubSection>
@@ -1053,34 +1054,34 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  DROPDOWN MENU                                                */}
       {/* ============================================================ */}
-      <Section title="Dropdown Menu">
+      <Section title={tf("auto.d5c53c6369be5029")}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
-              Quick Actions
+              {tf("auto.2cc2b6f7f200e65c")}
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuItem>
               <Check className="h-4 w-4" />
-              Mark as done
+              {tf("auto.62aa4b87cc523455")}
               <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <BookOpen className="h-4 w-4" />
-              Open docs
+              {tf("auto.76deaf7d26b92ba0")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
               checked={menuChecked}
               onCheckedChange={(value) => setMenuChecked(value === true)}
             >
-              Watch issue
+              {tf("auto.3e773f12bbf4f598")}
             </DropdownMenuCheckboxItem>
             <DropdownMenuItem variant="destructive">
               <Trash2 className="h-4 w-4" />
-              Delete issue
+              {tf("auto.085be85d203ebab4")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -1089,17 +1090,17 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  POPOVER                                                      */}
       {/* ============================================================ */}
-      <Section title="Popover">
+      <Section title={tf("auto.064f6ac1a7897842")}>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm">Open Popover</Button>
+            <Button variant="outline" size="sm">{tf("auto.6d22c4c60d3b783a")}</Button>
           </PopoverTrigger>
           <PopoverContent className="space-y-2">
-            <p className="text-sm font-medium">Agent heartbeat</p>
+            <p className="text-sm font-medium">{tf("auto.ed550be0a33790dd")}</p>
             <p className="text-xs text-muted-foreground">
-              Last run succeeded 24s ago. Next timer run in 9m.
+              {tf("auto.d3a181a128e87378")}
             </p>
-            <Button size="xs">Wake now</Button>
+            <Button size="xs">{tf("auto.b14d667b45ef586d")}</Button>
           </PopoverContent>
         </Popover>
       </Section>
@@ -1107,7 +1108,7 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  COLLAPSIBLE                                                  */}
       {/* ============================================================ */}
-      <Section title="Collapsible">
+      <Section title={tf("auto.d4a5d5f8fd9b6852")}>
         <Collapsible open={collapsibleOpen} onOpenChange={setCollapsibleOpen} className="space-y-2">
           <CollapsibleTrigger asChild>
             <Button variant="outline" size="sm">
@@ -1116,8 +1117,8 @@ export function DesignGuide() {
           </CollapsibleTrigger>
           <CollapsibleContent className="rounded-md border border-border p-3">
             <div className="space-y-2">
-              <Label htmlFor="owner-filter">Owner</Label>
-              <Input id="owner-filter" placeholder="Filter by agent name" />
+              <Label htmlFor="owner-filter">{tf("text.Owner")}</Label>
+              <Input id="owner-filter" placeholder={tf("auto.0f60d859d663d733")} />
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -1126,29 +1127,29 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  SHEET                                                        */}
       {/* ============================================================ */}
-      <Section title="Sheet">
+      <Section title={tf("auto.54bf0ebbfb3e0e37")}>
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" size="sm">Open Side Panel</Button>
+            <Button variant="outline" size="sm">{tf("auto.6451992b207c2dd8")}</Button>
           </SheetTrigger>
           <SheetContent side="right">
             <SheetHeader>
-              <SheetTitle>Issue Properties</SheetTitle>
-              <SheetDescription>Edit metadata without leaving the current page.</SheetDescription>
+              <SheetTitle>{tf("auto.851c108249a26294")}</SheetTitle>
+              <SheetDescription>{tf("auto.16dc84b3666f1c6c")}</SheetDescription>
             </SheetHeader>
             <div className="space-y-4 px-4">
               <div className="space-y-1">
-                <Label htmlFor="sheet-title">Title</Label>
+                <Label htmlFor="sheet-title">{tf("text.Title")}</Label>
                 <Input id="sheet-title" defaultValue="Improve onboarding docs" />
               </div>
               <div className="space-y-1">
-                <Label htmlFor="sheet-description">Description</Label>
+                <Label htmlFor="sheet-description">{tf("text.Description")}</Label>
                 <Textarea id="sheet-description" defaultValue="Capture setup pitfalls and screenshots." />
               </div>
             </div>
             <SheetFooter>
-              <Button variant="outline">Cancel</Button>
-              <Button>Save</Button>
+              <Button variant="outline">{tf("text.Cancel")}</Button>
+              <Button>{tf("text.Save")}</Button>
             </SheetFooter>
           </SheetContent>
         </Sheet>
@@ -1157,7 +1158,7 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  SCROLL AREA                                                  */}
       {/* ============================================================ */}
-      <Section title="Scroll Area">
+      <Section title={tf("auto.9b26d240abb6918e")}>
         <ScrollArea className="h-36 rounded-md border border-border">
           <div className="space-y-2 p-3">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -1172,31 +1173,31 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  COMMAND                                                      */}
       {/* ============================================================ */}
-      <Section title="Command (CMDK)">
+      <Section title={tf("auto.b42efd2f38e43986")}>
         <div className="rounded-md border border-border">
           <Command>
-            <CommandInput placeholder="Type a command or search..." />
+            <CommandInput placeholder={tf("auto.14d048ecc3bd0384")} />
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandEmpty>{tf("text.No results found.")}</CommandEmpty>
               <CommandGroup heading="Pages">
                 <CommandItem>
                   <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
+                  {tf("text.Dashboard")}
                 </CommandItem>
                 <CommandItem>
                   <CircleDot className="h-4 w-4" />
-                  Issues
+                  {tf("auto.666067dd376e5d45")}
                 </CommandItem>
               </CommandGroup>
               <CommandSeparator />
               <CommandGroup heading="Actions">
                 <CommandItem>
                   <CommandIcon className="h-4 w-4" />
-                  Open command palette
+                  {tf("auto.c022b19a38a632d9")}
                 </CommandItem>
                 <CommandItem>
                   <Plus className="h-4 w-4" />
-                  Create new issue
+                  {tf("auto.f27a451c16eaf14c")}
                 </CommandItem>
               </CommandGroup>
             </CommandList>
@@ -1207,19 +1208,19 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  BREADCRUMB                                                   */}
       {/* ============================================================ */}
-      <Section title="Breadcrumb">
+      <Section title={tf("auto.2bd873d6c734e63e")}>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="#">Projects</BreadcrumbLink>
+              <BreadcrumbLink href="#">{tf("text.Projects")}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="#">Paperclip App</BreadcrumbLink>
+              <BreadcrumbLink href="#">{tf("auto.a2afee2c12319c20")}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Issue List</BreadcrumbPage>
+              <BreadcrumbPage>{tf("auto.b8a227c7fc41bc78")}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -1228,8 +1229,8 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  CARDS                                                        */}
       {/* ============================================================ */}
-      <Section title="Cards">
-        <SubSection title="Dashboard agent runs">
+      <Section title={tf("auto.a52fcbbc33644d31")}>
+        <SubSection title={tf("auto.0aaef70331351062")}>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {["running", "queued", "succeeded", "failed", "timed_out", "cancelled", "interrupted"].map((status) => (
               <AgentRunCard
@@ -1240,34 +1241,34 @@ export function DesignGuide() {
                   status, adapterType: "codex_local", invocationSource: "on_demand", triggerDetail: "manual",
                   startedAt: null, finishedAt: null, createdAt: "2026-09-11T12:00:00Z", issueId: "design-guide-task",
                 }}
-                issue={{ identifier: "PAP-559", title: "Recreate this wireframe on pages Paperclip", status: status === "succeeded" ? "done" : "in_progress" }}
+                issue={{ identifier: "PAP-559", title: tf("auto.d70afc1d3c4aa824"), status: status === "succeeded" ? "done" : "in_progress" }}
               />
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">The dashboard and Live runs page use the same compact cards. In-progress task icons animate across the app, including between runs, to represent task workflow status. Live indicators report active execution. Open a run to view its status and transcript.</p>
+          <p className="text-xs text-muted-foreground">{tf("auto.27b8dd399bd33a21")}</p>
         </SubSection>
-        <SubSection title="Standard Card">
+        <SubSection title={tf("auto.e00864532bc47255")}>
           <Card>
             <CardHeader>
-              <CardTitle>Card Title</CardTitle>
-              <CardDescription>Card description with supporting text.</CardDescription>
+              <CardTitle>{tf("auto.1441a2959af749da")}</CardTitle>
+              <CardDescription>{tf("auto.d94e320eeedd0562")}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm">Card content goes here. This is the main body area.</p>
+              <p className="text-sm">{tf("auto.86e31a710d6c4645")}</p>
             </CardContent>
             <CardFooter className="gap-2">
-              <Button size="sm">Action</Button>
-              <Button variant="outline" size="sm">Cancel</Button>
+              <Button size="sm">{tf("auto.64cff1319d2fd2cb")}</Button>
+              <Button variant="outline" size="sm">{tf("text.Cancel")}</Button>
             </CardFooter>
           </Card>
         </SubSection>
 
-        <SubSection title="Metric Cards">
+        <SubSection title={tf("auto.b0916fef0db094a0")}>
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <MetricCard icon={Bot} value={12} label="Active Agents" description="+3 this week" />
-            <MetricCard icon={CircleDot} value={48} label="Open Issues" />
-            <MetricCard icon={DollarSign} value="$1,234" label="Monthly Cost" description="Under budget" />
-            <MetricCard icon={Zap} value="99.9%" label="Uptime" />
+            <MetricCard icon={Bot} value={12} label={tf("auto.86622a874660b466")} description={tf("auto.6f7320b6f6a028cd")} />
+            <MetricCard icon={CircleDot} value={48} label={tf("auto.4e2912a774ef86f8")} />
+            <MetricCard icon={DollarSign} value="$1,234" label={tf("auto.7294a203a4350828")} description={tf("auto.fffd741228ea2d63")} />
+            <MetricCard icon={Zap} value="99.9%" label={tf("auto.d63ab4711473b039")} />
           </div>
         </SubSection>
       </Section>
@@ -1275,45 +1276,45 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  TABS                                                         */}
       {/* ============================================================ */}
-      <Section title="Tabs">
-        <SubSection title="Default (pill) variant">
+      <Section title={tf("auto.8e5ea509893e6dfd")}>
+        <SubSection title={tf("auto.ec1cb396b05090d1")}>
           <Tabs defaultValue="overview">
             <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="runs">Runs</TabsTrigger>
-              <TabsTrigger value="config">Config</TabsTrigger>
-              <TabsTrigger value="costs">Costs</TabsTrigger>
+              <TabsTrigger value="overview">{tf("text.Overview")}</TabsTrigger>
+              <TabsTrigger value="runs">{tf("text.Runs")}</TabsTrigger>
+              <TabsTrigger value="config">{tf("auto.87e89abb4c1c551f")}</TabsTrigger>
+              <TabsTrigger value="costs">{tf("text.Costs")}</TabsTrigger>
             </TabsList>
             <TabsContent value="overview">
-              <p className="text-sm text-muted-foreground py-4">Overview tab content.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.b2cef641163c0b36")}</p>
             </TabsContent>
             <TabsContent value="runs">
-              <p className="text-sm text-muted-foreground py-4">Runs tab content.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.6ca368f49f1e4faa")}</p>
             </TabsContent>
             <TabsContent value="config">
-              <p className="text-sm text-muted-foreground py-4">Config tab content.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.64f6f1ee3ea1ed14")}</p>
             </TabsContent>
             <TabsContent value="costs">
-              <p className="text-sm text-muted-foreground py-4">Costs tab content.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.f1e79d4d0dd77f5f")}</p>
             </TabsContent>
           </Tabs>
         </SubSection>
 
-        <SubSection title="Line variant">
+        <SubSection title={tf("auto.aa51396438b5f528")}>
           <Tabs defaultValue="summary">
             <TabsList variant="line">
-              <TabsTrigger value="summary">Summary</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="comments">Comments</TabsTrigger>
+              <TabsTrigger value="summary">{tf("text.Summary")}</TabsTrigger>
+              <TabsTrigger value="details">{tf("text.Details")}</TabsTrigger>
+              <TabsTrigger value="comments">{tf("text.Comments")}</TabsTrigger>
             </TabsList>
             <TabsContent value="summary">
-              <p className="text-sm text-muted-foreground py-4">Summary content with underline tabs.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.ba0d2125e463b571")}</p>
             </TabsContent>
             <TabsContent value="details">
-              <p className="text-sm text-muted-foreground py-4">Details content.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.255afa723eaba21f")}</p>
             </TabsContent>
             <TabsContent value="comments">
-              <p className="text-sm text-muted-foreground py-4">Comments content.</p>
+              <p className="text-sm text-muted-foreground py-4">{tf("auto.e0def86bb69f5775")}</p>
             </TabsContent>
           </Tabs>
         </SubSection>
@@ -1322,7 +1323,7 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  ENTITY ROWS                                                  */}
       {/* ============================================================ */}
-      <Section title="Entity Rows">
+      <Section title={tf("auto.6d199ef5141308ed")}>
         <div className="border border-border rounded-md">
           <EntityRow
             leading={
@@ -1333,8 +1334,8 @@ export function DesignGuide() {
               </>
             }
             identifier="PAP-001"
-            title="Implement authentication flow"
-            subtitle="Responsible: Agent Alpha"
+            title={tf("auto.8b4c3fedf954a051")}
+            subtitle={tf("auto.00fdc4441096031e")}
             trailing={<IssueStatusBadge status="in_progress" />}
             onClick={() => {}}
           />
@@ -1346,8 +1347,8 @@ export function DesignGuide() {
               </>
             }
             identifier="PAP-002"
-            title="Set up CI/CD pipeline"
-            subtitle="Completed 2 days ago"
+            title={tf("auto.bbae449675484c25")}
+            subtitle={tf("auto.2b00e1ecb757c504")}
             trailing={<IssueStatusBadge status="done" />}
             onClick={() => {}}
           />
@@ -1359,7 +1360,7 @@ export function DesignGuide() {
               </>
             }
             identifier="PAP-003"
-            title="Write API documentation"
+            title={tf("auto.7ffde9f0129f0b9b")}
             trailing={<IssueStatusBadge status="todo" />}
             onClick={() => {}}
           />
@@ -1371,17 +1372,17 @@ export function DesignGuide() {
               </>
             }
             identifier="PAP-004"
-            title="Deploy to production"
-            subtitle="Blocked by PAP-001"
+            title={tf("auto.edc8c3dc0e695ade")}
+            subtitle={tf("auto.c8d7dcd82d29b320")}
             trailing={<IssueStatusBadge status="blocked" />}
             selected
           />
         </div>
-        <SubSection title="Membership action">
+        <SubSection title={tf("auto.3ac5eb84ef7ff76b")}>
           <div className="border border-border rounded-md">
             <EntityRow
-              title="Joined resource"
-              subtitle="Hover or focus the row to reveal the reserved action slot."
+              title={tf("auto.33c4f605af1e1377")}
+              subtitle={tf("auto.232477a5f80bb939")}
               className="group"
               trailing={
                 <MembershipAction
@@ -1393,8 +1394,8 @@ export function DesignGuide() {
               }
             />
             <EntityRow
-              title="Left resource"
-              subtitle="Persistent action with dimmed row content."
+              title={tf("auto.cdd43bd9e0fec441")}
+              subtitle={tf("auto.792ff7ccc7e315b5")}
               className="group text-foreground/55"
               trailing={
                 <MembershipAction
@@ -1406,8 +1407,8 @@ export function DesignGuide() {
               }
             />
             <EntityRow
-              title="Leaving resource"
-              subtitle="Disabled while the optimistic mutation is pending."
+              title={tf("auto.64205cc843d51ae4")}
+              subtitle={tf("auto.1d2ed02511b09bd7")}
               className="group text-foreground/55"
               trailing={
                 <MembershipAction
@@ -1421,8 +1422,8 @@ export function DesignGuide() {
               }
             />
             <EntityRow
-              title="Joining resource"
-              subtitle="The target state is visible immediately while the server confirms."
+              title={tf("auto.6dcaccef0dd427c0")}
+              subtitle={tf("auto.81c33361157a142e")}
               className="group"
               trailing={
                 <MembershipAction
@@ -1442,7 +1443,7 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  FILTER BAR                                                   */}
       {/* ============================================================ */}
-      <Section title="Filter Bar">
+      <Section title={tf("auto.75d3ce3739283a7b")}>
         <FilterBar
           filters={filters}
           onRemove={(key) => setFilters((f) => f.filter((x) => x.key !== key))}
@@ -1454,15 +1455,15 @@ export function DesignGuide() {
             size="sm"
             onClick={() =>
               setFilters([
-                { key: "status", label: "Status", value: "Active" },
+                { key: "status", label: tf("text.Status"), value: "Active" },
                 // PAP-411: priority filter demo row suppressed while SHOW_TASK_PRIORITY_UI is off.
                 ...(SHOW_TASK_PRIORITY_UI
-                  ? [{ key: "priority", label: "Priority", value: "High" } as FilterValue]
+                  ? [{ key: "priority", label: tf("text.Priority"), value: "High" } as FilterValue]
                   : []),
               ])
             }
           >
-            Reset filters
+            {tf("auto.10afa98480f2d06c")}
           </Button>
         )}
       </Section>
@@ -1470,16 +1471,16 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  AVATARS                                                      */}
       {/* ============================================================ */}
-      <Section title="Avatars">
-        <SubSection title="Sizes">
+      <Section title={tf("auto.fedfdc14d4f7bbb0")}>
+        <SubSection title={tf("auto.74a3978d10045c73")}>
           <div className="flex items-center gap-3">
-            <Avatar size="sm"><AvatarFallback>SM</AvatarFallback></Avatar>
-            <Avatar><AvatarFallback>DF</AvatarFallback></Avatar>
-            <Avatar size="lg"><AvatarFallback>LG</AvatarFallback></Avatar>
+            <Avatar size="sm"><AvatarFallback>{tf("auto.6ff9250a7351ff2f")}</AvatarFallback></Avatar>
+            <Avatar><AvatarFallback>{tf("auto.4a3161bbf086290c")}</AvatarFallback></Avatar>
+            <Avatar size="lg"><AvatarFallback>{tf("auto.b870b7809747623d")}</AvatarFallback></Avatar>
           </div>
         </SubSection>
 
-        <SubSection title="Group">
+        <SubSection title={tf("auto.34ca0e76608842ff")}>
           <AvatarGroup>
             <Avatar><AvatarFallback>A1</AvatarFallback></Avatar>
             <Avatar><AvatarFallback>A2</AvatarFallback></Avatar>
@@ -1489,8 +1490,8 @@ export function DesignGuide() {
         </SubSection>
       </Section>
 
-      <Section title="App logos">
-        <SubSection title="Official marks and runtime fallback">
+      <Section title={tf("auto.b9810433a0411a94")}>
+        <SubSection title={tf("auto.ebbfad89e338f3ab")}>
           <div className="flex items-center gap-3">
             <AppLogo
               name="Notion"
@@ -1507,8 +1508,8 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  IDENTITY                                                     */}
       {/* ============================================================ */}
-      <Section title="Identity">
-        <SubSection title="Sizes">
+      <Section title={tf("auto.999f23fcd7bec707")}>
+        <SubSection title={tf("auto.74a3978d10045c73")}>
           <div className="flex items-center gap-6">
             <Identity name="Agent Alpha" size="sm" />
             <Identity name="Agent Alpha" />
@@ -1516,7 +1517,7 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="Initials derivation">
+        <SubSection title={tf("auto.9cec7db78edf46ed")}>
           <div className="flex flex-col gap-2">
             <Identity name="CEO Agent" size="sm" />
             <Identity name="Alpha" size="sm" />
@@ -1524,7 +1525,7 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="Custom initials">
+        <SubSection title={tf("auto.dba050820f8b6600")}>
           <Identity name="Backend Service" initials="BS" size="sm" />
         </SubSection>
       </Section>
@@ -1532,19 +1533,19 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  TOOLTIPS                                                     */}
       {/* ============================================================ */}
-      <Section title="Tooltips">
+      <Section title={tf("auto.1cfb0bd9a2d1c43a")}>
         <div className="flex items-center gap-4">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="sm">Hover me</Button>
+              <Button variant="outline" size="sm">{tf("auto.1d8fb154c6f5adfd")}</Button>
             </TooltipTrigger>
-            <TooltipContent>This is a tooltip</TooltipContent>
+            <TooltipContent>{tf("auto.cf6a28c0c440b506")}</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon-sm"><Settings /></Button>
             </TooltipTrigger>
-            <TooltipContent>Settings</TooltipContent>
+            <TooltipContent>{tf("text.Settings")}</TooltipContent>
           </Tooltip>
         </div>
       </Section>
@@ -1552,31 +1553,31 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  DIALOG                                                       */}
       {/* ============================================================ */}
-      <Section title="Dialog">
+      <Section title={tf("auto.69b51517d04bcfed")}>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">Open Dialog</Button>
+            <Button variant="outline">{tf("auto.7482430eea717fab")}</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Dialog Title</DialogTitle>
+              <DialogTitle>{tf("auto.f40917a70065210e")}</DialogTitle>
               <DialogDescription>
-                This is a sample dialog showing the standard layout with header, content, and footer.
+                {tf("auto.146d0c0db9e13c11")}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div>
-                <Label>Name</Label>
-                <Input placeholder="Enter a name" className="mt-1.5" />
+                <Label>{tf("text.Name")}</Label>
+                <Input placeholder={tf("auto.c13b0e0858d5b81b")} className="mt-1.5" />
               </div>
               <div>
-                <Label>Description</Label>
-                <Textarea placeholder="Describe..." className="mt-1.5" />
+                <Label>{tf("text.Description")}</Label>
+                <Textarea placeholder={tf("auto.682fdb6b17e54acb")} className="mt-1.5" />
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline">Cancel</Button>
-              <Button>Save</Button>
+              <Button variant="outline">{tf("text.Cancel")}</Button>
+              <Button>{tf("text.Save")}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -1585,12 +1586,12 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  EMPTY STATE                                                  */}
       {/* ============================================================ */}
-      <Section title="Empty State">
+      <Section title={tf("auto.1a9692274dcc6b1f")}>
         <div className="border border-border rounded-md">
           <EmptyState
             icon={Inbox}
-            message="No items to show. Create your first one to get started."
-            action="Create Item"
+            message={tf("auto.93e06ed50fa472a5")}
+            action={tf("auto.79d3f1d08f0cfc58")}
             onAction={() => {}}
           />
         </div>
@@ -1599,12 +1600,12 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  PROGRESS BARS                                                */}
       {/* ============================================================ */}
-      <Section title="Progress Bars (Budget)">
+      <Section title={tf("auto.2faeb28cccd56f15")}>
         <div className="space-y-3">
           {[
-            { label: "Under budget (40%)", pct: 40, color: "bg-green-400" },
-            { label: "Warning (75%)", pct: 75, color: "bg-yellow-400" },
-            { label: "Over budget (95%)", pct: 95, color: "bg-red-400" },
+            { label: tf("auto.2867ec0792afc0e9"), pct: 40, color: "bg-green-400" },
+            { label: tf("auto.92ca76cb48d6b452"), pct: 75, color: "bg-yellow-400" },
+            { label: tf("auto.afc09c0882546278"), pct: 95, color: "bg-red-400" },
           ].map(({ label, pct, color }) => (
             <div key={label} className="space-y-1">
               <div className="flex items-center justify-between">
@@ -1625,21 +1626,21 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  LOG VIEWER                                                   */}
       {/* ============================================================ */}
-      <Section title="Log Viewer">
+      <Section title={tf("auto.b26528cf21f8b605")}>
         <div className="bg-neutral-950 rounded-lg p-3 font-mono text-xs max-h-80 overflow-y-auto">
-          <div className="text-foreground">[12:00:01] INFO  Agent started successfully</div>
-          <div className="text-foreground">[12:00:02] INFO  Processing task PAP-001</div>
-          <div className="text-yellow-400">[12:00:05] WARN  Rate limit approaching (80%)</div>
-          <div className="text-foreground">[12:00:08] INFO  Task PAP-001 completed</div>
-          <div className="text-red-400">[12:00:12] ERROR Connection timeout to upstream service</div>
-          <div className="text-blue-300">[12:00:12] SYS   Retrying connection in 5s...</div>
-          <div className="text-foreground">[12:00:17] INFO  Reconnected successfully</div>
+          <div className="text-foreground">{tf("auto.d3a5d13f33523eb3")}</div>
+          <div className="text-foreground">{tf("auto.a88e2f216a3b00e6")}</div>
+          <div className="text-yellow-400">{tf("auto.b5573bcb8304d4f2")}</div>
+          <div className="text-foreground">{tf("auto.91e5c5f5f08a46dc")}</div>
+          <div className="text-red-400">{tf("auto.65dcd74cdd0ddc86")}</div>
+          <div className="text-blue-300">{tf("auto.e1d8a89afe8f0cd3")}</div>
+          <div className="text-foreground">{tf("auto.8c3e2f64ade62135")}</div>
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 animate-pulse" />
               <span className="inline-flex h-full w-full rounded-full bg-blue-500" />
             </span>
-            <span className="text-blue-600 dark:text-blue-400">Live</span>
+            <span className="text-blue-600 dark:text-blue-400">{tf("auto.b64ac05f17e64d03")}</span>
           </div>
         </div>
       </Section>
@@ -1647,29 +1648,29 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  PROPERTY ROW PATTERN                                         */}
       {/* ============================================================ */}
-      <Section title="Property Row Pattern">
+      <Section title={tf("auto.f7883e78ba05f24c")}>
         <div className="border border-border rounded-md p-4 space-y-1 max-w-sm">
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-xs text-muted-foreground">Status</span>
+            <span className="text-xs text-muted-foreground">{tf("text.Status")}</span>
             <StatusBadge status="active" />
           </div>
           {/* PAP-411: priority metadata row hidden behind SHOW_TASK_PRIORITY_UI. */}
           {SHOW_TASK_PRIORITY_UI && (
             <div className="flex items-center justify-between py-1.5">
-              <span className="text-xs text-muted-foreground">Priority</span>
+              <span className="text-xs text-muted-foreground">{tf("text.Priority")}</span>
               <PriorityIcon priority="high" />
             </div>
           )}
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-xs text-muted-foreground">Responsible</span>
+            <span className="text-xs text-muted-foreground">{tf("auto.bc110a6d0722098a")}</span>
             <div className="flex items-center gap-1.5">
               <Avatar size="sm"><AvatarFallback>A</AvatarFallback></Avatar>
-              <span className="text-xs">Agent Alpha</span>
+              <span className="text-xs">{tf("auto.d47b013c22ecd4b7")}</span>
             </div>
           </div>
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-xs text-muted-foreground">Created</span>
-            <span className="text-xs">Jan 15, 2025</span>
+            <span className="text-xs text-muted-foreground">{tf("text.Created")}</span>
+            <span className="text-xs">{tf("auto.618176e8e31f7945")}</span>
           </div>
         </div>
       </Section>
@@ -1677,11 +1678,11 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  NAVIGATION PATTERNS                                          */}
       {/* ============================================================ */}
-      <Section title="Navigation Patterns">
-        <SubSection title="Agent chat picker">
+      <Section title={tf("auto.423846c4e3edbcaa")}>
+        <SubSection title={tf("auto.25f7f290585c8c64")}>
           <AgentChatPickerExample />
         </SubSection>
-        <SubSection title="Sidebar nav items">
+        <SubSection title={tf("auto.51d712dbf5fa3728")}>
           <p className="text-sm text-muted-foreground">
             Layout accepts sidebarSections to compose additional SidebarSection groups inside the shared sidebar.
             Use SidebarNavItem for each row, with sibling action buttons for starring or menus.
@@ -1690,35 +1691,35 @@ export function DesignGuide() {
           <Card className="block w-60 p-3 space-y-0.5">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-accent text-accent-foreground">
               <LayoutDashboard className="h-4 w-4" />
-              Dashboard
+              {tf("text.Dashboard")}
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground cursor-pointer">
               <CircleDot className="h-4 w-4" />
-              Issues
+              {tf("auto.666067dd376e5d45")}
               <Badge variant="ghost" className="ml-auto bg-primary text-primary-foreground px-1.5">
                 12
               </Badge>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground cursor-pointer">
               <Bot className="h-4 w-4" />
-              Agents
+              {tf("text.Agents")}
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground cursor-pointer">
               <Hexagon className="h-4 w-4" />
-              Projects
+              {tf("text.Projects")}
             </div>
           </Card>
         </SubSection>
 
-        <SubSection title="View toggle">
+        <SubSection title={tf("auto.3f2f0df8a6c314c5")}>
           <div className="flex items-center border border-border rounded-md w-fit">
             <button className="px-3 py-1.5 text-xs font-medium bg-accent text-foreground rounded-l-md">
               <ListTodo className="h-3.5 w-3.5 inline mr-1" />
-              List
+              {tf("auto.6f202f54a7b2d8fe")}
             </button>
             <button className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-accent/50 rounded-r-md">
               <Target className="h-3.5 w-3.5 inline mr-1" />
-              Org
+              {tf("nav.org")}
             </button>
           </div>
         </SubSection>
@@ -1727,11 +1728,11 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  GROUPED LIST (Issues pattern)                                */}
       {/* ============================================================ */}
-      <Section title="Grouped List (Issues pattern)">
+      <Section title={tf("auto.b43e0a874c2e129c")}>
         <div>
           <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-t-md">
             <StatusIcon status="in_progress" />
-            <span className="text-sm font-medium">In Progress</span>
+            <span className="text-sm font-medium">{tf("auto.b4cc4b07c300103a")}</span>
             <span className="text-xs text-muted-foreground ml-1">2</span>
           </div>
           <div className="border border-border rounded-b-md">
@@ -1739,13 +1740,13 @@ export function DesignGuide() {
             <EntityRow
               leading={SHOW_TASK_PRIORITY_UI ? <PriorityIcon priority="high" /> : undefined}
               identifier="PAP-101"
-              title="Build agent heartbeat system"
+              title={tf("auto.d355e8ac90cba300")}
               onClick={() => {}}
             />
             <EntityRow
               leading={SHOW_TASK_PRIORITY_UI ? <PriorityIcon priority="medium" /> : undefined}
               identifier="PAP-102"
-              title="Add cost tracking dashboard"
+              title={tf("auto.abd57cbb8de0a8d2")}
               onClick={() => {}}
             />
           </div>
@@ -1755,28 +1756,28 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  COMMENT THREAD PATTERN                                       */}
       {/* ============================================================ */}
-      <Section title="Comment Thread Pattern">
+      <Section title={tf("auto.9e84ba5b991155c5")}>
         <div className="space-y-3 max-w-2xl">
-          <h3 className="text-sm font-semibold">Comments (2)</h3>
+          <h3 className="text-sm font-semibold">{tf("auto.88e500512f4fed24")}</h3>
           <div className="space-y-3">
             <div className="rounded-md border border-border p-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-muted-foreground">Agent</span>
-                <span className="text-xs text-muted-foreground">Jan 15, 2025</span>
+                <span className="text-xs font-medium text-muted-foreground">{tf("text.Agent")}</span>
+                <span className="text-xs text-muted-foreground">{tf("auto.618176e8e31f7945")}</span>
               </div>
-              <p className="text-sm">Started working on the authentication module. Will need API keys configured.</p>
+              <p className="text-sm">{tf("auto.6a5b34f345f6fcb9")}</p>
             </div>
             <div className="rounded-md border border-border p-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-muted-foreground">Human</span>
-                <span className="text-xs text-muted-foreground">Jan 16, 2025</span>
+                <span className="text-xs font-medium text-muted-foreground">{tf("auto.9ffa865f2bc6e850")}</span>
+                <span className="text-xs text-muted-foreground">{tf("auto.68db3dbe2bd559b0")}</span>
               </div>
-              <p className="text-sm">API keys have been added to the vault. Please proceed.</p>
+              <p className="text-sm">{tf("auto.ad6210e97b69fc1e")}</p>
             </div>
           </div>
           <div className="space-y-2">
-            <Textarea placeholder="Leave a comment..." rows={3} />
-            <Button size="sm">Comment</Button>
+            <Textarea placeholder={tf("auto.4dff58ab6888329d")} rows={3} />
+            <Button size="sm">{tf("text.Comment")}</Button>
           </div>
         </div>
       </Section>
@@ -1784,29 +1785,29 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  COST TABLE PATTERN                                           */}
       {/* ============================================================ */}
-      <Section title="Cost Table Pattern">
+      <Section title={tf("auto.48212c43111b7717")}>
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-xs">
             <thead className="border-b border-border bg-accent/20">
               <tr>
-                <th className="text-left px-3 py-2 font-medium text-muted-foreground">Model</th>
-                <th className="text-left px-3 py-2 font-medium text-muted-foreground">Tokens</th>
-                <th className="text-left px-3 py-2 font-medium text-muted-foreground">Cost</th>
+                <th className="text-left px-3 py-2 font-medium text-muted-foreground">{tf("text.Model")}</th>
+                <th className="text-left px-3 py-2 font-medium text-muted-foreground">{tf("text.Tokens")}</th>
+                <th className="text-left px-3 py-2 font-medium text-muted-foreground">{tf("text.Cost")}</th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b border-border">
-                <td className="px-3 py-2">claude-sonnet-4-20250514</td>
+                <td className="px-3 py-2">{tf("auto.8cb50e5cf14a42a3")}</td>
                 <td className="px-3 py-2 font-mono">1.2M</td>
                 <td className="px-3 py-2 font-mono">$18.00</td>
               </tr>
               <tr className="border-b border-border">
-                <td className="px-3 py-2">claude-haiku-4-20250506</td>
+                <td className="px-3 py-2">{tf("auto.e7f937c50f7c473c")}</td>
                 <td className="px-3 py-2 font-mono">500k</td>
                 <td className="px-3 py-2 font-mono">$1.25</td>
               </tr>
               <tr>
-                <td className="px-3 py-2 font-medium">Total</td>
+                <td className="px-3 py-2 font-medium">{tf("text.Total")}</td>
                 <td className="px-3 py-2 font-mono">1.7M</td>
                 <td className="px-3 py-2 font-mono font-medium">$19.25</td>
               </tr>
@@ -1818,8 +1819,8 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  SKELETONS                                                    */}
       {/* ============================================================ */}
-      <Section title="Skeletons">
-        <SubSection title="Individual">
+      <Section title={tf("auto.f6fb698c6074f81c")}>
+        <SubSection title={tf("auto.010dd7b94f5f3d31")}>
           <div className="space-y-2">
             <Skeleton className="h-4 w-48" />
             <Skeleton className="h-8 w-full max-w-sm" />
@@ -1827,13 +1828,13 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="Page Skeleton (list)">
+        <SubSection title={tf("auto.39ecd32d5578bae1")}>
           <div className="border border-border rounded-md p-4">
             <PageSkeleton variant="list" />
           </div>
         </SubSection>
 
-        <SubSection title="Page Skeleton (detail)">
+        <SubSection title={tf("auto.0a8ae9fd12855918")}>
           <div className="border border-border rounded-md p-4">
             <PageSkeleton variant="detail" />
           </div>
@@ -1843,14 +1844,14 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  SEPARATOR                                                    */}
       {/* ============================================================ */}
-      <Section title="Separator">
+      <Section title={tf("auto.be237eda7fff4fd3")}>
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Horizontal</p>
+          <p className="text-sm text-muted-foreground">{tf("auto.0abba441f16eff90")}</p>
           <Separator />
           <div className="flex items-center gap-4 h-8">
-            <span className="text-sm">Left</span>
+            <span className="text-sm">{tf("auto.58eb9032e3bb83f0")}</span>
             <Separator orientation="vertical" />
-            <span className="text-sm">Right</span>
+            <span className="text-sm">{tf("auto.883361d5d682a157")}</span>
           </div>
         </div>
       </Section>
@@ -1860,69 +1861,69 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  TEAM CATALOG                                                 */}
       {/* ============================================================ */}
-      <Section title="Team Catalog">
+      <Section title={tf("auto.d2fa1c21f5de6041")}>
         <p className="text-sm text-muted-foreground">
           Components from the Team Catalog browse/install surface (<code className="font-mono text-xs">/teams-catalog</code>).
           Fixtures are shared with the Storybook stories.
         </p>
 
-        <SubSection title="TeamRow (browse list)">
+        <SubSection title={tf("auto.ae39d7cf2e420451")}>
           <div className="w-(--sz-28rem) rounded-md border border-border">
             <div className="px-3 py-2 text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-              Bundled · 1
+              {tf("auto.f2ee24d4b86a3b90")}
             </div>
             <TeamRow team={sampleTeam} selected onSelect={() => {}} />
             <div className="px-3 py-2 text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-              Optional · 2
+              {tf("auto.934c00b04ec97585")}
             </div>
             <TeamRow team={optionalTeam} selected={false} onSelect={() => {}} />
             <div className="px-3 py-2 text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-              Installed · 2
+              {tf("auto.a893f422953ef8d2")}
             </div>
             <TeamRow team={sampleTeam} selected={false} onSelect={() => {}} installed={outOfDateInstalledState} />
             <TeamRow team={warnTeam} selected={false} onSelect={() => {}} installed={currentInstalledState} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Installed teams collapse under <code className="font-mono">INSTALLED · N</code>; an out-of-date
-            install (server <code className="font-mono">originHash</code> ≠ catalog <code className="font-mono">contentHash</code>)
+            Installed teams collapse under <code className="font-mono">{tf("auto.4d29db5a2b3fe8fa")}</code>; an out-of-date
+            install (server <code className="font-mono">{tf("auto.18dcaefc7047b6e2")}</code> ≠ catalog <code className="font-mono">{tf("auto.3a84b2f508f5b930")}</code>)
             shows the amber <code className="font-mono">↑</code> badge (PAP-10256).
           </p>
         </SubSection>
 
-        <SubSection title="TeamCard (onboarding grid)">
+        <SubSection title={tf("auto.74466b3f53185959")}>
           <p className="text-xs text-muted-foreground">
             Square tile for the onboarding &ldquo;Pick a starter team&rdquo; grid. Selected tile gets{" "}
-            <code className="font-mono">ring-2 ring-ring</code>. Drives the{" "}
-            <code className="font-mono">useInstallTeamCatalogEntry</code> simplified flow.
+            <code className="font-mono">{tf("auto.6b97ab5288dc8024")}</code>. Drives the{" "}
+            <code className="font-mono">{tf("auto.d3aa53d1750dcff8")}</code> simplified flow.
           </p>
           <TeamCardShowcase />
         </SubSection>
 
-        <SubSection title="TeamHierarchyPreview">
+        <SubSection title={tf("auto.49f0bc9751dc2f53")}>
           <div className="max-w-md">
             <TeamHierarchyPreview team={sampleTeam} />
           </div>
         </SubSection>
 
-        <SubSection title="RequiredSkillsList">
+        <SubSection title={tf("auto.eebc853548c83844")}>
           <div className="max-w-xl">
             <RequiredSkillsList skills={sampleTeam.requiredSkills} />
           </div>
         </SubSection>
 
-        <SubSection title="EnvInputsList">
+        <SubSection title={tf("auto.e0e1d2ba122f776d")}>
           <div className="max-w-xl">
             <EnvInputsList inputs={sampleTeam.envInputs} />
           </div>
         </SubSection>
 
-        <SubSection title="ExternalSourcesList">
+        <SubSection title={tf("auto.f3b51cdfc294672b")}>
           <div className="max-w-xl">
             <ExternalSourcesList sources={sampleTeam.sourceRefs} />
           </div>
         </SubSection>
 
-        <SubSection title="Source policy step (StepSourcePolicy)">
+        <SubSection title={tf("auto.3c591dbb928e2dfc")}>
           <div className="max-w-xl rounded-md border border-border p-4">
             <StepSourcePolicy
               team={warnTeam}
@@ -1938,7 +1939,7 @@ export function DesignGuide() {
           </div>
         </SubSection>
 
-        <SubSection title="Skill plan step (StepSkillPlan)">
+        <SubSection title={tf("auto.29edcbc5c321b75c")}>
           <div className="max-w-xl rounded-md border border-border p-4">
             <StepSkillPlan team={sampleTeam} preparations={sampleSkillPreparations} />
           </div>
@@ -1946,7 +1947,7 @@ export function DesignGuide() {
       </Section>
 
       {/* ============================================================ */}
-      <Section title="Common Icons (Lucide)">
+      <Section title={tf("auto.fcdd09a5007f83d7")}>
         <div className="grid grid-cols-4 md:grid-cols-6 gap-4">
           {[
             ["Inbox", Inbox],
@@ -1981,7 +1982,7 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  KEYBOARD SHORTCUTS                                           */}
       {/* ============================================================ */}
-      <Section title="Keyboard Shortcuts">
+      <Section title={tf("auto.59cdaa26dd9dcd4c")}>
         <div className="border border-border rounded-md divide-y divide-border text-sm">
           {[
             ["Cmd+K / Ctrl+K", "Open Command Palette"],
@@ -2001,14 +2002,14 @@ export function DesignGuide() {
         </div>
       </Section>
 
-      <Section title="Issue Output Surface">
-        <SubSection title="Multiple outputs (primary video + 'Also produced')">
+      <Section title={tf("auto.3ae7b4b1d349bc1a")}>
+        <SubSection title={tf("auto.0cf1290bdfbc3041")}>
           <IssueOutputSection workProducts={DESIGN_GUIDE_OUTPUTS} />
         </SubSection>
-        <SubSection title="Degraded output (invalid / failed attachment metadata)">
+        <SubSection title={tf("auto.21e539925495ff97")}>
           <IssueOutputSection workProducts={DESIGN_GUIDE_DEGRADED_OUTPUTS} />
         </SubSection>
-        <SubSection title="Empty state">
+        <SubSection title={tf("auto.b725568f17565cd9")}>
           <p className="text-xs text-muted-foreground">
             When an issue has produced no artifact work products, the Output section renders nothing
             at all (no placeholder card).
@@ -2019,45 +2020,45 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  TOOLS & ACCESS (PAP-10389)                                   */}
       {/* ============================================================ */}
-      <Section title="Tools & Access">
-        <SubSection title="EnforcementBanner — default / denied-detected">
+      <Section title={tf("auto.168341ff2207b6b8")}>
+        <SubSection title={tf("auto.4957fe676d3ebac0")}>
           <div className="space-y-3">
             <EnforcementBanner companyId="" forceVariant="default" recentDenialCount={0} />
             <EnforcementBanner companyId="" forceVariant="denied-detected" recentDenialCount={3} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            Persistent at the top of the Tools &amp; Access surface. Tints to <code>denied-detected</code> when
+            Persistent at the top of the Tools &amp; Access surface. Tints to <code>{tf("auto.01d5fda3a801adf5")}</code> when
             governed tool calls were denied or failed in the last hour. Observability only — enforcement lives
             in the tool gateway.
           </p>
         </SubSection>
 
-        <SubSection title="EnforcementBanner — presentational tones (info / warning / error)">
+        <SubSection title={tf("auto.ecfa53bbd55956d5")}>
           <div className="space-y-3">
             <EnforcementBanner
               tone="info"
-              title="Effective access — server resolved."
+              title={tf("auto.62affc02b3698062")}
               body="This is exactly what the tool gateway will accept. Profile and policy edits reflect within ~5s; the prompt cannot expand it."
             />
             <EnforcementBanner
               tone="warning"
-              title="Local stdio is local code execution, not a security sandbox."
+              title={tf("auto.ec72dcff658c803b")}
               body="A local-stdio slot runs with the orchestrator's privileges. Only bind trusted commands; quarantine anything you would not run yourself."
             />
             <EnforcementBanner
               tone="error"
-              title="Runtime failed closed."
+              title={tf("auto.182c306e62c1d803")}
               body="The supervisor is restarting (attempt 2/3). The gateway returns runtime-error and the agent does not see partial output."
             />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Static governance copy with a tone. Used for the PAP-10400 trust-tier banner on Runtime and the
-            effective-access banner on Agent → Tools. Pass <code>title</code>/<code>body</code> and an optional{" "}
-            <code>icon</code>.
+            effective-access banner on Agent → Tools. Pass <code>{tf("auto.aaf2320646108059")}</code>/<code>{tf("auto.230d8358dc8e8890")}</code> and an optional{" "}
+            <code>{tf("auto.c2d4b446a44ce54f")}</code>.
           </p>
         </SubSection>
 
-        <SubSection title="Action approval card — pending / stale (surfaces 11/12)">
+        <SubSection title={tf("auto.f3f8dba90e704468")}>
           <div className="grid gap-4 lg:grid-cols-2">
             <ActionCard
               toolName="slack.post_message"
@@ -2096,13 +2097,13 @@ export function DesignGuide() {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Signed payload sha256 + expiry surface on every variant (PAP-10400). The{" "}
-            <code>stale</code> variant tints the border amber, banners the catalog-hash mismatch, strikes through
-            the previous hash next to the current one, and renders <code>Approve</code> disabled until the request
+            <code>{tf("auto.a03f2386ae06b211")}</code> variant tints the border amber, banners the catalog-hash mismatch, strikes through
+            the previous hash next to the current one, and renders <code>{tf("text.Approve")}</code> disabled until the request
             is re-issued.
           </p>
         </SubSection>
 
-        <SubSection title="Action approval card — mobile (390×844, surface 99)">
+        <SubSection title={tf("auto.22124d879bdf28bc")}>
           <div className="w-(--sz-390px) max-w-full rounded-xl border border-border bg-background p-3">
             <ActionCardMobile
               toolName="slack.post_message"
@@ -2127,22 +2128,22 @@ export function DesignGuide() {
           </p>
         </SubSection>
 
-        <SubSection title="BindingsTable (reused in the audit row drilldown)">
+        <SubSection title={tf("auto.412f4ae6c2f72bb2")}>
           <BindingsTable
             rows={[
-              { label: "Application", value: "Slack · manifest v2.4.1" },
-              { label: "Connection", value: "https://slack.com/api · acme-workspace", mono: true },
-              { label: "Catalog", value: "sha256:9f86d081…f00a08", mono: true },
-              { label: "Payload", value: "sha256:2c26b46b…66e7ae", mono: true },
+              { label: tf("auto.e7ad522ea327e5ba"), value: "Slack · manifest v2.4.1" },
+              { label: tf("auto.639a40e82b9a96f0"), value: "https://slack.com/api · acme-workspace", mono: true },
+              { label: tf("auto.3877d14889a9909b"), value: "sha256:9f86d081…f00a08", mono: true },
+              { label: tf("auto.99733344956dde48"), value: "sha256:2c26b46b…66e7ae", mono: true },
             ]}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Two-column key/value block with mono values. Lives inside <code>ActionCard</code> and is reused
+            Two-column key/value block with mono values. Lives inside <code>{tf("auto.c498ca0bf348b20a")}</code> and is reused
             standalone in the audit row drilldown.
           </p>
         </SubSection>
 
-        <SubSection title="Tool-access status keys (StatusBadge)">
+        <SubSection title={tf("auto.6c64d2c42b88eadb")}>
           <div className="flex flex-wrap items-center gap-2">
             {[
               "allowed", "denied", "block", "require-approval", "redacted", "rate-limit",
@@ -2153,29 +2154,29 @@ export function DesignGuide() {
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
             Policy decisions, connection/runtime health, and catalog quarantine all route through the canonical{" "}
-            <code>StatusBadge</code> keys defined in <code>lib/status-colors</code>.
+            <code>{tf("auto.8ac888d3088bafbe")}</code> keys defined in <code>lib/status-colors</code>.
           </p>
         </SubSection>
 
-        <SubSection title="EmptyState (canonical, with description + action)">
+        <SubSection title={tf("auto.b3132a7efcd3059b")}>
           <EmptyState
             icon={Inbox}
-            message="No connections yet"
-            description="Add a connection to an application to configure credentials and discover its tools."
-            action="New connection"
+            message={tf("auto.8697571e96e71c3b")}
+            description={tf("auto.99930f064a466438")}
+            action={tf("auto.729bceeec8165d77")}
             onAction={() => {}}
           />
         </SubSection>
       </Section>
 
-      <Section title="Composio Services">
+      <Section title={tf("auto.b3c50ea6be99b939")}>
         <p className="text-sm text-muted-foreground">
           A broker connection (Composio) fronts many services, so its detail page lists toolkits
           with per-service state instead of one credential. Row state comes from Composio's own
-          account status, which is why there is a fourth <code>attention</code> state alongside the
+          account status, which is why there is a fourth <code>{tf("auto.e0787d272a439bb7")}</code> state alongside the
           three the design asks for: an expired credential is neither connected nor still settling.
         </p>
-        <SubSection title="Row states">
+        <SubSection title={tf("auto.f4087360c028486b")}>
           <ServicesList
             rows={DESIGN_GUIDE_COMPOSIO_ROWS}
             busySlug={null}
@@ -2184,7 +2185,7 @@ export function DesignGuide() {
             onDisconnect={() => {}}
           />
         </SubSection>
-        <SubSection title="Busy row">
+        <SubSection title={tf("auto.bd82177544118ea2")}>
           <ServicesList
             rows={[DESIGN_GUIDE_COMPOSIO_ROWS[2]!]}
             busySlug={DESIGN_GUIDE_COMPOSIO_ROWS[2]!.toolkitSlug}
@@ -2193,7 +2194,7 @@ export function DesignGuide() {
             onDisconnect={() => {}}
           />
         </SubSection>
-        <SubSection title="Provenance chip">
+        <SubSection title={tf("auto.be0de511f93b8fb5")}>
           <p className="mb-2 text-xs text-muted-foreground">
             Shown wherever a brokered child connection appears, so the parent/child coupling is
             legible. Links to the broker's Services tab when the parent is known.
@@ -2211,50 +2212,50 @@ export function DesignGuide() {
         </SubSection>
       </Section>
 
-      <Section title="Source Repositories">
-        <SubSection title="Empty and disconnected">
+      <Section title={tf("auto.e0eeae29ab3b67d8")}>
+        <SubSection title={tf("auto.bbc2c7c5589e424f")}>
           <RepositoryEditor selected={[]} onChange={() => {}} state="disconnected" onConnect={() => {}} onRetry={() => {}} />
         </SubSection>
-        <SubSection title="Selected and searchable">
+        <SubSection title={tf("auto.8cc1dc4e70aee51f")}>
           <RepositoryEditor selected={[{ id: "1", fullName: "paperclipai/paperclip", url: "https://github.com/paperclipai/paperclip", connections: ["Your GitHub"] }]}
             available={[{ id: "2", fullName: "paperclipai/docs", url: "https://github.com/paperclipai/docs", connections: ["Company GitHub"] }]}
             onChange={() => {}} onConnect={() => {}} onRetry={() => {}} />
         </SubSection>
-        <p className="text-sm text-muted-foreground">Loading, errors, empty search, mobile, and short viewports are covered in the Project repos Storybook stories.</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.32c000752b55ce11")}</p>
       </Section>
 
-      <Section title="Environment Variables Editor">
+      <Section title={tf("auto.069e0a9758ebb27f")}>
         <p className="text-sm text-muted-foreground">
           Reusable env-var editor (agents, projects, environments, routines). One shared grid, an
           in-field Text/Secret source switch, a fuzzy secret picker with a pinned “Create secret”
           item, automatic sensitive-value detection, and inline secret-health warnings. See the
-          Storybook <span className="font-mono">Product/Environment Variables Editor</span> stories
+          Storybook <span className="font-mono">{tf("auto.732eaa27f3846b52")}</span> stories
           for all 10 states.
         </p>
         <EnvironmentVariablesEditorShowcase />
       </Section>
 
-      <Section title="Tasks created from a task">
-        <SubSection title="Subtasks and created work are independent">
+      <Section title={tf("auto.74fdf58160e6990a")}>
+        <SubSection title={tf("auto.7ba2ef0819d42345")}>
           <div className="max-w-xl">
             <TaskDetailTasksPanel
               subtasks={[DESIGN_GUIDE_TASK]}
               createdTasks={[
                 { ...DESIGN_GUIDE_TASK, projectId: "design-board", project: { id: "design-board", name: "Board UI" } as Issue["project"] },
-                { ...DESIGN_GUIDE_TASK, id: "design-followup", identifier: "PAP-428", title: "Write release notes", status: "todo", projectId: null },
+                { ...DESIGN_GUIDE_TASK, id: "design-followup", identifier: "PAP-428", title: tf("auto.36392fa802e586ea"), status: "todo", projectId: null },
               ]}
               projects={[]}
             />
           </div>
         </SubSection>
-        <SubSection title="Empty, loading and failed">
+        <SubSection title={tf("auto.a89ee7969a825869")}>
           <TaskDetailTasksPanel subtasks={[]} createdTasks={[]} projects={[]} />
           <TaskDetailTasksPanel subtasks={[]} createdTasks={[]} projects={[]} isLoading />
           <TaskDetailTasksPanel subtasks={[]} createdTasks={[]} projects={[]} hasError onRetry={() => {}} />
         </SubSection>
       </Section>
 
-      <Section title="Execution recovery">
+      <Section title={tf("auto.ce899bed4548cc7b")}>
         <p className="text-sm text-muted-foreground">
           Recovery runs in the background. Task lists keep their ordinary status without
           execution badges. Active transcript headers keep saying Working during automatic
@@ -2263,13 +2264,13 @@ export function DesignGuide() {
         </p>
       </Section>
 
-      <Section title="Saved provider API keys">
-        <SavedProviderKeySelect options={[{ id: "example", label: "Claude API key (Your key)", binding: { type: "user_secret_ref", key: "ANTHROPIC_API_KEY", version: "latest" } }]} value="example" onChange={() => {}} loading={false} error={false} />
+      <Section title={tf("auto.90ca15689b00fc63")}>
+        <SavedProviderKeySelect options={[{ id: "example", label: tf("auto.fa51d00e7b5a0efb"), binding: { type: "user_secret_ref", key: "ANTHROPIC_API_KEY", version: "latest" } }]} value="example" onChange={() => {}} loading={false} error={false} />
         <SavedProviderKeySelect options={[]} value="" onChange={() => {}} loading error={false} />
         <SavedProviderKeySelect options={[]} value="" onChange={() => {}} loading={false} error />
       </Section>
 
-      <Section title="Connection Intent">
+      <Section title={tf("auto.7a2a4540aa01f2cd")}>
         <p className="text-sm text-muted-foreground">
           The task card is the dialog host for the shared connection setup flow. Provider forms,
           validation, OAuth, access selection, and completion come from the same feature module as
@@ -2294,30 +2295,30 @@ export function DesignGuide() {
         </div>
       </Section>
 
-      <Section title="Resizable Panels">
+      <Section title={tf("auto.4f98ed3771b82232")}>
         <p className="text-sm text-muted-foreground">
-          Design-system wrapper over <span className="font-mono">react-resizable-panels</span>{" "}
+          Design-system wrapper over <span className="font-mono">{tf("auto.317449096a235105")}</span>{" "}
           (Skill Studio D2). Drag a handle to resize; panels accept percentage or pixel
-          (<span className="font-mono">minSize="240px"</span>) constraints and the middle panel is
+          (<span className="font-mono">{tf("auto.0210b75ecfb31dc7")}</span>) constraints and the middle panel is
           collapsible. Use anywhere a split view is needed.
         </p>
         <div className="h-48 max-w-2xl overflow-hidden rounded-md border border-border">
           <ResizablePanelGroup>
             <ResizablePanel id="a" minSize="120px" className="bg-muted/30">
               <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-                Panel A
+                {tf("auto.e1010dcdb8e2fcbe")}
               </div>
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel id="b" minSize="120px" collapsible collapsedSize="40px" className="bg-muted/10">
               <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-                Panel B (collapsible)
+                {tf("auto.9e3c09a5638be666")}
               </div>
             </ResizablePanel>
             <ResizableHandle />
             <ResizablePanel id="c" minSize="120px" className="bg-muted/30">
               <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-                Panel C
+                {tf("auto.8a631860e6e24118")}
               </div>
             </ResizablePanel>
           </ResizablePanelGroup>
@@ -2327,57 +2328,57 @@ export function DesignGuide() {
       {/* ============================================================ */}
       {/*  INLINE BANNER + BUILT-IN AGENTS                              */}
       {/* ============================================================ */}
-      <Section title="Inline Banner">
+      <Section title={tf("auto.15aba1d3e0ec11c2")}>
         <p className="text-sm text-muted-foreground">
-          Token-backed full-width notice (<span className="font-mono">brandBanner</span> tones). Use{" "}
-          <span className="font-mono">info</span> for provenance/context and{" "}
-          <span className="font-mono">warning</span> for paused/attention. Supports an optional bold
+          Token-backed full-width notice (<span className="font-mono">{tf("auto.0f38377798cd3d0e")}</span> tones). Use{" "}
+          <span className="font-mono">{tf("auto.06271baf49532c87")}</span> for provenance/context and{" "}
+          <span className="font-mono">{tf("auto.4bd9354bb6522334")}</span> for paused/attention. Supports an optional bold
           title and a trailing actions slot. Replaces hand-rolled{" "}
-          <span className="font-mono">bg-yellow-*</span>/<span className="font-mono">bg-blue-*</span>{" "}
+          <span className="font-mono">{tf("auto.40ebfdc4fddb62b2")}</span>/<span className="font-mono">{tf("auto.ccd9ef468c65f1dd")}</span>{" "}
           banners.
         </p>
         <div className="space-y-3">
           <InlineBanner
             tone="info"
-            title="Built-in agent"
-            actions={<Button variant="outline" size="sm">Reset to defaults</Button>}
+            title={tf("auto.4bdd2857aa666efe")}
+            actions={<Button variant="outline" size="sm">{tf("auto.e240e635ff6dce4f")}</Button>}
           >
-            Ships with Paperclip and powers <strong>Briefs</strong>. It can be paused but not deleted.
+            Ships with Paperclip and powers <strong>{tf("auto.997b201dacec1e25")}</strong>. It can be paused but not deleted.
           </InlineBanner>
           <InlineBanner
             tone="warning"
-            title="Briefs is paused."
+            title={tf("auto.2cea4b8c3fd3a644")}
             actions={
               <>
-                <Button variant="ghost" size="sm">View agent</Button>
-                <Button size="sm">Resume agent</Button>
+                <Button variant="ghost" size="sm">{tf("auto.7ce7832e35e85d35")}</Button>
+                <Button size="sm">{tf("auto.0bb60c4501919e6a")}</Button>
               </>
             }
           >
-            Its built-in agent was paused 2 days ago, so new briefs aren't being generated.
+            {tf("auto.1deb8deeb7fa4f45")}
           </InlineBanner>
           <InlineBanner
             tone="danger"
-            title="Summary generation failed."
-            actions={<Button size="sm">Retry</Button>}
+            title={tf("auto.6a0cb00af80d234a")}
+            actions={<Button size="sm">{tf("text.Retry")}</Button>}
           >
-            The linked issue reached a terminal state before a summary was written.
+            {tf("auto.ad3323b16b9d47b2")}
           </InlineBanner>
           <InlineBanner tone="info" compact>
-            Compact variant for embedding inside dialogs and modals.
+            {tf("auto.aa514eb48295811a")}
           </InlineBanner>
         </div>
       </Section>
 
-      <Section title="AI Connections">
+      <Section title={tf("auto.7d8087278dd6c3ae")}>
         <AiConnectionDesignExamples />
       </Section>
 
-      <Section title="Built-in Agent Lifecycle Chips">
+      <Section title={tf("auto.c6dd7903abd15a1f")}>
         <p className="text-sm text-muted-foreground">
           A derived lifecycle chip (amber) for attention states. The lifecycle chip is separate from
           the agent status vocabulary and only shows for{" "}
-          <span className="font-mono">needs_setup</span> / <span className="font-mono">pending_approval</span>.
+          <span className="font-mono">{tf("auto.a2989bf3b050aba4")}</span> / <span className="font-mono">{tf("auto.92950a08d178acc4")}</span>.
         </p>
         <div className="flex flex-wrap items-center gap-4">
           <BuiltInLifecycleChip status="needs_setup" />
@@ -2386,8 +2387,8 @@ export function DesignGuide() {
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
           <span className="font-mono">&lt;BuiltInAgentGate agentKey&gt;</span> composes{" "}
-          <span className="font-mono">PageSkeleton</span> + <span className="font-mono">EmptyState</span>{" "}
-          + <span className="font-mono">InlineBanner</span> to render the loading / setup /
+          <span className="font-mono">{tf("auto.e86e1cc8ddac4e90")}</span> + <span className="font-mono">{tf("auto.a422df8c8b26372d")}</span>{" "}
+          + <span className="font-mono">{tf("auto.5825a2ca81c8e03b")}</span> to render the loading / setup /
           pending-approval / paused / ready states of a feature that depends on a built-in agent.
         </p>
       </Section>

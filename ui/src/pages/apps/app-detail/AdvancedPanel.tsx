@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowUpRight, ChevronRight, Loader2, Lock } from "lucide-react";
@@ -118,7 +119,7 @@ function KeySection({
         <div className="flex items-start gap-3">
           <Lock className="mt-0.5 h-4 w-4 text-muted-foreground" />
           <div>
-            <h2 className="text-sm font-medium text-foreground">Reconnect</h2>
+            <h2 className="text-sm font-medium text-foreground">{tf("auto.bf8a9eab9e7e141b")}</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {canReplace ? "Replace the stored credential." : unavailableMessage}
             </p>
@@ -126,7 +127,7 @@ function KeySection({
         </div>
         {canReplace && !open && (
           <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
-            Reconnect
+            {tf("auto.bf8a9eab9e7e141b")}
           </Button>
         )}
       </div>
@@ -179,16 +180,16 @@ export function ReconnectCard({
         navigateTopLevel(target.url);
       } catch (error) {
         pushToast({
-          title: "Couldn’t start sign-in",
-          body: error instanceof Error ? error.message : "Please try again.",
+          title: tf("auto.33d85fafdf4b2714"),
+          body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
           tone: "error",
         });
       }
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn’t start sign-in",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.33d85fafdf4b2714"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -196,15 +197,15 @@ export function ReconnectCard({
     mutationFn: () => toolsApi.checkConnectionHealth(connection.id),
     onSuccess: () => {
       pushToast({
-        title: "Vercel credential verified",
+        title: tf("auto.48706ce3b76e9d05"),
         body: `${humanizeConnectionDisplayName(connection)} is back online.`,
         tone: "success",
       });
       onReconnected();
     },
     onError: (error) => pushToast({
-      title: "Credential still needs attention",
-      body: error instanceof Error ? error.message : "Review the connector in Vercel Connect and try again.",
+      title: tf("auto.cf74236aea74055b"),
+      body: error instanceof Error ? error.message: tf("auto.102132d27b88f7d6"),
       tone: "error",
     }),
   });
@@ -234,11 +235,11 @@ export function ReconnectCard({
         ) : methodUnavailable ? (
           <Button size="sm" variant="outline" asChild>
             <Link to={`/apps/connect?source=${encodeURIComponent(galleryEntry!.slug)}`}>
-              Add supported connection
+              {tf("auto.fa83864532817b24")}
             </Link>
           </Button>
         ) : onReconnect ? (
-          <Button size="sm" variant="outline" onClick={onReconnect}>Reconnect</Button>
+          <Button size="sm" variant="outline" onClick={onReconnect}>{tf("auto.bf8a9eab9e7e141b")}</Button>
         ) : managedByVercel && !oauth ? (
           <div className="flex items-center gap-2">
             <Button type="button" size="sm" variant="outline" asChild>
@@ -313,14 +314,14 @@ function ReconnectForm({
         result.connection.healthStatus === "healthy" || result.connection.healthStatus === "unknown";
       if (healthy) {
         pushToast({
-          title: "Reconnected",
+          title: tf("auto.20a447dbc60511a6"),
           body: `${humanizeConnectionDisplayName(connection)} is back online.`,
           tone: "success",
         });
         onReconnected();
       } else {
         pushToast({
-          title: "Still not working",
+          title: tf("auto.46d820c55ac73740"),
           body: result.connection.healthMessage?.trim() || "That key didn't check out. Try another.",
           tone: "error",
         });
@@ -328,8 +329,8 @@ function ReconnectForm({
     },
     onError: (error) =>
       pushToast({
-        title: "That key didn't work",
-        body: error instanceof Error ? error.message : "Check the key and try again.",
+        title: tf("auto.5bf9a8b27f980ee4"),
+        body: error instanceof Error ? error.message: tf("auto.7e751a81bfdcce67"),
         tone: "error",
       }),
   });
@@ -341,7 +342,7 @@ function ReconnectForm({
   if (connection.credentialSource === "vercel_connect") {
     return (
       <p className="text-sm text-muted-foreground">
-        Credentials for this connection are managed in Vercel Connect.
+        {tf("auto.7352a3aada5fa7e3")}
       </p>
     );
   }
@@ -378,7 +379,7 @@ function ReconnectForm({
           autoComplete="off"
           value={single}
           onChange={(e) => setSingle(e.target.value)}
-          placeholder="Paste your new key"
+          placeholder={tf("auto.0dbd3b63d1b73c08")}
           className="h-10 font-mono"
         />
       )}
@@ -389,7 +390,7 @@ function ReconnectForm({
         </Button>
         {onCancel && (
           <Button size="sm" variant="ghost" onClick={onCancel} disabled={reconnect.isPending}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
         )}
       </div>
@@ -404,7 +405,7 @@ function TechnicalDetails({ connection }: { connection: ToolConnection }) {
       <section>
         <CollapsibleTrigger asChild>
           <button type="button" className="flex w-full items-center gap-3 py-1 text-left">
-            <span className="min-w-0 flex-1 text-sm font-medium text-foreground">Connection details</span>
+            <span className="min-w-0 flex-1 text-sm font-medium text-foreground">{tf("auto.51bfffbcdbcfbc00")}</span>
             <ChevronRight
               className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")}
             />
@@ -412,9 +413,9 @@ function TechnicalDetails({ connection }: { connection: ToolConnection }) {
         </CollapsibleTrigger>
         <CollapsibleContent>
           <dl className="mt-4 grid gap-2 pb-2 text-xs sm:grid-cols-(--gtc-59)">
-            <dt className="text-muted-foreground">Address</dt>
+            <dt className="text-muted-foreground">{tf("auto.56ef8f20955f2564")}</dt>
             <dd className="break-all font-mono text-foreground">{connectionAddress(connection)}</dd>
-            <dt className="text-muted-foreground">Type</dt>
+            <dt className="text-muted-foreground">{tf("text.Type")}</dt>
             <dd className="text-foreground">{connectionTransportLabel(connection.transport)}</dd>
           </dl>
         </CollapsibleContent>
@@ -485,7 +486,7 @@ export function DangerZone({
             type="button"
             className="flex w-full items-center gap-3 py-1 text-left"
           >
-            <span className="min-w-0 flex-1 text-sm font-medium text-destructive">Danger zone</span>
+            <span className="min-w-0 flex-1 text-sm font-medium text-destructive">{tf("auto.fd8b8dae44216610")}</span>
             <ChevronRight
               className={cn("h-4 w-4 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")}
             />
@@ -496,9 +497,9 @@ export function DangerZone({
           <div className="mt-3 divide-y divide-border border-t border-border">
             {connection && onToggleConnection ? (
               <div className="flex items-center justify-between gap-4 py-4">
-                <h2 className="text-sm font-medium text-foreground">Pause connection</h2>
+                <h2 className="text-sm font-medium text-foreground">{tf("auto.722c186746f9e6ae")}</h2>
                 <ToggleSwitch
-                  aria-label="Pause connection"
+                  aria-label={tf("auto.722c186746f9e6ae")}
                   checked={paused}
                   disabled={toggleDisabled}
                   onCheckedChange={onToggleConnection}
@@ -522,7 +523,7 @@ export function DangerZone({
             {connection?.authKind === "oauth" && !methodUnavailable && (onReconnectIdentity || !canReplaceCredential) ? (
               <div className="flex flex-wrap items-center justify-between gap-3 py-4">
                 <div>
-                  <p className="text-sm font-medium text-foreground">Reconnect</p>
+                  <p className="text-sm font-medium text-foreground">{tf("auto.bf8a9eab9e7e141b")}</p>
                   <p className="text-xs text-muted-foreground">
                     {canReplaceCredential
                       ? `Sign in to ${identityProviderName} again.`
@@ -548,9 +549,9 @@ export function DangerZone({
               && onRevokeIdentity ? (
                 <div className="flex flex-wrap items-center justify-between gap-3 py-4">
                   <div>
-                    <p className="text-sm font-medium text-foreground">Revoke identity</p>
+                    <p className="text-sm font-medium text-foreground">{tf("auto.c8534276405e474b")}</p>
                     <p className="text-xs text-muted-foreground">
-                      Disconnect the identity currently used by this app.
+                      {tf("auto.fa1ff4ff6cd56525")}
                     </p>
                   </div>
                   <Button
@@ -558,14 +559,14 @@ export function DangerZone({
                     size="sm"
                     onClick={() => setRevokeTarget(identityGrant)}
                   >
-                    Revoke
+                    {tf("auto.87e6d00bbf53ec5a")}
                   </Button>
                 </div>
             ) : null}
 
             <div className="flex flex-wrap items-center justify-between gap-3 py-4">
               <div>
-                <p className="text-sm font-medium text-foreground">Remove this app</p>
+                <p className="text-sm font-medium text-foreground">{tf("auto.83be3901aaf06a04")}</p>
                 <p className="text-xs text-muted-foreground">
                   {childConnectionCount > 0
                     ? `Deletes credentials for ${appName} and ${childConnectionCount} connected ${childConnectionCount === 1 ? "service" : "services"}.`
@@ -575,7 +576,7 @@ export function DangerZone({
               {confirming ? (
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" onClick={() => setConfirming(false)} disabled={removing}>
-                    Cancel
+                    {tf("text.Cancel")}
                   </Button>
                   <Button variant="destructive" size="sm" onClick={onRemove} disabled={removing}>
                     {removing && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
@@ -584,7 +585,7 @@ export function DangerZone({
                 </div>
               ) : (
                 <Button variant="destructive" size="sm" onClick={() => setConfirming(true)}>
-                  Remove app
+                  {tf("auto.2ce428741dc4fbd9")}
                 </Button>
               )}
             </div>

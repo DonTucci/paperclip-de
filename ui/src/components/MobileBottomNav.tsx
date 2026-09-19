@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo } from "react";
 import { NavLink, useLocation } from "@/lib/router";
 import {
@@ -43,14 +44,14 @@ export function MobileBottomNav({ visible }: MobileBottomNavProps) {
 
   const items = useMemo<MobileNavItem[]>(
     () => [
-      { type: "link", to: "/dashboard", label: "Home", icon: House },
-      { type: "link", to: "/issues", label: "Tasks", icon: CircleCheck },
-      { type: "action", label: "New Task", icon: SquarePen, onClick: () => openNewIssue() },
-      { type: "link", to: "/agents/all", label: "Agents", icon: Users },
+      { type: "link", to: "/dashboard", label: tf("auto.3a78695388b38b5c"), icon: House },
+      { type: "link", to: "/issues", label: tf("text.Tasks"), icon: CircleCheck },
+      { type: "action", label: tf("text.New Task"), icon: SquarePen, onClick: () => openNewIssue() },
+      { type: "link", to: "/agents/all", label: tf("text.Agents"), icon: Users },
       {
         type: "link",
         to: "/inbox",
-        label: "Inbox",
+        label: tf("text.Inbox"),
         icon: Inbox,
         badge: inboxBadge.inbox,
       },
@@ -64,7 +65,7 @@ export function MobileBottomNav({ visible }: MobileBottomNavProps) {
         "fixed bottom-0 left-0 right-0 z-30 bg-border/50 transition-transform duration-200 ease-out dark:bg-muted md:hidden pb-(--sz-safe-bottom)",
         visible ? "translate-y-0" : "translate-y-full",
       )}
-      aria-label="Mobile navigation"
+      aria-label={tf("auto.806f228ffbd42e4e")}
     >
       <div className="grid h-16 grid-cols-5 px-1">
         {items.map((item) => {

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { groupWarningsByStage, LOW_TRUST_REVIEW_PRESET } from "@paperclipai/shared";
@@ -289,29 +290,29 @@ function retryCleanupItems(plan: PipelineAutomationRetryPlan): Array<{
   return [
     {
       id: "retireDirectChildren",
-      label: "Retire direct child items",
-      description: "Hide child outputs from normal pipeline boards and parent rollups.",
+      label: tf("auto.0b573a1d57356ec6"),
+      description: tf("auto.95d4de8b45a4781d"),
       count: plan.effectCounts.directChildren,
       disabled: plan.effectCounts.directChildren === 0,
     },
     {
       id: "retireDescendants",
-      label: "Retire descendants",
-      description: "Hide downstream output items under those children.",
+      label: tf("auto.ccd7f990336fa6e6"),
+      description: tf("auto.a32e8ce3400b5155"),
       count: plan.effectCounts.descendants,
       disabled: plan.effectCounts.descendants === 0,
     },
     {
       id: "cancelLinkedAutomationIssues",
-      label: "Cancel linked automation tasks",
-      description: "Cancel unfinished automation tasks superseded by the fresh retry.",
+      label: tf("auto.936a555019229049"),
+      description: tf("auto.f61f7bf04934ce84"),
       count: plan.effectCounts.linkedAutomationIssues,
       disabled: plan.effectCounts.linkedAutomationIssues === 0,
     },
     {
       id: "keepAuditHistory",
-      label: "Keep audit trail visible in item history",
-      description: "Record retry and retired outputs as history instead of deleting records.",
+      label: tf("auto.586792fb3059a443"),
+      description: tf("auto.5e47a7cf00edb3be"),
       required: true,
       disabled: true,
     },
@@ -661,12 +662,12 @@ export function PipelinesIndexTable({
     <div className="space-y-4">
       <div className="flex flex-col gap-3 border-y border-border py-4 lg:flex-row lg:items-center lg:justify-between">
         <label className="relative block w-full max-w-md">
-          <span className="sr-only">Search pipelines</span>
+          <span className="sr-only">{tf("auto.fd422543d2571278")}</span>
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search pipelines"
+            placeholder={tf("auto.fd422543d2571278")}
             className="h-10 pl-9"
           />
         </label>
@@ -682,7 +683,7 @@ export function PipelinesIndexTable({
               )}
               disabled={!connectionsAvailable}
               onClick={() => onViewModeChange("nested")}
-              title="Nested view"
+              title={tf("auto.0ecbbbb2517a65b6")}
             >
               <ListTree className="h-3.5 w-3.5" />
             </button>
@@ -695,7 +696,7 @@ export function PipelinesIndexTable({
                   : "text-muted-foreground hover:text-foreground",
               )}
               onClick={() => onViewModeChange("flat")}
-              title="Flat list"
+              title={tf("auto.2abb78c9e066ea86")}
             >
               <List className="h-3.5 w-3.5" />
             </button>
@@ -703,7 +704,7 @@ export function PipelinesIndexTable({
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="icon" className="h-8 w-8 shrink-0" title="Sort">
+              <Button variant="outline" size="icon" className="h-8 w-8 shrink-0" title={tf("auto.bec69036aa27e7fa")}>
                 <ArrowUpDown className="h-3.5 w-3.5" />
               </Button>
             </PopoverTrigger>
@@ -732,17 +733,17 @@ export function PipelinesIndexTable({
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState icon={Hexagon} message="No pipelines match your search." />
+        <EmptyState icon={Hexagon} message={tf("auto.f887cf4cff7ef40a")} />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-(--sz-780px) border-collapse text-sm">
             <thead>
               <tr className="border-b border-border text-left text-(length:--text-micro) font-semibold uppercase tracking-widest text-muted-foreground">
-                <th className="py-2 pl-3 pr-4">Name</th>
-                <th className="px-4 py-2">Attention</th>
-                <th className="px-4 py-2">Open items</th>
-                <th className="px-4 py-2">Status</th>
-                <th className="px-4 py-2">Last activity</th>
+                <th className="py-2 pl-3 pr-4">{tf("text.Name")}</th>
+                <th className="px-4 py-2">{tf("auto.c2eb8cd9d9564314")}</th>
+                <th className="px-4 py-2">{tf("auto.161e4d503fd39a32")}</th>
+                <th className="px-4 py-2">{tf("text.Status")}</th>
+                <th className="px-4 py-2">{tf("auto.06475633ed3e14cf")}</th>
               </tr>
             </thead>
             <tbody>
@@ -854,16 +855,16 @@ function NewPipelineDialog({
       <DialogContent>
         <form onSubmit={submit} className="space-y-4">
           <DialogHeader>
-            <DialogTitle>New pipeline</DialogTitle>
-            <DialogDescription>Name the pipeline and add a short description.</DialogDescription>
+            <DialogTitle>{tf("auto.43604bb124f1605c")}</DialogTitle>
+            <DialogDescription>{tf("auto.694004bb9e962d24")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <label className="block space-y-1.5 text-sm font-medium">
-              <span>Name</span>
+              <span>{tf("text.Name")}</span>
               <Input value={name} onChange={(event) => setName(event.target.value)} autoFocus />
             </label>
             <label className="block space-y-1.5 text-sm font-medium">
-              <span>Description</span>
+              <span>{tf("text.Description")}</span>
               <Textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
@@ -874,7 +875,7 @@ function NewPipelineDialog({
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button type="submit" disabled={pending || !name.trim()}>
               {pending ? "Creating..." : "Create pipeline"}
@@ -905,7 +906,7 @@ function PipelinesIndex() {
   const [viewMode, setViewMode] = useState<PipelineViewMode>("nested");
   const [newPipelineOpen, setNewPipelineOpen] = useState(false);
 
-  useEffect(() => setBreadcrumbs([{ label: "Pipelines" }]), [setBreadcrumbs]);
+  useEffect(() => setBreadcrumbs([{ label: tf("nav.pipelines") }]), [setBreadcrumbs]);
 
   const pipelinesQuery = useQuery({
     queryKey: selectedCompanyId ? queryKeys.pipelines.list(selectedCompanyId) : ["pipelines", "missing-company"],
@@ -941,7 +942,7 @@ function PipelinesIndex() {
   });
 
   if (!selectedCompanyId) {
-    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">Select an organization to view pipelines.</div>;
+    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">{tf("auto.fb644ace7f17f0c2")}</div>;
   }
   if (pipelinesQuery.isLoading) return <PageSkeleton />;
 
@@ -952,27 +953,27 @@ function PipelinesIndex() {
     <div className="w-full max-w-6xl px-6 py-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">Work</p>
-          <h1 className="text-2xl font-semibold text-foreground">Pipelines</h1>
+          <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("nav.work")}</p>
+          <h1 className="text-2xl font-semibold text-foreground">{tf("nav.pipelines")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {formatNumber(pipelines.length)} pipeline{pipelines.length === 1 ? "" : "s"}. Connected ones are grouped from upstream work into downstream work.
           </p>
         </div>
         <Button onClick={() => setNewPipelineOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          New pipeline
+          {tf("auto.43604bb124f1605c")}
         </Button>
       </div>
 
       {pipelinesQuery.error ? (
-        <p className="mb-4 text-sm text-destructive">Could not load pipelines.</p>
+        <p className="mb-4 text-sm text-destructive">{tf("auto.81da5459511e5f5d")}</p>
       ) : null}
 
       {pipelines.length === 0 && !pipelinesQuery.error ? (
         <EmptyState
           icon={Hexagon}
-          message="No pipelines yet."
-          action="New pipeline"
+          message={tf("auto.72183d31fea778ed")}
+          action={tf("auto.43604bb124f1605c")}
           onAction={() => setNewPipelineOpen(true)}
         />
       ) : (
@@ -1257,17 +1258,17 @@ function PipelineCaseCard({
           {isWorking ? (
             <Badge variant="outline" className="relative border-emerald-400/40 bg-emerald-50 text-(length:--text-nano) text-emerald-700 dark:border-emerald-300/30 dark:bg-emerald-900/30 dark:text-emerald-300">
               <span className="absolute -left-1 -top-1 h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
-              Working
+              {tf("auto.a92f0449a9f7235b")}
             </Badge>
           ) : null}
           {hasNeedsAttention ? (
             <Badge variant="outline" className="border-amber-400/40 bg-amber-50 text-(length:--text-nano) text-amber-700 dark:border-amber-300/30 dark:bg-amber-900/25 dark:text-amber-300">
-              Needs attention
+              {tf("auto.c1ebc7817870e5be")}
             </Badge>
           ) : null}
           {hasChangedNotice ? (
             <Badge variant="outline" className="border-indigo-400/40 bg-indigo-50 text-(length:--text-nano) text-indigo-700 dark:border-indigo-300/30 dark:bg-indigo-900/25 dark:text-indigo-300">
-              This changed
+              {tf("auto.56ec3b71e2f77331")}
             </Badge>
           ) : null}
           {liveDownstreamCount > 0 ? (
@@ -1388,7 +1389,7 @@ function PipelineBoardColumn({
       >
         {isBlockedDropTarget ? (
           <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-(length:--text-micro) text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
-            This move skips the normal flow
+            {tf("auto.5eeba22eff5adde4")}
           </p>
         ) : null}
         <SortableContext items={sortableCaseIds} strategy={verticalListSortingStrategy}>
@@ -1630,7 +1631,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
     },
     onError: (error) => {
       pushToast({
-        title: "Move blocked",
+        title: tf("auto.996bb059696d87d9"),
         body:
           error instanceof ApiError && error.status === 409
             ? "This item changed while you were looking. The board has been refreshed."
@@ -1691,7 +1692,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Pipelines", href: "/pipelines" },
+      { label: tf("nav.pipelines"), href: "/pipelines" },
       { label: pipeline?.name ?? "Pipeline" },
     ]);
   }, [pipeline?.name, setBreadcrumbs]);
@@ -1702,21 +1703,21 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
 
   if (pipelineQuery.isLoading || casesQuery.isLoading) return <PageSkeleton />;
   if (!pipeline) {
-    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">Pipeline not found.</div>;
+    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">{tf("auto.97115fd9946b99b2")}</div>;
   }
 
   if (orderedStages.length === 0) {
     return (
       <div className="mx-auto max-w-6xl space-y-4 px-6 py-8">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">Pipeline</p>
+          <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("auto.37e1c775f452d695")}</p>
           <h1 className="text-2xl font-semibold text-foreground">{pipeline.name}</h1>
-          <p className="text-sm text-muted-foreground">No stages are set up for this pipeline yet.</p>
+          <p className="text-sm text-muted-foreground">{tf("auto.bebb89c9fdacc400")}</p>
         </div>
         <EmptyState
           icon={Hexagon}
-          message="Add stages in pipeline settings to enable the board."
-          action="Open settings"
+          message={tf("auto.4d94fe22b5544861")}
+          action={tf("auto.ca381c1e76e681b6")}
           onAction={() => navigate(`/pipelines/${pipelineId}/settings`)}
         />
       </div>
@@ -1729,7 +1730,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
     <div className="w-full space-y-4 px-6 py-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">Pipeline</p>
+          <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("auto.37e1c775f452d695")}</p>
           <h1 className="text-2xl font-semibold text-foreground">{pipeline.name}</h1>
           {pipeline.description ? <p className="mt-1 text-sm text-muted-foreground">{pipeline.description}</p> : null}
           <p className="mt-1 text-xs text-muted-foreground">{cases.length} total item{cases.length === 1 ? "" : "s"}</p>
@@ -1751,23 +1752,23 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
           <Select value={groupBy} onValueChange={handleGroupByChange}>
-            <SelectTrigger className="h-9 w-(--sz-148px)" aria-label="Group by" title="Group by">
+            <SelectTrigger className="h-9 w-(--sz-148px)" aria-label={tf("auto.956a51f6b098a41b")} title={tf("auto.956a51f6b098a41b")}>
               <Layers className="h-4 w-4 text-muted-foreground" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              <SelectItem value="builtFor">Built for</SelectItem>
+              <SelectItem value="none">{tf("text.None")}</SelectItem>
+              <SelectItem value="builtFor">{tf("auto.0ae12b05cf0fd9ca")}</SelectItem>
             </SelectContent>
           </Select>
           <Button asChild>
             <Link to={`/pipelines/${pipelineId}/add`}>
               <Plus className="mr-2 h-4 w-4" />
-              Add items
+              {tf("auto.13583d03136d8481")}
             </Link>
           </Button>
           <Button variant="outline" size="icon" asChild>
-            <Link to={`/pipelines/${pipelineId}/settings`} aria-label="Pipeline settings" title="Pipeline settings">
+            <Link to={`/pipelines/${pipelineId}/settings`} aria-label={tf("auto.ddecf9865513adfe")} title={tf("auto.ddecf9865513adfe")}>
               <Settings className="h-4 w-4" />
             </Link>
           </Button>
@@ -1861,12 +1862,12 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
           </DialogHeader>
           {pendingMove && !pendingMove.allowed ? (
             <label className="block space-y-1.5 text-sm font-medium">
-              <span>Reason</span>
+              <span>{tf("text.Reason")}</span>
               <Textarea
                 value={overrideReason}
                 onChange={(event) => setOverrideReason(event.target.value)}
                 rows={3}
-                placeholder="Explain why this item should skip the normal flow."
+                placeholder={tf("auto.44fa41d4bdf395f5")}
                 autoFocus
               />
             </label>
@@ -1881,7 +1882,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
                 setOverrideReason("");
               }}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             {pendingMove?.allowed ? (
               <Button
@@ -1895,7 +1896,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
                   })
                 }
               >
-                Move it
+                {tf("auto.71ae3bd4880719bc")}
               </Button>
             ) : pendingMove ? (
               <Button
@@ -1912,7 +1913,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
                   })
                 }
               >
-                Override and move
+                {tf("auto.f33f72e92be32abd")}
               </Button>
             ) : null}
           </DialogFooter>
@@ -1933,7 +1934,7 @@ function NavigateToItem({ pipelineId, caseId }: { pipelineId: string; caseId: st
 }
 
 function NavigateMissingItem() {
-  return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">Item not found.</div>;
+  return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">{tf("auto.48048a3f93468d95")}</div>;
 }
 
 function LinkRedirect({ to }: { to: string }) {
@@ -2152,7 +2153,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       options.push({ id: `agent:${agent.id}`, label: agent.name });
     }
     if (currentUserId) {
-      options.push({ id: `user:${currentUserId}`, label: "Me" });
+      options.push({ id: `user:${currentUserId}`, label: tf("auto.d30af076b0dc85cc") });
     }
     return options;
   }, [agents, companyMembers?.users, currentUserId]);
@@ -2284,7 +2285,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Pipelines", href: "/pipelines" },
+      { label: tf("nav.pipelines"), href: "/pipelines" },
       { label: pipeline.data?.name ?? detail?.pipeline.name ?? "Pipeline", href: `/pipelines/${pipelineId}` },
       { label: detail?.case.title ?? "Item" },
     ]);
@@ -2306,9 +2307,9 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
     },
     onSuccess: async () => {
       await invalidateItem();
-      pushToast({ title: "Conversation started", tone: "success" });
+      pushToast({ title: tf("auto.26c9f9cc7badff45"), tone: "success" });
     },
-    onError: () => pushToast({ title: "Could not start the conversation", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.84ffc7a8c34f2803"), tone: "error" }),
   });
 
   // Body-document selection → "Start conversation & comment": returns the created issue so the
@@ -2319,7 +2320,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       await invalidateItem();
       return ("issue" in result ? result.issue : null) ?? null;
     } catch {
-      pushToast({ title: "Could not start the conversation", tone: "error" });
+      pushToast({ title: tf("auto.84ffc7a8c34f2803"), tone: "error" });
       return null;
     }
   }, [caseId, invalidateItem, pushToast]);
@@ -2413,9 +2414,9 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
     if (!conversationIssueId) return;
     try {
       await issuesApi.interruptLatestQueuedComments(conversationIssueId, runId);
-      pushToast({ title: "Interrupt requested", body: "Queued messages will be sent when the previous run has stopped.", tone: "success" });
+      pushToast({ title: tf("auto.766c2332064aba42"), body: "Queued messages will be sent when the previous run has stopped.", tone: "success" });
     } catch (error) {
-      pushToast({ title: "Interrupt failed", body: error instanceof Error ? error.message : "Unable to send queued messages", tone: "error" });
+      pushToast({ title: tf("auto.53d754e8ad852d35"), body: error instanceof Error ? error.message: tf("auto.3ea71dbacf31f685"), tone: "error" });
     } finally {
       await invalidateConversation();
     }
@@ -2482,16 +2483,16 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
         tone: "success",
       });
     },
-    onError: () => pushToast({ title: "Could not resolve the suggestion", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.39270bdc83474311"), tone: "error" }),
   });
 
   const acknowledgeChange = useMutation({
     mutationFn: () => pipelinesApi.acknowledgeDrift(caseId, { expectedVersion: detail?.case.version }),
     onSuccess: async () => {
       await invalidateItem();
-      pushToast({ title: "Change acknowledged", tone: "success" });
+      pushToast({ title: tf("auto.a8a896c32a51e133"), tone: "success" });
     },
-    onError: () => pushToast({ title: "Could not acknowledge the change", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.c06204e55d40ed44"), tone: "error" }),
   });
 
   const previousRetryAvailability = useQuery({
@@ -2540,12 +2541,12 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
     onSuccess: async () => {
       setRetryDialogScope(null);
       await invalidateItem();
-      pushToast({ title: "Step automation re-run started", tone: "success" });
+      pushToast({ title: tf("auto.754cc252e845f3eb"), tone: "success" });
     },
     onError: (error: unknown) => {
-      const message = error instanceof ApiError && error.message ? error.message : "Could not re-run this step.";
+      const message = error instanceof ApiError && error.message ? error.message: tf("auto.ae294383cca3ecbb");
       setRetryDialogError(message);
-      pushToast({ title: "Could not re-run this step", tone: "error" });
+      pushToast({ title: tf("auto.32836085f7c5560f"), tone: "error" });
     },
   });
 
@@ -2565,12 +2566,12 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
         queryClient.invalidateQueries({ queryKey: ["pipelines", "item", caseId, "automation-retry-plan"] }),
         queryClient.invalidateQueries({ queryKey: queryKeys.pipelines.caseChildren(caseId) }),
       ]);
-      pushToast({ title: "Retry started", tone: "success" });
+      pushToast({ title: tf("auto.f50dc3340f4f74e8"), tone: "success" });
     },
     onError: (error: unknown) => {
-      const message = error instanceof ApiError && error.message ? error.message : "Could not retry this automation.";
+      const message = error instanceof ApiError && error.message ? error.message: tf("auto.367bb6c2d9373aa7");
       setRetryDialogError(message);
-      pushToast({ title: "Could not retry this automation", tone: "error" });
+      pushToast({ title: tf("auto.ddf986894b94fdf2"), tone: "error" });
     },
   });
 
@@ -2607,14 +2608,13 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
     onMutate: () => setLivenessRetryError(null),
     onSuccess: async () => {
       await invalidateItem();
-      pushToast({ title: "Retry started", tone: "success" });
+      pushToast({ title: tf("auto.f50dc3340f4f74e8"), tone: "success" });
     },
     onError: (error: unknown) => {
       const message = error instanceof ApiError && error.message
-        ? error.message
-        : "Could not retry. Please try again.";
+        ? error.message: tf("auto.647fcac267d230ef");
       setLivenessRetryError(message);
-      pushToast({ title: "Could not retry the automation", tone: "error" });
+      pushToast({ title: tf("auto.50fd78d890191ff3"), tone: "error" });
     },
   });
 
@@ -2646,9 +2646,9 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       setMoveDialogOpen(false);
       setMoveStageKey("");
       await invalidateItem();
-      pushToast({ title: "Item moved", tone: "success" });
+      pushToast({ title: tf("auto.05082e4b8c4fe432"), tone: "success" });
     },
-    onError: () => pushToast({ title: "Could not move the item", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.492acd8eb54f2eb0"), tone: "error" }),
   });
   const removeItem = useMutation({
     mutationFn: () => {
@@ -2662,10 +2662,10 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
     onSuccess: async () => {
       setRemoveDialogOpen(false);
       await invalidateItem();
-      pushToast({ title: "Item removed", tone: "success" });
+      pushToast({ title: tf("auto.79df300fef285cb9"), tone: "success" });
       navigate(`/pipelines/${pipelineId}`);
     },
-    onError: () => pushToast({ title: "Could not remove the item", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.0ce513f409f62a99"), tone: "error" }),
   });
 
   const reviewConfig = useMemo(
@@ -2723,12 +2723,12 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       });
       if (nextHref) navigate(nextHref);
     },
-    onError: () => pushToast({ title: "Could not update the review", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.ee312b88e2474ac3"), tone: "error" }),
   });
 
   if (pipeline.isLoading || item.isLoading) return <PageSkeleton />;
   if (!detail || !pipeline.data) {
-    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">Item not found.</div>;
+    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">{tf("auto.48048a3f93468d95")}</div>;
   }
 
   const workReferences = extractWorkReferences(detail.case);
@@ -2769,7 +2769,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
         <Button asChild>
           <Link to={conversationIssuePath!} state={conversationIssueState} issuePrefetch={conversationIssueDetail.data ?? null}>
             <MessageSquare className="mr-2 h-4 w-4" />
-            Open conversation
+            {tf("auto.7047b9af7a4cd070")}
           </Link>
         </Button>
       )
@@ -2797,7 +2797,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       <div className="mb-6 grid gap-5 lg:grid-cols-(--gtc-45) lg:items-start lg:gap-8">
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/pipelines" className="hover:text-foreground">Pipelines</Link>
+            <Link to="/pipelines" className="hover:text-foreground">{tf("nav.pipelines")}</Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <Link to={`/pipelines/${pipelineId}`} className="hover:text-foreground">{pipeline.data.name}</Link>
           </div>
@@ -2845,7 +2845,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             {primaryAction}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Item actions">
+                <Button variant="outline" size="icon" aria-label={tf("auto.a145120d719eaee6")}>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -2892,7 +2892,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                   }}
                 >
                   <ArrowUpDown className="h-4 w-4" />
-                  Move to stage...
+                  {tf("auto.a28cf2aa02c149a5")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
@@ -2903,7 +2903,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                   }}
                 >
                   <Trash2 className="h-4 w-4" />
-                  Remove item
+                  {tf("auto.5a89edf2867d98dd")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -2914,7 +2914,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       <Dialog open={moveDialogOpen} onOpenChange={setMoveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Move to stage</DialogTitle>
+            <DialogTitle>{tf("auto.e64cc92ef733312f")}</DialogTitle>
             <DialogDescription>
               Manual moves can bypass the normal agent handoff for this item. Let automation move work when possible;
               use this override only when the board needs to correct the item state.
@@ -2931,10 +2931,10 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
               </div>
             </div>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-foreground">Stage</span>
+              <span className="text-sm font-medium text-foreground">{tf("auto.de838855e4a6e04e")}</span>
               <Select value={moveStageKey} onValueChange={setMoveStageKey}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a stage" />
+                  <SelectValue placeholder={tf("auto.15a9299c0b66ffcb")} />
                 </SelectTrigger>
                 <SelectContent>
                   {moveStageOptions.map((stage) => (
@@ -2953,7 +2953,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
               onClick={() => setMoveDialogOpen(false)}
               disabled={moveItemToStage.isPending}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               type="button"
@@ -2976,36 +2976,35 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
           <DialogHeader>
             <DialogTitle>{retryDialogScope === "previous_stage" ? "Retry previous step" : "Re-run this step"}</DialogTitle>
             <DialogDescription>
-              Review the automation preflight before Paperclip dispatches a fresh run.
+              {tf("auto.38e3e11f827177f4")}
             </DialogDescription>
           </DialogHeader>
           {retryPlan.isLoading ? (
             <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Checking retry safety...
+              {tf("auto.b96573c375f51248")}
             </div>
           ) : retryPlan.error ? (
             <div className="rounded-sm border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
               {retryPlan.error instanceof ApiError && retryPlan.error.message
-                ? retryPlan.error.message
-                : "Could not check whether this automation can be retried."}
+                ? retryPlan.error.message: tf("auto.a30f69d4201b3f2c")}
             </div>
           ) : retryPlan.data ? (
             <div className="space-y-4 py-2">
               <div className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
-                  <div className="text-xs font-medium uppercase text-muted-foreground">From</div>
+                  <div className="text-xs font-medium uppercase text-muted-foreground">{tf("auto.218197693424e015")}</div>
                   <div className="mt-1 font-medium text-foreground">{retryPlan.data.currentStage.name}</div>
                 </div>
                 <div>
-                  <div id="retry-runs-at-label" className="text-xs font-medium uppercase text-muted-foreground">Runs at</div>
+                  <div id="retry-runs-at-label" className="text-xs font-medium uppercase text-muted-foreground">{tf("auto.1b2499936a6525b9")}</div>
                   {retryShowTargetDropdown ? (
                     <Select
                       value={retrySelectedTargetId}
                       onValueChange={(value) => setRetryTargetStageId(value)}
                     >
                       <SelectTrigger className="mt-1 w-full" aria-labelledby="retry-runs-at-label">
-                        <SelectValue placeholder="Choose a step" />
+                        <SelectValue placeholder={tf("auto.f1fb3b3ce71b8232")} />
                       </SelectTrigger>
                       <SelectContent>
                         {retryAvailableTargets.map((stage) => (
@@ -3020,7 +3019,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                   )}
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-medium uppercase text-muted-foreground">Automation</div>
+                  <div className="text-xs font-medium uppercase text-muted-foreground">{tf("auto.d909750b1bbb71a3")}</div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-1 text-foreground">
                     {retryPlan.data.routine ? (
                       <>
@@ -3030,7 +3029,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                         >
                           {retryPlan.data.routine.title}
                         </Link>
-                        <span className="text-muted-foreground">assigned to</span>
+                        <span className="text-muted-foreground">{tf("auto.83a18d92de004c16")}</span>
                         {retryPlan.data.routine.assigneeAgent ? (
                           <Link
                             to={`/agents/${retryPlan.data.routine.assigneeAgent.id}`}
@@ -3039,7 +3038,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                             {retryPlan.data.routine.assigneeAgent.name}
                           </Link>
                         ) : (
-                          <span className="font-medium text-muted-foreground">No responsible</span>
+                          <span className="font-medium text-muted-foreground">{tf("auto.15abdee5d453108e")}</span>
                         )}
                       </>
                     ) : (
@@ -3053,15 +3052,15 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                 {retryPreflightRefreshing ? (
                   <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 rounded-sm bg-background/70 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Checking retry safety...
+                    {tf("auto.b96573c375f51248")}
                   </div>
                 ) : null}
                 <div className={cn("space-y-4", retryPreflightRefreshing && "opacity-50")}>
                   <div className="grid gap-2 text-sm sm:grid-cols-4">
-                    <RetryMetric label="children" value={retryPlan.data.effectCounts.directChildren} />
-                    <RetryMetric label="descendants" value={retryPlan.data.effectCounts.descendants} />
-                    <RetryMetric label="linked tasks" value={retryPlan.data.effectCounts.linkedAutomationIssues} />
-                    <RetryMetric label="active work" value={retryPlan.data.effectCounts.activeDescendants} tone={retryPlan.data.effectCounts.activeDescendants > 0 ? "warning" : "default"} />
+                    <RetryMetric label={tf("auto.10910087de24bfca")} value={retryPlan.data.effectCounts.directChildren} />
+                    <RetryMetric label={tf("auto.2ea3c7963d2a748f")} value={retryPlan.data.effectCounts.descendants} />
+                    <RetryMetric label={tf("auto.3a0ca25fb4805bec")} value={retryPlan.data.effectCounts.linkedAutomationIssues} />
+                    <RetryMetric label={tf("auto.36d97e777416b44e")} value={retryPlan.data.effectCounts.activeDescendants} tone={retryPlan.data.effectCounts.activeDescendants > 0 ? "warning" : "default"} />
                   </div>
 
                   {retryPlan.data.blockers.length > 0 ? (
@@ -3083,7 +3082,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
 
                   {retryIsNonImmediateTarget ? (
                     <p className="text-xs text-muted-foreground">
-                      Re-running from an earlier step affects more downstream items.
+                      {tf("auto.3634ef4e747b2034")}
                     </p>
                   ) : null}
 
@@ -3137,7 +3136,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
               onClick={() => setRetryDialogScope(null)}
               disabled={rerunCurrentStageAutomation.isPending || retryStageAutomation.isPending}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               type="button"
@@ -3186,7 +3185,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                 disabled={resolveSuggestion.isPending}
               >
                 <Check className="mr-2 h-4 w-4" />
-                Approve
+                {tf("text.Approve")}
               </Button>
               <Button
                 size="sm"
@@ -3195,7 +3194,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                 disabled={resolveSuggestion.isPending}
               >
                 <X className="mr-2 h-4 w-4" />
-                Not yet
+                {tf("auto.a9549d7d06368d83")}
               </Button>
             </div>
           ) : null}
@@ -3217,13 +3216,13 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             onClick={() => acknowledgeChange.mutate()}
             disabled={acknowledgeChange.isPending}
           >
-            Acknowledge
+            {tf("auto.f9236d9e87b6235e")}
           </Button>
         </section>
       ) : null}
 
       {(childrenGate || (breakdown?.waitForPieces ?? false)) && waitingChildren.length > 0 ? (
-        <section aria-label="Waiting child items" className="mb-5 border-y border-border px-4 py-4">
+        <section aria-label={tf("auto.d2b775d57a7a1fc7")} className="mb-5 border-y border-border px-4 py-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <ListTree className="h-4 w-4 text-muted-foreground" />
@@ -3261,7 +3260,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             <details className="group rounded-md border border-border">
               <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground [&::-webkit-details-marker]:hidden">
                 <ChevronRight className="h-3.5 w-3.5 text-muted-foreground transition-transform group-open:rotate-90" />
-                More details
+                {tf("auto.b5eff1dbd0154de8")}
                 <span className="text-(length:--text-micro) font-normal text-muted-foreground">
                   {mainPaneFields.length} {mainPaneFields.length === 1 ? "field" : "fields"}
                 </span>
@@ -3288,7 +3287,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             onRetry={() => outputs.refetch()}
           />
 
-          <DetailSection title="Conversation">
+          <DetailSection title={tf("auto.ccca181757536587")}>
             {activeConversationIssue ? (
               <div className="py-3">
                 <IssueChatThread
@@ -3343,7 +3342,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
               </div>
             ) : (
               <div className="flex flex-col items-start gap-3 py-3 text-sm text-muted-foreground">
-                <p>No active conversation yet.</p>
+                <p>{tf("auto.ac58416e04bd15d3")}</p>
                 <Button size="sm" variant="outline" onClick={() => startConversation.mutate()} disabled={startConversation.isPending}>
                   <MessageSquare className="mr-2 h-4 w-4" />
                   {startConversation.isPending ? "Starting..." : "Start a conversation"}
@@ -3356,7 +3355,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
         <aside className="min-w-0 space-y-8">
           {reviewPanel}
 
-          <DetailSection title="Linked work">
+          <DetailSection title={tf("auto.e5455759ff0eb447")}>
             <PipelineWorkReferences references={workReferences} />
           </DetailSection>
 
@@ -3391,7 +3390,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             ) : null}
           </DetailSection>
 
-          <DetailSection title="Details">
+          <DetailSection title={tf("text.Details")}>
             {itemFields.length > 0 ? (
               <dl className="divide-y divide-border">
                 {itemFields.map((field) => (
@@ -3402,11 +3401,11 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                 ))}
               </dl>
             ) : (
-              <p className="py-3 text-sm text-muted-foreground">No added details.</p>
+              <p className="py-3 text-sm text-muted-foreground">{tf("auto.06aab58607842581")}</p>
             )}
           </DetailSection>
 
-          <DetailSection title="Activity">
+          <DetailSection title={tf("text.Activity")}>
             {eventRows.length > 0 ? (
               <ol className="divide-y divide-border">
                 {eventRows.map((event) => (
@@ -3419,7 +3418,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
                 ))}
               </ol>
             ) : (
-              <p className="py-3 text-sm text-muted-foreground">No activity yet.</p>
+              <p className="py-3 text-sm text-muted-foreground">{tf("auto.a288d2d0a21eed3c")}</p>
             )}
           </DetailSection>
         </aside>
@@ -3428,9 +3427,9 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove item</DialogTitle>
+            <DialogTitle>{tf("auto.5a89edf2867d98dd")}</DialogTitle>
             <DialogDescription>
-              This moves the item out of active work. It stays visible in the pipeline history.
+              {tf("auto.de02a7c91d53106f")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -3481,7 +3480,7 @@ function ActivePipelineWorkBanner({ activeWork }: { activeWork: PipelineCaseActi
       >
         <Link to={issuePath}>
           <ExternalLink className="mr-2 h-4 w-4" />
-          Open task
+          {tf("auto.6b5c9394cb7f900b")}
         </Link>
       </Button>
     </section>
@@ -3591,7 +3590,7 @@ function reviewDecisionActions(
   if (config.approveToStageKey) {
     actions.push({
       decision: "approve",
-      label: "Approve",
+      label: tf("text.Approve"),
       targetStageKey: config.approveToStageKey,
       targetStageName: stageLookup.get(config.approveToStageKey) ?? humanizePipelineItemStatus(config.approveToStageKey),
       requireReason: false,
@@ -3601,7 +3600,7 @@ function reviewDecisionActions(
   if (config.requestChangesToStageKey) {
     actions.push({
       decision: "request_changes",
-      label: "Request changes",
+      label: tf("text.Request changes"),
       targetStageKey: config.requestChangesToStageKey,
       targetStageName: stageLookup.get(config.requestChangesToStageKey) ?? humanizePipelineItemStatus(config.requestChangesToStageKey),
       requireReason: config.requireRequestChangesReason,
@@ -3611,7 +3610,7 @@ function reviewDecisionActions(
   if (config.rejectToStageKey) {
     actions.push({
       decision: "reject",
-      label: "Reject",
+      label: tf("text.Reject"),
       targetStageKey: config.rejectToStageKey,
       targetStageName: stageLookup.get(config.rejectToStageKey) ?? humanizePipelineItemStatus(config.rejectToStageKey),
       requireReason: config.requireRejectReason,
@@ -3653,26 +3652,26 @@ function ReviewDecisionPanel({
 
   return (
     <section>
-      <h2 className="mb-3 text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">Review</h2>
+      <h2 className="mb-3 text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("auto.aff0766a5290e117")}</h2>
       <div className="border-y border-amber-300 bg-amber-50/70 p-5 text-amber-950 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-100 sm:p-6">
         <div className="space-y-5">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-1 h-5 w-5 shrink-0" />
             <div>
-              <p className="text-2xl font-semibold leading-tight">In review</p>
+              <p className="text-2xl font-semibold leading-tight">{tf("status.in_review")}</p>
               <p className="mt-1 text-sm opacity-80">
-                Decide where this item goes next.
+                {tf("auto.ceb5048de3dc22d9")}
               </p>
             </div>
           </div>
 
           <label className="block space-y-1.5 text-sm font-medium">
-            <span>Reason</span>
+            <span>{tf("text.Reason")}</span>
             <Textarea
               value={note}
               onChange={(event) => onNoteChange(event.target.value)}
               rows={4}
-              placeholder={requireReason ? "Required for changes or rejection." : "Optional note."}
+              placeholder={requireReason ? tf("auto.27022b11174b36ce") : tf("auto.48cba79c9006df66")}
               className="bg-background/90 text-foreground"
             />
           </label>
@@ -3714,7 +3713,7 @@ function ReviewDecisionPanel({
               Next in this review queue: <span className="font-medium">{nextItemTitle}</span>
             </p>
           ) : (
-            <p className="text-xs opacity-75">No other item is waiting in this pipeline review queue.</p>
+            <p className="text-xs opacity-75">{tf("auto.3e03b036e34cdff3")}</p>
           )}
         </div>
       </div>
@@ -3762,7 +3761,7 @@ function PipelineEventText({
           <>
             {" "}
             <Link to={pipelineStageAutomationSettingsHref(pipelineId, stageId)} className="font-medium text-foreground hover:underline">
-              Fix stage settings
+              {tf("auto.f004e056ad4e5992")}
             </Link>
           </>
         ) : null}
@@ -3874,7 +3873,7 @@ function OutputDeliverableTag({ label }: { label: string }) {
 function OutputUnverifiedTag() {
   return (
     <Badge variant="outline" className="border-border px-1.5 text-(length:--text-nano) font-semibold uppercase text-muted-foreground">
-      Unverified
+      {tf("auto.33c8e8de41c3a351")}
     </Badge>
   );
 }
@@ -3937,7 +3936,7 @@ function ItemOutputDocumentRow({ item }: { item: PipelineCaseDocumentOutputItem 
         to={href}
         className="inline-flex h-(--sz-30px) w-(--sz-30px) shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
         aria-label={`Open ${item.title}`}
-        title="Open document"
+        title={tf("auto.07e93c9ea2c61d95")}
       >
         <ArrowUpRight className="h-4 w-4" />
       </Link>
@@ -3965,7 +3964,7 @@ function ItemOutputWorkProductRow({ item }: { item: PipelineCaseWorkProductOutpu
         to={href}
         className="inline-flex h-(--sz-30px) w-(--sz-30px) shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
         ariaLabel={`Open ${item.title}`}
-        title="Open work product"
+        title={tf("auto.73e348fe85b0f808")}
       >
         <ArrowUpRight className="h-4 w-4" />
       </OutputLink>
@@ -4018,7 +4017,7 @@ function ItemOutputAttachmentRow({ item }: { item: PipelineCaseAttachmentOutputI
           rel="noreferrer"
           className="inline-flex h-(--sz-30px) w-(--sz-30px) items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           aria-label={`Open ${filename}`}
-          title="Open"
+          title={tf("text.Open")}
         >
           <ArrowUpRight className="h-4 w-4" />
         </a>
@@ -4026,7 +4025,7 @@ function ItemOutputAttachmentRow({ item }: { item: PipelineCaseAttachmentOutputI
           href={item.downloadPath}
           className="inline-flex h-(--sz-30px) w-(--sz-30px) items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           aria-label={`Download ${filename}`}
-          title="Download"
+          title={tf("text.Download")}
         >
           <Download className="h-4 w-4" />
         </a>
@@ -4056,7 +4055,7 @@ function ItemOutputsSection({
   if (documents.length > 0) {
     groups.push({
       key: "document",
-      label: "Documents",
+      label: tf("text.Documents"),
       icon: <FileText className="h-4 w-4 text-muted-foreground" />,
       rows: documents.map((item) => <ItemOutputDocumentRow key={item.id} item={item} />),
     });
@@ -4064,7 +4063,7 @@ function ItemOutputsSection({
   if (workProducts.length > 0) {
     groups.push({
       key: "work_product",
-      label: "Work products",
+      label: tf("auto.5c96c6bdb65d04b8"),
       icon: <Package className="h-4 w-4 text-muted-foreground" />,
       rows: workProducts.map((item) => <ItemOutputWorkProductRow key={item.id} item={item} />),
     });
@@ -4072,7 +4071,7 @@ function ItemOutputsSection({
   if (attachments.length > 0) {
     groups.push({
       key: "attachment",
-      label: "Attachments",
+      label: tf("text.Attachments"),
       icon: <Paperclip className="h-4 w-4 text-muted-foreground" />,
       rows: attachments.map((item) => <ItemOutputAttachmentRow key={item.id} item={item} />),
     });
@@ -4080,7 +4079,7 @@ function ItemOutputsSection({
 
   return (
     <DetailSection
-      title="Item outputs"
+      title={tf("auto.aeaa10ffee742806")}
       trailing={
         loading ? null : (
           <Badge variant="ghost" className="bg-muted text-(length:--text-micro) normal-case tracking-normal text-muted-foreground">
@@ -4101,13 +4100,13 @@ function ItemOutputsSection({
       ) : error ? (
         <div className="flex items-center gap-2 py-2.5 text-xs text-destructive">
           <AlertTriangle className="h-4 w-4 shrink-0" />
-          <span>Couldn't load item outputs.</span>
+          <span>{tf("auto.6c171fae369c4ed1")}</span>
           <button
             type="button"
             onClick={onRetry}
             className="ml-auto rounded-sm border border-border px-2 py-0.5 text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Retry
+            {tf("text.Retry")}
           </button>
         </div>
       ) : (
@@ -4134,7 +4133,7 @@ function BuiltFromTree({
   rows: Array<{ case: PipelineCase; stage: PipelineStage }>;
 }) {
   if (rows.length === 0) {
-    return <p className="py-3 text-sm text-muted-foreground">No built-from items.</p>;
+    return <p className="py-3 text-sm text-muted-foreground">{tf("auto.54df01aecd14b07f")}</p>;
   }
   return (
     <ul className="divide-y divide-border">
@@ -4190,9 +4189,9 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Pipelines", href: "/pipelines" },
+      { label: tf("nav.pipelines"), href: "/pipelines" },
       { label: pipeline.data?.name ?? "Pipeline", href: `/pipelines/${pipelineId}` },
-      { label: "Add items" },
+      { label: tf("auto.13583d03136d8481") },
     ]);
   }, [pipeline.data?.name, pipelineId, setBreadcrumbs]);
 
@@ -4228,7 +4227,7 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
 
   if (pipeline.isLoading || intake.isLoading) return <PageSkeleton />;
   if (!pipeline.data || !intake.data) {
-    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">Pipeline not found.</div>;
+    return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">{tf("auto.97115fd9946b99b2")}</div>;
   }
 
   const firstStageName = intake.data.stageName ?? pipeline.data.stages[0]?.name ?? "first stage";
@@ -4239,7 +4238,7 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
         <p className="text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
           Add to {pipeline.data.name}
         </p>
-        <h1 className="text-2xl font-semibold text-foreground">Build your list, then submit it all at once</h1>
+        <h1 className="text-2xl font-semibold text-foreground">{tf("auto.591126c29b4efe4c")}</h1>
         <p className="text-sm text-muted-foreground">
           Items will be added to the first stage ({firstStageName}).
         </p>
@@ -4283,13 +4282,13 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
           onClick={() => setRows((current) => [...current, newDraftRow(false)])}
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add another item
+          {tf("auto.a0e39727fcc0e87c")}
         </button>
       </div>
 
       <div className="mt-10 flex items-center justify-between border-t border-border pt-5">
         <Button variant="outline" onClick={() => navigate(`/pipelines/${pipelineId}`)}>
-          Cancel
+          {tf("text.Cancel")}
         </Button>
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">
@@ -4341,10 +4340,10 @@ function DraftItemRow({
           {!row.expanded && row.serverError ? <span className="block text-xs text-destructive">{row.serverError}</span> : null}
         </button>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={onToggle} aria-label={row.expanded ? "Collapse item" : "Expand item"}>
+          <Button variant="outline" size="icon" onClick={onToggle} aria-label={row.expanded ? tf("auto.0a1a7333fc5c5da7") : tf("auto.18f105fe679eda5d")}>
             {row.expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
-          <Button variant="outline" size="icon" onClick={onRemove} aria-label="Remove item">
+          <Button variant="outline" size="icon" onClick={onRemove} aria-label={tf("auto.5a89edf2867d98dd")}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -4365,9 +4364,9 @@ function DraftItemRow({
             {row.serverError ? <p className="md:col-span-2 text-sm text-destructive">{row.serverError}</p> : null}
           </div>
           <aside className="border border-border p-4 text-sm">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">Preview</p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("text.Preview")}</p>
             <p className="font-semibold text-foreground">{title}</p>
-            <p className="mt-3 text-xs text-muted-foreground">First stage on submit:</p>
+            <p className="mt-3 text-xs text-muted-foreground">{tf("auto.007b29c287122c8b")}</p>
             <p className="font-semibold text-foreground">{intake.stageName ?? "First stage"}</p>
           </aside>
         </div>
@@ -4392,12 +4391,12 @@ export function GeneratedField({
     <label className={cn("block space-y-1", field.type === "multiline" && "md:col-span-2")}>
       <span className="text-sm font-medium text-foreground">
         {field.label}
-        {field.required ? <span className="ml-1 font-normal text-destructive">required</span> : null}
+        {field.required ? <span className="ml-1 font-normal text-destructive">{tf("auto.d0a3630555bbec7f")}</span> : null}
       </span>
       {field.type === "select" ? (
         <Select value={value} onValueChange={onChange}>
           <SelectTrigger id={inputId} aria-invalid={Boolean(error)} className="w-full">
-            <SelectValue placeholder="Choose..." />
+            <SelectValue placeholder={tf("auto.895ba517a993c95a")} />
           </SelectTrigger>
           <SelectContent>
             {(field.options ?? []).map((option) => (
@@ -4573,7 +4572,7 @@ function ReviewQueueStatusChip({ failed }: { failed: boolean }) {
   return (
     <Badge variant="outline" className="border-amber-200 bg-amber-50 font-semibold text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/30 dark:text-amber-300">
       <AlertTriangle className="h-3 w-3" />
-      Needs attention
+      {tf("auto.c1ebc7817870e5be")}
     </Badge>
   );
 }
@@ -4623,12 +4622,12 @@ function ReviewQueueDetailDialog({
 
         <div className="space-y-5">
           <section className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">What is being decided</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{tf("auto.a955af4531becbd6")}</p>
             <p className="text-sm text-foreground">{row?.prompt}</p>
           </section>
 
           <section className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Item preview</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{tf("auto.c4df5b53cae54b8c")}</p>
             {fields.length > 0 ? (
               <div className="divide-y divide-border rounded-md border border-border">
                 {fields.map(([key, value]) => (
@@ -4640,7 +4639,7 @@ function ReviewQueueDetailDialog({
               </div>
             ) : (
               <p className="rounded-md border border-border px-3 py-3 text-sm text-muted-foreground">
-                No preview details yet.
+                {tf("auto.0954042fa76fd08c")}
               </p>
             )}
           </section>
@@ -4651,18 +4650,18 @@ function ReviewQueueDetailDialog({
               className="inline-block text-sm font-medium text-primary hover:underline"
               onClick={() => onOpenChange(false)}
             >
-              Open the full item
+              {tf("auto.8537ca0a86cb25f4")}
             </Link>
           ) : null}
 
           {canDecide ? (
             <label className="block space-y-1.5 text-sm font-medium">
-              <span>Note</span>
+              <span>{tf("auto.d8da2c49df39d91d")}</span>
               <Textarea
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 rows={3}
-                placeholder={requestChangesRequiresNote ? "Required when requesting changes." : "Optional note."}
+                placeholder={requestChangesRequiresNote ? tf("auto.46963679cfd66129") : tf("auto.48cba79c9006df66")}
               />
             </label>
           ) : null}
@@ -4670,7 +4669,7 @@ function ReviewQueueDetailDialog({
 
         <DialogFooter className="gap-2 sm:gap-2">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           {canDecide ? (
             <>
@@ -4795,13 +4794,13 @@ function ReviewQueueSection({
                       event.stopPropagation();
                       onApprove(row);
                     }}>
-                      Approve
+                      {tf("text.Approve")}
                     </Button>
                     <Button type="button" size="sm" variant="outline" disabled={pending} onClick={(event) => {
                       event.stopPropagation();
                       onDecline(row);
                     }}>
-                      Not yet
+                      {tf("auto.a9549d7d06368d83")}
                     </Button>
                   </>
                 ) : row.kind === "review" ? (
@@ -4810,13 +4809,13 @@ function ReviewQueueSection({
                       event.stopPropagation();
                       onApprove(row);
                     }}>
-                      Approve
+                      {tf("text.Approve")}
                     </Button>
                     <Button type="button" size="sm" variant="outline" disabled={pending} onClick={(event) => {
                       event.stopPropagation();
                       onRequestChanges(row);
                     }}>
-                      Request changes
+                      {tf("text.Request changes")}
                     </Button>
                   </>
                 ) : null}
@@ -4842,7 +4841,7 @@ export function ReviewQueue() {
   const [detailRow, setDetailRow] = useState<ReviewQueueRow | null>(null);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Review queue" }]);
+    setBreadcrumbs([{ label: tf("auto.3e1654beab977bad") }]);
   }, [setBreadcrumbs]);
 
   const attentionQuery = useQuery({
@@ -5054,7 +5053,7 @@ export function ReviewQueue() {
   }, [activeRowId, decideRow, openItem, visibleRows]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Hexagon} message="Select an organization to view the review queue." />;
+    return <EmptyState icon={Hexagon} message={tf("auto.a1e2c7789da3a17e")} />;
   }
 
   if (attentionQuery.isLoading || reviewCasesQuery.isLoading) {
@@ -5067,7 +5066,7 @@ export function ReviewQueue() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-normal text-foreground">Review queue</h1>
+          <h1 className="text-2xl font-semibold tracking-normal text-foreground">{tf("auto.3e1654beab977bad")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Needs your attention ({formatNumber(visibleRows.length)})
           </p>
@@ -5083,11 +5082,11 @@ export function ReviewQueue() {
       </div>
 
       {attentionQuery.error || reviewCasesQuery.error ? (
-        <p className="text-sm text-amber-700 dark:text-amber-300">Some items need attention. Try again in a moment.</p>
+        <p className="text-sm text-amber-700 dark:text-amber-300">{tf("auto.63a63ac7055edad1")}</p>
       ) : null}
 
       {visibleRows.length === 0 ? (
-        <EmptyState icon={Check} message="Nothing needs you right now." />
+        <EmptyState icon={Check} message={tf("auto.d61ed3c5af68fab3")} />
       ) : (
         <div className="space-y-6">
           {groupedRows.map((group) => (
@@ -5119,7 +5118,7 @@ export function ReviewQueue() {
       )}
 
       <p className="text-xs text-muted-foreground">
-        Shortcuts: <span className="font-semibold">j</span>/<span className="font-semibold">k</span> or arrow keys move, <span className="font-semibold">Enter</span> opens item, <span className="font-semibold">a</span> approves.
+        Shortcuts: <span className="font-semibold">j</span>/<span className="font-semibold">k</span> or arrow keys move, <span className="font-semibold">{tf("auto.dc8659db6d416dc3")}</span> opens item, <span className="font-semibold">a</span> approves.
       </p>
 
       <ReviewQueueDetailDialog
@@ -5161,7 +5160,7 @@ export function Learnings() {
   const [offset, setOffset] = useState(0);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Learnings" }]);
+    setBreadcrumbs([{ label: tf("auto.71cc0d3f8db84d73") }]);
   }, [setBreadcrumbs]);
 
   const learningsQuery = useQuery({
@@ -5178,7 +5177,7 @@ export function Learnings() {
   });
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={BookOpenText} message="Select an organization to view learnings." />;
+    return <EmptyState icon={BookOpenText} message={tf("auto.5015fa9694e5a21a")} />;
   }
 
   if (learningsQuery.isLoading && !learningsQuery.data) {
@@ -5196,9 +5195,9 @@ export function Learnings() {
   return (
     <div className="space-y-6">
       <div className="border-b border-border pb-5">
-        <h1 className="text-2xl font-semibold tracking-normal text-foreground">Learnings</h1>
+        <h1 className="text-2xl font-semibold tracking-normal text-foreground">{tf("auto.71cc0d3f8db84d73")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Patterns from review decisions and hand moves, in plain words.
+          {tf("auto.972e6f28a0c38eca")}
         </p>
       </div>
 
@@ -5213,9 +5212,9 @@ export function Learnings() {
       </div>
 
       {learningsQuery.error ? (
-        <p className="text-sm text-destructive">Could not load learnings.</p>
+        <p className="text-sm text-destructive">{tf("auto.ceb0103cde1ecd75")}</p>
       ) : groups.length === 0 ? (
-        <EmptyState icon={BookOpenText} message="No learnings yet." />
+        <EmptyState icon={BookOpenText} message={tf("auto.77c3ad5580299c4c")} />
       ) : (
         <div className="space-y-6">
           {groups.map((group) => (
@@ -5263,7 +5262,7 @@ export function Learnings() {
           disabled={!canGoPrevious}
           onClick={() => setOffset((current) => Math.max(0, current - LEARNINGS_PAGE_SIZE))}
         >
-          Previous
+          {tf("text.Previous")}
         </Button>
         <span className="text-sm text-muted-foreground">
           {events.length > 0 ? `${formatNumber(firstVisible)}-${formatNumber(lastVisible)}` : "No rows"}
@@ -5274,7 +5273,7 @@ export function Learnings() {
           disabled={!canGoNext}
           onClick={() => setOffset((current) => pagination?.nextOffset ?? current + LEARNINGS_PAGE_SIZE)}
         >
-          Next
+          {tf("text.Next")}
         </Button>
       </div>
     </div>

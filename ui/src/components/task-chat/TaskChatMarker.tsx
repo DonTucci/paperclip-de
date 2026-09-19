@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useId, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronDown, CircleDot, OctagonX, Square, Flag } from "lucide-react";
@@ -101,7 +102,7 @@ export function TaskChatMarker({
               <div className="flex items-center justify-end gap-2 border-t border-border/70 bg-background/50 px-3 py-2 dark:bg-background/30">
                 {item.runHref ? (
                   <Button asChild variant="ghost" size="xs">
-                    <Link to={item.runHref}>View run</Link>
+                    <Link to={item.runHref}>{tf("auto.aaf7fccc7d1315f2")}</Link>
                   </Button>
                 ) : null}
                 {onTryAgain ? (

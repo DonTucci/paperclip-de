@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback } from "react";
 import { useMutation, useQueryClient, type UseMutationResult } from "@tanstack/react-query";
 import type { IssueRetryNowOutcome, IssueRetryNowResponse } from "@paperclipai/shared";
@@ -65,7 +66,7 @@ export function useRetryNowMutation(
     },
     onError: (error) => {
       pushToast({
-        title: "Couldn't retry now",
+        title: tf("auto.7452a71d0f62b354"),
         body: readErrorMessage(error),
         tone: "error",
       });

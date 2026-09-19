@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { createContext, useContext, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Mail, Paperclip } from "lucide-react";
@@ -80,7 +81,7 @@ export function EmailMessageCard({
           {message.from}
           {message.direction === "inbound" && (
             <span className="ml-2 rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">
-              External
+              {tf("auto.68c114ea9c8c6604")}
             </span>
           )}
         </p>
@@ -117,7 +118,7 @@ export function EmailMessageCard({
         </div>
       )}
       <details className="text-xs text-muted-foreground">
-        <summary className="cursor-pointer">Email details</summary>
+        <summary className="cursor-pointer">{tf("auto.2f33e40a3c96891f")}</summary>
         <div className="space-y-2 pt-3">
           {!!message.bcc?.length && <p>Bcc: {message.bcc.join(", ")}</p>}
           <p className="break-all">Message ID: {message.providerMessageId}</p>
@@ -144,7 +145,7 @@ export function EmailMessageCard({
       )}
       {attachments.error && (
         <p role="alert" className="text-xs text-destructive">
-          Attachments could not be loaded.
+          {tf("auto.0d3fe62700451b64")}
         </p>
       )}
     </article>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Synthetic fixtures for the Task Chat Redesign dev harness. No live agent is
  * required: every state in the inventory maps to a deterministic scenario the
@@ -39,7 +40,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
       return {
         surface: "thread",
         items: [
-          { id: "mk-start", kind: "marker", variant: "session_start", label: "Session started", detail: "claude · Auto mode" },
+          { id: "mk-start", kind: "marker", variant: "session_start", label: tf("auto.a6a7c4b6edfc68a2"), detail: "claude · Auto mode" },
           ...exchangePrefix(),
         ],
       };
@@ -66,7 +67,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
             kind: "turn",
             settled: false,
             summary: { toolCount: 1, added: 0, removed: 0 },
-            liveStatus: { id: "st-thinking", kind: "status", status: "running", label: "Thinking", startedAtMs: Date.now() - 6100, tokens: { used: 18240, size: 200000 } },
+            liveStatus: { id: "st-thinking", kind: "status", status: "running", label: tf("auto.a20d12c5e9c428c3"), startedAtMs: Date.now() - 6100, tokens: { used: 18240, size: 200000 } },
             items: [
               { id: "th-grep", kind: "tool", name: "Grep", target: "rateLimit", toolKind: "search", status: "completed" },
             ],
@@ -89,7 +90,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
             settled: false,
             summary: { toolCount: 1, added: 0, removed: 0 },
             liveStatus: {
-              id: "st-responding", kind: "status", status: "running", label: "Responding", startedAtMs: Date.now() - 9300, tokens: { used: 18240, size: 200000 },
+              id: "st-responding", kind: "status", status: "running", label: tf("auto.98047c1e6a79f788"), startedAtMs: Date.now() - 9300, tokens: { used: 18240, size: 200000 },
               selfTalk:
                 "I found an existing ipRateLimit helper, so I'll extend it with a per-account token bucket keyed on the email address instead of adding a second limiter. The bucket refills at six requests a minute, matching the lockout policy the auth spec documents, and failed attempts drain it twice as fast so brute-force runs hit the ceiling quickly while a fat-fingered password barely registers.",
             },
@@ -115,7 +116,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
             settled: false,
             summary: { toolCount: 2, added: 0, removed: 0 },
             liveStatus: {
-              id: "st-responding-burst", kind: "status", status: "running", label: "Responding", startedAtMs: Date.now() - 21400, tokens: { used: 18240, size: 200000 },
+              id: "st-responding-burst", kind: "status", status: "running", label: tf("auto.98047c1e6a79f788"), startedAtMs: Date.now() - 21400, tokens: { used: 18240, size: 200000 },
               selfTalk:
                 "Found the existing ipRateLimit helper — extending it beats adding a second limiter.\n\n" +
                 "Wiring a per-account token bucket keyed on the email address, refilling at six requests a minute per the auth spec.\n\n" +
@@ -167,7 +168,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
             kind: "turn",
             settled: false,
             summary: { toolCount: 2, added: 0, removed: 0 },
-            liveStatus: { id: "st-working", kind: "status", status: "working", label: "Editing files", detail: "Edit · server/src/routes/auth.ts", toolName: "Edit", startedAtMs: Date.now() - 4200 },
+            liveStatus: { id: "st-working", kind: "status", status: "working", label: tf("auto.d868fdd01755f295"), detail: "Edit · server/src/routes/auth.ts", toolName: "Edit", startedAtMs: Date.now() - 4200 },
             items: [
               { id: "w-read", kind: "tool", name: "Read", target: "server/src/routes/auth.ts", toolKind: "read", status: "completed" },
               { id: "w-edit", kind: "tool", name: "Edit", target: "server/src/routes/auth.ts", toolKind: "edit", status: "in_progress" },
@@ -186,7 +187,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
             kind: "turn",
             settled: false,
             summary: { toolCount: 1, added: 0, removed: 0 },
-            liveStatus: { id: "st-running", kind: "status", status: "running", label: "Running", detail: "no output for 3s — still running", startedAtMs: Date.now() - 12000, tokens: { used: 18240, size: 200000 } },
+            liveStatus: { id: "st-running", kind: "status", status: "running", label: tf("text.Running"), detail: "no output for 3s — still running", startedAtMs: Date.now() - 12000, tokens: { used: 18240, size: 200000 } },
             items: [
               { id: "r-grep", kind: "tool", name: "Grep", target: "rateLimit", toolKind: "search", status: "completed" },
             ],
@@ -229,14 +230,14 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
         surface: "thread",
         items: [
           {
-            id: "st-approval", kind: "status", status: "awaiting_approval", label: "Approve running a command?",
+            id: "st-approval", kind: "status", status: "awaiting_approval", label: tf("auto.7347bea3a493944e"),
             detail: "npm run migrate — modifies the database",
             approval: {
               toolName: "execute",
               options: [
-                { id: "reject", label: "Deny", kind: "reject_once" },
-                { id: "allow-always", label: "Always allow", kind: "allow_always" },
-                { id: "allow", label: "Allow once", kind: "allow_once" },
+                { id: "reject", label: tf("auto.05a2d7332eb9d8bf"), kind: "reject_once" },
+                { id: "allow-always", label: tf("auto.977618bd8bc7eef4"), kind: "allow_always" },
+                { id: "allow", label: tf("auto.168511d24d9ee031"), kind: "allow_once" },
               ],
             },
           },
@@ -258,7 +259,7 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
           {
             id: "turn-long-run", kind: "turn", settled: false,
             summary: { toolCount: 8, added: 4, removed: 1 },
-            liveStatus: { id: "long-status", kind: "status", status: "working", label: "Running tests", detail: "Bash · vitest", toolName: "Bash", startedAtMs: Date.now() - 48_000 },
+            liveStatus: { id: "long-status", kind: "status", status: "working", label: tf("auto.6effe77ed6628990"), detail: "Bash · vitest", toolName: "Bash", startedAtMs: Date.now() - 48_000 },
             items: [
               phase("phase-opening", undefined, false, [
                 { id: "generic-1", kind: "tool", name: "Tool", rawName: "tool call", status: "completed" },
@@ -286,21 +287,21 @@ export function buildScenario(id: TaskChatStateId): TaskChatScenario {
         surface: "thread",
         items: [
           { id: "m-int", kind: "message", author: "agent", authorName: AGENT, text: "Starting the migration now…" },
-          { id: "mk-int", kind: "marker", variant: "interrupted", label: "Interrupted", detail: "stopped by you at 2:35 PM" },
+          { id: "mk-int", kind: "marker", variant: "interrupted", label: tf("auto.132d124d6bb3d811"), detail: "stopped by you at 2:35 PM" },
         ],
       };
     case "refused":
       return {
         surface: "thread",
         items: [
-          { id: "st-refused", kind: "status", status: "refused", label: "Turn ended: refusal", detail: "The agent declined to complete this request." },
+          { id: "st-refused", kind: "status", status: "refused", label: tf("auto.fb399aa0c2e8513a"), detail: "The agent declined to complete this request." },
         ],
       };
     case "truncated":
       return {
         surface: "thread",
         items: [
-          { id: "st-trunc", kind: "status", status: "truncated", label: "Turn ended: max tokens", detail: "Output was cut off — continue to resume.", tokens: { used: 199120, size: 200000 } },
+          { id: "st-trunc", kind: "status", status: "truncated", label: tf("auto.216e33437b793599"), detail: "Output was cut off — continue to resume.", tokens: { used: 199120, size: 200000 } },
         ],
       };
     case "live-token-cost":

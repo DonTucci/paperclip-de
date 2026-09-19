@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { checkMcpRemoteHeaderName, checkMcpRemoteHeaderValue, mcpRemoteHeaderRejectionMessage } from "@paperclipai/shared";
 import type { GenericMcpAuthMode } from "@paperclipai/shared";
 
@@ -102,63 +103,63 @@ export function genericConnectGuidance(
     case "mcp_remote_url_missing":
     case "mcp_remote_url_invalid":
       return {
-        title: "That doesn't look like a server address",
+        title: tf("auto.bfc61b7d9da8fdcb"),
         body: "Paste the full address, starting with https:// — for example https://mcp.example.com/mcp.",
         focus: "url",
       };
     case "remote_http_private_endpoint":
       return {
-        title: "That address is inside a private network",
+        title: tf("auto.cf6af677144b25e2"),
         body: "This Paperclip is reachable from the internet, so it won't call addresses on your local network. Use the server's public address instead.",
         focus: "url",
       };
     case "remote_http_dns_failed":
       return {
-        title: "We couldn't find that host",
+        title: tf("auto.878cfbd4818e83ec"),
         body: "The address didn't resolve. Check the spelling, or confirm the server is published on the internet.",
         focus: "url",
       };
     case "mcp_header_rejected":
       return {
-        title: "Paperclip can't send that header",
+        title: tf("auto.a44875fd751cff3e"),
         body: fallback,
         focus: "credentials",
       };
     case "tool_access_name_conflict":
       return {
-        title: "Paperclip couldn’t name this connection",
+        title: tf("auto.ab5a81c8f294ee73"),
         body: "Try connecting again.",
         focus: "none",
       };
     case "oauth_challenge":
       return {
-        title: "This server wants a credential",
+        title: tf("auto.644181a0f0ed6eaf"),
         body: "It asked us to authenticate but didn't offer a sign-in Paperclip can complete on its own. Add the key or headers its docs list under Advanced authentication.",
         focus: "credentials",
       };
     case "oauth_manual_client_required":
     case "oauth_manual_client_rebinding_required":
       return {
-        title: "This server needs sign-in details you create yourself",
+        title: tf("auto.7c6f63c1da485a80"),
         body: "Register Paperclip in the provider's settings, then add the client ID and secret it gives you under Advanced authentication.",
         focus: "credentials",
       };
     case "oauth_redirect_origin_unsupported":
     case "oauth_redirect_uri_invalid":
       return {
-        title: "This Paperclip needs a public HTTPS address first",
+        title: tf("auto.64aee34f7488dd6a"),
         body: "Sign-in sends the operator back to Paperclip, so this instance has to be reachable over HTTPS. Ask your Paperclip admin to configure it.",
         focus: "deployment",
       };
     case "runtime_error":
       return {
-        title: "We couldn't reach that server",
+        title: tf("auto.a05e60fed6745525"),
         body: "Nothing answered at that address. Confirm the server is running and the address is right, then try again.",
         focus: "url",
       };
     default:
       return {
-        title: "Paperclip couldn't connect",
+        title: tf("auto.58620c657dc08fa8"),
         body: fallback,
         focus: "none",
       };

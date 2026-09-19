@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   ResourceMembershipResourceType,
@@ -178,7 +179,7 @@ export function useResourceMembershipMutation(companyId: string | null | undefin
         : variables.state === "left" ? "leave" : "join";
       pushToast({
         title: `Couldn't ${verb} ${variables.resourceName}.`,
-        body: error instanceof Error ? error.message : "Try again.",
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       });
     },

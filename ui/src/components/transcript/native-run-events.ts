@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { HeartbeatRunEvent } from "@paperclipai/shared";
 import type { TranscriptEntry } from "@/adapters";
 
@@ -811,7 +812,7 @@ export function nativeRunEventsToTranscript(events: readonly HeartbeatRunEvent[]
         family: "provider_notice",
         eventType: event.eventType,
         status: payload.severity === "error" ? "failed" : "informational",
-        title: "Provider notice",
+        title: tf("auto.72afcaa867143168"),
         summary: text(payload.summary)?.trim() || text(payload.message)?.trim() || "Provider notice",
         payload,
       });

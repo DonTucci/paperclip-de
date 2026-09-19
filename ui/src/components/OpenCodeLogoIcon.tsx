@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { cn } from "../lib/utils";
 
 interface OpenCodeLogoIconProps {
@@ -9,12 +10,12 @@ export function OpenCodeLogoIcon({ className }: OpenCodeLogoIconProps) {
     <>
       <img
         src="/brands/opencode-logo-light-square.svg"
-        alt="OpenCode"
+        alt={tf("auto.3af0e55ccc96d87c")}
         className={cn("dark:hidden", className)}
       />
       <img
         src="/brands/opencode-logo-dark-square.svg"
-        alt="OpenCode"
+        alt={tf("auto.3af0e55ccc96d87c")}
         className={cn("hidden dark:block", className)}
       />
     </>

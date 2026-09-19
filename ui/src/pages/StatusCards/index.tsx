@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FlaskConical, Loader2, Plus } from "lucide-react";
@@ -33,7 +34,7 @@ export function StatusCards() {
   const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Status" }]);
+    setBreadcrumbs([{ label: tf("text.Status") }]);
   }, [setBreadcrumbs]);
 
   const activeQuery = useQuery({
@@ -75,25 +76,25 @@ export function StatusCards() {
     mutationFn: (id: string) => statusCardsApi.refresh(id),
     onMutate: () => setActionError(null),
     onSuccess: () => invalidateLists(),
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not refresh the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.d2110c59a297c88b")),
   });
   const recompileMutation = useMutation({
     mutationFn: (id: string) => statusCardsApi.recompile(id),
     onMutate: () => setActionError(null),
     onSuccess: () => invalidateLists(),
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not run the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.0d6f49bd38f70baf")),
   });
   const archiveMutation = useMutation({
     mutationFn: (id: string) => statusCardsApi.patch(id, { archived: true }),
     onMutate: () => setActionError(null),
     onSuccess: () => invalidateLists(),
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not archive the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.b709664d36aa226c")),
   });
   const restoreMutation = useMutation({
     mutationFn: (id: string) => statusCardsApi.patch(id, { archived: false }),
     onMutate: () => setActionError(null),
     onSuccess: () => invalidateLists(),
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not restore the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.ec008909fbc5b312")),
   });
 
   const openDetail = (id: string, tab: string = "summary") => {
@@ -116,10 +117,10 @@ export function StatusCards() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold">Status</h1>
+          <h1 className="text-xl font-bold">{tf("text.Status")}</h1>
           <Badge variant="secondary" className="gap-1">
             <FlaskConical className="h-3 w-3" />
-            Experimental
+            {tf("auto.3dc9f569422dcfda")}
           </Badge>
         </div>
         <div className="flex items-center gap-4">
@@ -130,27 +131,27 @@ export function StatusCards() {
           ) : null}
           <Button onClick={() => setCreateOpen(true)} disabled={!selectedCompanyId}>
             <Plus className="h-4 w-4" />
-            New card
+            {tf("auto.8d3efc397417cfd0")}
           </Button>
         </div>
       </div>
 
-      {actionError ? <InlineBanner tone="warning" title="Heads up">{actionError}</InlineBanner> : null}
+      {actionError ? <InlineBanner tone="warning" title={tf("auto.dc1f657d6c09a8b9")}>{actionError}</InlineBanner> : null}
 
       {activeQuery.isLoading ? (
         <div className="flex items-center gap-2 py-12 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Loading cards…
+          <Loader2 className="h-4 w-4 animate-spin" /> {tf("auto.af565e572cae6bd2")}
         </div>
       ) : activeQuery.isError ? (
-        <InlineBanner tone="danger" title="Could not load status cards">
-          {activeQuery.error instanceof Error ? activeQuery.error.message : "Try again."}
+        <InlineBanner tone="danger" title={tf("auto.202da107a1359448")}>
+          {activeQuery.error instanceof Error ? activeQuery.error.message: tf("auto.a0c2cc1374d94994")}
         </InlineBanner>
       ) : activeCards.length === 0 ? (
         <EmptyState
           icon={FlaskConical}
-          title="No status cards yet"
-          message="Create a card to keep a living summary of the issues you care about."
-          action={selectedCompanyId ? "New card" : undefined}
+          title={tf("auto.9604f34dde154d3d")}
+          message={tf("auto.95707085eb43de11")}
+          action={selectedCompanyId ? tf("auto.8d3efc397417cfd0") : undefined}
           onAction={() => setCreateOpen(true)}
         />
       ) : (

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -241,7 +242,7 @@ function CandidateStatusBadge({
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-muted-foreground border-border/60"
         >
-          <Link2 className="h-3 w-3" /> Imported
+          <Link2 className="h-3 w-3" /> {tf("auto.321f179c80ba93ea")}
         </Badge>
       );
     case "conflict":
@@ -250,7 +251,7 @@ function CandidateStatusBadge({
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-amber-600 border-amber-500/40 dark:text-amber-400"
         >
-          <AlertTriangle className="h-3 w-3" /> Conflict
+          <AlertTriangle className="h-3 w-3" /> {tf("auto.014659ab9d98c8fe")}
         </Badge>
       );
     case "skipped":
@@ -259,7 +260,7 @@ function CandidateStatusBadge({
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-muted-foreground border-border/60"
         >
-          <FileWarning className="h-3 w-3" /> Skipped
+          <FileWarning className="h-3 w-3" /> {tf("auto.12698ce1ea5cd4ab")}
         </Badge>
       );
     case "new":
@@ -269,7 +270,7 @@ function CandidateStatusBadge({
           variant="outline"
           className="gap-1 px-1.5 py-0 font-normal text-emerald-600 border-emerald-500/40 dark:text-emerald-400"
         >
-          <CheckCircle2 className="h-3 w-3" /> New
+          <CheckCircle2 className="h-3 w-3" /> {tf("auto.18fdd549b2ed367a")}
         </Badge>
       );
   }
@@ -377,7 +378,7 @@ export function ImportSkillsFromProjectDialog({
     onError: (error) => {
       toast.pushToast({
         tone: "error",
-        title: "Import failed",
+        title: tf("auto.0a26f41abd00f95e"),
         body: readableErrorMessage(error),
       });
     },
@@ -468,7 +469,7 @@ export function ImportSkillsFromProjectDialog({
         });
       }
     } catch (error) {
-      toast.pushToast({ tone: "error", title: "Could not inspect skill", body: readableErrorMessage(error) });
+      toast.pushToast({ tone: "error", title: tf("auto.ce3b184f52a76cd9"), body: readableErrorMessage(error) });
     } finally {
       setBrowseAddingKey(null);
     }
@@ -513,17 +514,17 @@ export function ImportSkillsFromProjectDialog({
         <header className="flex shrink-0 items-start justify-between gap-3 border-b border-border/60 px-5 py-4">
           <div className="flex flex-col gap-1">
             <DialogTitle className="text-base font-semibold">
-              Import skills from project
+              {tf("auto.364c89b0f1b44de1")}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Pick a project, scan its workspaces for skills, and import them as references.
+              {tf("auto.ca4ed80b1ad6078f")}
             </DialogDescription>
           </div>
           <button
             type="button"
             className="rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100"
             onClick={handleClose}
-            aria-label="Close import dialog"
+            aria-label={tf("auto.0dbadc41afe7ec1a")}
           >
             <X className="h-4 w-4" />
           </button>
@@ -570,7 +571,7 @@ export function ImportSkillsFromProjectDialog({
             <div className="min-w-0 flex-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <Link2 className="h-3.5 w-3.5 shrink-0" />
-                Files stay in the project — Studio edits save directly to them.
+                {tf("auto.43a69b6356598fae")}
               </span>
             </div>
           ) : (
@@ -588,7 +589,7 @@ export function ImportSkillsFromProjectDialog({
                       disabled={selectableCandidates.length === 0}
                       data-testid="select-all"
                     >
-                      Select all
+                      {tf("auto.1fc9a387654d410f")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -597,12 +598,12 @@ export function ImportSkillsFromProjectDialog({
                       disabled={selectedCount === 0}
                       data-testid="deselect-all"
                     >
-                      Deselect all
+                      {tf("auto.967549497036d513")}
                     </Button>
                   </div>
                 )}
                 <Button variant="outline" size="sm" onClick={backToPick}>
-                  <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Back
+                  <ArrowLeft className="mr-1 h-3.5 w-3.5" /> {tf("text.Back")}
                 </Button>
                 {!scanError && candidates.length > 0 && (
                   <Button
@@ -613,7 +614,7 @@ export function ImportSkillsFromProjectDialog({
                   >
                     {importMutation.isPending ? (
                       <>
-                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> Importing…
+                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> {tf("auto.c01c4324f1fa14fc")}
                       </>
                     ) : (
                       `Import ${selectedCount} skill${selectedCount === 1 ? "" : "s"}`
@@ -624,12 +625,12 @@ export function ImportSkillsFromProjectDialog({
             )}
             {step === "pick" && (
               <Button variant="ghost" size="sm" onClick={handleClose}>
-                Cancel
+                {tf("text.Cancel")}
               </Button>
             )}
             {step === "result" && (
               <Button size="sm" onClick={handleClose}>
-                Done
+                {tf("text.Done")}
               </Button>
             )}
           </div>
@@ -666,16 +667,16 @@ function PickProjectStep({
           <Input
             value={filter}
             onChange={(event) => onFilterChange(event.target.value)}
-            placeholder="Filter projects"
+            placeholder={tf("auto.8fd82c567aa71d52")}
             className="pl-7 text-xs"
-            aria-label="Filter projects"
+            aria-label={tf("auto.8fd82c567aa71d52")}
             data-testid="project-filter"
           />
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto">
         {loading ? (
-          <div className="p-6 text-center text-sm text-muted-foreground">Loading projects…</div>
+          <div className="p-6 text-center text-sm text-muted-foreground">{tf("auto.6970a1ced73ddb58")}</div>
         ) : error ? (
           <div
             className="m-5 flex items-start gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive"
@@ -685,7 +686,7 @@ function PickProjectStep({
             <div>{readableErrorMessage(error)}</div>
           </div>
         ) : totalProjects === 0 ? (
-          <EmptyState icon={Layers} message="This organization has no projects yet." />
+          <EmptyState icon={Layers} message={tf("auto.9d0d78cc1ccab0cb")} />
         ) : projects.length === 0 ? (
           <EmptyState icon={Search} message={`No projects match "${filter}".`} />
         ) : (
@@ -719,7 +720,7 @@ function PickProjectStep({
                       </div>
                       {disabled && (
                         <div className="mt-1 text-(length:--text-micro) text-muted-foreground">
-                          Remote-only project — no locally scannable workspaces to import from.
+                          {tf("auto.d2cc84ce0ba5cbcb")}
                         </div>
                       )}
                     </div>
@@ -752,7 +753,7 @@ function ScanningStep({ projectName }: { projectName: string }) {
       <div>
         <p className="text-sm font-medium">Scanning {projectName || "project"} for skills…</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Looking in well-known skill folders across each workspace.
+          {tf("auto.d15a3bde00aebcb7")}
         </p>
       </div>
       <div className="flex max-w-md flex-wrap justify-center gap-1.5">
@@ -815,15 +816,15 @@ function ProjectSkillBrowser({
       <div className="shrink-0 border-b border-border/60 px-5 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-medium">Browse project folders</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">Open any folder and add directories or individual SKILL.md files.</p>
+            <p className="text-sm font-medium">{tf("auto.2bef76acf5d7f8bf")}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{tf("auto.28acd6296b6ca426")}</p>
           </div>
           <Button variant="outline" size="sm" onClick={onBack}>
-            <ArrowLeft className="mr-1 h-3.5 w-3.5" /> Discovered skills
+            <ArrowLeft className="mr-1 h-3.5 w-3.5" /> {tf("auto.e81e58d8cdf2e67d")}
           </Button>
         </div>
         {workspaces.length > 1 && (
-          <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Project workspace">
+          <div className="mt-3 flex flex-wrap gap-1.5" aria-label={tf("auto.ce016e7f0a41c4f3")}>
             {workspaces.map((workspace) => (
               <Button
                 key={workspace.id}
@@ -844,7 +845,7 @@ function ProjectSkillBrowser({
           size="sm"
           onClick={() => result?.parentPath && setFolderPath(result.parentPath)}
           disabled={!result?.parentPath}
-          aria-label="Open parent folder"
+          aria-label={tf("auto.a00d48483e7b4dbb")}
         >
           <ArrowLeft className="h-3.5 w-3.5" />
         </Button>
@@ -853,7 +854,7 @@ function ProjectSkillBrowser({
       <div className="min-h-0 flex-1 overflow-y-auto">
         {browseQuery.isLoading ? (
           <div className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading folder…
+            <Loader2 className="h-4 w-4 animate-spin" /> {tf("auto.4cf8a251abedc073")}
           </div>
         ) : browseQuery.error ? (
           <div className="p-6 text-sm text-destructive">{readableErrorMessage(browseQuery.error)}</div>
@@ -891,10 +892,10 @@ function ProjectSkillBrowser({
             })}
           </ul>
         ) : (
-          <div className="p-8 text-center text-sm text-muted-foreground">This folder is empty.</div>
+          <div className="p-8 text-center text-sm text-muted-foreground">{tf("auto.bd88d713ecd33916")}</div>
         )}
         {result?.truncated && (
-          <p className="border-t border-border/60 px-5 py-2 text-xs text-muted-foreground">Showing the first 250 entries.</p>
+          <p className="border-t border-border/60 px-5 py-2 text-xs text-muted-foreground">{tf("auto.ba9ceb98d16f702e")}</p>
         )}
       </div>
     </div>
@@ -960,7 +961,7 @@ function SelectStep({
           </p>
           {!grant && (
             <Button variant="outline" size="sm" className="mt-4" onClick={onRetry}>
-              Try again
+              {tf("text.Try again")}
             </Button>
           )}
         </div>
@@ -990,7 +991,7 @@ function SelectStep({
           <div className="mx-auto mb-4 w-fit bg-muted/50 p-4">
             <FolderSearch className="h-10 w-10 text-muted-foreground/50" />
           </div>
-          <p className="text-base font-semibold">No skills found</p>
+          <p className="text-base font-semibold">{tf("auto.52777c2d5f9c50ae")}</p>
           <p className="mt-1.5 text-sm text-muted-foreground">
             None of the well-known skill folders in this project's workspaces contain a{" "}
             <code className="rounded bg-muted px-1 py-0.5 text-xs">SKILL.md</code>. We searched{" "}
@@ -1005,7 +1006,7 @@ function SelectStep({
             onClick={() => onBrowseOpenChange(true)}
             data-testid="browse-project-folders-empty"
           >
-            <FolderOpen className="mr-1.5 h-3.5 w-3.5" /> Browse project folders
+            <FolderOpen className="mr-1.5 h-3.5 w-3.5" /> {tf("auto.2bef76acf5d7f8bf")}
           </Button>
           {onImportFromPath && (
             <p className="mt-3 text-sm text-muted-foreground">
@@ -1015,7 +1016,7 @@ function SelectStep({
                 className="font-medium text-foreground underline underline-offset-2"
                 onClick={onImportFromPath}
               >
-                Import from path or URL
+                {tf("auto.abed2dfba3bf7b4b")}
               </button>
               .
             </p>
@@ -1028,9 +1029,9 @@ function SelectStep({
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-testid="candidate-list">
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/60 px-5 py-2.5">
-        <p className="text-xs text-muted-foreground">Choose discovered skills, or browse any workspace folder.</p>
+        <p className="text-xs text-muted-foreground">{tf("auto.d2115eb1676560c6")}</p>
         <Button variant="outline" size="sm" onClick={() => onBrowseOpenChange(true)} data-testid="browse-project-folders">
-          <FolderOpen className="mr-1.5 h-3.5 w-3.5" /> Browse folders
+          <FolderOpen className="mr-1.5 h-3.5 w-3.5" /> {tf("auto.66279466d3bec8d3")}
         </Button>
       </div>
       <div className="shrink-0 border-b border-border/60 px-5 py-2.5">
@@ -1039,9 +1040,9 @@ function SelectStep({
           <Input
             value={filter}
             onChange={(event) => onFilterChange(event.target.value)}
-            placeholder="Search discovered skills…"
+            placeholder={tf("auto.f2e858d5bfed8110")}
             className="h-8 pl-8 text-xs"
-            aria-label="Search discovered skills"
+            aria-label={tf("auto.5777aeadd74cac19")}
           />
         </div>
       </div>
@@ -1055,7 +1056,7 @@ function SelectStep({
             <section key={group.key}>
               {groupIndex > 0 && !group.isPrimary && groups[groupIndex - 1]?.isPrimary && (
                 <header className="border-y border-border/60 bg-muted/30 px-5 py-2 text-xs uppercase tracking-wide text-muted-foreground">
-                  Other Workspaces
+                  {tf("auto.1f41d204e6e52207")}
                 </header>
               )}
               <header className="sticky top-0 z-10 border-b border-border/60 bg-background px-5 py-2 text-sm font-medium text-foreground">
@@ -1129,7 +1130,7 @@ function SelectStep({
                                   htmlFor={`rename-${candidate.workspaceId}-${candidate.slug}`}
                                   className="shrink-0 text-xs text-muted-foreground"
                                 >
-                                  Import as
+                                  {tf("auto.ab3fa4e6af9d1f40")}
                                 </label>
                                 <Input
                                   id={`rename-${candidate.workspaceId}-${candidate.slug}`}
@@ -1147,7 +1148,7 @@ function SelectStep({
                                 />
                                 {selectedValue && !isValidSelectionSlug(selectedValue) && (
                                   <span className="text-xs text-destructive">
-                                    Use a lowercase URL-safe slug.
+                                    {tf("auto.dd6a3d5232c96560")}
                                   </span>
                                 )}
                               </div>
@@ -1183,7 +1184,7 @@ function ResultStep({ result }: ResultStepProps) {
         <div className="flex items-start gap-3 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3">
           <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <div className="text-xs leading-relaxed text-muted-foreground">
-            <span className="font-medium text-foreground">No files were copied.</span> These skills
+            <span className="font-medium text-foreground">{tf("auto.7f32af54e7becb64")}</span> These skills
             reference the files in the project workspace — editing them in Skill Studio saves
             directly back to those files.
           </div>
@@ -1220,7 +1221,7 @@ function ResultStep({ result }: ResultStepProps) {
                     to={skillStudioRoute(skill.id)}
                     className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-foreground no-underline hover:underline"
                   >
-                    Open <ExternalLink className="h-3 w-3" />
+                    {tf("text.Open")} <ExternalLink className="h-3 w-3" />
                   </Link>
                 </li>
               ))}

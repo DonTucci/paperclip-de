@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
@@ -525,12 +526,12 @@ const EnumField = React.memo(({
         disabled={disabled}
       >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select an option" />
+          <SelectValue placeholder={tf("auto.fb1cbc38fb4060f4")} />
         </SelectTrigger>
         <SelectContent>
           {showUnsetOption && (
             <SelectItem value={ENUM_UNSET_VALUE} textValue="None">
-              <span className="text-muted-foreground">None</span>
+              <span className="text-muted-foreground">{tf("text.None")}</span>
             </SelectItem>
           )}
           {options.map((option) => (
@@ -710,7 +711,7 @@ const SecretField = React.memo(({
           value={bindingValue}
           onChange={handlePickerChange}
           label=""
-          placeholder="Select an existing secret"
+          placeholder={tf("auto.485e486633d52484")}
           allowVersionSelector={false}
           emptyHint="No active secrets yet. Create one or paste a raw value below."
           disabled={disabled}
@@ -729,7 +730,7 @@ const SecretField = React.memo(({
                   }}
                   disabled={disabled}
                 >
-                  Hide raw value input
+                  {tf("auto.7886a2cd020cf63f")}
                 </button>
               ) : null}
             </div>
@@ -740,7 +741,7 @@ const SecretField = React.memo(({
               onClick={() => setShowRawInput(true)}
               disabled={disabled}
             >
-              Or paste a raw value
+              {tf("auto.e04884c8a6f708f8")}
             </button>
           )
         ) : null}
@@ -980,13 +981,13 @@ const ArrayField = React.memo(({
               }}
             >
               <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Remove item</span>
+              <span className="sr-only">{tf("auto.5a89edf2867d98dd")}</span>
             </Button>
           </div>
         ))}
         {items.length === 0 && (
           <div className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
-            No items added yet.
+            {tf("auto.48dcdce6280584cc")}
           </div>
         )}
       </div>
@@ -1319,7 +1320,7 @@ export function JsonSchemaForm({
           className,
         )}
       >
-        No configuration options available.
+        {tf("auto.7027931a1cee29e2")}
       </div>
     );
   }

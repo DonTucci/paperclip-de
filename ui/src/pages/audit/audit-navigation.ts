@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 export type AuditSection = "activity" | "runs" | "costs" | "budgets" | "timeline";
 
 export const AUDIT_SECTIONS: ReadonlyArray<{
@@ -5,11 +6,11 @@ export const AUDIT_SECTIONS: ReadonlyArray<{
   label: string;
   href: string;
 }> = [
-  { value: "activity", label: "Activity", href: "/activity" },
-  { value: "runs", label: "Runs", href: "/activity/runs" },
-  { value: "costs", label: "Costs", href: "/activity/costs" },
-  { value: "budgets", label: "Budgets", href: "/activity/budgets" },
-  { value: "timeline", label: "Timeline", href: "/activity/timeline" },
+  { value: "activity", label: tf("text.Activity"), href: "/activity" },
+  { value: "runs", label: tf("text.Runs"), href: "/activity/runs" },
+  { value: "costs", label: tf("text.Costs"), href: "/activity/costs" },
+  { value: "budgets", label: tf("auto.a1a06e046b0b9ad3"), href: "/activity/budgets" },
+  { value: "timeline", label: tf("text.Timeline"), href: "/activity/timeline" },
 ];
 
 export interface AuditLinkScope {

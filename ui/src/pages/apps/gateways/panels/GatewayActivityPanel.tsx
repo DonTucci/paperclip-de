@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -12,12 +13,12 @@ import { ErrorState, RelativeTime } from "@/pages/tools/shared";
 const PAGE_SIZE = 25;
 
 const OUTCOME_META: Record<ToolAuditOutcome, { label: string; status: string }> = {
-  allowed: { label: "Allowed", status: "allowed" },
-  blocked: { label: "Blocked", status: "denied" },
-  asked_first: { label: "Asked first", status: "require-approval" },
-  waiting: { label: "Waiting", status: "deferred" },
-  failed: { label: "Failed", status: "failed" },
-  unknown: { label: "Recorded", status: "unchecked" },
+  allowed: { label: tf("auto.1bb201d188352e9b"), status: "allowed" },
+  blocked: { label: tf("status.blocked"), status: "denied" },
+  asked_first: { label: tf("auto.db928628a30ccd18"), status: "require-approval" },
+  waiting: { label: tf("status.waiting"), status: "deferred" },
+  failed: { label: tf("text.Failed"), status: "failed" },
+  unknown: { label: tf("auto.c7175fa7a0db0d3c"), status: "unchecked" },
 };
 
 function detailString(details: Record<string, unknown> | null, key: string): string | null {
@@ -107,18 +108,18 @@ function ActivityRow({ event }: { event: ToolGatewayActivityEvent }) {
       {open ? (
         <div className="border-t border-border bg-muted/30 px-4 py-3 pl-10 text-xs">
           <dl>
-            {rawTool ? <Fact label="Tool" value={rawTool} mono /> : null}
-            {event.invocation?.status ? <Fact label="Call status" value={event.invocation.status} /> : null}
-            {event.invocation?.policyDecision ? <Fact label="Decision" value={event.invocation.policyDecision} /> : null}
-            {reason ? <Fact label="Reason" value={reason} mono /> : null}
-            {duration ? <Fact label="Duration" value={duration} /> : null}
-            {event.invocation?.id ? <Fact label="Invocation ID" value={event.invocation.id} mono /> : null}
-            {event.invocation?.errorCode ? <Fact label="Error code" value={event.invocation.errorCode} mono /> : null}
-            {event.invocation?.errorMessage ? <Fact label="Error" value={event.invocation.errorMessage} /> : null}
+            {rawTool ? <Fact label={tf("text.Tool")} value={rawTool} mono /> : null}
+            {event.invocation?.status ? <Fact label={tf("auto.c43d9824781fc965")} value={event.invocation.status} /> : null}
+            {event.invocation?.policyDecision ? <Fact label={tf("auto.640ae4baf96061fe")} value={event.invocation.policyDecision} /> : null}
+            {reason ? <Fact label={tf("text.Reason")} value={reason} mono /> : null}
+            {duration ? <Fact label={tf("text.Duration")} value={duration} /> : null}
+            {event.invocation?.id ? <Fact label={tf("auto.56d237ee606ca2dd")} value={event.invocation.id} mono /> : null}
+            {event.invocation?.errorCode ? <Fact label={tf("auto.0570b384c3cecf81")} value={event.invocation.errorCode} mono /> : null}
+            {event.invocation?.errorMessage ? <Fact label={tf("text.Error")} value={event.invocation.errorMessage} /> : null}
           </dl>
           {argumentsText ? (
             <div className="mt-2 space-y-1">
-              <div className="text-muted-foreground">Arguments (redacted)</div>
+              <div className="text-muted-foreground">{tf("auto.1965f782698f963c")}</div>
               <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground">
                 {argumentsText}
               </pre>
@@ -126,7 +127,7 @@ function ActivityRow({ event }: { event: ToolGatewayActivityEvent }) {
           ) : null}
           {resultText ? (
             <div className="mt-3 space-y-1">
-              <div className="text-muted-foreground">Result (redacted)</div>
+              <div className="text-muted-foreground">{tf("auto.1a33ba53693b5ccb")}</div>
               <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground">
                 {resultText}
               </pre>
@@ -179,11 +180,11 @@ export function GatewayActivityPanel({
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        Calls through this gateway from the last 30 days. Open a row to inspect its tool, redacted arguments, result, and decision.
+        {tf("auto.4c86c708f1718656")}
       </p>
       {events.length === 0 ? (
         <div className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          No calls have gone through this gateway yet.
+          {tf("auto.a4511ecdcb0edf86")}
         </div>
       ) : (
         <ul className="divide-y divide-border rounded-lg border border-border">

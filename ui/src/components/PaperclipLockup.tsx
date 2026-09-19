@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { SVGProps } from "react";
 
 interface PaperclipLockupProps extends Omit<SVGProps<SVGSVGElement>, "children"> {
@@ -17,7 +18,7 @@ interface PaperclipLockupProps extends Omit<SVGProps<SVGSVGElement>, "children">
  */
 export function PaperclipLockup({
   decorative = false,
-  title = "Paperclip",
+  title = tf("auto.c34c3f7368649659"),
   className,
   ...rest
 }: PaperclipLockupProps) {

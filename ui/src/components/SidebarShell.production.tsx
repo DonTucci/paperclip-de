@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useCallback,
   useEffect,
@@ -218,7 +219,7 @@ export function SidebarShell({
         {canResize ? (
           <div
             role="separator"
-            aria-label="Resize sidebar"
+            aria-label={tf("auto.243854b4d0c709a0")}
             aria-orientation="vertical"
             aria-valuemin={MIN_SIDEBAR_WIDTH}
             aria-valuemax={MAX_SIDEBAR_WIDTH}

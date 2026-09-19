@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ToolOAuthStartResult } from "@paperclipai/shared";
 import { resolveAuthorizationTarget } from "./authorizationUrl";
 
@@ -84,7 +85,7 @@ async function postCloudHandoff(
   }
   if (response) return response;
   throw new OAuthHandoffError(
-    lastError instanceof Error ? lastError.message : "Paperclip Cloud couldn’t prepare secure sign-in. Try again.",
+    lastError instanceof Error ? lastError.message: tf("auto.f5b98996fc7ff46a"),
     "unavailable",
   );
 }

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { HeartbeatRunEvent } from "@paperclipai/shared";
 import type { TranscriptEntry } from "@/adapters";
@@ -103,7 +104,7 @@ export function useNativeRunTranscripts(runs: readonly NativeRunTranscriptSource
           if (previous.has(run.id)) return previous;
           const next = new Map(previous);
           next.set(run.id, {
-            message: error instanceof Error ? error.message : "Native run activity could not be loaded",
+            message: error instanceof Error ? error.message: tf("auto.87c3b85ea3aee049"),
             failedAt: new Date().toISOString(),
           });
           return next;

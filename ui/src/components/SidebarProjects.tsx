@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NavLink, useLocation } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -49,9 +50,9 @@ import type { Project } from "@paperclipai/shared";
 type ProjectSidebarSlot = ReturnType<typeof usePluginSlots>["slots"][number];
 
 const PROJECT_SORT_CHOICES: SidebarSectionRadioChoice[] = [
-  { value: "top", label: "Top" },
-  { value: "alphabetical", label: "Alphabetical" },
-  { value: "recent", label: "Recent" },
+  { value: "top", label: tf("auto.d5cdfcf7ff75338f") },
+  { value: "alphabetical", label: tf("auto.a49d631f8c6cf6fb") },
+  { value: "recent", label: tf("auto.690dbe9dc0993c42") },
 ];
 const REORDER_POINTER_MEDIA = "(hover: hover) and (pointer: fine)";
 
@@ -147,7 +148,7 @@ function ProjectItem({
       <ProjectTile color={project.color ?? null} icon={project.icon ?? null} size="xs" />
       <span className={rail ? SIDEBAR_RAIL_HIDDEN_LABEL : "flex-1 truncate"}>{project.name}</span>
       {!rail ? <ExternalObjectStatusSummary summary={externalObjectsSummary} compact /> : null}
-      {!rail && project.pauseReason === "budget" ? <BudgetSidebarMarker title="Project paused by budget" /> : null}
+      {!rail && project.pauseReason === "budget" ? <BudgetSidebarMarker title={tf("auto.1aa2562895efb503")} /> : null}
     </NavLink>
   );
 
@@ -409,7 +410,7 @@ export function SidebarProjects() {
 
   return (
     <SidebarSection
-      label="Projects"
+      label={tf("text.Projects")}
       collapsible={{ open, onOpenChange: setOpen }}
       headerAction={{
         ariaLabel: "New project",
@@ -419,7 +420,7 @@ export function SidebarProjects() {
       menu={{
         ariaLabel: "Projects section actions",
         actions: [
-          { type: "item", label: "Browse projects", icon: FolderOpen, href: "/projects" },
+          { type: "item", label: tf("auto.8eac1d4abf06ff4f"), icon: FolderOpen, href: "/projects" },
           { type: "separator" },
         ],
         radioLabel: "Project sort",

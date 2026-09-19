@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -128,7 +129,7 @@ export function StatusCardDetailDrawer({
       await invalidateCard();
       setActionNote("Refresh queued — the Summarizer is updating this card.");
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not refresh the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.d2110c59a297c88b")),
   });
 
   const recompileMutation = useMutation({
@@ -141,7 +142,7 @@ export function StatusCardDetailDrawer({
       await invalidateCard();
       setActionNote("Run queued — the Summarizer is updating this card.");
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not run the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.0d6f49bd38f70baf")),
   });
 
   const saveSettingsMutation = useMutation({
@@ -168,7 +169,7 @@ export function StatusCardDetailDrawer({
         queryClient.invalidateQueries({ queryKey: queryKeys.statusCards.detail(card.id) }),
       ]);
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not save settings."),
+    onError: (err) => setActionError(err instanceof Error ? err.message: tf("auto.38a16d2f842d74d1")),
   });
 
   if (!card) return null;
@@ -248,19 +249,19 @@ export function StatusCardDetailDrawer({
 
         <Tabs value={tab} onValueChange={setTab} className="flex min-h-0 flex-1 flex-col gap-0">
           <TabsList variant="line" className="w-full justify-start gap-4 border-b border-border px-4">
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-            <TabsTrigger value="watched">Watched issues</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="summary">{tf("text.Summary")}</TabsTrigger>
+            <TabsTrigger value="settings">{tf("text.Settings")}</TabsTrigger>
+            <TabsTrigger value="watched">{tf("auto.df63da53661a1b05")}</TabsTrigger>
+            <TabsTrigger value="history">{tf("text.History")}</TabsTrigger>
           </TabsList>
 
           {actionError ? (
             <div className="px-4 pt-3">
-              <InlineBanner tone="warning" title="Heads up">{actionError}</InlineBanner>
+              <InlineBanner tone="warning" title={tf("auto.dc1f657d6c09a8b9")}>{actionError}</InlineBanner>
             </div>
           ) : actionNote ? (
             <div className="px-4 pt-3">
-              <InlineBanner tone="info" title="Working on it">{actionNote}</InlineBanner>
+              <InlineBanner tone="info" title={tf("auto.d55b6d1bbd56f5bf")}>{actionNote}</InlineBanner>
             </div>
           ) : null}
 
@@ -276,7 +277,7 @@ export function StatusCardDetailDrawer({
                       value={selectedRevisionId ?? "__latest__"}
                       onValueChange={(value) => setSelectedRevisionId(value === "__latest__" ? null : value)}
                     >
-                      <SelectTrigger size="sm" className="w-auto gap-1.5" aria-label="Select summary revision">
+                      <SelectTrigger size="sm" className="w-auto gap-1.5" aria-label={tf("auto.e9e258ba6e6839cb")}>
                         <History className="h-3.5 w-3.5" aria-hidden="true" />
                         <SelectValue />
                       </SelectTrigger>
@@ -323,7 +324,7 @@ export function StatusCardDetailDrawer({
                     </>
                   ) : (
                     <p className="text-sm text-muted-foreground">
-                      No change summary was recorded for this revision.
+                      {tf("auto.8be76f660b5315a7")}
                     </p>
                   )}
                 </div>
@@ -347,13 +348,13 @@ export function StatusCardDetailDrawer({
                       className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground underline-offset-2 hover:underline"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                      View setup task
+                      {tf("auto.6b5859989f3fdb4d")}
                     </Link>
                   ) : null}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  No summary yet — the first one is generated automatically once this card finishes setting up.
+                  {tf("auto.ec44e68ae5c28430")}
                 </p>
               )}
 
@@ -377,10 +378,10 @@ export function StatusCardDetailDrawer({
                   every recorded update (each update is one summary revision). */}
               {updatesQuery.isLoading ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Loading history…
+                  <Loader2 className="h-4 w-4 animate-spin" /> {tf("auto.a960c435c77f666c")}
                 </div>
               ) : updates.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No updates recorded yet.</p>
+                <p className="text-sm text-muted-foreground">{tf("auto.f0a917b114336ce7")}</p>
               ) : (
                 <>
                   <div className="text-xs text-muted-foreground">
@@ -419,15 +420,15 @@ export function StatusCardDetailDrawer({
             <TabsContent value="watched" className="mt-0 space-y-3">
               {card.queries.length === 0 && (card.mentionedIssueIds?.length ?? 0) === 0 ? (
                 <div className="rounded-md border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
-                  This card is still setting up — the issues it watches appear here once it's ready.
+                  {tf("auto.40fedd14b62097e9")}
                 </div>
               ) : dryRunQuery.isLoading ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin" /> Matching issues…
+                  <Loader2 className="h-4 w-4 animate-spin" /> {tf("auto.70cd0c47b737b9b6")}
                 </div>
               ) : dryRunQuery.isError ? (
-                <InlineBanner tone="danger" title="Could not load matched issues">
-                  {dryRunQuery.error instanceof Error ? dryRunQuery.error.message : "Try again."}
+                <InlineBanner tone="danger" title={tf("auto.9ab2d3318d994a9c")}>
+                  {dryRunQuery.error instanceof Error ? dryRunQuery.error.message: tf("auto.a0c2cc1374d94994")}
                 </InlineBanner>
               ) : (
                 <MatchedIssueList
@@ -439,24 +440,24 @@ export function StatusCardDetailDrawer({
 
             <TabsContent value="settings" className="mt-0 space-y-6">
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Card name</h3>
+                <h3 className="text-sm font-semibold">{tf("auto.e260ce2668950ee5")}</h3>
                 <Input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  placeholder="Auto-named from the query"
+                  placeholder={tf("auto.9165924dad195966")}
                   className="text-sm"
-                  aria-label="Card name"
+                  aria-label={tf("auto.e260ce2668950ee5")}
                 />
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold">What this card watches & reports</h3>
+                <h3 className="text-sm font-semibold">{tf("auto.1e934501d807f992")}</h3>
                 <Textarea
                   value={interest}
                   onChange={(event) => setInterest(event.target.value)}
                   rows={3}
                   className="text-sm"
-                  aria-label="What this card watches & reports"
+                  aria-label={tf("auto.1e934501d807f992")}
                 />
                 <p className="text-xs text-muted-foreground">
                   This one message drives the whole card: the agent compiles the watch query from it
@@ -465,7 +466,7 @@ export function StatusCardDetailDrawer({
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold">Agent</h3>
+                <h3 className="text-sm font-semibold">{tf("text.Agent")}</h3>
                 <SummarizerAgentSelect
                   companyId={card.companyId}
                   value={summarizerAgentId}
@@ -504,7 +505,7 @@ function QueryDebugSection({ card }: { card: StatusCardView }) {
     <Collapsible className="rounded-md border border-border">
       <CollapsibleTrigger className="group flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold">
         <span className="flex items-center gap-2">
-          Query debug
+          {tf("auto.58f8683ddefe9fd5")}
           <Badge variant="secondary">v{card.queryVersion}</Badge>
         </span>
         <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
@@ -543,7 +544,7 @@ function MatchedIssueList({ queries, mentioned }: { queries: StatusCardDryRun["q
   if (matched.length === 0 && mentionedOnly.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
-        The compiled query matches no issues right now.
+        {tf("auto.6bf003b65a23912d")}
       </div>
     );
   }
@@ -558,7 +559,7 @@ function MatchedIssueList({ queries, mentioned }: { queries: StatusCardDryRun["q
       ) : null}
       {mentionedOnly.length > 0 ? (
         <div className="space-y-1.5">
-          <p className="text-xs font-medium text-muted-foreground">Mentioned in the latest update</p>
+          <p className="text-xs font-medium text-muted-foreground">{tf("auto.af6b8ee2be6bf872")}</p>
           {mentionedOnly.map((issue) => (
             <WatchedIssueRow key={issue.id} issue={issue} />
           ))}

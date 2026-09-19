@@ -1,14 +1,21 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import englishCatalog from "../../../i18n/fork/en.json";
 
 function source(relativePath: string) {
-  return readFileSync(new URL(relativePath, import.meta.url), "utf8");
+  return readFileSync(new URL(relativePath, import.meta.url), "utf8").replace(/\r\n/g, "\n");
+}
+
+function expectLocalizedText(fileSource: string, text: string) {
+  const key = Object.entries(englishCatalog).find(([, value]) => value === text)?.[0];
+  expect(key, `Missing English catalog entry for: ${text}`).toBeDefined();
+  expect(fileSource).toContain(`tf("${key}")`);
 }
 
 describe("chat connector UI contract", () => {
   it("describes the close command as a conversation control rather than a task status change", () => {
     const setup = source("./ChatEndpointSetup.tsx");
-    expect(setup).toContain("Close the active chat conversation");
+    expectLocalizedText(setup, "Close the active chat conversation");
     expect(setup).not.toContain("Close the active Paperclip task");
   });
 
@@ -31,18 +38,19 @@ describe("chat connector UI contract", () => {
     expect(issue).toMatch(
       /agentsApi\.retryFailedRun\(\s*failedRun\.agentId,\s*failedRun\.runId,\s*companyId/,
     );
-    expect(issue).toContain("Retry queued");
+    expectLocalizedText(issue, "Retry queued");
     for (const file of ["Inbox.tsx", "LegacyInbox.tsx"]) {
       const page = source(`../../${file}`);
       expect(page).toMatch(
-        /const retryRunMutation = useMutation\(\{[\s\S]*?onError: \(error\) => \{\s*pushToast\(\{\s*title: "Run retry failed"/,
+        /const retryRunMutation = useMutation\(\{[\s\S]*?onError: \(error\) => \{\s*pushToast\(\{/,
       );
+      expectLocalizedText(page, "Run retry failed");
     }
   });
   it("keeps the exact dual-purpose choice and immutable searchable agent selection", () => {
     const setup = source("./ChatEndpointSetup.tsx");
-    expect(setup).toContain("Chat with an agent");
-    expect(setup).toContain("Use this connection as an agent tool");
+    expectLocalizedText(setup, "Chat with an agent");
+    expectLocalizedText(setup, "Use this connection as an agent tool");
     expect(setup).toContain("<AgentSelect");
     expect(setup).not.toContain("Change agent");
   });
@@ -54,13 +62,13 @@ describe("chat connector UI contract", () => {
     }
     expect(detail).not.toContain('"overview"');
     expect(detail).toContain("Open {providerNames[provider]}");
-    expect(detail).toContain("Open task");
+    expectLocalizedText(detail, "Open task");
     expect(detail.toLowerCase()).not.toContain("detach");
   });
 
   it("shows independent Slack callback surfaces and public URL drift", () => {
     const detail = source("./ChatEndpointDetail.tsx");
-    expect(detail).toContain("Slack callback health");
+    expectLocalizedText(detail, "Slack callback health");
     expect(detail).toContain("Events API");
     expect(detail).toContain("Interactivity");
     expect(detail).toContain("Slash command");
@@ -79,13 +87,13 @@ describe("chat connector UI contract", () => {
   it("keeps provider capabilities automatic and settings focused on plausible reach", () => {
     const detail = source("./ChatEndpointDetail.tsx");
     const setup = source("./ChatEndpointSetup.tsx");
-    expect(detail).toContain("Allow direct messages");
-    expect(detail).toContain("Allow group chats");
+    expectLocalizedText(detail, "Allow direct messages");
+    expectLocalizedText(detail, "Allow group chats");
     expect(detail).toContain("Their tasks run only with an isolated workspace");
     expect(detail).toContain("otherwise Paperclip safely refuses the request");
-    expect(setup).toContain("Link the account you’re testing");
+    expectLocalizedText(setup, "Link the account you’re testing");
     expect(setup).toContain("Paperclip does not replay the refused request");
-    expect(setup).toContain("Review identity access");
+    expectLocalizedText(setup, "Review identity access");
     expect(setup).toContain("instanceSettingsApi.getExperimental()");
     expect(setup).toContain("chatEndpointsApi.listPrincipals(endpointId)");
     expect(setup).toContain("queryKeys.chatEndpoints.detail(next.id)");
@@ -110,11 +118,11 @@ describe("chat connector UI contract", () => {
     );
     const activity = detail.slice(detail.indexOf("function Activity"));
     expect(detail).toContain('"pause" | "resume" | "remove"');
-    expect(detail).toContain("Remove this connection?");
+    expectLocalizedText(detail, "Remove this connection?");
     expect(detail).toContain("purpose=chat&resume=${endpoint.id}");
     expect(detail).toContain('? "" : "&reconnect=1"');
     expect(detail).toContain("Finish setup");
-    expect(detail).toContain("Continue setup");
+    expectLocalizedText(detail, "Continue setup");
     expect(detail).toContain('endpoint.setup?.step !== "complete"');
     expect(detail).toContain("Reconnect");
     expect(detail).not.toContain("Change agent");
@@ -175,7 +183,7 @@ describe("chat connector UI contract", () => {
     expect(setup).toContain("permissions=309237763136&scope=bot");
     expect(setup).not.toContain("applications.commands");
     expect(setup).toContain("Generate webhook secret");
-    expect(setup).toContain("will not show it again");
+    expectLocalizedText(setup, "Copy this value now. Paperclip will not show it again.");
     expect(setup).toContain('params.get("reconnect") === "1"');
     expect(setup).toContain(
       "Leave the token blank to reuse the saved credential",
@@ -200,15 +208,16 @@ describe("chat connector UI contract", () => {
     expect(setup).toContain("GCC High");
     expect(setup).toContain("operated by 21Vianet");
     expect(setup).toContain("Client secret value");
-    expect(setup).toContain("Microsoft portal field map");
-    expect(setup).toContain(
+    expectLocalizedText(setup, "Microsoft portal field map");
+    expectLocalizedText(
+      setup,
       "Accounts in this organizational directory only (Single tenant)",
     );
-    expect(setup).toContain("Use existing app registration");
-    expect(setup).toContain("Settings · Configuration");
-    expect(setup).toContain("Configure · App features · Bot");
-    expect(setup).toContain("Configure · Permissions");
-    expect(setup).toContain("Upload an app · Upload a custom app");
+    expectLocalizedText(setup, "Use existing app registration");
+    expectLocalizedText(setup, "Settings · Configuration");
+    expectLocalizedText(setup, "Configure · App features · Bot");
+    expectLocalizedText(setup, "Configure · Permissions");
+    expectLocalizedText(setup, "Upload an app · Upload a custom app");
     expect(setup).toContain("Copy manifest settings");
     expect(setup).toContain("disabled={!credentials.clientId?.trim()}");
     expect(setup).toContain(
@@ -239,11 +248,10 @@ describe("chat connector UI contract", () => {
     expect(setup).not.toContain("api://paperclip-chat/");
     expect(setup).toContain("not private channels");
     expect(setup).toContain("native file receipt and consent-based sending");
-    expect(setup).toContain("issue_comment");
-    expect(setup).toContain("pull_request");
-    expect(setup).toContain("pull_request_review_comment");
-    expect(setup).toContain("Enable SSL verification");
-    expect(setup).toContain("Only on this account");
+    expectLocalizedText(setup, "issue_comment");
+    expectLocalizedText(setup, "pull_request_review_comment");
+    expectLocalizedText(setup, "Enable SSL verification");
+    expectLocalizedText(setup, "Only on this account");
     expect(setup).toContain('type="password"');
     expect(setup).not.toContain("WebkitTextSecurity");
     expect(setup).toContain("Start Slack message test");
@@ -302,9 +310,9 @@ describe("chat connector UI contract", () => {
     );
     expect(setup).toContain("Generate webhook secret");
     expect(setup).toContain("GitHub App ID");
-    expect(setup).toContain("Private key (PEM)");
-    expect(setup).toContain("Choose .pem file");
-    expect(setup).toContain("Choose GitHub App private key file");
+    expectLocalizedText(setup, "Private key (PEM)");
+    expectLocalizedText(setup, "Choose .pem file");
+    expectLocalizedText(setup, "Choose GitHub App private key file");
     expect(setup).toContain("readGitHubPrivateKeyFile");
     expect(setup).toContain("privateKeyReadGuard.invalidate()");
     expect(setup).toContain("privateKeyFileLoading ||");

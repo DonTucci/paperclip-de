@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
@@ -38,11 +39,11 @@ export type RoutineContextualNavItem = {
 };
 
 export const ROUTINE_CONTEXTUAL_NAV_ITEMS: readonly RoutineContextualNavItem[] = [
-  { view: "overview", label: "Overview", icon: LayoutDashboard },
-  { view: "triggers", label: "Schedule", icon: CalendarClock },
-  { view: "variables", label: "Variables", icon: Braces },
-  { view: "delivery", label: "Delivery", icon: Send },
-  { view: "secrets", label: "Secrets", icon: KeyRound },
+  { view: "overview", label: tf("text.Overview"), icon: LayoutDashboard },
+  { view: "triggers", label: tf("text.Schedule"), icon: CalendarClock },
+  { view: "variables", label: tf("text.Variables"), icon: Braces },
+  { view: "delivery", label: tf("auto.52bfe584a5fc4505"), icon: Send },
+  { view: "secrets", label: tf("text.Secrets"), icon: KeyRound },
 ];
 
 export function isRoutineDetailView(value: string | null | undefined): value is RoutineDetailView {
@@ -106,7 +107,7 @@ export function RoutineContextualSidebar({
       showHeader={false}
       className="border-r border-border bg-background"
     >
-      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-label="Routine navigation">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-label={tf("auto.906a9d167c535d0b")}>
         <div className="flex flex-col gap-0.5">
           {ROUTINE_CONTEXTUAL_NAV_ITEMS.map((item) => (
             <SidebarNavItem
@@ -120,17 +121,17 @@ export function RoutineContextualSidebar({
         </div>
 
         <p className="px-4 pb-1 pt-5 text-(length:--text-nano) font-mono font-medium uppercase tracking-widest text-muted-foreground/60">
-          Audit
+          {tf("text.Audit")}
         </p>
         <div className="flex flex-col gap-0.5">
           <SidebarNavItem
             to={routineRunsAuditHref(routineId)}
-            label="Runs"
+            label={tf("text.Runs")}
             icon={Play}
           />
           <SidebarNavItem
             to={routineActivityAuditHref(routineId)}
-            label="Activity"
+            label={tf("text.Activity")}
             icon={Activity}
           />
         </div>

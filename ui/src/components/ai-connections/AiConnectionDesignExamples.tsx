@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { AiConnectionPicker } from "./AiConnectionPicker";
 import { LocalProviderLoginInstructions, ProviderApiKeyCard } from "@/components/AdapterLoginChrome";
@@ -39,7 +40,7 @@ export function AiConnectionDesignExamples() {
         Storybook under AI Connections / Review. Example controls below do not
         connect accounts.
       </p>
-      <p className="text-sm text-muted-foreground">Provider lists and account management use Browse and AppDetail from the Connectors interface. The picker below uses ConnectionChoiceList, also used by ConnectionSetupFlow.</p>
+      <p className="text-sm text-muted-foreground">{tf("auto.14339f7b811490a4")}</p>
       <AiConnectionPicker
         requirement={requirement}
         connections={[account]}
@@ -57,7 +58,7 @@ export function AiConnectionDesignExamples() {
         disabled
         onChange={() => {}}
         onSubmit={() => {}}
-        placeholder="Enter API key here"
+        placeholder={tf("auto.c80c3ac9799dc19b")}
       />
       <LocalProviderLoginInstructions
         adapterType="claude_local"

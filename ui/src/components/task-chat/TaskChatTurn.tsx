@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useStreamlinedTaskChatPresentation } from "./presentation-mode";
@@ -27,7 +28,7 @@ interface TaskChatTurnProps {
   leading?: ReactNode;
 }
 
-/** Metric segments after the label: "38s · 3 tools · +34 −3 · 12.3k tokens". */
+/** Metric segments after the label: tf("auto.16588337ce636822"). */
 export function turnSummaryMetrics(
   summary: TaskChatTurnItem["summary"],
 ): string {

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   Component,
   createContext,
@@ -596,7 +597,7 @@ function LauncherModalShell({
             className="ml-auto"
             onClick={() => void closeLauncher(instance.key, { reason: "programmatic" })}
           >
-            Close
+            {tf("text.Close")}
           </Button>
         </div>
         <div

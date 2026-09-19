@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useCopyAction } from "@/lib/use-copy-action";
@@ -139,14 +140,14 @@ export function TweakPanel() {
         onPointerUp={onHeaderPointerUp}
       >
         <GripHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
-        <span>Motion tweak panel</span>
+        <span>{tf("auto.1f577a8ab9cb3ace")}</span>
         <div className="ml-auto flex items-center gap-1">
-          <button type="button" title="Reset all" onClick={resetAll} className="rounded p-0.5 hover:bg-accent">
+          <button type="button" title={tf("auto.645982c52b7c11ae")} onClick={resetAll} className="rounded p-0.5 hover:bg-accent">
             <RotateCcw className="h-3.5 w-3.5" />
           </button>
           <button
             type="button"
-            title={minimized ? "Expand" : "Minimize"}
+            title={minimized ? tf("auto.07548c2c6511d4d1") : tf("auto.d72e311c4ddaf4ac")}
             onClick={() => setMinimized((m) => !m)}
             className="rounded p-0.5 hover:bg-accent"
           >
@@ -210,7 +211,7 @@ export function TweakPanel() {
               className="flex flex-1 items-center justify-center gap-1 rounded border border-border px-2 py-1 text-xs hover:bg-accent"
             >
               <Copy className="h-3.5 w-3.5" />
-              Copy as @theme
+              {tf("auto.f312e3164bcc6d8a")}
             </button>
           </div>
 

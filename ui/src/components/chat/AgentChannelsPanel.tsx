@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, MessageSquarePlus } from "lucide-react";
 import { chatEndpointsApi, type ChatProvider } from "@/api/chatEndpoints";
@@ -39,29 +40,29 @@ export function AgentChannelsPanel({
     <section className="max-w-3xl space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">Channels</h2>
+          <h2 className="text-lg font-semibold">{tf("auto.4c8906cf76f5740a")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Chat and email identities connected to this agent.
+            {tf("auto.1a1a7a34710f87cb")}
           </p>
         </div>
         <Button asChild size="sm">
           <Link to={`/apps?chatAgentId=${encodeURIComponent(agentId)}`}>
             <MessageSquarePlus />
-            Connect a channel
+            {tf("auto.283fa1a6131eb1eb")}
           </Link>
         </Button>
       </div>
       {query.isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading channels…</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.b09d106b3f777e53")}</p>
       ) : endpoints.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-5">
-          <p className="text-sm font-medium">No channels connected</p>
+          <p className="text-sm font-medium">{tf("auto.ce30a0411e96165e")}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Connect AgentMail, Slack, GitHub, Discord, Microsoft Teams, or Telegram from
             Connectors.
           </p>
           <Button asChild className="mt-3" variant="outline" size="sm">
-            <Link to="/apps">Open Connectors</Link>
+            <Link to="/apps">{tf("auto.d985974b1d0546ec")}</Link>
           </Button>
         </div>
       ) : (

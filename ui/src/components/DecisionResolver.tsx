@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useMemo } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -166,7 +167,7 @@ export function DecisionResolver({ companyId, decisionId, originIssue, agentMap,
   if (detail.isLoading) {
     return (
       <div className="flex items-center gap-2 py-3 text-xs text-muted-foreground">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading decision…
+        <Loader2 className="h-3.5 w-3.5 animate-spin" /> {tf("auto.ad0b2287390d6253")}
       </div>
     );
   }
@@ -174,7 +175,7 @@ export function DecisionResolver({ companyId, decisionId, originIssue, agentMap,
   if (detail.error || !decision) {
     return (
       <p className="py-3 text-xs text-muted-foreground">
-        This decision is no longer available — it may have been resolved elsewhere.
+        {tf("auto.e3f188cda1be6b59")}
       </p>
     );
   }

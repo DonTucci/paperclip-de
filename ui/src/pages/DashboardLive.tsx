@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect } from "react";
 import { ArrowLeft, RadioTower } from "lucide-react";
 import { Link } from "@/lib/router";
@@ -14,8 +15,8 @@ export function DashboardLive() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Dashboard", href: "/dashboard" },
-      { label: "Live runs" },
+      { label: tf("text.Dashboard"), href: "/dashboard" },
+      { label: tf("auto.905f1fefa6932455") },
     ]);
   }, [setBreadcrumbs]);
 
@@ -23,7 +24,7 @@ export function DashboardLive() {
     return (
       <EmptyState
         icon={RadioTower}
-        message={companies.length === 0 ? "Create an organization to view live runs." : "Select an organization to view live runs."}
+        message={companies.length === 0 ? tf("auto.dfd72377cca37638") : tf("auto.1a5b4c52d3d07fc7")}
       />
     );
   }
@@ -37,11 +38,11 @@ export function DashboardLive() {
             className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Dashboard
+            {tf("text.Dashboard")}
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold tracking-normal text-foreground">Live agent runs</h1>
+          <h1 className="mt-2 text-2xl font-semibold tracking-normal text-foreground">{tf("auto.6663a17b699c35a5")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Active runs first, followed by the most recent completed runs.
+            {tf("auto.e4351c0f7022fd92")}
           </p>
         </div>
         <div className="text-sm text-muted-foreground">Showing up to {DASHBOARD_LIVE_RUN_LIMIT}</div>
@@ -49,11 +50,11 @@ export function DashboardLive() {
 
       <ActiveAgentsPanel
         companyId={selectedCompanyId}
-        title="Active / recent"
+        title={tf("auto.29047d81c75e0353")}
         minRunCount={DASHBOARD_LIVE_RUN_LIMIT}
         fetchLimit={DASHBOARD_LIVE_RUN_LIMIT}
         cardLimit={DASHBOARD_LIVE_RUN_LIMIT}
-        emptyMessage="No active or recent agent runs."
+        emptyMessage={tf("auto.ae4f00afad4e95ae")}
         queryScope="dashboard-live"
         showMoreLink={false}
       />

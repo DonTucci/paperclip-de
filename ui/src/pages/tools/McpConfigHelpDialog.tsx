@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,14 +58,14 @@ export function McpConfigHelpDialog() {
           variant="ghost"
           size="icon"
           className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
-          aria-label="Get help creating an MCP config"
+          aria-label={tf("auto.2b39abc0e46ce58c")}
         >
           <HelpCircle className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-(--sz-85vh) overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Ask an agent for an MCP config</DialogTitle>
+          <DialogTitle>{tf("auto.fd679cf37003a3aa")}</DialogTitle>
           <DialogDescription>
             Don't know the URL or headers a tool needs? Hand this request to an agent and paste back what it
             gives you.
@@ -79,7 +80,7 @@ export function McpConfigHelpDialog() {
 
         <div className="space-y-2">
           <label htmlFor="mcp-config-help-prompt" className="text-sm font-medium text-foreground">
-            Prompt to send
+            {tf("auto.928a8e35e48cbc4d")}
           </label>
           <Textarea
             id="mcp-config-help-prompt"

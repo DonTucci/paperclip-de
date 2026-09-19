@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { memo, type ComponentType, type SVGProps } from "react";
 import { Bot, FileText, Hexagon, MessageSquare, Paperclip, Quote } from "lucide-react";
 import type { Agent, CompanySearchResult } from "@paperclipai/shared";
@@ -13,10 +14,10 @@ type SnippetStyle = {
 };
 
 const SNIPPET_STYLES: Record<string, SnippetStyle> = {
-  comment: { Icon: MessageSquare, label: "Comment" },
-  document: { Icon: FileText, label: "Doc" },
-  artifact: { Icon: Paperclip, label: "Artifact" },
-  description: { Icon: Quote, label: "Description" },
+  comment: { Icon: MessageSquare, label: tf("text.Comment") },
+  document: { Icon: FileText, label: tf("auto.49f4e57c2625d4ae") },
+  artifact: { Icon: Paperclip, label: tf("auto.e06171a1c467f2d4") },
+  description: { Icon: Quote, label: tf("text.Description") },
 };
 
 function snippetStyle(field: string, fallbackLabel: string): SnippetStyle {

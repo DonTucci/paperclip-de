@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import type { BudgetIncident } from "@paperclipai/shared";
 import { AlertOctagon, ArrowUpRight, PauseCircle } from "lucide-react";
@@ -77,7 +78,7 @@ export function BudgetIncidentCard({
 
         <div className="rounded-xl border border-border/60 bg-background/60 p-3">
           <label className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">
-            New budget (USD)
+            {tf("auto.99dd3774b5bec80b")}
           </label>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <Input
@@ -99,14 +100,14 @@ export function BudgetIncidentCard({
           </div>
           {parsed !== null && parsed <= incident.amountObserved ? (
             <p className="mt-2 text-xs text-red-700 dark:text-red-200/80">
-              The new budget must exceed current observed spend.
+              {tf("auto.a9af346c9817a37e")}
             </p>
           ) : null}
         </div>
 
         <div className="flex justify-end">
           <Button variant="ghost" className="text-muted-foreground" disabled={isMutating} onClick={onKeepPaused}>
-            Keep paused
+            {tf("auto.686b908d5611e297")}
           </Button>
         </div>
       </CardContent>

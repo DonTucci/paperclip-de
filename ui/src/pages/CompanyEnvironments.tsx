@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useCallback,
   useEffect,
@@ -686,7 +687,7 @@ function EnvironmentCustomImageBrowserTerminal({
 
         if (frame.type === "error") {
           setConnectionState("error");
-          setErrorMessage(typeof frame.message === "string" ? frame.message : "Terminal connection failed.");
+          setErrorMessage(typeof frame.message === "string" ? frame.message: tf("auto.66de2537d3cae646"));
           return;
         }
 
@@ -709,7 +710,7 @@ function EnvironmentCustomImageBrowserTerminal({
       };
     } catch (error) {
       setConnectionState("error");
-      setErrorMessage(error instanceof Error ? error.message : "Terminal session could not be opened.");
+      setErrorMessage(error instanceof Error ? error.message: tf("auto.c2791743ff54eaf0"));
     }
   }, [closeSocket, fitTerminal, getTerminalDimensions, resetTerminalScreen, sendTerminalResize, sessionId]);
 
@@ -735,13 +736,13 @@ function EnvironmentCustomImageBrowserTerminal({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-3 py-2">
         <div className="flex min-w-0 items-center gap-2 text-xs">
           <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
-          <span className="font-medium">Browser terminal</span>
+          <span className="font-medium">{tf("auto.56091b3f4582b6f9")}</span>
           <span className="text-muted-foreground">{customImageTerminalStatusCopy(connectionState)}</span>
         </div>
         <div className="flex items-center gap-2">
           {terminalInteractive ? (
             <Button size="sm" variant="ghost" onClick={disconnectTerminal}>
-              Disconnect
+              {tf("text.Disconnect")}
             </Button>
           ) : (
             <Button
@@ -760,7 +761,7 @@ function EnvironmentCustomImageBrowserTerminal({
         <div
           ref={terminalElementRef}
           data-testid={`custom-image-terminal-screen-${sessionId}`}
-          aria-label="Custom image browser terminal"
+          aria-label={tf("auto.b0cd22fca82da30b")}
           role="application"
           tabIndex={0}
           onFocus={() => xtermRef.current?.focus()}
@@ -781,7 +782,7 @@ function capabilityState(capability: EnvironmentProviderCapability | null | unde
   if (!capability || capability.status !== "supported" || !capability.supportsInteractiveSetup) {
     return {
       kind: "unsupported" as const,
-      label: "Unsupported provider",
+      label: tf("auto.1609d5fba47cd40f"),
       reason: "This provider does not advertise interactive template setup.",
     };
   }
@@ -789,14 +790,14 @@ function capabilityState(capability: EnvironmentProviderCapability | null | unde
   if (!capability.supportsTemplateCapture) {
     return {
       kind: "capture_unavailable" as const,
-      label: "Setup capture unavailable",
+      label: tf("auto.03343786294be321"),
       reason: "This provider advertises setup, but image capture is unavailable.",
     };
   }
 
   return {
     kind: "supported" as const,
-    label: "Template setup",
+    label: tf("auto.5b15507cf524b893"),
     reason: null,
   };
 }
@@ -912,15 +913,15 @@ function EnvironmentImageTemplatePanel({
       }));
       setSessionResult(result);
       pushToast({
-        title: "Setup session started",
+        title: tf("auto.53d6f8907b526cfc"),
         body: "Connect details are available while the session is active.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to start setup",
-        body: error instanceof Error ? error.message : "Setup session could not be started.",
+        title: tf("auto.7f4748134c7be063"),
+        body: error instanceof Error ? error.message: tf("auto.e0feeb057a9faff3"),
         tone: "error",
       });
     },
@@ -937,15 +938,15 @@ function EnvironmentImageTemplatePanel({
       setSessionResult({ session: result.session, connectionPayload: null });
       invalidateOverview();
       pushToast({
-        title: "Template captured",
+        title: tf("auto.28445ed07a10e8a8"),
         body: "Future runs can use the promoted template.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to capture template",
-        body: error instanceof Error ? error.message : "Template capture failed.",
+        title: tf("auto.bf302545076f3b5e"),
+        body: error instanceof Error ? error.message: tf("auto.0e1be98f6b772459"),
         tone: "error",
       });
     },
@@ -963,15 +964,15 @@ function EnvironmentImageTemplatePanel({
       setSessionResult({ session, connectionPayload: null });
       invalidateOverview();
       pushToast({
-        title: "Setup cancelled",
+        title: tf("auto.cd2153e3f4eaac43"),
         body: "The active template was not changed.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to cancel setup",
-        body: error instanceof Error ? error.message : "Setup session could not be cancelled.",
+        title: tf("auto.77dd7d596290c5f7"),
+        body: error instanceof Error ? error.message: tf("auto.ac216c72c5add567"),
         tone: "error",
       });
     },
@@ -987,15 +988,15 @@ function EnvironmentImageTemplatePanel({
       }));
       invalidateOverview();
       pushToast({
-        title: "Template rolled back",
+        title: tf("auto.3a816611d8b88691"),
         body: "Future runs will use the previous template.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to roll back template",
-        body: error instanceof Error ? error.message : "Rollback failed.",
+        title: tf("auto.27866f871ef83495"),
+        body: error instanceof Error ? error.message: tf("auto.0638f6f5421e8d16"),
         tone: "error",
       });
     },
@@ -1030,7 +1031,7 @@ function EnvironmentImageTemplatePanel({
       }));
       invalidateOverview();
       pushToast({
-        title: "Template relinked",
+        title: tf("auto.71419153a9368618"),
         body: "Runs use the captured image again.",
         tone: "success",
       });
@@ -1038,8 +1039,8 @@ function EnvironmentImageTemplatePanel({
     onError: (error) => {
       if (error instanceof RelinkConfirmationDeclined) return;
       pushToast({
-        title: "Failed to relink template",
-        body: error instanceof Error ? error.message : "Relink failed.",
+        title: tf("auto.b65f3f9a737a2506"),
+        body: error instanceof Error ? error.message: tf("auto.badb997ec079bceb"),
         tone: "error",
       });
     },
@@ -1055,15 +1056,15 @@ function EnvironmentImageTemplatePanel({
       }));
       invalidateOverview();
       pushToast({
-        title: "Template disabled",
+        title: tf("auto.3cce508cd55f7915"),
         body: "Future runs will use the base provider configuration.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to disable template",
-        body: error instanceof Error ? error.message : "Disable failed.",
+        title: tf("auto.1a69e3fc3b9a5fc0"),
+        body: error instanceof Error ? error.message: tf("auto.635cc728f194b507"),
         tone: "error",
       });
     },
@@ -1081,7 +1082,7 @@ function EnvironmentImageTemplatePanel({
   if (overviewQuery.isLoading) {
     return (
       <div className="mt-3 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-        Loading template setup...
+        {tf("auto.b901516e32e1270c")}
       </div>
     );
   }
@@ -1089,7 +1090,7 @@ function EnvironmentImageTemplatePanel({
   if (overviewQuery.isError) {
     return (
       <div className="mt-3 border-t border-border/60 pt-3 text-xs text-destructive">
-        {overviewQuery.error instanceof Error ? overviewQuery.error.message : "Template setup could not be loaded."}
+        {overviewQuery.error instanceof Error ? overviewQuery.error.message: tf("auto.2ef6914039ac9414")}
       </div>
     );
   }
@@ -1142,7 +1143,7 @@ function EnvironmentImageTemplatePanel({
               disabled={isMutating || session.status !== "waiting_for_user"}
             >
               <Check className="mr-1.5 h-3.5 w-3.5" />
-              Finished
+              {tf("auto.7804f7a79a9eee32")}
             </Button>
             <Button
               size="sm"
@@ -1151,13 +1152,13 @@ function EnvironmentImageTemplatePanel({
               disabled={isMutating}
             >
               <X className="mr-1.5 h-3.5 w-3.5" />
-              Cancel
+              {tf("text.Cancel")}
             </Button>
           </div>
         </div>
         {isCapturing ? (
           <div className="mt-2 text-xs text-muted-foreground">
-            Capture is in progress. If this state remains after a refresh or interrupted request, cancel it to return to the active template controls.
+            {tf("auto.ad3474e111b22138")}
           </div>
         ) : null}
         {session.status === "waiting_for_user" && connectionPayload?.type === "ssh" ? (
@@ -1166,7 +1167,7 @@ function EnvironmentImageTemplatePanel({
         {session.status === "waiting_for_user" && connectionCommand ? (
           <details className="mt-2 rounded-md border border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
             <summary className="cursor-pointer select-none font-medium text-foreground">
-              SSH command fallback
+              {tf("auto.9f1db9e00858c762")}
             </summary>
             <code className="mt-2 block overflow-x-auto whitespace-nowrap text-(length:--text-micro) leading-5">
               {connectionCommand}
@@ -1193,7 +1194,7 @@ function EnvironmentImageTemplatePanel({
       <div className="mt-3 border-t border-border/60 pt-3" data-testid={`custom-image-template-state-${environment.id}`}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
-            <div className="text-xs font-medium">Active template</div>
+            <div className="text-xs font-medium">{tf("auto.a378e2403355303b")}</div>
             <div className="text-xs text-muted-foreground">
               {providerDisplayName} · {activeTemplate.templateKind}
               {" · "}
@@ -1227,7 +1228,7 @@ function EnvironmentImageTemplatePanel({
               disabled={isMutating}
             >
               <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-              Refresh
+              {tf("text.Refresh")}
             </Button>
             <Button
               size="sm"
@@ -1237,7 +1238,7 @@ function EnvironmentImageTemplatePanel({
               data-testid={`custom-image-template-relink-${environment.id}`}
             >
               <Link2 className="mr-1.5 h-3.5 w-3.5" />
-              Relink
+              {tf("auto.6c2050caec79d2e5")}
             </Button>
             <Button
               size="sm"
@@ -1246,7 +1247,7 @@ function EnvironmentImageTemplatePanel({
               disabled={isMutating}
             >
               <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-              Rollback
+              {tf("auto.c591f5574995c740")}
             </Button>
             <Button
               size="sm"
@@ -1255,7 +1256,7 @@ function EnvironmentImageTemplatePanel({
               disabled={isMutating}
             >
               <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-              Disable
+              {tf("text.Disable")}
             </Button>
           </div>
         </div>
@@ -1267,7 +1268,7 @@ function EnvironmentImageTemplatePanel({
     <div className="mt-3 border-t border-border/60 pt-3" data-testid={`custom-image-template-state-${environment.id}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <div className="text-xs font-medium">Not configured</div>
+          <div className="text-xs font-medium">{tf("auto.dd1841d295024256")}</div>
           <div className="text-xs text-muted-foreground">
             {latestSession
               ? sessionStatusCopy(latestSession.status)
@@ -1284,7 +1285,7 @@ function EnvironmentImageTemplatePanel({
           disabled={isMutating}
         >
           <Play className="mr-1.5 h-3.5 w-3.5" />
-          Configure image
+          {tf("auto.91142ef01b7566a9")}
         </Button>
       </div>
     </div>
@@ -1319,13 +1320,13 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
 
   useEffect(() => {
     const crumbs = [
-      { label: "Settings", href: "/company/settings" },
+      { label: tf("text.Settings"), href: "/company/settings" },
       isEnvironmentFormPage
-        ? { label: "Environments", href: ENVIRONMENTS_PATH }
-        : { label: "Environments" },
+        ? { label: tf("text.Environments"), href: ENVIRONMENTS_PATH }
+        : { label: tf("text.Environments") },
     ];
-    if (mode === "create") crumbs.push({ label: "Add environment" });
-    if (mode === "edit") crumbs.push({ label: "Edit environment" });
+    if (mode === "create") crumbs.push({ label: tf("auto.dcbe4c44d66b3f6e") });
+    if (mode === "edit") crumbs.push({ label: tf("auto.05515e83217b8310") });
     setBreadcrumbs(crumbs);
   }, [isEnvironmentFormPage, mode, setBreadcrumbs]);
 
@@ -1439,15 +1440,15 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
       setEnvironmentVariablesDirty(false);
       navigate(ENVIRONMENTS_PATH, { replace: true });
       pushToast({
-        title: "Environment variables updated",
+        title: tf("auto.140a828b0875d36a"),
         body: `${environment.name} will inject the updated variables into future runs.`,
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to save environment variables",
-        body: error instanceof Error ? error.message : "Environment variables save failed.",
+        title: tf("auto.01ee01929bc12fd0"),
+        body: error instanceof Error ? error.message: tf("auto.3ee776830966086b"),
         tone: "error",
       });
     },
@@ -1489,13 +1490,13 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
       const reconciliation = (environment as EnvironmentUpdateResult).customImageReconciliation;
       if (reconciliation?.action === "relinked") {
         pushToast({
-          title: "Custom image kept active",
+          title: tf("auto.5469d38aedfb8f9d"),
           body: "The captured image was re-linked to the updated configuration automatically.",
           tone: "info",
         });
       } else if (reconciliation?.action === "detached") {
         pushToast({
-          title: "Custom image no longer applies",
+          title: tf("auto.c07e146f6d704411"),
           body: "This change alters what the captured image was built from. Runs use the base configuration until you capture a new image.",
           tone: "warn",
         });
@@ -1503,8 +1504,8 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to save environment",
-        body: error instanceof Error ? error.message : "Environment save failed.",
+        title: tf("auto.40eb0c9afcc9341f"),
+        body: error instanceof Error ? error.message: tf("auto.eef0b7876dde4a69"),
         tone: "error",
       });
     },
@@ -1516,15 +1517,15 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.instance.settings });
       pushToast({
-        title: "Default environment updated",
+        title: tf("auto.bd8aa959d567e305"),
         body: "Agent inheritance now follows the updated instance default.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to update default environment",
-        body: error instanceof Error ? error.message : "Default environment update failed.",
+        title: tf("auto.0239d19d9cf5a8fe"),
+        body: error instanceof Error ? error.message: tf("auto.c0105cd921c42836"),
         tone: "error",
       });
     },
@@ -1567,7 +1568,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
       navigate(ENVIRONMENTS_PATH, { replace: true });
       const destroyedCount = environment.destroyedReusableSandboxLeaseCount ?? 0;
       pushToast({
-        title: "Environment deleted",
+        title: tf("auto.0b3759e1ffd2f764"),
         body:
           destroyedCount > 0
             ? `${environment.name} was deleted. Destroyed ${destroyedCount === 1 ? "1 reusable sandbox" : `${destroyedCount} reusable sandboxes`}.`
@@ -1585,8 +1586,8 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
         queryKey: ["environment-delete-blast-radius", input.environment.id],
       });
       pushToast({
-        title: "Failed to delete environment",
-        body: error instanceof Error ? error.message : "Environment delete failed.",
+        title: tf("auto.382f89dda2bc2660"),
+        body: error instanceof Error ? error.message: tf("auto.3718b5d7374d66b5"),
         tone: "error",
       });
     },
@@ -1618,13 +1619,13 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
         [environmentId]: {
           ok: false,
           driver: failedEnvironment?.driver ?? "local",
-          summary: error instanceof Error ? error.message : "Environment probe failed.",
+          summary: error instanceof Error ? error.message: tf("auto.f7f3392fcd63d266"),
           details: null,
         },
       }));
       pushToast({
-        title: "Environment probe failed",
-        body: error instanceof Error ? error.message : "Environment probe failed.",
+        title: tf("auto.faeba0887f20e922"),
+        body: error instanceof Error ? error.message: tf("auto.f7f3392fcd63d266"),
         tone: "error",
       });
     },
@@ -1645,8 +1646,8 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
     },
     onError: (error) => {
       pushToast({
-        title: "Draft probe failed",
-        body: error instanceof Error ? error.message : "Environment probe failed.",
+        title: tf("auto.a48eacbdcf4315a2"),
+        body: error instanceof Error ? error.message: tf("auto.f7f3392fcd63d266"),
         tone: "error",
       });
     },
@@ -1940,14 +1941,14 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
   })();
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select an organization context to manage environment secrets and bindings.</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.64bdfdbc689a3826")}</div>;
   }
 
   if (!environmentsEnabled) {
     return (
       <div className="max-w-6xl space-y-4">
         <div className="text-sm text-muted-foreground">
-          Enable Environments in instance experimental settings to manage shared execution targets.
+          {tf("auto.e0b9fc5007b3802a")}
         </div>
       </div>
     );
@@ -1959,10 +1960,10 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <label className="flex flex-wrap items-center gap-3 text-sm font-medium">
-            <span>Default</span>
+            <span>{tf("text.Default")}</span>
             <span>
               <select
-                aria-label="Default environment"
+                aria-label={tf("auto.4929026b6fc93bf8")}
                 className="min-w-(--sz-12rem) max-w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm font-normal outline-none"
                 value={instanceDefaultEnvironmentId}
                 onChange={(event) =>
@@ -1975,11 +1976,11 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                   // placeholder only renders while no default is stamped yet.
                   instanceDefaultEnvironmentId === "" ? (
                     <option value="" disabled>
-                      Select environment
+                      {tf("auto.bedc68e3c795da4b")}
                     </option>
                   ) : null
                 ) : (
-                  <option value="">Local</option>
+                  <option value="">{tf("text.Local")}</option>
                 )}
                 {nonLocalEnvironments.map((environment) => (
                   <option key={environment.id} value={environment.id}>
@@ -1990,7 +1991,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
             </span>
           </label>
           <Button size="icon-sm" variant="ghost" asChild>
-            <Link to={`${ENVIRONMENTS_PATH}/new`} aria-label="Add environment" title="Add environment">
+            <Link to={`${ENVIRONMENTS_PATH}/new`} aria-label={tf("auto.dcbe4c44d66b3f6e")} title={tf("auto.dcbe4c44d66b3f6e")}>
               <Plus className="h-4 w-4" />
             </Link>
           </Button>
@@ -2022,7 +2023,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                       {isPlatformManagedEnvironment(environment) ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">
                           <Lock className="h-3 w-3" aria-hidden />
-                          Managed by Paperclip
+                          {tf("auto.eca360585456c302")}
                         </span>
                       ) : null}
                     </div>
@@ -2049,7 +2050,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                         })()}
                       </div>
                     ) : (
-                      <div className="text-xs text-muted-foreground">Runs on this Paperclip host.</div>
+                      <div className="text-xs text-muted-foreground">{tf("auto.9dbf3809a61bf1d5")}</div>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -2068,7 +2069,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                       </Button>
                     ) : null}
                     <Button size="sm" variant="ghost" asChild>
-                      <Link to={environmentEditPath(environment.id)}>Edit</Link>
+                      <Link to={environmentEditPath(environment.id)}>{tf("text.Edit")}</Link>
                     </Button>
                   </div>
                 </div>
@@ -2095,16 +2096,16 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
 
       {isEnvironmentFormPage && mode === "edit" && environments === undefined ? (
         <div className="text-sm text-muted-foreground">
-          Loading environment...
+          {tf("auto.68007c8ac49c8960")}
         </div>
       ) : null}
 
       {isEnvironmentFormPage && mode === "edit" && environments !== undefined && !editingEnvironment ? (
         <div className="space-y-3 text-sm">
-          <div className="font-medium">Environment not found</div>
-          <div className="text-muted-foreground">The environment may have been removed or is not available in this organization.</div>
+          <div className="font-medium">{tf("auto.50b45e7c07b3cdc2")}</div>
+          <div className="text-muted-foreground">{tf("auto.ced1fc2d6aa17898")}</div>
           <Button size="sm" variant="outline" asChild>
-            <Link to={ENVIRONMENTS_PATH}>Back to environments</Link>
+            <Link to={ENVIRONMENTS_PATH}>{tf("auto.3e0af89df96f0d06")}</Link>
           </Button>
         </div>
       ) : null}
@@ -2117,7 +2118,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               <Button size="sm" variant="ghost" asChild>
                 <Link to={ENVIRONMENTS_PATH}>
                   <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
-                  Environments
+                  {tf("text.Environments")}
                 </Link>
               </Button>
             </div>
@@ -2125,7 +2126,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               <h1 className="text-lg font-semibold">{editingEnvironment.name}</h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                 <Lock className="h-3 w-3" aria-hidden />
-                Managed by Paperclip
+                {tf("auto.eca360585456c302")}
               </span>
             </div>
             <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
@@ -2138,7 +2139,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
           </div>
           <div className="py-4">
             <Field
-              label="Environment variables"
+              label={tf("text.Environment variables")}
               hint="Injected into runs that resolve through this environment. Use plain values or organization secrets."
             >
               <EnvironmentVariablesEditor
@@ -2154,8 +2155,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
             {managedEnvironmentEnvVarsMutation.isError ? (
               <div className="mt-3 text-xs text-destructive">
                 {managedEnvironmentEnvVarsMutation.error instanceof Error
-                  ? managedEnvironmentEnvVarsMutation.error.message
-                  : "Failed to save environment variables"}
+                  ? managedEnvironmentEnvVarsMutation.error.message: tf("auto.01ee01929bc12fd0")}
               </div>
             ) : null}
           </div>
@@ -2165,7 +2165,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               onClick={closeEnvironmentForm}
               disabled={managedEnvironmentEnvVarsMutation.isPending}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               onClick={() => managedEnvironmentEnvVarsMutation.mutate(flushEnvironmentForm().envVars)}
@@ -2187,7 +2187,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               <Button size="sm" variant="ghost" asChild>
                 <Link to={ENVIRONMENTS_PATH}>
                   <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
-                  Environments
+                  {tf("text.Environments")}
                 </Link>
               </Button>
               {editingEnvironment ? (
@@ -2196,7 +2196,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                   variant="ghost"
                   className="text-muted-foreground hover:text-destructive"
                   aria-label={`Delete ${editingEnvironment.name}`}
-                  title="Delete environment"
+                  title={tf("auto.a7470854bb34a1cc")}
                   data-testid="environment-delete-button"
                   onClick={() => {
                     setReassignEnvironmentTargetId("");
@@ -2209,13 +2209,13 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
             </div>
             <h1 className="text-lg font-semibold">{editingEnvironmentId ? "Edit environment" : "Add environment"}</h1>
             <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
-              Configure a reusable execution target for your agents. Saved changes affect future runs; Paperclip may start fresh sessions or sandbox leases after environment config changes.
+              {tf("auto.d5c6e5ed4aacf983")}
             </p>
           </div>
 
           <div className="py-4">
             <div className="space-y-4">
-              <Field label="Name" hint="Operator-facing name for this execution target.">
+              <Field label={tf("text.Name")} hint="Operator-facing name for this execution target.">
                 <input
                   className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                   type="text"
@@ -2223,7 +2223,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                   onChange={(e) => setEnvironmentForm((current) => ({ ...current, name: e.target.value }))}
                 />
               </Field>
-              <Field label="Description" hint="Optional note about what this machine is for.">
+              <Field label={tf("text.Description")} hint="Optional note about what this machine is for.">
                 <input
                   className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                   type="text"
@@ -2231,7 +2231,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                   onChange={(e) => setEnvironmentForm((current) => ({ ...current, description: e.target.value }))}
                 />
               </Field>
-              <Field label="Driver" hint="Sandbox stores plugin-backed provider config on the shared environment seam. SSH stores a remote machine target.">
+              <Field label={tf("auto.9fe4c68ec20dda7c")} hint="Sandbox stores plugin-backed provider config on the shared environment seam. SSH stores a remote machine target.">
                 <select
                   className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                   value={environmentForm.driver}
@@ -2256,18 +2256,18 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                     }))}
                 >
                   {sandboxCreationEnabled || environmentForm.driver === "sandbox" ? (
-                    <option value="sandbox">Sandbox</option>
+                    <option value="sandbox">{tf("auto.67fc62497e85d81b")}</option>
                   ) : null}
-                  <option value="ssh">SSH</option>
+                  <option value="ssh">{tf("auto.01c4d3c21642b217")}</option>
                   {environmentForm.driver === "local" ? (
-                    <option value="local">Local</option>
+                    <option value="local">{tf("text.Local")}</option>
                   ) : null}
                 </select>
               </Field>
 
               {environmentForm.driver === "ssh" ? (
                 <div className="grid gap-3 md:grid-cols-2">
-                  <Field label="Host" hint="DNS name or IP address for the remote machine.">
+                  <Field label={tf("auto.4a823118b9ba8baa")} hint="DNS name or IP address for the remote machine.">
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                       type="text"
@@ -2275,7 +2275,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                       onChange={(e) => setEnvironmentForm((current) => ({ ...current, sshHost: e.target.value }))}
                     />
                   </Field>
-                  <Field label="Port" hint="Defaults to 22.">
+                  <Field label={tf("auto.72e9a59f5a1d6289")} hint="Defaults to 22.">
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                       type="number"
@@ -2285,7 +2285,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                       onChange={(e) => setEnvironmentForm((current) => ({ ...current, sshPort: e.target.value }))}
                     />
                   </Field>
-                  <Field label="Username" hint="SSH username.">
+                  <Field label={tf("auto.e3b89e9d33f88e52")} hint="SSH username.">
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                       type="text"
@@ -2300,7 +2300,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                     the platform-managed environment owns; an SSH environment the
                     user configured is outside that contract.
                   */}
-                  <Field label="Remote workspace path" hint="Absolute path that Paperclip will verify during SSH connection tests.">
+                  <Field label={tf("auto.386e8a50fe467952")} hint="Absolute path that Paperclip will verify during SSH connection tests.">
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                       type="text"
@@ -2310,7 +2310,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                         setEnvironmentForm((current) => ({ ...current, sshRemoteWorkspacePath: e.target.value }))}
                     />
                   </Field>
-                  <Field label="Private key" hint="Optional PEM private key. Leave blank to rely on the server's SSH agent or default keychain.">
+                  <Field label={tf("auto.477bf990a2b3a489")} hint="Optional PEM private key. Leave blank to rely on the server's SSH agent or default keychain.">
                     <div className="space-y-2">
                       <select
                         className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
@@ -2322,7 +2322,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                             sshPrivateKey: e.target.value ? "" : current.sshPrivateKey,
                           }))}
                       >
-                        <option value="">No saved secret</option>
+                        <option value="">{tf("auto.b39f5a0e038e6c78")}</option>
                         {(secrets ?? []).map((secret) => (
                           <option key={secret.id} value={secret.id}>{secret.name}</option>
                         ))}
@@ -2335,7 +2335,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                       />
                     </div>
                   </Field>
-                  <Field label="Known hosts" hint="Optional known_hosts block used when strict host key checking is enabled.">
+                  <Field label={tf("auto.45d7c9da91c51a7b")} hint="Optional known_hosts block used when strict host key checking is enabled.">
                     <textarea
                       className="h-32 w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-xs font-mono outline-none"
                       value={environmentForm.sshKnownHosts}
@@ -2344,7 +2344,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                   </Field>
                   <div className="md:col-span-2">
                     <ToggleField
-                      label="Strict host key checking"
+                      label={tf("auto.843373bb0a7955cf")}
                       hint="Keep this on unless you deliberately want probe-time host key acceptance disabled."
                       checked={environmentForm.sshStrictHostKeyChecking}
                       onChange={(checked) =>
@@ -2356,7 +2356,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
 
               {environmentForm.driver === "sandbox" ? (
                 <div className="space-y-3">
-                  <Field label="Provider" hint="Installed run-capable sandbox provider plugins appear here.">
+                  <Field label={tf("text.Provider")} hint="Installed run-capable sandbox provider plugins appear here.">
                     <select
                       className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
                       value={environmentForm.sandboxProvider}
@@ -2397,11 +2397,11 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                     />
                   ) : (
                     <div className="text-xs text-muted-foreground">
-                      This provider does not declare additional configuration fields.
+                      {tf("auto.0aee5daba8485cce")}
                     </div>
                   )}
                   <ToggleField
-                    label="Stream run logs"
+                    label={tf("auto.95161f1e983d9327")}
                     hint="Stream the agent CLI's output live while runs execute (recommended). Turn off to deliver output only when the run finishes."
                     checked={environmentForm.sandboxConfig.streamRunLogs !== false}
                     onChange={(checked) =>
@@ -2418,7 +2418,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               environmentForm.driver === "sandbox" &&
               selectedCompanyId ? (
                 <div className="space-y-2 py-3">
-                  <div className="text-sm font-medium">Custom image</div>
+                  <div className="text-sm font-medium">{tf("auto.032747a5d15926e7")}</div>
                   <div className="text-xs text-muted-foreground">
                     Start a setup sandbox, SSH in to customize the instance, then capture the
                     running machine as a reusable image for future runs.
@@ -2433,7 +2433,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               ) : null}
 
               <Field
-                label="Environment variables"
+                label={tf("text.Environment variables")}
                 hint="Injected into runs that resolve through this environment. Use plain values or organization secrets."
               >
                 <EnvironmentVariablesEditor
@@ -2450,8 +2450,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               {environmentMutation.isError ? (
                 <div className="text-xs text-destructive">
                   {environmentMutation.error instanceof Error
-                    ? environmentMutation.error.message
-                    : "Failed to save environment"}
+                    ? environmentMutation.error.message: tf("auto.40eb0c9afcc9341f")}
                 </div>
               ) : null}
               {draftEnvironmentProbeMutation.data ? (
@@ -2468,7 +2467,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
               onClick={closeEnvironmentForm}
               disabled={environmentMutation.isPending}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             {environmentForm.driver !== "local" ? (
               <Button
@@ -2525,7 +2524,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                 </AlertDialogHeader>
                 {reusableLeaseHolderGroups.length > 0 ? (
                   <div className="space-y-1.5" data-testid="environment-delete-lease-holders">
-                    <div className="text-xs font-medium text-muted-foreground">Sandbox leases held by</div>
+                    <div className="text-xs font-medium text-muted-foreground">{tf("auto.fbbb266d6134d206")}</div>
                     <ul className="space-y-1">
                       {reusableLeaseHolderGroups.map((group) => (
                         <li key={group.workspaceId ?? group.label} className="text-sm">
@@ -2562,7 +2561,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                           Reassign {agentsUsingEnvironment.length === 1 ? "agent" : "agents"} to
                         </span>
                         <select
-                          aria-label="Reassign agents to environment"
+                          aria-label={tf("auto.d160f99d91b1e942")}
                           data-testid="environment-delete-reassign-select"
                           className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm font-normal outline-none"
                           value={reassignEnvironmentTargetId}
@@ -2594,7 +2593,7 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                   </div>
                 ) : null}
                 <AlertDialogFooter>
-                  <AlertDialogCancel disabled={deleteEnvironmentMutation.isPending}>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel disabled={deleteEnvironmentMutation.isPending}>{tf("text.Cancel")}</AlertDialogCancel>
                   <AlertDialogAction
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     data-testid="environment-delete-confirm"

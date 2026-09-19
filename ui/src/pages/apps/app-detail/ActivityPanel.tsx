@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo } from "react";
 import {
   humanizeConnectionDisplayName,
@@ -76,7 +77,7 @@ function RecentActivity({
   return (
     <section className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Recent activity</h2>
+        <h2 className="text-lg font-semibold text-foreground">{tf("auto.6cb44b56336af70b")}</h2>
       </div>
       {loading ? (
         <div className="space-y-2 py-4">
@@ -84,7 +85,7 @@ function RecentActivity({
           <Skeleton className="h-4 w-2/3" />
         </div>
       ) : rows.length === 0 ? (
-        <p className="py-5 text-sm text-muted-foreground">No activity yet.</p>
+        <p className="py-5 text-sm text-muted-foreground">{tf("auto.a288d2d0a21eed3c")}</p>
       ) : (
         <ul className="divide-y divide-border">
           {rows.map((row) => (

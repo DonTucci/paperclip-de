@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Archive, MoreHorizontal, Pencil, RefreshCw } from "lucide-react";
@@ -145,10 +146,10 @@ function RecentTasksList({
       if (storageKey) updateRecentTaskSnapshots(storageKey, companyId, [updated]);
       await refreshIssueQueries(renameEntry.id);
       setRenameEntry(null);
-      toastActions?.pushToast({ title: "Task renamed", tone: "success" });
+      toastActions?.pushToast({ title: tf("auto.136fd9d2741b880b"), tone: "success" });
     } catch (error) {
       toastActions?.pushToast({
-        title: "Task rename failed",
+        title: tf("auto.d5ce4a7f4b5cb2bc"),
         body: errorMessage(error, "Unable to rename this task."),
         tone: "error",
       });
@@ -165,10 +166,10 @@ function RecentTasksList({
       await queryClient.invalidateQueries({
         queryKey: queryKeys.sidebarBadges(companyId),
       });
-      toastActions?.pushToast({ title: "Task archived from inbox", tone: "success" });
+      toastActions?.pushToast({ title: tf("auto.ca9374d16da7e408"), tone: "success" });
     } catch (error) {
       toastActions?.pushToast({
-        title: "Task archive failed",
+        title: tf("auto.c44e1abcfdea6c25"),
         body: errorMessage(error, "Unable to archive this task from the inbox."),
         tone: "error",
       });
@@ -203,7 +204,7 @@ function RecentTasksList({
           }
         }
         setRestartWakeRetryPending(restartRetryStorageKey, entry.id, false);
-        toastActions?.pushToast({ title: "Task restarted", tone: "success" });
+        toastActions?.pushToast({ title: tf("auto.2769f7fb20007f69"), tone: "success" });
       } else if (state.activePauseHold) {
         throw new Error("This task is paused by a parent task. Restart it from the pause root.");
       } else if (readRestartWakeRetryIssueIds(restartRetryStorageKey).has(entry.id)) {
@@ -224,21 +225,21 @@ function RecentTasksList({
           }
         }
         setRestartWakeRetryPending(restartRetryStorageKey, entry.id, false);
-        toastActions?.pushToast({ title: "Task restarted", tone: "success" });
+        toastActions?.pushToast({ title: tf("auto.2769f7fb20007f69"), tone: "success" });
       } else {
         await issuesApi.createTreeHold(entry.id, {
           mode: "pause",
           reason: "Paused from Recent Tasks.",
           releasePolicy: { strategy: "manual" },
         });
-        toastActions?.pushToast({ title: "Task paused", tone: "success" });
+        toastActions?.pushToast({ title: tf("auto.d75247d087367f83"), tone: "success" });
       }
       await queryClient.invalidateQueries({
         queryKey: ["issues", "tree-control-state", entry.id],
       });
     } catch (error) {
       toastActions?.pushToast({
-        title: "Task pause update failed",
+        title: tf("auto.9b384ff0ca06736b"),
         body: errorMessage(error, "Unable to pause or restart this task."),
         tone: "error",
       });
@@ -249,7 +250,7 @@ function RecentTasksList({
 
   return (
     <>
-      <SidebarSection label="Recent Tasks">
+      <SidebarSection label={tf("auto.49a027ddc61602c1")}>
         {entries.map((entry) => (
           <div key={entry.id} className="sidebar-action-row group/recent-task relative">
             <SidebarNavItem
@@ -281,7 +282,7 @@ function RecentTasksList({
                     onSelect={() => beginRename(entry)}
                   >
                     <Pencil aria-hidden="true" />
-                    Rename
+                    {tf("auto.3064d79a295cefe4")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className={RECENT_TASK_MENU_ITEM_CLASS}
@@ -289,7 +290,7 @@ function RecentTasksList({
                     onSelect={() => void archiveTask(entry)}
                   >
                     <Archive aria-hidden="true" />
-                    Archive
+                    {tf("text.Archive")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className={RECENT_TASK_MENU_ITEM_CLASS}
@@ -297,7 +298,7 @@ function RecentTasksList({
                     onSelect={() => void toggleTaskPause(entry)}
                   >
                     <RefreshCw aria-hidden="true" />
-                    Pause/Restart
+                    {tf("auto.7d81fbdd2e933baa")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -315,12 +316,12 @@ function RecentTasksList({
         <DialogContent className="sm:max-w-md">
           <form className="grid gap-4" onSubmit={(event) => void submitRename(event)}>
             <DialogHeader>
-              <DialogTitle>Rename task</DialogTitle>
-              <DialogDescription>Choose a short, clear name for this task.</DialogDescription>
+              <DialogTitle>{tf("auto.5b1f3e19f6cd421c")}</DialogTitle>
+              <DialogDescription>{tf("auto.e35c8b971c35dc05")}</DialogDescription>
             </DialogHeader>
             <Input
               autoFocus
-              aria-label="Task name"
+              aria-label={tf("auto.d5164108945c9ab5")}
               value={renameValue}
               disabled={pendingAction === "rename"}
               onChange={(event) => setRenameValue(event.target.value)}
@@ -332,7 +333,7 @@ function RecentTasksList({
                 disabled={pendingAction === "rename"}
                 onClick={() => setRenameEntry(null)}
               >
-                Cancel
+                {tf("text.Cancel")}
               </Button>
               <Button
                 type="submit"

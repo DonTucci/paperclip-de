@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, relativeTime } from "@/lib/utils";
@@ -41,12 +42,12 @@ export function OutputRow({ item, creatorName }: OutputRowProps) {
       </div>
       {meta ? (
         <div className="flex shrink-0 items-center gap-1">
-          <Button asChild variant="ghost" size="icon-sm" title="Open in new tab">
+          <Button asChild variant="ghost" size="icon-sm" title={tf("auto.e0af5c0bc2457475")}>
             <a href={meta.openPath} target="_blank" rel="noreferrer" aria-label={`Open ${filename}`}>
               <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
-          <Button asChild variant="ghost" size="icon-sm" title="Download">
+          <Button asChild variant="ghost" size="icon-sm" title={tf("text.Download")}>
             <a href={meta.downloadPath} aria-label={`Download ${filename}`}>
               <Download className="h-4 w-4" />
             </a>

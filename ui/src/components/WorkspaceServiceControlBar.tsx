@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
@@ -67,21 +68,21 @@ function formatServiceUrl(url: string | null | undefined) {
 function statusMeta(entry: WorkspaceServiceControlEntry): { label: string; unhealthy: boolean } {
   switch (entry.state) {
     case "provisioning":
-      return { label: "Provisioning…", unhealthy: false };
+      return { label: tf("auto.62cd0e7db7caf32b"), unhealthy: false };
     case "starting":
-      return { label: "Starting…", unhealthy: false };
+      return { label: tf("auto.bbe5fc3b9ef39f99"), unhealthy: false };
     case "stopping":
-      return { label: "Stopping…", unhealthy: false };
+      return { label: tf("auto.bbe8574175aba84f"), unhealthy: false };
     case "restarting":
-      return { label: "Restarting…", unhealthy: false };
+      return { label: tf("auto.75d0f1469d166c8c"), unhealthy: false };
     case "failed":
-      return { label: "Failed", unhealthy: false };
+      return { label: tf("text.Failed"), unhealthy: false };
     case "running":
       return entry.healthStatus === "unhealthy"
-        ? { label: "Unhealthy", unhealthy: true }
-        : { label: "Running", unhealthy: false };
+        ? { label: tf("auto.317b1fbc1e13beeb"), unhealthy: true }
+        : { label: tf("text.Running"), unhealthy: false };
     default:
-      return { label: "Stopped", unhealthy: false };
+      return { label: tf("auto.1a4f630ac1b69fd0"), unhealthy: false };
   }
 }
 
@@ -151,7 +152,7 @@ function UrlSegment({ entry, compact }: { entry: WorkspaceServiceControlEntry; c
   const live = entry.state === "running" && Boolean(entry.url);
 
   if (!displayUrl) {
-    return <span className="font-mono text-xs text-muted-foreground/70">no url</span>;
+    return <span className="font-mono text-xs text-muted-foreground/70">{tf("auto.d36257bc62258be5")}</span>;
   }
   return (
     <>
@@ -181,10 +182,10 @@ function UrlSegment({ entry, compact }: { entry: WorkspaceServiceControlEntry; c
           size="icon-xs"
           disabled={!live}
           className="text-muted-foreground hover:text-foreground"
-          title="Open in new tab"
+          title={tf("auto.e0af5c0bc2457475")}
         >
           {live ? (
-            <a href={entry.url ?? undefined} target="_blank" rel="noreferrer" aria-label="Open in new tab">
+            <a href={entry.url ?? undefined} target="_blank" rel="noreferrer" aria-label={tf("auto.e0af5c0bc2457475")}>
               <ExternalLink className="size-3" />
             </a>
           ) : (
@@ -214,11 +215,11 @@ function ActionSlots({
         className="w-13 justify-center"
         disabled={!canStart}
         onClick={() => onAction("start")}
-        aria-label="Start"
-        title="Start"
+        aria-label={tf("text.Start")}
+        title={tf("text.Start")}
       >
         <Play className="size-3" />
-        Start
+        {tf("text.Start")}
       </Button>
     );
   }
@@ -231,8 +232,8 @@ function ActionSlots({
           size="icon-xs"
           disabled={!canStart}
           onClick={() => onAction("start")}
-          aria-label="Start"
-          title="Start"
+          aria-label={tf("text.Start")}
+          title={tf("text.Start")}
         >
           <Play className="size-3" />
         </Button>
@@ -241,8 +242,8 @@ function ActionSlots({
           size="icon-xs"
           disabled={!canStart}
           onClick={() => onAction("restart")}
-          aria-label="Restart"
-          title="Restart"
+          aria-label={tf("text.Restart")}
+          title={tf("text.Restart")}
           className="border border-border text-foreground"
         >
           <RotateCcw className="size-3" />
@@ -258,8 +259,8 @@ function ActionSlots({
         size="icon-xs"
         disabled={transitional}
         onClick={() => onAction("stop")}
-        aria-label="Stop"
-        title="Stop"
+        aria-label={tf("text.Stop")}
+        title={tf("text.Stop")}
         className="border border-border text-foreground"
       >
         <Square className="size-3" />
@@ -269,8 +270,8 @@ function ActionSlots({
         size="icon-xs"
         disabled={transitional || !canStart}
         onClick={() => onAction("restart")}
-        aria-label="Restart"
-        title="Restart"
+        aria-label={tf("text.Restart")}
+        title={tf("text.Restart")}
         className="border border-border text-foreground"
       >
         <RotateCcw className="size-3" />
@@ -300,7 +301,7 @@ function ServiceDetail({
             onClick={onViewLogs}
             className="font-medium text-foreground underline underline-offset-2 hover:text-foreground/80"
           >
-            View logs
+            {tf("auto.9ec41ffd7797fa24")}
           </button>
         </>
       ) : null}
@@ -481,7 +482,7 @@ function MultiServiceBar({
                     className="ml-auto text-muted-foreground"
                     onClick={onManageServices}
                   >
-                    Manage in Services tab →
+                    {tf("auto.84d3c11f258cc8d7")}
                   </Button>
                 ) : null}
               </div>
@@ -495,7 +496,7 @@ function MultiServiceBar({
                 <UrlSegment entry={primary} />
               </>
             ) : (
-              <span className="font-mono text-xs text-muted-foreground/70">no url</span>
+              <span className="font-mono text-xs text-muted-foreground/70">{tf("auto.d36257bc62258be5")}</span>
             )}
           </div>
           <div className="mx-3 hidden h-5 w-px bg-border sm:block" />

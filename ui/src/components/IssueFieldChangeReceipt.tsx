@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import type { ActivityEvent } from "@paperclipai/shared";
 import {
@@ -66,7 +67,7 @@ export function IssueFieldChangeReceipt({
                     rather than implying the whole value is shown. */}
                 {row.truncated ? (
                   <span className="text-(length:--text-nano) uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-                    preview
+                    {tf("auto.5975cf1bba432391")}
                   </span>
                 ) : null}
               </dd>

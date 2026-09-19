@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useId, useState } from "react";
 import { completedActivitySummary } from "./completed-activity-summary";
 import {
@@ -386,7 +387,7 @@ export function TaskChatRunnerActivityGroup({
             <ol
               id={historyId}
               className="flex min-w-0 flex-col gap-1"
-              aria-label="Activity history"
+              aria-label={tf("auto.e46875181b6eb319")}
               data-testid="task-chat-runner-activity-list"
             >
               {activities.map((activity, index) => (

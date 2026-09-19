@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 "use client"
 
 import * as React from "react"
@@ -31,8 +32,8 @@ function Command({
 }
 
 function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
+  title = tf("auto.56d80c4bb94de359"),
+  description = tf("auto.b090608ceb3d0f8e"),
   children,
   className,
   showCloseButton = true,
@@ -62,7 +63,7 @@ function CommandDialog({
             className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-0 right-2 flex h-12 items-center rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{tf("text.Close")}</span>
           </DialogPrimitive.Close>
         )}
       </DialogContent>

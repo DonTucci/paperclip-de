@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { aiConnectionsApi } from "@/api/ai-connections";
 import type { AiProvider } from "@paperclipai/shared";
 import { useQuery } from "@tanstack/react-query";
@@ -93,7 +94,7 @@ export function SavedProviderKeySelect({
         <label className="block space-y-2 text-sm">
           <span>{kind === "api" ? "API key" : "Subscription"}</span>
           <select
-            aria-label={kind === "api" ? "Saved API key" : "Saved subscription"}
+            aria-label={kind === "api" ? tf("auto.90acb76dcf19b352") : tf("auto.d4e6deb711205e25")}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             value={value}
             onChange={(event) => onChange(event.target.value)}
@@ -114,12 +115,12 @@ export function SavedProviderKeySelect({
       )}
       {loading && (
         <p role="status" className="text-sm text-muted-foreground">
-          Checking saved API keys…
+          {tf("auto.b34650f622971baa")}
         </p>
       )}
       {error && (
         <p role="alert" className="text-sm text-destructive">
-          Some saved keys could not be loaded. You can still enter a new key.
+          {tf("auto.1af606f55aabecfc")}
         </p>
       )}
       {value && (

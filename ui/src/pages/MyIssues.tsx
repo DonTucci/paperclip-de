@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { issuesApi } from "../api/issues";
@@ -19,7 +20,7 @@ export function MyIssues() {
   const { setBreadcrumbs } = useBreadcrumbs();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "My Tasks" }]);
+    setBreadcrumbs([{ label: tf("auto.faf87355035004de") }]);
   }, [setBreadcrumbs]);
 
   const { data: issues, isLoading, error } = useQuery({
@@ -53,7 +54,7 @@ export function MyIssues() {
       {error && <p className="text-sm text-destructive">{error.message}</p>}
 
       {myIssues.length === 0 && (
-        <EmptyState icon={ListTodo} message="No tasks assigned to you." />
+        <EmptyState icon={ListTodo} message={tf("auto.1a9677b0bfa04c73")} />
       )}
 
       {myIssues.length > 0 && (

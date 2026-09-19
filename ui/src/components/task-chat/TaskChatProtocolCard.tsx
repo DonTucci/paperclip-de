@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
@@ -233,7 +234,7 @@ function CardShell({
 function PlanSteps({ steps }: { steps: TaskChatProtocolStep[] }) {
   if (steps.length === 0) return null;
   return (
-    <ol className="flex flex-col gap-1.5" aria-label="Plan steps">
+    <ol className="flex flex-col gap-1.5" aria-label={tf("auto.3fa02f98189b8323")}>
       {steps.map((step) => (
         <li key={step.id} className="flex items-start gap-2 text-sm">
           <StatusIcon status={step.status} className="mt-0.5 shrink-0" />
@@ -273,7 +274,7 @@ function ProviderActivityCard({
     >
       {item.steps.length > 0 ? <PlanSteps steps={item.steps} /> : null}
       {item.children.length > 0 ? (
-        <ul className="flex flex-col gap-2" aria-label="Delegated agents">
+        <ul className="flex flex-col gap-2" aria-label={tf("auto.a3a4ad04fa0db247")}>
           {item.children.map((child) => (
             <li
               key={child.id}
@@ -306,7 +307,7 @@ function ProviderActivityCard({
         </ul>
       ) : null}
       {item.links.length > 0 ? (
-        <ul className="flex flex-col gap-2" aria-label="Research sources">
+        <ul className="flex flex-col gap-2" aria-label={tf("auto.6891cd2295ca833c")}>
           {item.links.map((link) => (
             <li key={link.href}>
               <a
@@ -337,7 +338,7 @@ function ProviderActivityCard({
           )}
         >
           <summary className="flex cursor-pointer list-none items-center gap-1 text-xs font-medium text-muted-foreground">
-            <ChevronDown aria-hidden className="h-3.5 w-3.5" /> Details
+            <ChevronDown aria-hidden className="h-3.5 w-3.5" /> {tf("text.Details")}
           </summary>
           {item.details.length > 0 ? (
             <dl className="mt-2 flex min-w-0 flex-col gap-1.5 text-xs">
@@ -366,7 +367,7 @@ function ProviderActivityCard({
           ) : null}
           {item.outputTruncated ? (
             <p className="mt-1 text-xs text-muted-foreground">
-              Output truncated to 8 KiB.
+              {tf("auto.71045c3c3bab4c2d")}
             </p>
           ) : null}
         </details>
@@ -404,7 +405,7 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
     <>
       <CardShell
         icon={GitBranch}
-        title="Workspace changes"
+        title={tf("auto.1ac656d5ef1eac07")}
         status={item.complete ? "completed" : "running"}
         summary={summary}
         testId="task-chat-workspace-change"
@@ -452,7 +453,7 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
               variant="outline"
               onClick={() => setSelectedPath(item.files[0].path)}
             >
-              Review diff
+              {tf("auto.6146827609521d64")}
             </Button>
           ) : null}
         </div>
@@ -472,7 +473,7 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
           {item.files.length > 1 ? (
             <div
               className="flex max-w-full gap-1 overflow-x-auto pb-1"
-              aria-label="Changed files"
+              aria-label={tf("auto.5d4041aa7af3b4ad")}
             >
               {item.files.map((file) => (
                 <Button
@@ -489,7 +490,7 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
           ) : null}
           {selected?.binary ? (
             <p className="rounded-sm bg-muted/50 p-3 text-sm text-muted-foreground">
-              Binary file; text diff is unavailable.
+              {tf("auto.98cd1b4b3a11b423")}
             </p>
           ) : selected?.diff ? (
             <pre className="max-h-(--sz-70vh) overflow-auto whitespace-pre rounded-sm bg-muted/50 p-3 font-mono text-xs">
@@ -497,7 +498,7 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
             </pre>
           ) : (
             <p className="rounded-sm bg-muted/50 p-3 text-sm text-muted-foreground">
-              No inline patch was recorded for this file.
+              {tf("auto.009e7b89c2467661")}
             </p>
           )}
         </DialogContent>
@@ -546,7 +547,7 @@ function WorkspaceFileCard({ item }: { item: TaskChatWorkspaceFileItem }) {
             variant="outline"
             onClick={() => setOpen(true)}
           >
-            Preview
+            {tf("text.Preview")}
           </Button>
         </div>
       </CardShell>
@@ -580,7 +581,7 @@ function WorkspaceFileCard({ item }: { item: TaskChatWorkspaceFileItem }) {
           )}
           {item.previewTruncated ? (
             <p className="text-xs text-muted-foreground">
-              Preview truncated by the runner.
+              {tf("auto.c8a44a1ed087a82c")}
             </p>
           ) : null}
         </DialogContent>
@@ -704,7 +705,7 @@ function RuntimeRequestCard({
   const fields =
     item.fields.length > 0
       ? item.fields
-      : [{ name: "answer", label: "Response", placeholder: null }];
+      : [{ name: "answer", label: tf("auto.9061383b8e228ef3"), placeholder: null }];
   const [values, setValues] = useState<Record<string, string>>(() =>
     draftKey ? loadStructuredDraft(draftKey, {}) : {},
   );
@@ -739,8 +740,7 @@ function RuntimeRequestCard({
       setSubmitting(false);
       setError(
         cause instanceof Error
-          ? cause.message
-          : "The runtime request could not be resolved.",
+          ? cause.message: tf("auto.1a317fadda39e5d0"),
       );
     }
   };
@@ -849,7 +849,7 @@ function RuntimeRequestCard({
                 disabled={!onDecision || submitting}
                 onClick={() => void submit({ action: "decline" })}
               >
-                Deny
+                {tf("auto.05a2d7332eb9d8bf")}
               </Button>
             ) : null}
             {presentation === "timeline" ? (
@@ -860,7 +860,7 @@ function RuntimeRequestCard({
                 disabled={!onDecision || submitting}
                 onClick={() => void submit({ action: "cancel" })}
               >
-                Cancel
+                {tf("text.Cancel")}
               </Button>
             ) : null}
           </div>
@@ -899,7 +899,7 @@ function RuntimeRequestCard({
       ) : null}
       {item.status === "pending" && !onDecision ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Resolve this request in the active runtime session.
+          {tf("auto.a855c7a39e5f31a2")}
         </p>
       ) : null}
       {error ? (
@@ -924,7 +924,7 @@ function ResultCard({
   return (
     <CardShell
       icon={PackageCheck}
-      title="Run result"
+      title={tf("auto.916788b6b2b08f8c")}
       status={item.disposition}
       summary={item.summary}
       testId="task-chat-run-result"
@@ -942,7 +942,7 @@ function ResultCard({
           {item.verification.length > 0 ? (
             <ul
               className="flex flex-col gap-1"
-              aria-label="Verification results"
+              aria-label={tf("auto.14a01310ac6ab318")}
             >
               {item.verification.map((check, index) => (
                 <li
@@ -1003,7 +1003,7 @@ function TerminalCard({
   return (
     <CardShell
       icon={TerminalSquare}
-      title="Run ended"
+      title={tf("auto.65ad5d9043739bda")}
       status={item.runState}
       summary={[item.disposition.replaceAll("_", " "), item.stopReason]
         .filter(Boolean)

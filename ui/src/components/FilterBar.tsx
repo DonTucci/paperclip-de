@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +33,7 @@ export function FilterBar({ filters, onRemove, onClear }: FilterBarProps) {
         </Badge>
       ))}
       <Button variant="ghost" size="sm" className="text-xs h-6" onClick={onClear}>
-        Clear all
+        {tf("auto.29a390f9237e3c84")}
       </Button>
     </div>
   );

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -106,7 +107,7 @@ export function BuiltInAgentGate({ agentKey, companyId, featureLabel, children }
           actions={
             <>
               <Button variant="ghost" size="sm" asChild>
-                <Link to={agentUrl(state.agent)}>View agent</Link>
+                <Link to={agentUrl(state.agent)}>{tf("auto.7ce7832e35e85d35")}</Link>
               </Button>
               <Button
                 size="sm"

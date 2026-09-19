@@ -1,4 +1,6 @@
 const storageEntries = new Map<string, string>();
+// Bestehende Upstream-Tests prüfen englische Texte. Deutsche Ansichten haben eigene Tests.
+storageEntries.set("paperclip.ui.language", "en");
 
 function installStorageMock(target: Record<string, unknown>) {
   Object.defineProperty(target, "localStorage", {
@@ -38,3 +40,5 @@ if (typeof window !== "undefined" && window.localStorage !== globalThis.localSto
 if (typeof Element !== "undefined" && typeof Element.prototype.scrollIntoView !== "function") {
   Element.prototype.scrollIntoView = function scrollIntoView() {};
 }
+
+globalThis.localStorage.setItem("paperclip.ui.language", "en");

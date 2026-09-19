@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CompanySecret } from "@paperclipai/shared";
@@ -38,11 +39,11 @@ export function MyUserSecretsTab({ companyId }: { companyId: string }) {
     mutationFn: (secret: CompanySecret) => secretsApi.removeMyUserSecret(companyId, secret.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.secrets.myUserSecrets(companyId) });
-      pushToast({ title: "Value cleared", tone: "info" });
+      pushToast({ title: tf("auto.d0a44ff363af453c"), tone: "info" });
     },
     onError: (err) =>
       pushToast({
-        title: "Could not clear value",
+        title: tf("auto.bd9d21613ce00738"),
         body: err instanceof Error ? err.message : undefined,
         tone: "error",
       }),
@@ -75,13 +76,13 @@ export function MyUserSecretsTab({ companyId }: { companyId: string }) {
             <AlertCircle className="h-4 w-4" /> Failed to load your secrets:{" "}
             {(mySecretsQuery.error as Error).message}
             <Button variant="ghost" size="sm" onClick={() => mySecretsQuery.refetch()}>
-              Retry
+              {tf("text.Retry")}
             </Button>
           </div>
         ) : entries.length === 0 && !mySecretsQuery.isPending ? (
           <EmptyState
             icon={KeyRound}
-            message="No user secrets are defined for this organization yet. An admin defines which credentials each member supplies."
+            message={tf("auto.9fc4b58dc0e61561")}
           />
         ) : (
           <ul className="space-y-2">
@@ -171,7 +172,7 @@ function MyUserSecretRow({
             className="text-muted-foreground hover:text-destructive"
             onClick={onClear}
             disabled={clearing}
-            title="Clear my value"
+            title={tf("auto.0b19ca4155513444")}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>

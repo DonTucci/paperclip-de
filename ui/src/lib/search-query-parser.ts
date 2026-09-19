@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   COMPANY_SEARCH_UPDATED_WITHIN_OPTIONS,
   ISSUE_PRIORITIES,
@@ -40,13 +41,13 @@ export interface SearchOperatorSuggestion {
 export const SEARCH_OPERATOR_QUICK_FILTERS = ["assignee:me", "is:open", "updated:>7d"] as const;
 
 export const SEARCH_OPERATOR_SUGGESTIONS: SearchOperatorSuggestion[] = [
-  { token: "status:todo", label: "Open todo tasks", description: "Filter by task status" },
-  { token: "status:blocked", label: "Blocked tasks", description: "Find blocked work" },
-  { token: "assignee:me", label: "Assigned to me", description: "Use your current board user" },
-  { token: "project:\"Paperclip App\"", label: "Project name", description: "Quote multi-word project names" },
-  { token: "label:bug", label: "Label", description: "Filter by issue label" },
-  { token: "priority:high", label: "High priority", description: "Filter by priority" },
-  { token: "updated:>7d", label: "Recently updated", description: "Updated in the last 7 days" },
+  { token: "status:todo", label: tf("auto.b26fc8802dfc867c"), description: tf("auto.979aaadd7bcd85d0") },
+  { token: "status:blocked", label: tf("auto.fb0166222d354062"), description: tf("auto.3118bf057167bd7e") },
+  { token: "assignee:me", label: tf("auto.82adb506e0a78ebb"), description: tf("auto.65756130d1e8a650") },
+  { token: "project:\"Paperclip App\"", label: tf("auto.25498193b898195d"), description: tf("auto.cac260f350dbf3a3") },
+  { token: "label:bug", label: tf("auto.0e66373f45dcf3dd"), description: tf("auto.649f2d502d86a5cd") },
+  { token: "priority:high", label: tf("auto.b699a8c8e2c86c22"), description: tf("auto.48b74b8f81c021ef") },
+  { token: "updated:>7d", label: tf("auto.474b2a869ac1477d"), description: tf("auto.a8503d7379c14cd8") },
 ];
 
 export interface SearchQueryParserContext {
@@ -230,12 +231,12 @@ export function parseSearchQuery(input: string, context: SearchQueryParserContex
       if (value.toLowerCase() === "me") {
         if (context.currentAgentId) {
           filters.assigneeAgentId = context.currentAgentId;
-          pills.push({ key: "assignee", value: "me", label: "assignee:me" });
+          pills.push({ key: "assignee", value: "me", label: tf("auto.8c9d6707f7dd7053") });
           continue;
         }
         if (context.currentUserId) {
           filters.assigneeUserId = context.currentUserId;
-          pills.push({ key: "assignee", value: "me", label: "assignee:me" });
+          pills.push({ key: "assignee", value: "me", label: tf("auto.8c9d6707f7dd7053") });
           continue;
         }
         appendText(textParts, token.raw);
@@ -293,12 +294,12 @@ export function parseSearchQuery(input: string, context: SearchQueryParserContex
     if (key === "is") {
       if (value === "open") {
         filters.status = OPEN_STATUSES;
-        pills.push({ key: "is", value: "open", label: "is:open" });
+        pills.push({ key: "is", value: "open", label: tf("auto.e390453cced94d06") });
         continue;
       }
       if (value === "closed") {
         filters.status = CLOSED_STATUSES;
-        pills.push({ key: "is", value: "closed", label: "is:closed" });
+        pills.push({ key: "is", value: "closed", label: tf("auto.d4fbf63789da559f") });
         continue;
       }
       appendText(textParts, token.raw);

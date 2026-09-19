@@ -1,9 +1,10 @@
+import { tf } from "@/i18n/fork";
 import { Blocks, Inbox, ShieldCheck } from "lucide-react";
 
 export const APP_TABS = [
-  { key: "permissions", label: "Permissions", icon: ShieldCheck },
-  { key: "services", label: "Services", icon: Blocks },
-  { key: "review", label: "Review", icon: Inbox },
+  { key: "permissions", label: tf("text.Permissions"), icon: ShieldCheck },
+  { key: "services", label: tf("auto.604dce445e326d95"), icon: Blocks },
+  { key: "review", label: tf("auto.aff0766a5290e117"), icon: Inbox },
 ] as const;
 
 export type AppTabKey = (typeof APP_TABS)[number]["key"];

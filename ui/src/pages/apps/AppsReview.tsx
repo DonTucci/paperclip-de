@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect } from "react";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useCompany } from "@/context/CompanyContext";
@@ -19,22 +20,22 @@ export function AppsReview() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
-      { label: "Review" },
+      { label: tf("text.Connectors"), href: "/apps" },
+      { label: tf("auto.aff0766a5290e117") },
     ]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs]);
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select an organization to review approvals.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.85763bcfb321e9b5")}</div>;
   }
 
   return (
     <div className="max-w-3xl space-y-6 pb-12">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">Review</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{tf("auto.aff0766a5290e117")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Actions your agents want to run that need your OK first. Approve, always-allow, or decline.
+          {tf("auto.0337302930af42c2")}
         </p>
       </header>
 

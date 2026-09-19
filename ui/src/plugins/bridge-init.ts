@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Plugin bridge initialization.
  *
@@ -347,10 +348,10 @@ function PluginSdkAssigneePicker({
   companyId,
   value,
   onChange,
-  placeholder = "Responsible",
+  placeholder = tf("auto.bc110a6d0722098a"),
   noneLabel = "No responsible",
-  searchPlaceholder = "Search responsible...",
-  emptyMessage = "No responsible found.",
+  searchPlaceholder = tf("auto.9cb8d79fc8b40d38"),
+  emptyMessage = tf("auto.045a8ffe4067d6d2"),
   includeUsers = true,
   includeTerminatedAgents = false,
   className,
@@ -457,10 +458,10 @@ function PluginSdkProjectPicker({
   companyId,
   value,
   onChange,
-  placeholder = "Project",
+  placeholder = tf("text.Project"),
   noneLabel = "No project",
-  searchPlaceholder = "Search projects...",
-  emptyMessage = "No projects found.",
+  searchPlaceholder = tf("auto.c59dd5a3c5a25588"),
+  emptyMessage = tf("auto.26e92309ba5b0ca9"),
   includeArchived = false,
   className,
   onConfirm,
@@ -579,7 +580,7 @@ type PluginDataTableProps = {
   emptyMessage?: string;
 };
 
-function PluginSdkDataTable({ columns, rows, loading, emptyMessage = "No rows." }: PluginDataTableProps) {
+function PluginSdkDataTable({ columns, rows, loading, emptyMessage = tf("auto.1c6c8e7cac2f3c49") }: PluginDataTableProps) {
   if (loading) return createElement("div", { className: "text-sm text-muted-foreground" }, "Loading...");
   if (!rows.length) return createElement("div", { className: "text-sm text-muted-foreground" }, emptyMessage);
   const gridColumns = columns.map((column) => column.width ?? "minmax(0, 1fr)").join(" ");
@@ -643,7 +644,7 @@ function PluginSdkJsonTree({ data }: { data: unknown }) {
   return createElement("pre", { className: "max-h-80 overflow-auto rounded-md border bg-muted/30 p-2 text-xs" }, JSON.stringify(data, null, 2));
 }
 
-function PluginSdkSpinner({ label = "Loading" }: { size?: "sm" | "md" | "lg"; label?: string }) {
+function PluginSdkSpinner({ label = tf("auto.dc380888c4e2c776") }: { size?: "sm" | "md" | "lg"; label?: string }) {
   return createElement("span", {
     className: "inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground align-middle",
     role: "status",

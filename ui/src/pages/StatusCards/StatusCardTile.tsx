@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import type { SummarySlotIssueRef } from "@paperclipai/shared";
@@ -117,25 +118,25 @@ export function StatusCardTile({
         <div onClick={(event) => event.stopPropagation()}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="-mr-1 -mt-1 h-7 w-7 text-muted-foreground" aria-label="Card actions">
+              <Button variant="ghost" size="icon" className="-mr-1 -mt-1 h-7 w-7 text-muted-foreground" aria-label={tf("auto.a125822514d6945c")}>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={onOpen}>Open detail</DropdownMenuItem>
+              <DropdownMenuItem onSelect={onOpen}>{tf("auto.4ab8e7a5acc75973")}</DropdownMenuItem>
               <DropdownMenuItem onSelect={onRefresh} disabled={refreshPending || lifecycle === "updating"}>
-                Refresh now
+                {tf("auto.1486770684670d95")}
               </DropdownMenuItem>
               {(lifecycle === "compiling" && !setupRunning) || lifecycle === "error" ? (
                 <DropdownMenuItem onSelect={onRecompile} disabled={recompilePending}>
-                  Run now
+                  {tf("text.Run now")}
                 </DropdownMenuItem>
               ) : null}
-              <DropdownMenuItem onSelect={onEditInterest}>Edit interest &amp; settings</DropdownMenuItem>
-              <DropdownMenuItem onSelect={onOpenDebug}>Query debug</DropdownMenuItem>
+              <DropdownMenuItem onSelect={onEditInterest}>{tf("auto.42ec2cecf81160ed")}</DropdownMenuItem>
+              <DropdownMenuItem onSelect={onOpenDebug}>{tf("auto.58f8683ddefe9fd5")}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={onArchive} variant="destructive">
-                Archive
+                {tf("text.Archive")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -166,7 +167,7 @@ export function StatusCardTile({
                 className="mt-2 inline-flex items-center gap-1.5 font-medium text-foreground underline-offset-2 hover:underline"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
-                View setup task
+                {tf("auto.6b5859989f3fdb4d")}
               </Link>
             ) : (
               // The first run stalled (agent run died mid-setup) and the card
@@ -201,7 +202,7 @@ export function StatusCardTile({
                   className="inline-flex shrink-0 items-center gap-1 font-medium underline-offset-2 hover:underline"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  View update task
+                  {tf("auto.f1745b8e36e05231")}
                 </Link>
               ) : null}
             </div>
@@ -218,7 +219,7 @@ export function StatusCardTile({
             <span>
               {card.pendingChangeCount} {card.pendingChangeCount === 1 ? "change" : "changes"} since last update
             </span>
-            <span className="shrink-0 font-medium text-amber-700 dark:text-amber-400">Refresh</span>
+            <span className="shrink-0 font-medium text-amber-700 dark:text-amber-400">{tf("text.Refresh")}</span>
           </button>
         ) : null}
 
@@ -226,14 +227,14 @@ export function StatusCardTile({
           <div className="flex items-center justify-between gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-1.5 text-xs">
             <span className="flex items-center gap-1.5 text-destructive">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-              Last update failed
+              {tf("auto.c0ab4c40fe0b3fc8")}
             </span>
             <span className="flex shrink-0 items-center gap-3">
               <button type="button" onClick={stopClick(onRefresh)} disabled={refreshPending} className="font-medium text-destructive hover:underline disabled:opacity-60">
-                Retry
+                {tf("text.Retry")}
               </button>
               <button type="button" onClick={stopClick(onOpen)} className="text-muted-foreground hover:underline">
-                Details
+                {tf("text.Details")}
               </button>
             </span>
           </div>
@@ -254,18 +255,18 @@ export function StatusCardTile({
       {/* Summary body — kept visible for stale/error/updating/paused (never blank) */}
       <div className="min-h-0 flex-1 overflow-hidden px-4 pt-2">
         {lifecycle === "error" && card.summaryBody ? (
-          <p className="mb-1 text-(length:--text-micro) text-muted-foreground">Showing last good summary:</p>
+          <p className="mb-1 text-(length:--text-micro) text-muted-foreground">{tf("auto.357efcc7694cc235")}</p>
         ) : null}
         {hasSummary ? (
           <MarkdownBody className="text-xs leading-6 text-foreground [&_p]:my-0.5">{card.summaryBody!}</MarkdownBody>
         ) : lifecycle === "compiling" ? (
           <p className="text-xs text-muted-foreground">
-            You can add instructions and pick an update policy while this runs.
+            {tf("auto.b6b15463d775900b")}
           </p>
         ) : lifecycle === "updating" && draftStream.draft ? (
           <MarkdownBody className="text-xs leading-6 text-foreground [&_p]:my-0.5">{draftStream.draft}</MarkdownBody>
         ) : (
-          <p className="text-xs text-muted-foreground">No summary yet.</p>
+          <p className="text-xs text-muted-foreground">{tf("auto.95909797cda126da")}</p>
         )}
       </div>
 
@@ -292,7 +293,7 @@ export function StatusCardTile({
             className="h-7 w-7 shrink-0 text-muted-foreground"
             onClick={stopClick(onRefresh)}
             disabled={refreshPending}
-            aria-label="Refresh card"
+            aria-label={tf("auto.3cc87f178448786f")}
           >
             <RefreshCw className={cn("h-3.5 w-3.5", refreshPending && "animate-spin")} />
           </Button>

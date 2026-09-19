@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Send } from "lucide-react";
@@ -103,8 +104,8 @@ export function GatewayDetail() {
   useEffect(() => {
     if (!gateway) return;
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
-      { label: "Gateways", href: "/apps/gateways" },
+      { label: tf("text.Connectors"), href: "/apps" },
+      { label: tf("auto.9e4635769f0aaf0d"), href: "/apps/gateways" },
       { label: gateway.name },
     ]);
     return () => setBreadcrumbs([]);
@@ -128,14 +129,14 @@ export function GatewayDetail() {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't update the gateway",
+        title: tf("auto.539a9ea1acfe7839"),
         body: error instanceof Error ? error.message : String(error),
         tone: "error",
       }),
   });
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select an organization to manage gateways.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.3ae455c08f67c3b8")}</div>;
   }
   if (!activeTab) {
     return <Navigate replace to={gatewayTabHref(gatewayId, "overview")} />;
@@ -155,9 +156,9 @@ export function GatewayDetail() {
   if (!gateway) {
     return (
       <div className="max-w-3xl p-6">
-        <p className="text-sm text-muted-foreground">We couldn’t find that gateway.</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.247482e85ba16a77")}</p>
         <Button className="mt-4" variant="outline" onClick={() => navigate("/apps/gateways")}>
-          Back to gateways
+          {tf("auto.3bfa4b093638f566")}
         </Button>
       </div>
     );
@@ -169,7 +170,7 @@ export function GatewayDetail() {
         <div className="min-w-0">
           <div className="text-xs text-muted-foreground">
             <Link to="/apps/gateways" className="hover:underline">
-              Apps · Gateways
+              {tf("auto.c16cf2e7054e10e5")}
             </Link>
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">{gateway.name}</h1>
@@ -178,16 +179,16 @@ export function GatewayDetail() {
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => setEditing(true)}>
             <Pencil className="mr-1.5 h-4 w-4" />
-            Edit
+            {tf("text.Edit")}
           </Button>
           <Button onClick={() => setSnippetOpen(true)}>
             <Send className="mr-1.5 h-4 w-4" />
-            Client snippets
+            {tf("auto.e79437e88b5f5709")}
           </Button>
         </div>
       </div>
 
-      <nav className="flex items-center gap-6 overflow-x-auto border-b border-border text-sm" aria-label="Gateway tabs">
+      <nav className="flex items-center gap-6 overflow-x-auto border-b border-border text-sm" aria-label={tf("auto.f4560e4f65e2e90a")}>
         {GATEWAY_TABS.map((item) => {
           const isActive = item.key === activeTab;
           return (

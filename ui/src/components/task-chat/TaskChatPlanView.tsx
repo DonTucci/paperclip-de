@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { cn } from "@/lib/utils";
 import { Check, Circle, Loader2 } from "lucide-react";
 import type { TaskChatPlan, TaskChatPlanEntryStatus } from "./task-chat-model";
@@ -24,7 +25,7 @@ export function TaskChatPlanView({ plan }: { plan: TaskChatPlan }) {
   return (
     <div className="flex flex-col gap-2 py-2">
       <div className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
-        <span className="font-medium text-foreground">Plan</span>
+        <span className="font-medium text-foreground">{tf("text.Plan")}</span>
         <span>· rev {plan.revision}</span>
         <span className="ml-auto">
           {done}/{plan.entries.length} done

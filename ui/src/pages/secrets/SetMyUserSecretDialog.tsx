@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CompanySecret, UserSecretDefinition } from "@paperclipai/shared";
@@ -87,8 +88,7 @@ export function SetMyUserSecretDialog({
         err instanceof ApiError
           ? err.message
           : err instanceof Error
-            ? err.message
-            : "Failed to save value",
+            ? err.message: tf("auto.f998d6fa9ecfee0a"),
       );
     },
   });
@@ -127,11 +127,11 @@ export function SetMyUserSecretDialog({
 
             {isExternal ? (
               <div className="space-y-1">
-                <label className="text-xs font-medium text-foreground">External reference</label>
+                <label className="text-xs font-medium text-foreground">{tf("auto.5c54252e696c327b")}</label>
                 <Input
                   value={externalRef}
                   onChange={(event) => setExternalRef(event.target.value)}
-                  placeholder="provider reference or ARN"
+                  placeholder={tf("auto.3aaaf8111e78699a")}
                   className="font-mono text-sm"
                   autoFocus
                 />
@@ -142,16 +142,16 @@ export function SetMyUserSecretDialog({
               </div>
             ) : (
               <div className="space-y-1">
-                <label className="text-xs font-medium text-foreground">Your value</label>
+                <label className="text-xs font-medium text-foreground">{tf("auto.92b09f9a43ab14ca")}</label>
                 <Textarea
                   value={value}
                   onChange={(event) => setValue(event.target.value)}
-                  placeholder="Paste your token or credential"
+                  placeholder={tf("auto.2e889692433b9b92")}
                   className="font-mono text-sm min-h-(--sz-80px)"
                   autoFocus
                 />
                 <p className="text-(length:--text-micro) text-muted-foreground">
-                  Stored encrypted. Never shown back to anyone, including admins.
+                  {tf("auto.b803c895fd19a692")}
                 </p>
               </div>
             )}
@@ -162,7 +162,7 @@ export function SetMyUserSecretDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={save.isPending}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button onClick={() => save.mutate()} disabled={!canSave || save.isPending}>
             {save.isPending ? "Saving…" : existingSecret ? "Update value" : "Save value"}

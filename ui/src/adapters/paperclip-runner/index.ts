@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { PaperclipQuestion, PaperclipQuestionResponse, PaperclipQuestionSet, TranscriptEntry } from "@paperclipai/adapter-utils";
 import type { UIAdapterModule } from "../types";
 import { parseCodexStdoutLine, buildPaperclipRunnerConfig } from "@paperclipai/adapter-codex-local/ui";
@@ -783,7 +784,7 @@ export function parsePaperclipRunnerStdoutLine(line: string, ts: string): Transc
 
 export const paperclipRunnerUIAdapter: UIAdapterModule = {
   type: "paperclip_runner",
-  label: "Paperclip Runner",
+  label: tf("auto.aacfc564be2ab279"),
   parseStdoutLine: parsePaperclipRunnerStdoutLine,
   createStdoutParser: () => {
     let state = createParserState();

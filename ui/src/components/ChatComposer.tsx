@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   forwardRef,
   useImperativeHandle,
@@ -113,7 +114,7 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
     value,
     onChange,
     onSubmit,
-    placeholder = "Message…",
+    placeholder = tf("auto.fc71507e47999a33"),
     disabled = false,
     submitting = false,
     submitKey = "mod-enter",
@@ -254,7 +255,7 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
         >
           <span className="inline-flex items-center gap-2">
             <Paperclip className="h-3.5 w-3.5" />
-            Drop to attach
+            {tf("auto.34a7a637100fb1cd")}
           </span>
         </div>
       ) : null}
@@ -342,8 +343,8 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
               type="button"
               onClick={triggerFilePicker}
               disabled={disabled || attaching}
-              aria-label="Attach files"
-              title="Attach files"
+              aria-label={tf("auto.e697cc1e45afa541")}
+              title={tf("auto.e697cc1e45afa541")}
               className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
             >
               {attaching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Paperclip className="h-4 w-4" />}

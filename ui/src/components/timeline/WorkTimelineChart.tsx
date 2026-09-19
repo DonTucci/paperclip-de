@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Work Timeline — custom-SVG Gantt (board-locked Direction C, PAP-12422).
  *
@@ -954,7 +955,7 @@ function MiniMap({
           height={H - 2}
           width={handleW}
           testId="timeline-minimap-left-handle"
-          label="Drag left edge to resize visible range"
+          label={tf("auto.daede2443ddaff2e")}
           onMouseDown={(e) => startRangeDrag("left", e)}
         />
         <MiniMapHandle
@@ -963,7 +964,7 @@ function MiniMap({
           height={H - 2}
           width={handleW}
           testId="timeline-minimap-right-handle"
-          label="Drag right edge to resize visible range"
+          label={tf("auto.9e18abbaccd3be2d")}
           onMouseDown={(e) => startRangeDrag("right", e)}
         />
       </svg>

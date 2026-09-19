@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,7 @@ export function SecretPopoverForm({
     try {
       await onSubmit(trimmedName, value);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Failed to create secret");
+      setError(submitError instanceof Error ? submitError.message: tf("auto.c91d73b6f4ca6380"));
       setSubmitting(false);
     }
   }
@@ -83,14 +84,14 @@ export function SecretPopoverForm({
       </div>
 
       <label className="block space-y-1">
-        <span className="text-(length:--text-micro) font-medium text-muted-foreground">Name</span>
+        <span className="text-(length:--text-micro) font-medium text-muted-foreground">{tf("text.Name")}</span>
         <input
           className={cn(fieldClass, nameError && "border-destructive focus-visible:ring-destructive/40")}
           value={name}
           autoFocus
           spellCheck={false}
-          placeholder="secret_name"
-          aria-label="Secret name"
+          placeholder={tf("auto.aa8474d7b1f4c8eb")}
+          aria-label={tf("auto.5cdf573b8913b247")}
           aria-invalid={nameError ? true : undefined}
           onChange={(event) => setName(event.target.value)}
           onBlur={() => setTouched(true)}
@@ -105,7 +106,7 @@ export function SecretPopoverForm({
       </label>
 
       <label className="block space-y-1">
-        <span className="text-(length:--text-micro) font-medium text-muted-foreground">Value</span>
+        <span className="text-(length:--text-micro) font-medium text-muted-foreground">{tf("text.Value")}</span>
         <div className="relative">
           <input
             className={cn(fieldClass, "pr-8", valueError && "border-destructive focus-visible:ring-destructive/40")}
@@ -113,15 +114,15 @@ export function SecretPopoverForm({
             value={value}
             readOnly={mode === "store"}
             spellCheck={false}
-            placeholder={mode === "create" ? "value" : undefined}
-            aria-label="Secret value"
+            placeholder={mode === "create" ? tf("auto.cd42404d52ad55cc") : undefined}
+            aria-label={tf("auto.6ef47d9880313fd8")}
             aria-invalid={valueError ? true : undefined}
             onChange={mode === "create" ? (event) => setValue(event.target.value) : undefined}
           />
           <button
             type="button"
             className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-            aria-label={reveal ? "Hide value" : "Show value"}
+            aria-label={reveal ? tf("auto.381d9c1845cf1bd4") : tf("auto.fad206e22ec12620")}
             onClick={() => setReveal((prev) => !prev)}
           >
             {reveal ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
@@ -134,7 +135,7 @@ export function SecretPopoverForm({
 
       <div className="flex items-center justify-end gap-2 pt-0.5">
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
-          Cancel
+          {tf("text.Cancel")}
         </Button>
         <Button type="button" size="sm" onClick={() => void handleSubmit()} disabled={!canSubmit}>
           {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}

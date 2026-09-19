@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type ComponentType, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -91,7 +92,7 @@ export function ConnectClientDialog({
   );
   const tokenGroups = useMemo<SearchableSelectGroup<string, TokenOption>[]>(() => [{
     id: "tokens",
-    label: "Available this session",
+    label: tf("auto.07bcb127b1a140b4"),
     options: availableTokens.map((token) => ({
       key: token.id,
       value: token.id,
@@ -129,14 +130,14 @@ export function ConnectClientDialog({
       onTokenCreated(token);
       setSelectedTokenId(token.id);
       pushToast({
-        title: "Token issued",
+        title: tf("auto.819e5d266a5b8cca"),
         body: "The copy buttons now include its full Authorization header.",
         tone: "success",
       });
       await queryClient.invalidateQueries({ queryKey: gatewaysQueryKey(gateway.companyId) });
     },
     onError: (error) => pushToast({
-      title: "Token was not issued",
+      title: tf("auto.2f956f6dd26efe35"),
       body: error instanceof Error ? error.message : String(error),
       tone: "error",
     }),
@@ -145,11 +146,11 @@ export function ConnectClientDialog({
   async function copyText(value: string, label: string) {
     try {
       await copyTextToClipboard(value);
-      pushToast({ title: "Copied", body: label, tone: "success" });
+      pushToast({ title: tf("text.Copied"), body: label, tone: "success" });
     } catch (error) {
       pushToast({
-        title: "Copy failed",
-        body: error instanceof Error ? error.message : "Clipboard access is unavailable.",
+        title: tf("auto.5b50e7a693fee952"),
+        body: error instanceof Error ? error.message: tf("auto.0899c211b77f93b0"),
         tone: "error",
       });
     }
@@ -180,10 +181,10 @@ export function ConnectClientDialog({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Client snippets
+            {tf("auto.e79437e88b5f5709")}
             <Tooltip>
               <TooltipTrigger asChild>
-                <button type="button" aria-label="About client snippets" className="text-muted-foreground hover:text-foreground">
+                <button type="button" aria-label={tf("auto.217e85ca455e22a4")} className="text-muted-foreground hover:text-foreground">
                   <HelpCircle className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
@@ -194,20 +195,20 @@ export function ConnectClientDialog({
             </Tooltip>
           </DialogTitle>
           <DialogDescription>
-            Choose a client and copy a complete, authenticated configuration.
+            {tf("auto.d4d88fc91f9dd8cc")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-wrap items-center gap-2 border-b border-border pb-3">
-          <span className="text-xs font-medium text-muted-foreground">Authorization</span>
+          <span className="text-xs font-medium text-muted-foreground">{tf("auto.ca5839e38a15433e")}</span>
           {availableTokens.length > 0 ? (
             <SearchableSelect<string, TokenOption>
               value={selectedTokenId}
               groups={tokenGroups}
               onValueChange={setSelectedTokenId}
-              placeholder="Issue a token"
-              searchPlaceholder="Search tokens…"
-              emptyMessage="No copyable tokens."
+              placeholder={tf("auto.1418067b77b66bc6")}
+              searchPlaceholder={tf("auto.6323cd5be8f82c14")}
+              emptyMessage={tf("auto.fe96bdc5faf6219f")}
               contentWidth="auto"
               triggerClassName="h-8 w-auto max-w-xs rounded-full px-3"
               renderValue={(option) => option ? `${option.label} · ${maskedTokenLabel(option.token)}` : "Issue a token"}
@@ -220,7 +221,7 @@ export function ConnectClientDialog({
                 </span>
               )}
               createItem={{
-                render: () => <span>+ Issue a new token</span>,
+                render: () => <span>{tf("auto.6cc76e036410145f")}</span>,
                 onSelect: issueToken,
               }}
             />
@@ -244,21 +245,21 @@ export function ConnectClientDialog({
               onClick={() => void copyText(`Authorization: Bearer ${selectedToken.token}`, "Authorization header")}
             >
               <Copy className="mr-1 h-3.5 w-3.5" />
-              Copy header
+              {tf("auto.575ecd504c1aa68e")}
             </Button>
           ) : null}
         </div>
 
         {!selectedToken ? (
           <p className="text-xs text-muted-foreground">
-            Issue a token before copying a snippet; the full <code>Authorization: Bearer …</code> header is
+            Issue a token before copying a snippet; the full <code>{tf("auto.d28e460db764f5a8")}</code> header is
             required. Existing token secrets cannot be retrieved again, so only tokens issued in this page
             session can fill a snippet.
           </p>
         ) : null}
 
         <div className="grid gap-4 sm:grid-cols-(--gtc-10)">
-          <nav className="flex gap-1 overflow-x-auto sm:flex-col" aria-label="Clients">
+          <nav className="flex gap-1 overflow-x-auto sm:flex-col" aria-label={tf("auto.65a7256542c30138")}>
             {snippets.map((snippet) => {
               const Icon = CLIENT_ICONS[snippet.client];
               return (
@@ -289,7 +290,7 @@ export function ConnectClientDialog({
               )}
             >
               <LinkIcon className="h-4 w-4 shrink-0" />
-              Raw URL
+              {tf("auto.79300f3f02172a3d")}
             </button>
           </nav>
 
@@ -297,19 +298,19 @@ export function ConnectClientDialog({
             {active === "raw_url" ? (
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <div className="text-sm font-medium text-foreground">Endpoint URL</div>
+                  <div className="text-sm font-medium text-foreground">{tf("auto.2578179d177903e1")}</div>
                   <div className="flex items-center gap-2">
                     <code className="min-w-0 flex-1 truncate rounded-md bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
                       {endpoint}
                     </code>
                     <Button variant="outline" size="sm" onClick={() => void copyText(endpoint, "Endpoint URL")}>
                       <Copy className="mr-1 h-3.5 w-3.5" />
-                      Copy
+                      {tf("text.Copy")}
                     </Button>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <div className="text-sm font-medium text-foreground">Authorization header</div>
+                  <div className="text-sm font-medium text-foreground">{tf("auto.8e68075cabda5ea7")}</div>
                   <code className="block truncate rounded-md bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
                     {selectedToken ? `Authorization: Bearer ${maskedTokenLabel(selectedToken)}` : "Authorization: Bearer pcgw_•••"}
                   </code>
@@ -326,7 +327,7 @@ export function ConnectClientDialog({
                     onClick={() => copyConfigText && void copyText(copyConfigText, `${activeSnippet.label} config`)}
                   >
                     <Copy className="mr-1 h-3.5 w-3.5" />
-                    Copy
+                    {tf("text.Copy")}
                   </Button>
                 </div>
                 <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 font-mono text-xs text-muted-foreground">
@@ -339,7 +340,7 @@ export function ConnectClientDialog({
                 ) : null}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No client snippets available for this gateway.</p>
+              <p className="text-sm text-muted-foreground">{tf("auto.b7752029f5db551b")}</p>
             )}
 
             <p className="text-xs text-muted-foreground">
@@ -352,7 +353,7 @@ export function ConnectClientDialog({
         <DialogFooter>
           <Button onClick={() => onOpenChange(false)}>
             <Check className="mr-1.5 h-4 w-4" />
-            Done
+            {tf("text.Done")}
           </Button>
         </DialogFooter>
       </DialogContent>

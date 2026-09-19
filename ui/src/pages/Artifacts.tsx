@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ArrowLeft, Check, Layers, Package, Search, X } from "lucide-react";
@@ -30,18 +31,18 @@ const ARTIFACTS_PAGE_SIZE = 30;
 const SEARCH_DEBOUNCE_MS = 250;
 
 export const ARTIFACT_KIND_FILTERS: { value: ArtifactKindFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "image", label: "Images" },
-  { value: "video", label: "Videos" },
-  { value: "document", label: "Documents" },
-  { value: "text", label: "Text" },
-  { value: "file", label: "Files" },
+  { value: "all", label: tf("text.All") },
+  { value: "image", label: tf("auto.be7e2f20129365c2") },
+  { value: "video", label: tf("auto.c9a9639463c21952") },
+  { value: "document", label: tf("text.Documents") },
+  { value: "text", label: tf("auto.71988c4d8e0803ba") },
+  { value: "file", label: tf("text.Files") },
 ];
 
 export const ARTIFACT_GROUP_OPTIONS: { value: ArtifactGroupBy; label: string }[] = [
-  { value: "none", label: "None" },
-  { value: "task", label: "Task" },
-  { value: "parent_task", label: "Parent task" },
+  { value: "none", label: tf("text.None") },
+  { value: "task", label: tf("text.Task") },
+  { value: "parent_task", label: tf("auto.fb8d859156cd03a0") },
 ];
 
 const KIND_VALUES = new Set(ARTIFACT_KIND_FILTERS.map((filter) => filter.value));
@@ -218,16 +219,16 @@ export function Artifacts() {
   useEffect(() => {
     if (viewingSelectedStack && selectedGroup) {
       setBreadcrumbs([
-        { label: "Artifacts", href: "/artifacts" },
+        { label: tf("text.Artifacts"), href: "/artifacts" },
         { label: `${selectedGroup.issue.identifier} · ${selectedGroup.title}` },
       ]);
     } else {
-      setBreadcrumbs([{ label: "Artifacts" }]);
+      setBreadcrumbs([{ label: tf("text.Artifacts") }]);
     }
   }, [setBreadcrumbs, viewingSelectedStack, selectedGroup]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Package} message="Select an organization to view artifacts." />;
+    return <EmptyState icon={Package} message={tf("auto.f28735991a29a7fd")} />;
   }
 
   const showGroupCards = viewingStackList;
@@ -253,15 +254,15 @@ export function Artifacts() {
           <Input
             value={draftQuery}
             onChange={(event) => setDraftQuery(event.currentTarget.value)}
-            placeholder="Search artifacts..."
-            aria-label="Search artifacts"
+            placeholder={tf("auto.59aadbdf0d35a2f9")}
+            aria-label={tf("auto.c71436cce0eb861d")}
             className="h-9 pl-9 pr-9 text-sm"
           />
           {draftQuery.length > 0 ? (
             <button
               type="button"
               onClick={() => setDraftQuery("")}
-              aria-label="Clear artifact search"
+              aria-label={tf("auto.3bbc1b58ad114a7a")}
               className="absolute right-2 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />
@@ -277,7 +278,7 @@ export function Artifacts() {
                 variant="outline"
                 size="icon"
                 aria-label={`Group artifacts (currently ${artifactGroupByLabel(groupBy)})`}
-                title="Group artifacts"
+                title={tf("auto.49a9799e9ea9f87c")}
                 data-testid="artifact-group-control"
                 data-group-by={groupBy}
                 className={cn("h-8 w-8 shrink-0", grouping && "bg-accent")}
@@ -286,7 +287,7 @@ export function Artifacts() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuLabel>Group by</DropdownMenuLabel>
+              <DropdownMenuLabel>{tf("auto.956a51f6b098a41b")}</DropdownMenuLabel>
               {ARTIFACT_GROUP_OPTIONS.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
@@ -302,7 +303,7 @@ export function Artifacts() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filter artifacts by type">
+          <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label={tf("auto.ff8bce095215ebd7")}>
             {ARTIFACT_KIND_FILTERS.map((filter) => (
               <button
                 key={filter.value}
@@ -332,7 +333,7 @@ export function Artifacts() {
             className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
           >
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-            All stacks
+            {tf("auto.278e106339d2dd35")}
           </Link>
           {selectedGroup ? (
             <span className="truncate text-muted-foreground">

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type ReactNode, useMemo, useState } from "react";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -62,8 +63,8 @@ export function SearchFilterMenu(props: SearchFilterMenuProps) {
     options,
     selected,
     searchable = false,
-    searchPlaceholder = "Search…",
-    emptyMessage = "No options",
+    searchPlaceholder = tf("auto.7336265a0467a255"),
+    emptyMessage = tf("auto.d7a8974566f771f1"),
     triggerClassName,
     contentClassName,
     align = "start",
@@ -123,7 +124,7 @@ export function SearchFilterMenu(props: SearchFilterMenuProps) {
               className="text-xs text-muted-foreground hover:text-foreground"
               onClick={() => props.onClear()}
             >
-              Clear
+              {tf("text.Clear")}
             </button>
           ) : null}
         </div>

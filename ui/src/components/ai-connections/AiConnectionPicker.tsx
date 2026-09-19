@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { AppLogo } from "@/pages/apps/AppLogo";
 import { ConnectionChoiceList } from "@/features/connections/ConnectionChoiceList";
 import { Button } from "@/components/ui/button";
@@ -69,7 +70,7 @@ export function AiConnectionPicker({
       grantId: connection.grantId,
     });
   return (
-    <section className="flex flex-col gap-4" aria-label="AI connection">
+    <section className="flex flex-col gap-4" aria-label={tf("auto.a991b2272b0c52e7")}>
       <div className="flex items-center gap-3">
         <AppLogo
           name={AI_PROVIDERS[requirement.provider].name}
@@ -79,7 +80,7 @@ export function AiConnectionPicker({
           size={32}
         />
         <div className="flex min-w-0 flex-col gap-1">
-        <h3 className="text-sm font-semibold">AI connection</h3>
+        <h3 className="text-sm font-semibold">{tf("auto.a991b2272b0c52e7")}</h3>
         <p className="text-xs text-muted-foreground">
           {AI_PROVIDERS[requirement.provider].name}
           {value && value.mode !== "responsible_user" && ` · ${aiMethodLabel(value.provider, value.method)}`}
@@ -87,7 +88,7 @@ export function AiConnectionPicker({
         </div>
       </div>
       {loading ? (
-        <div role="status" aria-label="Loading AI connections">
+        <div role="status" aria-label={tf("auto.b38addbe9d8ec297")}>
           <Skeleton className="h-24 w-full" />
         </div>
       ) : error ? (
@@ -97,7 +98,7 @@ export function AiConnectionPicker({
           </p>
           {onRetry && (
             <Button type="button" variant="outline" onClick={onRetry}>
-              Retry connections
+              {tf("auto.4048d2fff829eecb")}
             </Button>
           )}
         </div>
@@ -134,7 +135,7 @@ export function AiConnectionPicker({
               className="self-end"
               onClick={onConnect}
             >
-              Connect another account
+              {tf("auto.261b28a3c6bf35b8")}
             </Button>
           )}
         </>

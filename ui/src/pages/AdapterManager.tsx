@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * @fileoverview Adapter Manager page — install, view, and manage external adapters.
  *
@@ -80,8 +81,8 @@ function AdapterRow({
             <Badge variant="outline">{adapter.source === "external" ? "External" : "Built-in"}</Badge>
             {adapter.source === "external" && (
               adapter.isLocalPath
-                ? <span title="Installed from local path"><FolderOpen className="h-4 w-4 text-amber-500" /></span>
-                : <span title="Installed from npm"><Package className="h-4 w-4 text-red-500" /></span>
+                ? <span title={tf("auto.743c385f9d621d74")}><FolderOpen className="h-4 w-4 text-amber-500" /></span>
+                : <span title={tf("auto.9478a781379aae34")}><Package className="h-4 w-4 text-red-500" /></span>
             )}
             {adapter.version && (
               <Badge variant="secondary" className="font-mono text-(length:--text-nano)">
@@ -90,7 +91,7 @@ function AdapterRow({
             )}
             {adapter.overriddenBuiltin && (
               <Badge variant="secondary" className="text-blue-600 border-blue-400">
-                Overrides built-in
+                {tf("auto.e82d10b2756687a3")}
               </Badge>
             )}
             {overriddenBy && (
@@ -118,7 +119,7 @@ function AdapterRow({
               variant="outline"
               size="icon-sm"
               className="h-8 w-8"
-              title="Reinstall adapter (pull latest from npm)"
+              title={tf("auto.fac31295d12e260f")}
               disabled={isReinstalling}
               onClick={() => onReinstall(adapter.type)}
             >
@@ -130,7 +131,7 @@ function AdapterRow({
               variant="outline"
               size="icon-sm"
               className="h-8 w-8"
-              title="Reload adapter (hot-swap)"
+              title={tf("auto.54a31f7a7715dada")}
               disabled={isReloading}
               onClick={() => onReload(adapter.type)}
             >
@@ -154,7 +155,7 @@ function AdapterRow({
               variant="outline"
               size="icon-sm"
               className="h-8 w-8 text-destructive hover:text-destructive"
-              title="Remove adapter"
+              title={tf("auto.8335c33d85c494e9")}
               onClick={() => onRemove(adapter.type)}
             >
               <Trash2 className="h-4 w-4" />
@@ -204,7 +205,7 @@ function ReinstallDialog({
     <Dialog open={open} onOpenChange={(o) => { if (!o) onCancel(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reinstall Adapter</DialogTitle>
+          <DialogTitle>{tf("auto.c5c600771edf4df5")}</DialogTitle>
           <DialogDescription>
             This will pull the latest version of{" "}
             <strong>{adapter?.packageName}</strong> from npm and hot-swap
@@ -215,17 +216,17 @@ function ReinstallDialog({
 
         <div className="rounded-md border bg-muted/50 px-4 py-3 text-sm space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Package</span>
+            <span className="text-muted-foreground">{tf("auto.59de121db1b8145e")}</span>
             <span className="font-mono">{adapter?.packageName}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Current</span>
+            <span className="text-muted-foreground">{tf("auto.e0d1b68224bf0b31")}</span>
             <span className="font-mono">
               {adapter?.version ? `v${adapter.version}` : "unknown"}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Latest on npm</span>
+            <span className="text-muted-foreground">{tf("auto.6ff23d6c1c17d22c")}</span>
             <span className="font-mono">
               {isFetchingVersion
                 ? "checking..."
@@ -236,14 +237,14 @@ function ReinstallDialog({
           </div>
           {isUpToDate && (
             <p className="text-xs text-muted-foreground pt-1">
-              Already on the latest version.
+              {tf("auto.2a171a61859e10d6")}
             </p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onCancel} disabled={isReinstalling}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button disabled={isReinstalling} onClick={onConfirm}>
             {isReinstalling ? "Reinstalling..." : "Reinstall"}
@@ -270,8 +271,8 @@ export function AdapterManager() {
   useEffect(() => {
     setBreadcrumbs([
       { label: selectedCompany?.name ?? "Organization", href: "/dashboard" },
-      { label: "Settings", href: "/company/settings" },
-      { label: "Adapters" },
+      { label: tf("text.Settings"), href: "/company/settings" },
+      { label: tf("text.Adapters") },
     ]);
   }, [selectedCompany?.name, setBreadcrumbs]);
 
@@ -294,13 +295,13 @@ export function AdapterManager() {
       setInstallVersion("");
       setIsLocalPath(false);
       pushToast({
-        title: "Adapter installed",
+        title: tf("auto.c42ca698ddb6c78c"),
         body: `Type "${result.type}" registered successfully.${result.version ? ` (v${result.version})` : ""}`,
         tone: "success",
       });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Install failed", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.33b4717bdc2f2510"), body: err.message, tone: "error" });
     },
   });
 
@@ -308,10 +309,10 @@ export function AdapterManager() {
     mutationFn: (type: string) => adaptersApi.remove(type),
     onSuccess: () => {
       invalidate();
-      pushToast({ title: "Adapter removed", tone: "success" });
+      pushToast({ title: tf("auto.dea8d71177aa99af"), tone: "success" });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Removal failed", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.59ac9c0ed7e07742"), body: err.message, tone: "error" });
     },
   });
 
@@ -322,7 +323,7 @@ export function AdapterManager() {
       invalidate();
     },
     onError: (err: Error) => {
-      pushToast({ title: "Toggle failed", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.607e19c13a17a574"), body: err.message, tone: "error" });
     },
   });
 
@@ -333,7 +334,7 @@ export function AdapterManager() {
       invalidate();
     },
     onError: (err: Error) => {
-      pushToast({ title: "Override toggle failed", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.f11f7bbf55f4e495"), body: err.message, tone: "error" });
     },
   });
 
@@ -344,13 +345,13 @@ export function AdapterManager() {
       invalidateDynamicParser(result.type);
       invalidateConfigSchemaCache(result.type);
       pushToast({
-        title: "Adapter reloaded",
+        title: tf("auto.3a4c526d82054223"),
         body: `Type "${result.type}" reloaded.${result.version ? ` (v${result.version})` : ""}`,
         tone: "success",
       });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Reload failed", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.a82cb9183608bc07"), body: err.message, tone: "error" });
     },
   });
 
@@ -361,13 +362,13 @@ export function AdapterManager() {
       invalidateDynamicParser(result.type);
       invalidateConfigSchemaCache(result.type);
       pushToast({
-        title: "Adapter reinstalled",
+        title: tf("auto.90cebc5a87e1e0e9"),
         body: `Type "${result.type}" updated from npm.${result.version ? ` (v${result.version})` : ""}`,
         tone: "success",
       });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Reinstall failed", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.df33a52cd240c747"), body: err.message, tone: "error" });
     },
   });
 
@@ -391,7 +392,7 @@ export function AdapterManager() {
       menuDisabled: !!a.disabled,
     }));
 
-  if (isLoading) return <div className="p-4 text-sm text-muted-foreground">Loading adapters...</div>;
+  if (isLoading) return <div className="p-4 text-sm text-muted-foreground">{tf("auto.245c1f9612f48c59")}</div>;
 
   const isMutating = installMutation.isPending || removeMutation.isPending || toggleMutation.isPending || overrideMutation.isPending || reloadMutation.isPending || reinstallMutation.isPending;
 
@@ -401,9 +402,9 @@ export function AdapterManager() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Cpu className="h-6 w-6 text-muted-foreground" />
-          <h1 className="text-xl font-semibold">Adapters</h1>
+          <h1 className="text-xl font-semibold">{tf("text.Adapters")}</h1>
           <Badge variant="outline" className="text-amber-600 border-amber-400">
-            Alpha
+            {tf("auto.b1a96dd646bccaa2")}
           </Badge>
         </div>
 
@@ -411,14 +412,14 @@ export function AdapterManager() {
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
               <Plus className="h-4 w-4" />
-              Install Adapter
+              {tf("auto.76bd921a3ef83af8")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Install External Adapter</DialogTitle>
+              <DialogTitle>{tf("auto.4d74bb6ede8b3209")}</DialogTitle>
               <DialogDescription>
-                Add an adapter from npm or a local path. The adapter package must export <code className="text-xs bg-muted px-1 py-0.5 rounded">createServerAdapter()</code>.
+                Add an adapter from npm or a local path. The adapter package must export <code className="text-xs bg-muted px-1 py-0.5 rounded">{tf("auto.56b1217560738314")}</code>.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -435,7 +436,7 @@ export function AdapterManager() {
                   onClick={() => setIsLocalPath(false)}
                 >
                   <Package className="h-3.5 w-3.5" />
-                  npm package
+                  {tf("auto.d6ee71088dbcb460")}
                 </button>
                 <button
                   type="button"
@@ -448,14 +449,14 @@ export function AdapterManager() {
                   onClick={() => setIsLocalPath(true)}
                 >
                   <FolderOpen className="h-3.5 w-3.5" />
-                  Local path
+                  {tf("auto.e335847f885ededb")}
                 </button>
               </div>
 
               {isLocalPath ? (
                 /* Local path input */
                 <div className="grid gap-2">
-                  <Label htmlFor="adapterLocalPath">Path to adapter package</Label>
+                  <Label htmlFor="adapterLocalPath">{tf("auto.a57e6183fe8b7de2")}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="adapterLocalPath"
@@ -467,26 +468,26 @@ export function AdapterManager() {
                     <ChoosePathButton />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Accepts Linux, WSL, and Windows paths. Windows paths are auto-converted.
+                    {tf("auto.af412d3616694012")}
                   </p>
                 </div>
               ) : (
                 /* npm package input */
                 <>
                   <div className="grid gap-2">
-                    <Label htmlFor="adapterPackageName">Package Name</Label>
+                    <Label htmlFor="adapterPackageName">{tf("auto.75da9a761bf38399")}</Label>
                     <Input
                       id="adapterPackageName"
-                      placeholder="my-paperclip-adapter"
+                      placeholder={tf("auto.be2c6c2b0e43e945")}
                       value={installPackage}
                       onChange={(e) => setInstallPackage(e.target.value)}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="adapterVersion">Version (optional)</Label>
+                    <Label htmlFor="adapterVersion">{tf("auto.df410f15550058cb")}</Label>
                     <Input
                       id="adapterVersion"
-                      placeholder="latest"
+                      placeholder={tf("auto.5e1e2bcac305958b")}
                       value={installVersion}
                       onChange={(e) => setInstallVersion(e.target.value)}
                     />
@@ -495,7 +496,7 @@ export function AdapterManager() {
               )}
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setInstallDialogOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setInstallDialogOpen(false)}>{tf("text.Cancel")}</Button>
               <Button
                 onClick={() =>
                   installMutation.mutate({
@@ -518,7 +519,7 @@ export function AdapterManager() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
           <div className="space-y-1 text-sm">
-            <p className="font-medium text-foreground">External adapters are alpha.</p>
+            <p className="font-medium text-foreground">{tf("auto.b203f6948e0f5fa1")}</p>
             <p className="text-muted-foreground">
               The adapter plugin system is under active development. APIs and storage format may change.
               Use the power icon to hide adapters from agent menus without removing them.
@@ -531,16 +532,16 @@ export function AdapterManager() {
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-base font-semibold">External Adapters</h2>
+          <h2 className="text-base font-semibold">{tf("auto.f8caa9094d695f42")}</h2>
         </div>
 
         {externalAdapters.length === 0 ? (
           <Card className="bg-muted/30">
             <CardContent className="flex flex-col items-center justify-center py-10">
               <Cpu className="h-10 w-10 text-muted-foreground mb-4" />
-              <p className="text-sm font-medium">No external adapters installed</p>
+              <p className="text-sm font-medium">{tf("auto.4f42a491c2cfb1d2")}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Install an adapter package to extend model support.
+                {tf("auto.68814655e4643c48")}
               </p>
             </CardContent>
           </Card>
@@ -588,11 +589,11 @@ export function AdapterManager() {
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-base font-semibold">Built-in Adapters</h2>
+          <h2 className="text-base font-semibold">{tf("auto.4cba737d7b294fb8")}</h2>
         </div>
 
         {builtinAdapters.length === 0 && overriddenBuiltins.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No built-in adapters found.</div>
+          <div className="text-sm text-muted-foreground">{tf("auto.5d52feaeee500a5b")}</div>
         ) : (
           <Card className="block py-0">
           <ul className="divide-y">
@@ -643,7 +644,7 @@ export function AdapterManager() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove Adapter</DialogTitle>
+            <DialogTitle>{tf("auto.bc2ff903997e93d8")}</DialogTitle>
             <DialogDescription>
               Are you sure you want to remove the <strong>{removeType}</strong> adapter?
               It will be unregistered and removed from the adapter store.
@@ -654,7 +655,7 @@ export function AdapterManager() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRemoveType(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setRemoveType(null)}>{tf("text.Cancel")}</Button>
             <Button
               variant="destructive"
               disabled={removeMutation.isPending}

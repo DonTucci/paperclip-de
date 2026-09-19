@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   IssueBlockerAttentionIssueSummary,
   IssueRelationIssueSummary,
@@ -199,7 +200,7 @@ export function TaskChatBlockerLinks({
     : "Ultimately blocked by";
   return (
     <div
-      aria-label="Task blockers"
+      aria-label={tf("auto.036bb651824cf377")}
       data-placement={placement}
       data-testid="task-chat-blocker-links"
       className="flex min-w-0 flex-col gap-1 overflow-hidden text-(length:--text-micro) leading-4 text-amber-700 dark:text-amber-300"
@@ -223,7 +224,7 @@ export function TaskChatLiveWorkLinks({
   const heading = streamlined && placement === "bottom" ? "Still waiting on live work" : "Waiting on live work";
   return (
     <div
-      aria-label="Tasks waiting on live work"
+      aria-label={tf("auto.1d80e4a70e36d932")}
       data-placement={placement}
       data-testid="task-chat-live-work-links"
       className="flex min-w-0 flex-col gap-1.5 overflow-hidden text-(length:--text-micro) leading-4 text-blue-700 dark:text-blue-300"
@@ -254,10 +255,10 @@ export function TaskChatLiveWorkLinks({
         ))}
       </ol>
       {liveWork.nowRunning.map((blocker) => streamlined ? (
-        <LiveWorkLink key={blocker.id} blocker={blocker} status="running" label="Now running" />
+        <LiveWorkLink key={blocker.id} blocker={blocker} status="running" label={tf("auto.44cdf35701cdac02")} />
       ) : (
         <div key={blocker.id} className="flex min-w-0 items-center gap-1.5 whitespace-nowrap">
-          <span className="shrink-0 font-medium">Now running</span>
+          <span className="shrink-0 font-medium">{tf("auto.44cdf35701cdac02")}</span>
           <LiveWorkLink blocker={blocker} status="running" />
         </div>
       ))}

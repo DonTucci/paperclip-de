@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Compass, Library, PencilRuler } from "lucide-react";
 import { useLocation } from "@/lib/router";
 import {
@@ -23,28 +24,28 @@ export function SkillsContextualSidebar() {
   return (
     <ContextualSidebarFrame
       surface="skills"
-      title="Skills"
+      title={tf("text.Skills")}
       icon={Library}
       fallbackTo="/dashboard"
       showHeader={false}
       className="border-r border-border bg-background"
     >
       <nav
-        aria-label="Skills"
+        aria-label={tf("text.Skills")}
         data-slot="contextual-sidebar-nav"
         className={contextualSidebarStyles.nav}
       >
         <div data-slot="contextual-sidebar-group" className={contextualSidebarStyles.group}>
           <SidebarNavItem
             to={SKILLS_NAVIGATION_HREFS.installed}
-            label="Installed"
+            label={tf("text.Installed")}
             icon={Library}
             active={activeView === "installed"}
             end
           />
           <SidebarNavItem
             to={SKILLS_NAVIGATION_HREFS.discover}
-            label="Discover"
+            label={tf("auto.d4a33d5b78bccebe")}
             icon={Compass}
             active={activeView === "discover"}
             end
@@ -56,18 +57,18 @@ export function SkillsContextualSidebar() {
             data-slot="contextual-sidebar-section-label"
             className={contextualSidebarStyles.sectionLabel}
           >
-            Author
+            {tf("auto.d95082a2ee57f3e4")}
           </div>
           <p
             data-slot="contextual-sidebar-section-description"
             className={contextualSidebarStyles.sectionDescription}
           >
-            Skills you create, edit, and test.
+            {tf("auto.cd7c4b5f9ef8e9e7")}
           </p>
           <div data-slot="contextual-sidebar-group" className={contextualSidebarStyles.group}>
             <SidebarNavItem
               to={SKILLS_NAVIGATION_HREFS.authored}
-              label="My Skills"
+              label={tf("auto.ea424d66243dffe9")}
               icon={PencilRuler}
               active={activeView === "authored"}
             />

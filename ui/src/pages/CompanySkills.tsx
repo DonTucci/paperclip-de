@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState, type SVGProps } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -400,7 +401,7 @@ function SourceFilterMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel>Source</DropdownMenuLabel>
+        <DropdownMenuLabel>{tf("text.Source")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={value} onValueChange={(next) => onChange(next as SourceFilter)}>
           {filters.map((filter) => (
             <DropdownMenuRadioItem key={filter} value={filter}>
@@ -446,16 +447,16 @@ function CatalogFilterMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="max-h-(--sz-calc-32) w-56 overflow-y-auto">
-        <DropdownMenuLabel>Type</DropdownMenuLabel>
+        <DropdownMenuLabel>{tf("text.Type")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={kindFilter} onValueChange={(next) => onKindChange(next as "all" | "bundled" | "optional")}>
-          <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="bundled">Bundled</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="optional">Optional</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="all">{tf("text.All")}</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="bundled">{tf("auto.79d3a1f108e8d9c3")}</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="optional">{tf("text.Optional")}</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel>Category</DropdownMenuLabel>
+        <DropdownMenuLabel>{tf("text.Category")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={categoryFilter || "__all__"} onValueChange={(next) => onCategoryChange(next === "__all__" ? "" : next)}>
-          <DropdownMenuRadioItem value="__all__">All categories</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="__all__">{tf("auto.9d5097a837102a17")}</DropdownMenuRadioItem>
           {categories.map((category) => (
             <DropdownMenuRadioItem key={category} value={category}>
               {category}
@@ -471,20 +472,20 @@ function TrustChip({ level }: { level: CompanySkillTrustLevel }) {
   const map = {
     markdown_only: {
       icon: ShieldCheck,
-      label: "Markdown only",
-      tooltip: "Text only — no scripts, no binaries, no assets.",
+      label: tf("auto.f6e1f70299429863"),
+      tooltip: tf("auto.8457c26395fb0e6f"),
       className: "border-border bg-muted/40 text-muted-foreground",
     },
     assets: {
       icon: Folder,
-      label: "Includes assets",
-      tooltip: "Ships images, fonts, or other non-script files.",
+      label: tf("auto.3ac07e562074f098"),
+      tooltip: tf("auto.9ee2f851f26d171e"),
       className: "border-cyan-500/30 bg-cyan-500/10 text-cyan-800 dark:text-cyan-200",
     },
     scripts_executables: {
       icon: AlertTriangle,
-      label: "Includes scripts",
-      tooltip: "Ships executable scripts. Review before installing.",
+      label: tf("auto.a3afb3e26a30ced8"),
+      tooltip: tf("auto.40141601f0eb7d8b"),
       className: "border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-200",
     },
   } as const;
@@ -508,14 +509,14 @@ function CompatChip({ compatibility }: { compatibility: CompanySkillCompatibilit
   const map = {
     unknown: {
       icon: HelpCircle,
-      label: "Unknown format",
-      tooltip: "Paperclip could not validate this skill as Agent Skills markdown. Install at your own risk.",
+      label: tf("auto.b85b1021c6fa2543"),
+      tooltip: tf("auto.11cb7a4152323713"),
       className: "border-yellow-500/40 bg-yellow-500/10 text-yellow-800 dark:text-yellow-200",
     },
     invalid: {
       icon: XOctagon,
-      label: "Invalid",
-      tooltip: "This skill cannot be installed — content is not valid Agent Skills markdown.",
+      label: tf("auto.96c34a0719eb565c"),
+      tooltip: tf("auto.731d1e9bb0ac229b"),
       className: "border-destructive/40 bg-destructive/10 text-destructive",
     },
   } as const;
@@ -544,7 +545,7 @@ function ProvenanceBadge({ packageName, packageVersion }: { packageName: string 
           <span>{packageName}{packageVersion ? ` v${packageVersion}` : ""}</span>
         </span>
       </TooltipTrigger>
-      <TooltipContent>Installed from the app-shipped skills catalog. Provenance is signed by package version and content hash.</TooltipContent>
+      <TooltipContent>{tf("auto.9947f300a0826a80")}</TooltipContent>
     </Tooltip>
   );
 }
@@ -577,7 +578,7 @@ export function skillDetailBreadcrumbs(
     ? folderBreadcrumbTrail(treeFromResult(folderResult), detail.folderId)
     : [];
   return [
-    { label: "Skills", href: "/skills" },
+    { label: tf("text.Skills"), href: "/skills" },
     ...trail.map((folder, index) => ({
       label: index === 0 ? reservedRootLabel(folder) : folder.name,
       href: `/skills?folder=${encodeURIComponent(folder.id)}`,
@@ -589,11 +590,11 @@ export function skillDetailBreadcrumbs(
 type DiscoverySort = "agents" | "stars" | "forks" | "recent" | "alphabetical";
 
 const DISCOVERY_SORT_LABELS: Record<DiscoverySort, string> = {
-  agents: "Most agents",
-  stars: "Most stars",
-  forks: "Most forks",
-  recent: "Recently updated",
-  alphabetical: "Alphabetical",
+  agents: tf("skills.sort.mostAgents"),
+  stars: tf("skills.sort.mostStars"),
+  forks: tf("skills.sort.mostForks"),
+  recent: tf("skills.sort.recent"),
+  alphabetical: tf("skills.sort.alphabetical"),
 };
 
 const DISCOVERY_SORTS: DiscoverySort[] = ["agents", "stars", "forks", "recent", "alphabetical"];
@@ -903,7 +904,7 @@ function SkillCard({
                 <>
                   <DropdownMenuItem onSelect={() => onOpenMove(card)}>
                     <FolderInput className="h-3.5 w-3.5" />
-                    Move to folder…
+                    {tf("auto.ca0754406d3bf31e")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
@@ -922,7 +923,7 @@ function SkillCard({
       {card.forkedFrom ? (
         <div className="mt-2 inline-flex items-center gap-1 text-(length:--text-micro) text-muted-foreground">
           <GitFork className="h-3 w-3" aria-hidden="true" />
-          Forked
+          {tf("auto.c0f2c3d33c87d5f1")}
         </div>
       ) : null}
 
@@ -942,9 +943,9 @@ function SkillCard({
           <span>
             {card.installed
               ? card.agentCount > 0
-                ? `Enabled for ${card.agentCount} ${card.agentCount === 1 ? "agent" : "agents"}`
-                : "Not enabled for any agents"
-              : "Available to install"}
+                ? tf(card.agentCount === 1 ? "skills.enabled_one" : "skills.enabled_other", { count: card.agentCount })
+                : tf("skills.notEnabled")
+              : tf("skills.availableToInstall")}
           </span>
           {card.starCount > 0 ? (
             <>
@@ -962,7 +963,7 @@ function SkillCard({
         <div className="mt-2 flex flex-wrap items-center gap-1">
           {card.installed ? (
             <Badge variant="secondary" className="text-(length:--text-nano)">
-              Installed
+              {tf("text.Installed")}
             </Badge>
           ) : null}
           <Badge variant="outline" className="max-w-full text-(length:--text-nano) text-muted-foreground">
@@ -975,11 +976,11 @@ function SkillCard({
           {card.required ? (
             <Badge variant="outline" className="ml-auto border-border bg-muted/60 text-(length:--text-nano) text-muted-foreground">
               <Lock className="h-3 w-3" aria-hidden="true" />
-              Bundled
+              {tf("auto.79d3a1f108e8d9c3")}
             </Badge>
           ) : card.sourceKind === "optional" ? (
             <Badge variant="outline" className="ml-auto text-(length:--text-nano) text-muted-foreground">
-              Optional
+              {tf("text.Optional")}
             </Badge>
           ) : null}
         </div>
@@ -1011,7 +1012,7 @@ function CategoryNav({
           active == null ? "bg-accent/60 font-medium text-foreground" : "text-muted-foreground",
         )}
       >
-        <span>All</span>
+        <span>{tf("text.All")}</span>
         <span className="text-xs text-muted-foreground">{total}</span>
       </button>
       {categories.map((category) => (
@@ -1131,11 +1132,11 @@ export function DiscoveryGrid({
   showBrowseRails?: boolean;
 }) {
   const installedView = tab === "installed";
-  const viewTitle = installedView ? "Installed skills" : "Discover skills";
+  const viewTitle = installedView ? tf("skills.installedTitle") : tf("skills.discoverTitle");
   const viewDescription = installedView
-    ? "Skills available to this organization."
-    : "Browse skills from every available source.";
-  const searchLabel = installedView ? "Search installed skills" : "Search discoverable skills";
+    ? tf("skills.installedDescription")
+    : tf("skills.discoverDescription");
+  const searchLabel = installedView ? tf("skills.searchInstalled") : tf("skills.searchDiscoverable");
   // Source filter (github / skills.sh / local / …) lives in the grid so it
   // narrows whatever the parent already filtered by tab/category/search (PAP-10907 E).
   const [sourceBadgeFilter, setSourceBadgeFilter] = useState<string>("all");
@@ -1209,13 +1210,13 @@ export function DiscoveryGrid({
       {showBrowseRails ? (
         <aside className={cn("hidden w-60 shrink-0 flex-col overflow-hidden border-r border-border md:flex", showFolderRail && "md:hidden")}>
           <div className="border-b border-border px-4 py-4">
-            <h2 className="text-sm font-semibold text-foreground">Browse by category</h2>
+            <h2 className="text-sm font-semibold text-foreground">{tf("auto.1add935d442b3ce7")}</h2>
             <p className="text-xs text-muted-foreground">
               Filter {installedView ? "installed" : "discoverable"} skills.
             </p>
           </div>
           <div className="px-4 pb-1 pt-3 text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
-            Categories
+            {tf("auto.b8b1d894c6837252")}
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto pb-4">
             <CategoryNav
@@ -1248,7 +1249,7 @@ export function DiscoveryGrid({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
-                <span className="text-muted-foreground">Sort</span>
+                <span className="text-muted-foreground">{tf("auto.bec69036aa27e7fa")}</span>
                 <span className="ml-1.5">{DISCOVERY_SORT_LABELS[sort]}</span>
                 <ChevronDown className="ml-1 h-3.5 w-3.5" />
               </Button>
@@ -1267,7 +1268,7 @@ export function DiscoveryGrid({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
-                  <span className="text-muted-foreground">Source</span>
+                  <span className="text-muted-foreground">{tf("text.Source")}</span>
                   <span className="ml-1.5">
                     {sourceBadgeFilter === "all"
                       ? "All"
@@ -1278,7 +1279,7 @@ export function DiscoveryGrid({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuRadioGroup value={sourceBadgeFilter} onValueChange={setSourceBadgeFilter}>
-                  <DropdownMenuRadioItem value="all">All sources</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="all">{tf("auto.08e774c5bacc362a")}</DropdownMenuRadioItem>
                   {availableSources.map((source) => (
                     <DropdownMenuRadioItem key={source.value} value={source.value}>
                       {source.label}
@@ -1293,8 +1294,8 @@ export function DiscoveryGrid({
             size="icon-sm"
             onClick={() => onScan()}
             disabled={scanPending}
-            aria-label="Scan project workspaces for skills"
-            title="Scan project workspaces for skills"
+            aria-label={tf("auto.84e548b74f8087e7")}
+            title={tf("auto.84e548b74f8087e7")}
           >
             <RefreshCw className={cn("h-4 w-4", scanPending && "animate-spin")} />
           </Button>
@@ -1302,26 +1303,26 @@ export function DiscoveryGrid({
             <DropdownMenuTrigger asChild>
               <Button size="sm" variant="default">
                 <Plus className="mr-1 h-3.5 w-3.5" />
-                New
+                {tf("auto.18fdd549b2ed367a")}
                 <ChevronDown className="ml-1 h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={onCreate}>
                 <Pencil className="mr-2 h-4 w-4" />
-                Create new skill
+                {tf("auto.7d7d4a1ad70f7b9d")}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onBrowseDiscover}>
                 <Compass className="mr-2 h-4 w-4" />
-                Discover skills
+                {tf("auto.70464b503b140302")}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onImport}>
                 <Globe className="mr-2 h-4 w-4" />
-                Import from path or URL
+                {tf("auto.abed2dfba3bf7b4b")}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={onImportFromProject}>
                 <FolderSearch className="mr-2 h-4 w-4" />
-                Import skills from project
+                {tf("auto.364c89b0f1b44de1")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -1338,7 +1339,7 @@ export function DiscoveryGrid({
           {onCreateFolder && !showFolderRail ? (
             <Button variant="outline" size="sm" onClick={onCreateFolder}>
               <Plus className="mr-1 h-3.5 w-3.5" />
-              New folder
+              {tf("auto.cf28f49ec597a6ed")}
             </Button>
           ) : null}
           {onToggleSelectMode ? (
@@ -1391,7 +1392,7 @@ export function DiscoveryGrid({
                   title={`Refresh skills from ${activeProjectFolder.name}`}
                 >
                   <RefreshCw className={cn("h-3.5 w-3.5", scanPending && "animate-spin")} />
-                  Refresh
+                  {tf("text.Refresh")}
                 </Button>
               ) : null}
             </div>
@@ -1437,11 +1438,11 @@ export function DiscoveryGrid({
                 <div className="mt-3 flex flex-col items-center gap-2">
                   {installedView ? (
                     <Button size="sm" onClick={onBrowseDiscover}>
-                      <Compass className="mr-1.5 h-3.5 w-3.5" /> Discover skills
+                      <Compass className="mr-1.5 h-3.5 w-3.5" /> {tf("auto.70464b503b140302")}
                     </Button>
                   ) : null}
                   <Button size="sm" variant="ghost" onClick={onCreate}>
-                    Create a skill
+                    {tf("auto.7356acceb0c59704")}
                   </Button>
                 </div>
               ) : (search || activeCategory || sourceFilterActive) ? (
@@ -1455,7 +1456,7 @@ export function DiscoveryGrid({
                       setSourceBadgeFilter("all");
                     }}
                   >
-                    Clear filters
+                    {tf("text.Clear filters")}
                   </Button>
                 </div>
               ) : null}
@@ -1463,7 +1464,7 @@ export function DiscoveryGrid({
           ) : (
             <>
               <p className="mb-3 text-xs text-muted-foreground">
-                {sourceFilteredCards.length} {sourceFilteredCards.length === 1 ? "skill" : "skills"}
+                {tf(sourceFilteredCards.length === 1 ? "skills.count_one" : "skills.count_other", { count: sourceFilteredCards.length })}
                 {activeCategory ? <span className="capitalize"> · {activeCategory}</span> : null}
               </p>
               <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(19rem,1fr))]">
@@ -1565,7 +1566,7 @@ function NewSkillWizard({
                   : draft.markdown,
               });
             }}
-            placeholder="Skill name"
+            placeholder={tf("auto.0fbb6f49b868f61e")}
             className="h-9"
           />
           <Input
@@ -1575,7 +1576,7 @@ function NewSkillWizard({
               setSlugDirty(nextSlug.length > 0);
               patchDraft({ slug: nextSlug });
             }}
-            placeholder="skill-shortname"
+            placeholder={tf("auto.fa4b0ed9ed44551c")}
             className="h-9 font-mono"
           />
           <Textarea
@@ -1590,7 +1591,7 @@ function NewSkillWizard({
                   : draft.markdown,
               });
             }}
-            placeholder="One-line promise for the skill"
+            placeholder={tf("auto.f88c725cc131fe4e")}
             className="min-h-20"
           />
         </div>
@@ -1613,7 +1614,7 @@ function NewSkillWizard({
             </div>
           </div>
           <div>
-            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Color</label>
+            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.6b73191a0a4b6742")}</label>
             <div className="flex flex-wrap gap-2">
               {SKILL_CREATE_ACCENTS.map((color) => (
                 <button
@@ -1636,11 +1637,11 @@ function NewSkillWizard({
             </div>
           </div>
           <div>
-            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">Categories</label>
+            <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.b8b1d894c6837252")}</label>
             <Input
               value={categoryDraft}
               onChange={(event) => patchDraft({ categories: splitCategoryDraft(event.target.value) })}
-              placeholder="engineering, review, memory"
+              placeholder={tf("auto.60bdd3ca934986f7")}
               className="h-9"
             />
           </div>
@@ -1656,17 +1657,17 @@ function NewSkillWizard({
       ) : (
         <div className="space-y-4 text-sm">
           <div className="grid grid-cols-(--gtc-26) gap-y-2">
-            <span className="text-muted-foreground">Name</span>
+            <span className="text-muted-foreground">{tf("text.Name")}</span>
             <span>{draft.name || "Untitled"}</span>
-            <span className="text-muted-foreground">Slug</span>
+            <span className="text-muted-foreground">{tf("auto.d15387ecc6c5e22d")}</span>
             <span className="font-mono">{effectiveSlug || "skill"}</span>
-            <span className="text-muted-foreground">Scope</span>
+            <span className="text-muted-foreground">{tf("auto.b073f6c68ef87211")}</span>
             <span>{draft.sharingScope === "private" ? "Private" : "Organization"}</span>
-            <span className="text-muted-foreground">Categories</span>
+            <span className="text-muted-foreground">{tf("auto.b8b1d894c6837252")}</span>
             <span>{draft.categories.length ? draft.categories.join(", ") : "none"}</span>
           </div>
           <div className="space-y-2">
-            <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">Sharing</label>
+            <label className="block text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.bbedc70e985fe0b6")}</label>
             <div className="grid gap-2 sm:grid-cols-3">
               {(["company", "private"] as const).map((scope) => (
                 <button
@@ -1689,8 +1690,8 @@ function NewSkillWizard({
                 disabled
                 className="rounded-md border border-dashed border-border px-3 py-2 text-left text-sm text-muted-foreground"
               >
-                <span className="block font-medium">Public link</span>
-                <span className="mt-1 block text-xs">Coming later.</span>
+                <span className="block font-medium">{tf("auto.178b790b1cb2c176")}</span>
+                <span className="mt-1 block text-xs">{tf("auto.3ff09ef158dc5fa2")}</span>
               </button>
             </div>
           </div>
@@ -1705,15 +1706,15 @@ function NewSkillWizard({
 
       <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
         <Button variant="ghost" size="sm" onClick={onCancel} disabled={isPending}>
-          Cancel
+          {tf("text.Cancel")}
         </Button>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={isPending || step === 0}>
-            Back
+            {tf("text.Back")}
           </Button>
           {step < steps.length - 1 ? (
             <Button size="sm" onClick={() => setStep((value) => Math.min(steps.length - 1, value + 1))} disabled={!nameValid}>
-              Next
+              {tf("text.Next")}
             </Button>
           ) : (
             <Button size="sm" onClick={submit} disabled={isPending || !nameValid}>
@@ -1767,7 +1768,7 @@ function CatalogList({
   if (filtered.length === 0) {
     return (
       <div className="px-4 py-6 text-sm text-muted-foreground">
-        No catalog skills match this filter.
+        {tf("auto.a68c5f42af4abd10")}
       </div>
     );
   }
@@ -1895,7 +1896,7 @@ function CatalogDetailPane({
   loadingPrimaryAction: boolean;
 }) {
   if (!skill) {
-    return <EmptyState icon={Boxes} message="Select a catalog skill to inspect." />;
+    return <EmptyState icon={Boxes} message={tf("auto.fff378ec9a0d406b")} />;
   }
 
   const installedHash = installedSkill?.originHash ?? null;
@@ -1910,11 +1911,11 @@ function CatalogDetailPane({
           <span>
             <Button disabled>
               <Download className="mr-1.5 h-3.5 w-3.5" />
-              Install skill
+              {tf("auto.a6f3e89f8bacd8c6")}
             </Button>
           </span>
         </TooltipTrigger>
-        <TooltipContent>This skill cannot be installed — its content is not valid Agent Skills markdown.</TooltipContent>
+        <TooltipContent>{tf("auto.2f73d4be4fa2ba37")}</TooltipContent>
       </Tooltip>
     );
   } else if (!isInstalled) {
@@ -1928,14 +1929,14 @@ function CatalogDetailPane({
     cta = (
       <Button onClick={onUpdate} disabled={loadingPrimaryAction} className="border-amber-500/40 bg-amber-500/20 text-amber-900 dark:text-amber-100 hover:bg-amber-500/30">
         <ArrowUpCircle className="mr-1.5 h-3.5 w-3.5" />
-        Update from catalog
+        {tf("auto.bb6d1531d721b508")}
       </Button>
     );
   } else {
     cta = (
       <Button variant="ghost" onClick={() => installedSkillId && onOpenInstalled(installedSkillId)}>
         <Check className="mr-1.5 h-3.5 w-3.5" />
-        Installed · Open in library
+        {tf("auto.d02ec26d4ef07f2f")}
       </Button>
     );
   }
@@ -1971,10 +1972,10 @@ function CatalogDetailPane({
               <TooltipTrigger asChild>
                 <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-(length:--text-micro) text-amber-800 dark:text-amber-200">
                   <ArrowUpCircle className="h-3 w-3" aria-hidden="true" />
-                  Update available
+                  {tf("auto.ff8b555d818f0b25")}
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent>Catalog content hash has changed since this skill was installed.</TooltipContent>
+              <TooltipContent>{tf("auto.38d876fb549921b8")}</TooltipContent>
             </Tooltip>
           ) : null}
           {skill.requires.length > 0 ? (
@@ -1995,16 +1996,16 @@ function CatalogDetailPane({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="uppercase tracking-(--tracking-caps)">Key</span>
+          <span className="uppercase tracking-(--tracking-caps)">{tf("text.Key")}</span>
           <span className="font-mono">{skill.key}</span>
           <span className="uppercase tracking-(--tracking-caps)">·</span>
-          <span className="uppercase tracking-(--tracking-caps)">Hash</span>
+          <span className="uppercase tracking-(--tracking-caps)">{tf("auto.a91069147f9bd924")}</span>
           <span className="font-mono">{skill.contentHash.slice(0, 24)}…</span>
           <CopyText
             text={skill.contentHash}
             copiedLabel="Copied hash"
             ariaLabel="Copy content hash"
-            title="Copy content hash"
+            title={tf("auto.82e315b101c9d98a")}
             className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <Copy className="h-3 w-3" />
@@ -2020,9 +2021,9 @@ function CatalogDetailPane({
         {fileQuery.isLoading ? (
           <PageSkeleton variant="detail" />
         ) : fileQuery.error ? (
-          <div className="text-sm text-destructive">{fileQuery.error instanceof Error ? fileQuery.error.message : "Failed to load file"}</div>
+          <div className="text-sm text-destructive">{fileQuery.error instanceof Error ? fileQuery.error.message: tf("auto.e9b9dd4d2b1cbbcb")}</div>
         ) : !fileQuery.data ? (
-          <div className="text-sm text-muted-foreground">Select a file to inspect.</div>
+          <div className="text-sm text-muted-foreground">{tf("auto.a0b86e47403ff914")}</div>
         ) : fileQuery.data.markdown ? (
           <MarkdownBody softBreaks={false} linkIssueReferences={false}>{body}</MarkdownBody>
         ) : (
@@ -2132,33 +2133,33 @@ export function InstallPreviewDialog({
         <div className="space-y-4 text-sm">
           <div className="rounded-md border border-border p-3">
             <div className="grid grid-cols-(--gtc-26) gap-y-2 text-xs">
-              <div className="text-muted-foreground">Trust</div>
+              <div className="text-muted-foreground">{tf("auto.ade9248e0132b411")}</div>
               <div className="flex items-center gap-2">
                 <TrustChip level={skill.trustLevel} />
                 {skill.trustLevel === "markdown_only" ? (
-                  <span className="text-muted-foreground">Safe</span>
+                  <span className="text-muted-foreground">{tf("auto.4f9f0dabcd26ae53")}</span>
                 ) : skill.trustLevel === "scripts_executables" ? (
-                  <span className="text-amber-800 dark:text-amber-200">Review required</span>
+                  <span className="text-amber-800 dark:text-amber-200">{tf("auto.f0742e3a82fe8b57")}</span>
                 ) : (
-                  <span className="text-muted-foreground">Non-script assets</span>
+                  <span className="text-muted-foreground">{tf("auto.f2223b9f8f8b66d5")}</span>
                 )}
               </div>
-              <div className="text-muted-foreground">Compatibility</div>
+              <div className="text-muted-foreground">{tf("auto.b37ddf1f6e0fac69")}</div>
               <div className="flex items-center gap-2">
                 {skill.compatibility === "compatible" ? (
                   <span className="inline-flex items-center gap-1 text-muted-foreground">
                     <Check className="h-3 w-3" aria-hidden="true" />
-                    Compatible
+                    {tf("auto.04c72ef3388c185b")}
                   </span>
                 ) : (
                   <CompatChip compatibility={skill.compatibility} />
                 )}
               </div>
-              <div className="text-muted-foreground">Requires</div>
+              <div className="text-muted-foreground">{tf("auto.143f0330d2de85b9")}</div>
               <div className="text-foreground">{skill.requires.length === 0 ? "none" : skill.requires.join(", ")}</div>
-              <div className="text-muted-foreground">Roles</div>
+              <div className="text-muted-foreground">{tf("text.Roles")}</div>
               <div className="text-foreground">{skill.recommendedForRoles.length === 0 ? "any" : skill.recommendedForRoles.join(" · ")}</div>
-              <div className="text-muted-foreground">Provenance</div>
+              <div className="text-muted-foreground">{tf("auto.1c4b8ff60530a1bf")}</div>
               <div className="min-w-0">
                 <div className="truncate">{packageName ?? "—"}{packageVersion ? ` v${packageVersion}` : ""}</div>
                 <div className="truncate font-mono text-(length:--text-micro) text-muted-foreground">{skill.contentHash}</div>
@@ -2190,9 +2191,9 @@ export function InstallPreviewDialog({
 
           {defaultAction === "install" ? (
             <div className="rounded-md border border-border p-3">
-              <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">Enable for agents</div>
+              <div className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">{tf("auto.def33a65381c8f7a")}</div>
               <p className="mb-2 text-xs text-muted-foreground">
-                Installing adds the skill to the organization library. Agents can only use it once it is enabled for them.
+                {tf("auto.1187e59d812c80a4")}
               </p>
               <AgentMultiSelect
                 agents={agents}
@@ -2202,7 +2203,7 @@ export function InstallPreviewDialog({
                   setSelectedAgentIds(next);
                 }}
                 showSelectionPreview={false}
-                emptyMessage="No agents in this organization support skills yet."
+                emptyMessage={tf("auto.fabcd320554821dd")}
                 isAgentDisabled={(agent) => {
                   const option = agent as AttachAgentOption;
                   return option.required || !option.supportsSkills;
@@ -2226,12 +2227,12 @@ export function InstallPreviewDialog({
           {advancedOpen ? (
             <div className="space-y-3 rounded-md border border-border p-3 text-xs">
               <div>
-                <label className="mb-1 block uppercase tracking-wide text-muted-foreground">Slug override</label>
+                <label className="mb-1 block uppercase tracking-wide text-muted-foreground">{tf("auto.93e7204d086bd020")}</label>
                 <Input value={slug} onChange={(event) => setSlug(event.target.value)} placeholder={defaultSlug ?? skill.slug} className="h-8" />
               </div>
               <label className="flex items-center gap-2">
                 <Checkbox checked={force} onCheckedChange={(value) => setForce(Boolean(value))} />
-                <span>Force replace existing same-key skill</span>
+                <span>{tf("auto.9ff3366735388e54")}</span>
               </label>
             </div>
           ) : null}
@@ -2245,7 +2246,7 @@ export function InstallPreviewDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isPending}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button
             variant={confirmVariant}
@@ -2317,13 +2318,13 @@ function AttachAgentsPopover({
       }}
       headerContent={sortedVersions.length > 0 ? (
         <div className="mt-2 flex items-center gap-2 text-xs">
-          <span className="shrink-0 text-muted-foreground">Version</span>
+          <span className="shrink-0 text-muted-foreground">{tf("text.Version")}</span>
           <select
             value={draftVersionId ?? "__latest__"}
             onChange={(event) => setDraftVersionId(event.target.value === "__latest__" ? null : event.target.value)}
             className="h-8 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs text-foreground"
           >
-            <option value="__latest__">Latest</option>
+            <option value="__latest__">{tf("auto.8730d3c2022abf1f")}</option>
             {sortedVersions.map((version) => (
               <option key={version.id} value={version.id}>
                 v{version.revisionNumber}{version.label ? ` · ${version.label}` : ""}
@@ -2332,7 +2333,7 @@ function AttachAgentsPopover({
           </select>
         </div>
       ) : null}
-      emptyMessage={eligible.length === 0 ? "No agents in this organization support skills yet." : "No agents yet."}
+      emptyMessage={eligible.length === 0 ? tf("auto.fabcd320554821dd") : tf("auto.8a33b2e7d85a08f8")}
       isAgentDisabled={(agent) => {
         const option = agent as AttachAgentOption;
         return option.required || !option.supportsSkills;
@@ -2344,7 +2345,7 @@ function AttachAgentsPopover({
       renderNameSuffix={(agent) => (agent as AttachAgentOption).paused ? (
         <Badge variant="outline" className="[&>svg]:size-2.5 border-amber-500/30 bg-amber-500/10 px-1.5 text-(length:--text-nano) uppercase tracking-wide text-amber-500">
           <Pause className="h-2.5 w-2.5" aria-hidden="true" />
-          Paused
+          {tf("text.Paused")}
         </Badge>
       ) : null}
     />
@@ -2483,14 +2484,14 @@ function SkillList({
         <div className="px-4 py-6 text-sm text-muted-foreground">
           No {SOURCE_FILTER_LABELS[sourceFilter].toLowerCase()} skills installed.{" "}
           <button type="button" className="text-foreground underline" onClick={onClearFilters}>
-            Clear filter
+            {tf("auto.ba59e2d4a5e39a42")}
           </button>
         </div>
       );
     }
     return (
       <div className="px-4 py-6 text-sm text-muted-foreground">
-        No skills match this filter.
+        {tf("auto.413c3fe796cc8941")}
       </div>
     );
   }
@@ -2570,10 +2571,10 @@ function SkillList({
 type SkillDetailTab = "overview" | "files" | "versions" | "agents";
 
 const SKILL_DETAIL_TABS: Array<{ value: SkillDetailTab; label: string; icon: typeof FileText }> = [
-  { value: "overview", label: "Overview", icon: FileText },
-  { value: "files", label: "Files", icon: FolderOpen },
-  { value: "versions", label: "Versions", icon: History },
-  { value: "agents", label: "Agents", icon: Users },
+  { value: "overview", label: tf("text.Overview"), icon: FileText },
+  { value: "files", label: tf("text.Files"), icon: FolderOpen },
+  { value: "versions", label: tf("auto.f89ea27036ac1d31"), icon: History },
+  { value: "agents", label: tf("text.Agents"), icon: Users },
 ];
 
 function currentVersionSelection(detail: CompanySkillDetail | null | undefined) {
@@ -2660,24 +2661,24 @@ function SkillVersionDiffDialog({
       <DialogContent className="flex max-h-(--sz-85vh) w-full !max-w-(--pct-90) flex-col overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <DialogHeader className="shrink-0">
-            <DialogTitle>Diff · skill files</DialogTitle>
+            <DialogTitle>{tf("auto.572671e75e1456d1")}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <label className="flex items-center gap-2">
-              <Badge variant="outline" className="border-red-500/30 bg-red-500/10 uppercase tracking-wider text-red-400">Old</Badge>
+              <Badge variant="outline" className="border-red-500/30 bg-red-500/10 uppercase tracking-wider text-red-400">{tf("auto.bca97160f4e1211f")}</Badge>
               <select
                 value={leftVersionId ?? ""}
                 onChange={(event) => onLeftVersionChange(event.target.value || null)}
                 className="h-8 w-44 rounded-md border border-border bg-background px-2 text-xs"
               >
-                <option value="">Initial</option>
+                <option value="">{tf("auto.1f397413e4399207")}</option>
                 {sorted.map((version) => (
                   <option key={version.id} value={version.id}>{versionLabel(version)}</option>
                 ))}
               </select>
             </label>
             <label className="flex items-center gap-2">
-              <Badge variant="outline" className="border-green-500/30 bg-green-500/10 uppercase tracking-wider text-green-400">New</Badge>
+              <Badge variant="outline" className="border-green-500/30 bg-green-500/10 uppercase tracking-wider text-green-400">{tf("auto.18fdd549b2ed367a")}</Badge>
               <select
                 value={right?.id ?? ""}
                 onChange={(event) => onRightVersionChange(event.target.value || null)}
@@ -2709,14 +2710,14 @@ function SkillVersionDiffDialog({
           </aside>
           <div className="min-w-0 flex-1 overflow-auto rounded-md border border-border text-xs">
             {!right ? (
-              <div className="p-6 text-center text-sm text-muted-foreground">Select a version to compare.</div>
+              <div className="p-6 text-center text-sm text-muted-foreground">{tf("auto.710e9cc79794e8b8")}</div>
             ) : left?.id === right.id ? (
-              <div className="p-6 text-center text-sm text-muted-foreground">Both sides are the same version.</div>
+              <div className="p-6 text-center text-sm text-muted-foreground">{tf("auto.c7a36674522c7142")}</div>
             ) : (
               <div className="font-mono text-xs leading-6">
                 <div className="grid grid-cols-(--gtc-1) border-b border-border/60 bg-muted/30 px-3 py-2 text-(length:--text-micro) uppercase tracking-wide text-muted-foreground">
-                  <span>Old</span>
-                  <span>New</span>
+                  <span>{tf("auto.bca97160f4e1211f")}</span>
+                  <span>{tf("auto.18fdd549b2ed367a")}</span>
                   <span />
                   <span>{effectivePath}</span>
                 </div>
@@ -2756,7 +2757,7 @@ function SkillLocationCard({
   const canonical = folderPath && folderPath.length > 0 ? folderPath : "Unfiled";
   return (
     <section>
-      <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Location</div>
+      <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.15b61974b2707a7b")}</div>
       <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-2.5 py-1.5">
         <FolderOpen className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         <span className="min-w-0 flex-1 truncate font-mono text-xs text-foreground" title={canonical}>{canonical}</span>
@@ -2775,7 +2776,7 @@ function SkillLocationCard({
         {onMove ? (
           <Button size="sm" variant="outline" onClick={onMove}>
             <FolderInput className="mr-1.5 h-3.5 w-3.5" />
-            Move
+            {tf("auto.6ecc3df6bffdd06c")}
           </Button>
         ) : null}
       </div>
@@ -2810,7 +2811,7 @@ function SkillTagsEditor({
     <section>
       <div className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         <Hash className="h-3 w-3" />
-        Tags
+        {tf("text.Tags")}
       </div>
       <div className="flex flex-wrap gap-1.5">
         {categories.map((tag) => (
@@ -2831,7 +2832,7 @@ function SkillTagsEditor({
           </span>
         ))}
         {categories.length === 0 ? (
-          <span className="text-xs text-muted-foreground">No tags yet.</span>
+          <span className="text-xs text-muted-foreground">{tf("auto.431f9060023576b9")}</span>
         ) : null}
       </div>
       <Input
@@ -2844,7 +2845,7 @@ function SkillTagsEditor({
           }
         }}
         onBlur={() => draft.trim() && addTag(draft)}
-        placeholder="Add a tag…"
+        placeholder={tf("auto.d0218e9140e482e5")}
         disabled={pending}
         className="mt-2 h-8 text-sm"
       />
@@ -2986,7 +2987,7 @@ export function SkillDetailPage({
   }, [isDirty]);
 
   if (!detail) {
-    return loading ? <PageSkeleton variant="detail" /> : <EmptyState icon={Boxes} message="Skill not found." />;
+    return loading ? <PageSkeleton variant="detail" /> : <EmptyState icon={Boxes} message={tf("auto.97cd06e1a48e2a01")} />;
   }
 
   const skill = detail;
@@ -3037,7 +3038,7 @@ export function SkillDetailPage({
     return (
       <div className="grid min-h-(--sz-560px) gap-0 lg:grid-cols-(--gtc-28)">
         <aside className="border-b border-border pb-3 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-3">
-          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Files</div>
+          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Files")}</div>
           <SkillTree
             nodes={buildTree(skill.fileInventory)}
             skillId={skill.id}
@@ -3058,20 +3059,20 @@ export function SkillDetailPage({
                     className={cn("px-3 py-1.5 text-sm", viewMode === "preview" ? "text-foreground" : "text-muted-foreground")}
                     onClick={() => setViewMode("preview")}
                   >
-                    <span className="flex items-center gap-1.5"><Eye className="h-3.5 w-3.5" /> View</span>
+                    <span className="flex items-center gap-1.5"><Eye className="h-3.5 w-3.5" /> {tf("text.View")}</span>
                   </button>
                   <button
                     className={cn("border-l border-border px-3 py-1.5 text-sm", viewMode === "code" ? "text-foreground" : "text-muted-foreground")}
                     onClick={() => setViewMode("code")}
                   >
-                    <span className="flex items-center gap-1.5"><Code2 className="h-3.5 w-3.5" /> Code</span>
+                    <span className="flex items-center gap-1.5"><Code2 className="h-3.5 w-3.5" /> {tf("auto.340f463033e0fd5d")}</span>
                   </button>
                 </div>
               ) : null}
               {skill.editable && file?.editable ? (
                 editMode ? (
                   <>
-                    <Button variant="ghost" size="sm" onClick={() => setEditMode(false)} disabled={savePending}>Cancel</Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditMode(false)} disabled={savePending}>{tf("text.Cancel")}</Button>
                     <Button size="sm" onClick={onSave} disabled={savePending}>
                       <Save className="mr-1.5 h-3.5 w-3.5" />
                       {savePending ? "Saving..." : "Save"}
@@ -3079,7 +3080,7 @@ export function SkillDetailPage({
                   </>
                 ) : (
                   <Button variant="ghost" size="sm" onClick={() => setEditMode(true)}>
-                    <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
+                    <Pencil className="mr-1.5 h-3.5 w-3.5" /> {tf("text.Edit")}
                   </Button>
                 )
               ) : !skill.editable ? (
@@ -3091,7 +3092,7 @@ export function SkillDetailPage({
                   title={skill.editableReason ?? "Fork this skill to edit it."}
                 >
                   <GitFork className="mr-1.5 h-3.5 w-3.5" />
-                  Fork
+                  {tf("auto.8e5b1a73152cf01c")}
                 </Button>
               ) : null}
             </div>
@@ -3099,7 +3100,7 @@ export function SkillDetailPage({
           {fileLoading ? (
             <PageSkeleton variant="detail" />
           ) : !file ? (
-            <div className="text-sm text-muted-foreground">Select a file to inspect.</div>
+            <div className="text-sm text-muted-foreground">{tf("auto.a0b86e47403ff914")}</div>
           ) : editMode && file.editable ? (
             file.markdown ? (
               <MarkdownEditor value={draft} onChange={setDraft} bordered={false} className="min-h-(--sz-520px)" />
@@ -3126,7 +3127,7 @@ export function SkillDetailPage({
     return (
       <div className="space-y-6">
         <section>
-          <h2 className="mb-2 text-sm font-medium">About</h2>
+          <h2 className="mb-2 text-sm font-medium">{tf("auto.4efca0d10c5feb8e")}</h2>
           {fileLoading ? (
             <PageSkeleton variant="detail" />
           ) : file?.markdown ? (
@@ -3137,28 +3138,28 @@ export function SkillDetailPage({
         </section>
         <section className="grid min-w-0 gap-3 text-sm sm:grid-cols-2">
           <div className="min-w-0 border-b border-border py-2">
-            <div className="text-xs text-muted-foreground">Key</div>
+            <div className="text-xs text-muted-foreground">{tf("text.Key")}</div>
             <div className="mt-1 truncate font-mono">{skill.key}</div>
           </div>
           <div className="min-w-0 border-b border-border py-2">
-            <div className="text-xs text-muted-foreground">Source</div>
+            <div className="text-xs text-muted-foreground">{tf("text.Source")}</div>
             <div className="mt-1 min-w-0 [overflow-wrap:anywhere]">{sourceLocatorText ?? source.label}</div>
           </div>
           <div className="min-w-0 border-b border-border py-2">
-            <div className="text-xs text-muted-foreground">Version</div>
+            <div className="text-xs text-muted-foreground">{tf("text.Version")}</div>
             <div className="mt-1">{versionLabel(skill.currentVersion ?? null)}</div>
           </div>
           <div className="min-w-0 border-b border-border py-2">
-            <div className="text-xs text-muted-foreground">Mode</div>
+            <div className="text-xs text-muted-foreground">{tf("auto.5e23ec6a300dc60a")}</div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {skill.editable ? (
                 "Editable"
               ) : (
                 <>
-                  <span>Read only</span>
+                  <span>{tf("auto.8ac767353080eae7")}</span>
                   <Button type="button" variant="outline" size="xs" onClick={onFork}>
                     <GitFork className="mr-1 h-3 w-3" />
-                    Fork
+                    {tf("auto.8e5b1a73152cf01c")}
                   </Button>
                 </>
               )}
@@ -3183,14 +3184,14 @@ export function SkillDetailPage({
             onClick={() => openVersionDiff()}
             disabled={sortedVersions.length < 2}
           >
-            <History className="mr-1.5 h-3.5 w-3.5" /> Compare
+            <History className="mr-1.5 h-3.5 w-3.5" /> {tf("auto.e888155d8c7d2e3c")}
           </Button>
         </div>
         <div className="border-y border-border">
           {versionsLoading ? (
             <PageSkeleton variant="list" />
           ) : sortedVersions.length === 0 ? (
-            <div className="py-6 text-sm text-muted-foreground">No saved versions yet.</div>
+            <div className="py-6 text-sm text-muted-foreground">{tf("auto.745127105a41bf17")}</div>
           ) : (
             sortedVersions.map((version) => (
               <div key={version.id} className="grid gap-2 border-b border-border px-0 py-3 text-sm last:border-b-0 sm:grid-cols-(--gtc-13)">
@@ -3206,7 +3207,7 @@ export function SkillDetailPage({
                   size="sm"
                   onClick={() => openVersionDiff(version.id)}
                 >
-                  View diff
+                  {tf("auto.0e5d6873018e6c69")}
                 </Button>
               </div>
             ))
@@ -3247,7 +3248,7 @@ export function SkillDetailPage({
         </div>
         {attached.length === 0 ? (
           <div className="rounded-md border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
-            No agents are using this skill yet. Use “Add to agent” to attach it.
+            {tf("auto.6c429b7f68424de8")}
           </div>
         ) : (
           <div className="border-y border-border">
@@ -3262,7 +3263,7 @@ export function SkillDetailPage({
                       {meta?.paused ? (
                         <Badge variant="outline" className="[&>svg]:size-2.5 border-amber-500/30 bg-amber-500/10 px-1.5 text-(length:--text-nano) uppercase tracking-wide text-amber-500">
                           <Pause className="h-2.5 w-2.5" aria-hidden="true" />
-                          Paused
+                          {tf("text.Paused")}
                         </Badge>
                       ) : null}
                     </div>
@@ -3272,7 +3273,7 @@ export function SkillDetailPage({
                     to={`/agents/${agent.urlKey}/skills`}
                     className="shrink-0 text-xs text-muted-foreground no-underline hover:text-foreground"
                   >
-                    View
+                    {tf("text.View")}
                   </Link>
                 </div>
               );
@@ -3367,7 +3368,7 @@ export function SkillDetailPage({
             <Button variant="outline" size="sm" asChild>
               <Link to={resolvedStudioHref}>
                 <FlaskConical className="mr-1.5 h-3.5 w-3.5" />
-                Open in Studio
+                {tf("auto.27661534054e8fac")}
               </Link>
             </Button>
             <div className="flex items-center overflow-hidden rounded-md border border-border">
@@ -3379,14 +3380,14 @@ export function SkillDetailPage({
                     <span className="hidden sm:inline">{detail.attachedAgentCount === 1 ? "install" : "installs"}</span>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>Agents in this organization that currently have this skill installed.</TooltipContent>
+                <TooltipContent>{tf("auto.1af2431b38927164")}</TooltipContent>
               </Tooltip>
               <button
                 type="button"
                 onClick={onToggleStar}
                 disabled={starPending}
                 className="inline-flex items-center gap-1.5 border-l border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground disabled:opacity-50"
-                title={detail.starredByCurrentActor ? "Unstar this skill" : "Star this skill"}
+                title={detail.starredByCurrentActor ? tf("auto.14e4463f737bbdbf") : tf("auto.ba42a65ced17e7c0")}
               >
                 <Star className={cn("h-3.5 w-3.5", detail.starredByCurrentActor && "fill-current text-yellow-400")} />
                 <span className="hidden sm:inline">{detail.starredByCurrentActor ? "Starred" : "Star"}</span>
@@ -3396,10 +3397,10 @@ export function SkillDetailPage({
                 type="button"
                 onClick={onFork}
                 className="inline-flex items-center gap-1.5 border-l border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground"
-                title="Fork this skill"
+                title={tf("auto.1525ade070c6951a")}
               >
                 <GitFork className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Fork</span>
+                <span className="hidden sm:inline">{tf("auto.8e5b1a73152cf01c")}</span>
                 <span className="font-medium text-foreground">{detail.forkCount}</span>
               </button>
             </div>
@@ -3438,7 +3439,7 @@ export function SkillDetailPage({
             onSave={(categories) => onUpdateSettings({ categories, sharingScope: detail.sharingScope === "public_link" ? "company" : detail.sharingScope })}
           />
           <section>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Agents</div>
+            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Agents")}</div>
             <div className="space-y-3">
               {/* Big primary action opens the agent multi-selector (PAP-10907). */}
               <AttachAgentsPopover
@@ -3451,7 +3452,7 @@ export function SkillDetailPage({
                 fullWidth
               />
               {detail.usedByAgents.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No agents attached yet.</p>
+                <p className="text-xs text-muted-foreground">{tf("auto.f1f6db9a1d6b09dd")}</p>
               ) : (
                 <div className="space-y-0.5">
                   {/* Preview up to three attached agents, then summarise the rest. */}
@@ -3466,7 +3467,7 @@ export function SkillDetailPage({
                         <AgentIcon icon={meta?.icon ?? null} className="h-4 w-4 shrink-0 text-muted-foreground" />
                         <span className="min-w-0 flex-1 truncate text-foreground">{agent.name}</span>
                         {meta?.paused ? (
-                          <Pause className="h-3 w-3 shrink-0 text-amber-500" aria-label="Paused" />
+                          <Pause className="h-3 w-3 shrink-0 text-amber-500" aria-label={tf("text.Paused")} />
                         ) : null}
                       </Link>
                     );
@@ -3485,7 +3486,7 @@ export function SkillDetailPage({
               available. Bundled/catalog skills surface their source label too
               (PAP-10907). */}
           <section>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Source</div>
+            <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Source")}</div>
             {githubSource ? (
               <div className="flex items-start gap-2 text-sm">
                 <GithubIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -3541,20 +3542,20 @@ export function SkillDetailPage({
               (PAP-10907 F). Only GitHub-sourced skills can pull updates. */}
           {detail.sourceType === "github" ? (
             <section>
-              <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Updates</div>
+              <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Updates")}</div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Pin className="h-3.5 w-3.5 shrink-0" aria-label="Pinned source revision" />
+                      <Pin className="h-3.5 w-3.5 shrink-0" aria-label={tf("auto.cf783ad7a3484b3d")} />
                     </TooltipTrigger>
-                    <TooltipContent>Pinned source revision</TooltipContent>
+                    <TooltipContent>{tf("auto.cf783ad7a3484b3d")}</TooltipContent>
                   </Tooltip>
                   <span className="truncate font-mono text-foreground">{currentPin ?? "untracked"}</span>
                 </div>
                 <Button variant="outline" size="sm" className="w-full" onClick={onCheckUpdates} disabled={checkUpdatesPending || updateStatusLoading}>
                   <RefreshCw className={cn("mr-1.5 h-3.5 w-3.5", (checkUpdatesPending || updateStatusLoading) && "animate-spin")} />
-                  Check for updates
+                  {tf("auto.f26f3275e735bdf6")}
                 </Button>
                 {updateStatus?.supported && updateStatus.hasUpdate ? (
                   <Button size="sm" className="w-full" onClick={onInstallUpdate} disabled={installUpdatePending}>
@@ -3562,7 +3563,7 @@ export function SkillDetailPage({
                     Install update{latestPin ? ` ${latestPin}` : ""}
                   </Button>
                 ) : updateStatus?.supported && !updateStatus.hasUpdate && !updateStatusLoading ? (
-                  <p className="text-xs text-muted-foreground">Up to date.</p>
+                  <p className="text-xs text-muted-foreground">{tf("auto.50620fd9619f77e6")}</p>
                 ) : null}
               </div>
             </section>
@@ -3581,7 +3582,7 @@ export function SkillDetailPage({
               className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground"
             >
               <Settings className="h-4 w-4 shrink-0" />
-              <span className="flex-1">Settings</span>
+              <span className="flex-1">{tf("text.Settings")}</span>
             </button>
           </section>
         </aside>
@@ -3591,7 +3592,7 @@ export function SkillDetailPage({
           unsaved state is obvious (PAP-10907 J). */}
       {isDirty ? (
         <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-background/95 px-4 py-2 shadow-lg backdrop-blur">
-          <span className="text-sm text-muted-foreground">Unsaved changes</span>
+          <span className="text-sm text-muted-foreground">{tf("auto.a710c2b90913b537")}</span>
           <Button
             variant="ghost"
             size="sm"
@@ -3601,7 +3602,7 @@ export function SkillDetailPage({
             }}
             disabled={savePending}
           >
-            Discard
+            {tf("auto.eb1a70e39274bb76")}
           </Button>
           <Button size="sm" onClick={onSave} disabled={savePending}>
             <Save className="mr-1.5 h-3.5 w-3.5" />
@@ -3613,33 +3614,33 @@ export function SkillDetailPage({
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Skill settings</DialogTitle>
+            <DialogTitle>{tf("auto.993ad1be7624fbb0")}</DialogTitle>
             <DialogDescription>Manage how {detail.name} is grouped and shared.</DialogDescription>
           </DialogHeader>
           <div className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Categories</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.b8b1d894c6837252")}</label>
               <Input
                 value={settingsCategoryDraft}
                 onChange={(event) => setSettingsCategoryDraft(event.target.value)}
-                placeholder="engineering, review, memory"
+                placeholder={tf("auto.60bdd3ca934986f7")}
                 className="h-9"
                 disabled={updateSettingsPending}
               />
-              <p className="text-xs text-muted-foreground">Separate categories with commas. Leave empty to clear categories.</p>
+              <p className="text-xs text-muted-foreground">{tf("auto.89128ea74d437628")}</p>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Sharing</label>
+              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.bbedc70e985fe0b6")}</label>
               <select
                 value={settingsSharingScope}
                 onChange={(event) => setSettingsSharingScope(event.target.value as Exclude<CompanySkillSharingScope, "public_link">)}
                 disabled={updateSettingsPending}
                 className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm text-foreground"
               >
-                <option value="company">Organization — visible inside this organization</option>
-                <option value="private">Private — only visible in your library</option>
+                <option value="company">{tf("auto.aee13df87e630722")}</option>
+                <option value="private">{tf("auto.4a8a9defe8c7bad5")}</option>
               </select>
-              <p className="text-xs text-muted-foreground">Public link sharing is coming later.</p>
+              <p className="text-xs text-muted-foreground">{tf("auto.470c9a79742464e5")}</p>
             </div>
             <div className="flex justify-end gap-2 border-t border-border pt-4">
               <Button
@@ -3652,7 +3653,7 @@ export function SkillDetailPage({
                 }}
                 disabled={!settingsDirty || updateSettingsPending}
               >
-                Reset
+                {tf("text.Reset")}
               </Button>
               <Button
                 type="button"
@@ -3666,9 +3667,9 @@ export function SkillDetailPage({
             </div>
             {detail.editable ? (
               <div className="rounded-md border border-destructive/40 p-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-destructive">Danger zone</div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-destructive">{tf("auto.fd8b8dae44216610")}</div>
                 <div className="mt-2 flex items-center justify-between gap-3">
-                  <p className="min-w-0 text-xs text-muted-foreground">Remove this skill from the organization library.</p>
+                  <p className="min-w-0 text-xs text-muted-foreground">{tf("auto.0677f58c2053b99e")}</p>
                   <Button
                     variant="destructive"
                     size="sm"
@@ -3748,7 +3749,7 @@ function SkillPane({
     return (
       <EmptyState
         icon={Boxes}
-        message="Select a skill to inspect its files."
+        message={tf("auto.f3676e18425eb692")}
       />
     );
   }
@@ -3782,7 +3783,7 @@ function SkillPane({
             <Button variant="outline" size="sm" asChild>
               <Link to={skillStudioRoute(detail.id)}>
                 <FlaskConical className="mr-1.5 h-3.5 w-3.5" />
-                Open in Studio
+                {tf("auto.27661534054e8fac")}
               </Link>
             </Button>
             <Button
@@ -3812,7 +3813,7 @@ function SkillPane({
         <div className="mt-4 space-y-3 border-t border-border pt-4 text-sm">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <div className="flex min-w-0 items-center gap-2">
-              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Source</span>
+              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">{tf("text.Source")}</span>
               <span className="flex min-w-0 items-center gap-2">
                 <SourceIcon className="h-3.5 w-3.5 text-muted-foreground" />
                 {detail.sourcePath && displaySourcePath ? (
@@ -3827,7 +3828,7 @@ function SkillPane({
                       text={detail.sourcePath}
                       copiedLabel="Copied path"
                       ariaLabel="Copy source path"
-                      title="Copy source path"
+                      title={tf("auto.4168898a5819d4f2")}
                       className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                     >
                       <Copy className="h-3.5 w-3.5" />
@@ -3840,7 +3841,7 @@ function SkillPane({
             </div>
             {detail.sourceType === "github" && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Pin</span>
+                <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">{tf("auto.ff1cee74414621d8")}</span>
                 <span className="font-mono text-xs">{currentPin ?? "untracked"}</span>
                 {updateStatus?.trackingRef && (
                   <span className="text-xs text-muted-foreground">tracking {updateStatus.trackingRef}</span>
@@ -3852,7 +3853,7 @@ function SkillPane({
                   disabled={checkUpdatesPending || updateStatusLoading}
                 >
                   <RefreshCw className={cn("mr-1.5 h-3.5 w-3.5", (checkUpdatesPending || updateStatusLoading) && "animate-spin")} />
-                  Check for updates
+                  {tf("auto.f26f3275e735bdf6")}
                 </Button>
                 {updateStatus?.supported && updateStatus.hasUpdate && (
                   <Button
@@ -3865,7 +3866,7 @@ function SkillPane({
                   </Button>
                 )}
                 {updateStatus?.supported && !updateStatus.hasUpdate && !updateStatusLoading && (
-                  <span className="text-xs text-muted-foreground">Up to date</span>
+                  <span className="text-xs text-muted-foreground">{tf("auto.ce29b7f85b9eaf7d")}</span>
                 )}
                 {!updateStatus?.supported && updateStatus?.reason && (
                   <span className="text-xs text-muted-foreground">{updateStatus.reason}</span>
@@ -3873,16 +3874,16 @@ function SkillPane({
               </div>
             )}
             <div className="flex items-center gap-2">
-              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Key</span>
+              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">{tf("text.Key")}</span>
               <span className="font-mono text-xs">{detail.key}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Mode</span>
+              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">{tf("auto.5e23ec6a300dc60a")}</span>
               <span>{detail.editable ? "Editable" : "Read only"}</span>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Trust</span>
+            <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">{tf("auto.ade9248e0132b411")}</span>
             <TrustChip level={detail.trustLevel} />
             <CompatChip compatibility={detail.compatibility} />
             {readonlyMetadataValue(detail.metadata, "userModifiedAt") ? (
@@ -3890,10 +3891,10 @@ function SkillPane({
                 <TooltipTrigger asChild>
                   <Badge variant="outline" className="border-violet-500/40 bg-violet-500/10 text-(length:--text-micro) text-violet-200">
                     <Pencil className="h-3 w-3" aria-hidden="true" />
-                    Locally modified
+                    {tf("auto.f5421a4ef27554fc")}
                   </Badge>
                 </TooltipTrigger>
-                <TooltipContent>You have edited this skill after installing. Updates from the catalog will overwrite your changes.</TooltipContent>
+                <TooltipContent>{tf("auto.6e9ffad0549aacc4")}</TooltipContent>
               </Tooltip>
             ) : null}
             {(() => {
@@ -3904,7 +3905,7 @@ function SkillPane({
           </div>
           <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Used by</span>
+              <span className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">{tf("auto.681bf81aba87bd68")}</span>
               <AttachAgentsPopover
                 agents={attachAgents}
                 attachedAgentIds={usedBy.map((agent) => agent.id)}
@@ -3915,7 +3916,7 @@ function SkillPane({
               />
             </div>
             {usedBy.length === 0 ? (
-              <span className="text-muted-foreground">No agents attached</span>
+              <span className="text-muted-foreground">{tf("auto.c7e39989df90e087")}</span>
             ) : (
               <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {usedBy.map((agent) => (
@@ -3947,7 +3948,7 @@ function SkillPane({
                 >
                   <span className="flex items-center gap-1.5">
                     <Eye className="h-3.5 w-3.5" />
-                    View
+                    {tf("text.View")}
                   </span>
                 </button>
                 <button
@@ -3956,7 +3957,7 @@ function SkillPane({
                 >
                   <span className="flex items-center gap-1.5">
                     <Code2 className="h-3.5 w-3.5" />
-                    Code
+                    {tf("auto.340f463033e0fd5d")}
                   </span>
                 </button>
               </div>
@@ -3964,7 +3965,7 @@ function SkillPane({
             {editMode && file?.editable && (
               <>
                 <Button variant="ghost" size="sm" onClick={() => setEditMode(false)} disabled={savePending}>
-                  Cancel
+                  {tf("text.Cancel")}
                 </Button>
                 <Button size="sm" onClick={onSave} disabled={savePending}>
                   <Save className="mr-1.5 h-3.5 w-3.5" />
@@ -3980,7 +3981,7 @@ function SkillPane({
         {fileLoading ? (
           <PageSkeleton variant="detail" />
         ) : !file ? (
-          <div className="text-sm text-muted-foreground">Select a file to inspect.</div>
+          <div className="text-sm text-muted-foreground">{tf("auto.a0b86e47403ff914")}</div>
         ) : editMode && file.editable ? (
           file.markdown ? (
             <MarkdownEditor
@@ -4360,13 +4361,13 @@ export function CompanySkills() {
   const activeDetail = detailQuery.data ?? displayedDetail;
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Skills", href: "/skills" },
+      { label: tf("text.Skills"), href: "/skills" },
       ...(isStudioNew
         ? [{ label: studioForkFromId ? "Fork skill" : "New skill" }]
         : activeDetail
           ? skillDetailBreadcrumbs(activeDetail, skillFoldersQuery.data).slice(1)
           : routeSkillToken
-            ? [{ label: "Detail" }]
+            ? [{ label: tf("auto.fb5f27d5457c4641") }]
             : []),
     ]);
   }, [activeDetail, isStudioNew, routeSkillToken, setBreadcrumbs, skillFoldersQuery.data, studioForkFromId]);
@@ -4403,11 +4404,11 @@ export function CompanySkills() {
       if (result.imported[0]) navigate(routeForSkill(result.imported[0]));
       pushToast({
         tone: "success",
-        title: "Skills imported",
+        title: tf("auto.9894287afa0ffe79"),
         body: `${result.imported.length} skill${result.imported.length === 1 ? "" : "s"} added.`,
       });
       if (result.warnings[0]) {
-        pushToast({ tone: "warn", title: "Import warnings", body: result.warnings[0] });
+        pushToast({ tone: "warn", title: tf("auto.39b2572fa78db656"), body: result.warnings[0] });
       }
       setSource("");
     },
@@ -4436,19 +4437,19 @@ export function CompanySkills() {
       setScanStatusMessage(summary);
       pushToast({
         tone: "success",
-        title: "Project skill scan complete",
+        title: tf("auto.c5777db8ff4aecb3"),
         body: summary,
       });
       if (result.conflicts[0]) {
         pushToast({
           tone: "warn",
-          title: "Skill conflicts found",
+          title: tf("auto.c87af51bb66cb0b8"),
           body: result.conflicts[0].reason,
         });
       } else if (result.warnings[0]) {
         pushToast({
           tone: "warn",
-          title: "Scan warnings",
+          title: tf("auto.3046a467ad61acc5"),
           body: result.warnings[0],
         });
       }
@@ -4473,7 +4474,7 @@ export function CompanySkills() {
       });
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to create skill.";
+      const message = error instanceof Error ? error.message: tf("auto.993d12daccdd2de0");
       setCreateError(message);
       reportSkillError(error, "Skill creation failed", "Failed to create skill.", "Creating a skill");
     },
@@ -4496,15 +4497,15 @@ export function CompanySkills() {
       setEditMode(false);
       pushToast({
         tone: "success",
-        title: "Skill saved",
+        title: tf("auto.a6663eb3336cdf0d"),
         body: result.path,
       });
     },
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Save failed",
-        body: error instanceof Error ? error.message : "Failed to save skill file.",
+        title: tf("auto.53ad6f999b1f062f"),
+        body: error instanceof Error ? error.message: tf("auto.192171d96fcbc813"),
       });
     },
   });
@@ -4526,8 +4527,8 @@ export function CompanySkills() {
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Star failed",
-        body: error instanceof Error ? error.message : "Failed to update star.",
+        title: tf("auto.e00d7aba5f98aa39"),
+        body: error instanceof Error ? error.message: tf("auto.59b153709ee8cb30"),
       });
     },
   });
@@ -4548,13 +4549,13 @@ export function CompanySkills() {
         queryClient.invalidateQueries({ queryKey: queryKeys.companySkills.list(selectedCompanyId!) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.companySkills.detail(selectedCompanyId!, skill.id) }),
       ]);
-      pushToast({ tone: "success", title: "Skill settings updated", body: skillSettingsToastBody(skill) });
+      pushToast({ tone: "success", title: tf("auto.0518d5b3128f74f3"), body: skillSettingsToastBody(skill) });
     },
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Skill settings update failed",
-        body: error instanceof Error ? error.message : "Failed to update skill settings.",
+        title: tf("auto.0b3791ccd9b3a7b6"),
+        body: error instanceof Error ? error.message: tf("auto.170db964716a10df"),
       });
     },
   });
@@ -4571,7 +4572,7 @@ export function CompanySkills() {
       navigate(routeForSkill(skill, selectedPath));
       pushToast({
         tone: "success",
-        title: "Skill updated",
+        title: tf("auto.575784e36c75a5d0"),
         body: skill.sourceRef ? `Pinned to ${shortRef(skill.sourceRef)}` : skill.name,
       });
     },
@@ -4740,19 +4741,19 @@ export function CompanySkills() {
       if (enableFailures > 0) {
         pushToast({
           tone: "warn",
-          title: "Skill installed, but enabling failed",
+          title: tf("auto.7f2185b5d2fabf6b"),
           body: `Could not enable ${result.skill.name} for ${enableFailures} agent${enableFailures === 1 ? "" : "s"}. Use "Add to agent" on the skill page.`,
         });
       }
       if (result.warnings[0]) {
-        pushToast({ tone: "warn", title: "Install warnings", body: result.warnings[0] });
+        pushToast({ tone: "warn", title: tf("auto.fe952c249770019a"), body: result.warnings[0] });
       }
       if (result.action === "created") {
         navigate(routeForSkill(result.skill));
       }
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to install catalog skill.";
+      const message = error instanceof Error ? error.message: tf("auto.45adf7113b8fe805");
       setInstallDialogState((current) => ({ ...current, error: message }));
       // Also surface explicit-policy / platform denials in the persistent banner
       // so the reason stays visible after the dialog closes.
@@ -4781,21 +4782,21 @@ export function CompanySkills() {
         } catch (moveError) {
           pushToast({
             tone: "error",
-            title: "Folder created, move failed",
-            body: moveError instanceof Error ? moveError.message : "Failed to move the selected skills.",
+            title: tf("auto.cc944912a7387787"),
+            body: moveError instanceof Error ? moveError.message: tf("auto.295a30ee3300d0b3"),
           });
           return;
         }
       } else {
         setFolderSelection(folder.id);
       }
-      pushToast({ tone: "success", title: "Folder created", body: folder.name });
+      pushToast({ tone: "success", title: tf("auto.b1dfe0e9670cba07"), body: folder.name });
     },
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Folder save failed",
-        body: error instanceof Error ? error.message : "Failed to save folder.",
+        title: tf("auto.b0b2fe03ac2afae4"),
+        body: error instanceof Error ? error.message: tf("auto.d26c3288c781eadf"),
       });
     },
   });
@@ -4810,8 +4811,8 @@ export function CompanySkills() {
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Folder save failed",
-        body: error instanceof Error ? error.message : "Failed to update folder.",
+        title: tf("auto.b0b2fe03ac2afae4"),
+        body: error instanceof Error ? error.message: tf("auto.72be324de8685f78"),
       });
     },
   });
@@ -4823,15 +4824,15 @@ export function CompanySkills() {
       setFolderSelection(folder.id);
       pushToast({
         tone: "success",
-        title: "Folder moved",
+        title: tf("auto.03adda2e37b9198e"),
         body: skillFolderPathDisplayFallback(folder.path) ?? folder.name,
       });
     },
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Folder move failed",
-        body: error instanceof Error ? error.message : "Failed to move folder.",
+        title: tf("auto.4adda1bcbe270331"),
+        body: error instanceof Error ? error.message: tf("auto.8f6b0ac27b886630"),
       });
     },
   });
@@ -4844,13 +4845,13 @@ export function CompanySkills() {
         queryClient.invalidateQueries({ queryKey: queryKeys.companySkills.list(selectedCompanyId!) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.folders.list(selectedCompanyId!, "skill") }),
       ]);
-      pushToast({ tone: "success", title: "Folder deleted", body: "Skills moved to Unfiled." });
+      pushToast({ tone: "success", title: tf("auto.796dc50ba898b20e"), body: "Skills moved to Unfiled." });
     },
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Folder delete failed",
-        body: error instanceof Error ? error.message : "Failed to delete folder.",
+        title: tf("auto.cdb83bbddabd2dff"),
+        body: error instanceof Error ? error.message: tf("auto.d6b6dd50c8594b5c"),
       });
     },
   });
@@ -4866,8 +4867,8 @@ export function CompanySkills() {
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Move failed",
-        body: error instanceof Error ? error.message : "Failed to move skill.",
+        title: tf("auto.55185d67bf51c3f1"),
+        body: error instanceof Error ? error.message: tf("auto.494bdeb68d819f6b"),
       });
     },
   });
@@ -4883,12 +4884,12 @@ export function CompanySkills() {
         queryClient.invalidateQueries({ queryKey: queryKeys.companySkills.list(selectedCompanyId!) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.folders.list(selectedCompanyId!, "skill") }),
       ]);
-      pushToast({ tone: "success", title: "Skills moved", body: `${ids.length} skill${ids.length === 1 ? "" : "s"} filed.` });
+      pushToast({ tone: "success", title: tf("auto.7d315bbc84ea4b0a"), body: `${ids.length} skill${ids.length === 1 ? "" : "s"} filed.` });
     } catch (moveError) {
       pushToast({
         tone: "error",
-        title: "Failed to move skills",
-        body: moveError instanceof Error ? moveError.message : "Failed to move the selected skills.",
+        title: tf("auto.7eeade8600860ab1"),
+        body: moveError instanceof Error ? moveError.message: tf("auto.295a30ee3300d0b3"),
       });
     }
   }
@@ -4903,8 +4904,8 @@ export function CompanySkills() {
     onError: (error) => {
       pushToast({
         tone: "error",
-        title: "Couldn't open My Skills",
-        body: error instanceof Error ? error.message : "Failed to create your personal folder.",
+        title: tf("auto.41e651acd494d0ae"),
+        body: error instanceof Error ? error.message: tf("auto.e45066fd7159b9ce"),
       });
     },
   });
@@ -4962,8 +4963,8 @@ export function CompanySkills() {
     } catch (error) {
       pushToast({
         tone: "error",
-        title: "Folder create failed",
-        body: error instanceof Error ? error.message : "Failed to create folder.",
+        title: tf("auto.f21798af3cffc31a"),
+        body: error instanceof Error ? error.message: tf("auto.e1c450fd01ebec8b"),
       });
       return null;
     }
@@ -4995,8 +4996,8 @@ export function CompanySkills() {
     } catch (moveError) {
       pushToast({
         tone: "error",
-        title: "Move failed",
-        body: moveError instanceof Error ? moveError.message : "Failed to move.",
+        title: tf("auto.55185d67bf51c3f1"),
+        body: moveError instanceof Error ? moveError.message: tf("auto.ebe20e29be0a872c"),
       });
     }
   }
@@ -5063,9 +5064,9 @@ export function CompanySkills() {
         }
         await attachAgentsMutation.mutateAsync({ agentId, desiredSkills: currentEntries });
       }
-      pushToast({ tone: "success", title: "Agents updated", body: `${nextAgentIds.length} agent(s) attached.` });
+      pushToast({ tone: "success", title: tf("auto.b40dde5b70fd9417"), body: `${nextAgentIds.length} agent(s) attached.` });
     } catch (error) {
-      pushToast({ tone: "error", title: "Update failed", body: error instanceof Error ? error.message : "Failed to update agent skills." });
+      pushToast({ tone: "error", title: tf("auto.e58282fd73fb8580"), body: error instanceof Error ? error.message: tf("auto.f491569a7cec22f8") });
     }
   }
 
@@ -5115,7 +5116,7 @@ export function CompanySkills() {
       navigate("/skills", { replace: true });
       pushToast({
         tone: "success",
-        title: "Skill removed",
+        title: tf("auto.5f6ba69d66d11321"),
         body: `${skill.name} was removed from the organization skill library.`,
       });
     },
@@ -5161,7 +5162,7 @@ export function CompanySkills() {
   );
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Boxes} message="Select an organization to manage skills." />;
+    return <EmptyState icon={Boxes} message={tf("auto.ff13cce79de05952")} />;
   }
 
   function handleAddSkillSource() {
@@ -5213,9 +5214,9 @@ export function CompanySkills() {
       <Dialog open={deleteOpen} onOpenChange={closeDeleteDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Remove skill</DialogTitle>
+            <DialogTitle>{tf("auto.a8597db6f24b4ea1")}</DialogTitle>
             <DialogDescription>
-              Remove this skill from the organization library. If any agents still use it, removal will be blocked until it is detached.
+              {tf("auto.fb004b1f95eb5726")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 text-sm">
@@ -5231,19 +5232,19 @@ export function CompanySkills() {
             ) : null}
             {(deleteTargetDetail?.usedByAgents.length ?? 0) > 0 ? (
               <p className="text-muted-foreground">
-                Detach this skill from all agents to enable removal.
+                {tf("auto.90f22064f2dba280")}
               </p>
             ) : null}
           </div>
           <DialogFooter>
             {(deleteTargetDetail?.usedByAgents.length ?? 0) > 0 ? (
               <Button variant="ghost" onClick={() => closeDeleteDialog(false)}>
-                Close
+                {tf("text.Close")}
               </Button>
             ) : (
               <>
                 <Button variant="ghost" onClick={() => closeDeleteDialog(false)} disabled={deleteSkill.isPending}>
-                  Cancel
+                  {tf("text.Cancel")}
                 </Button>
                 <Button
                   variant="destructive"
@@ -5261,9 +5262,9 @@ export function CompanySkills() {
       <Dialog open={emptySourceHelpOpen} onOpenChange={setEmptySourceHelpOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add a skill source</DialogTitle>
+            <DialogTitle>{tf("auto.be6f02796c0e90a7")}</DialogTitle>
             <DialogDescription>
-              Paste a local path, GitHub URL, or `skills.sh` command into the field first.
+              {tf("auto.82d4557bf6d84ade")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 text-sm">
@@ -5274,9 +5275,9 @@ export function CompanySkills() {
               className="flex items-start justify-between rounded-md border border-border px-3 py-3 text-foreground no-underline transition-colors hover:bg-accent/40"
             >
               <span>
-                <span className="block font-medium">Browse skills.sh</span>
+                <span className="block font-medium">{tf("auto.4c0b17cb94613972")}</span>
                 <span className="mt-1 block text-muted-foreground">
-                  Find install commands and paste one here.
+                  {tf("auto.073af77555d5e9ea")}
                 </span>
               </span>
               <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
@@ -5288,9 +5289,9 @@ export function CompanySkills() {
               className="flex items-start justify-between rounded-md border border-border px-3 py-3 text-foreground no-underline transition-colors hover:bg-accent/40"
             >
               <span>
-                <span className="block font-medium">Search GitHub</span>
+                <span className="block font-medium">{tf("auto.ff48a92c96b73fa8")}</span>
                 <span className="mt-1 block text-muted-foreground">
-                  Look for repositories with `SKILL.md`, then paste the repo URL here.
+                  {tf("auto.5f8a4c5d93639b4c")}
                 </span>
               </span>
               <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
@@ -5327,9 +5328,9 @@ export function CompanySkills() {
       <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Import a skill</DialogTitle>
+            <DialogTitle>{tf("auto.211f9507b0900fb6")}</DialogTitle>
             <DialogDescription>
-              Paste a local path, GitHub URL, or `skills.sh` command to import a skill into this organization.
+              {tf("auto.1f0bdc2d578f9b4f")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -5337,7 +5338,7 @@ export function CompanySkills() {
               <Input
                 value={source}
                 onChange={(event) => setSource(event.target.value)}
-                placeholder="Paste path, GitHub URL, or skills.sh command"
+                placeholder={tf("auto.b296100a52721343")}
                 className="h-9 rounded-none border-0 px-0 shadow-none focus-visible:ring-0"
               />
               <Button size="sm" onClick={handleAddSkillSource} disabled={importSkill.isPending}>
@@ -5351,8 +5352,8 @@ export function CompanySkills() {
               className="flex items-start justify-between rounded-md border border-border px-3 py-3 text-sm text-foreground no-underline transition-colors hover:bg-accent/40"
             >
               <span>
-                <span className="block font-medium">Browse skills.sh</span>
-                <span className="mt-1 block text-muted-foreground">Find install commands and paste one here.</span>
+                <span className="block font-medium">{tf("auto.4c0b17cb94613972")}</span>
+                <span className="mt-1 block text-muted-foreground">{tf("auto.073af77555d5e9ea")}</span>
               </span>
               <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             </a>
@@ -5363,8 +5364,8 @@ export function CompanySkills() {
               className="flex items-start justify-between rounded-md border border-border px-3 py-3 text-sm text-foreground no-underline transition-colors hover:bg-accent/40"
             >
               <span>
-                <span className="block font-medium">Search GitHub</span>
-                <span className="mt-1 block text-muted-foreground">Look for repositories with `SKILL.md`, then paste the repo URL.</span>
+                <span className="block font-medium">{tf("auto.ff48a92c96b73fa8")}</span>
+                <span className="mt-1 block text-muted-foreground">{tf("auto.a617408476067b39")}</span>
               </span>
               <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             </a>
@@ -5440,7 +5441,7 @@ export function CompanySkills() {
               className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
-              Back
+              {tf("text.Back")}
             </Link>
             <h1 className="text-2xl font-semibold">{studioTitle}</h1>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{studioDescription}</p>
@@ -5450,7 +5451,7 @@ export function CompanySkills() {
               {studioForkFromId && studioForkDetailQuery.isLoading ? (
                 <PageSkeleton variant="detail" />
               ) : studioForkFromId && !studioForkDetailQuery.data ? (
-                <EmptyState icon={Boxes} message="Fork source skill not found." />
+                <EmptyState icon={Boxes} message={tf("auto.d767f0a79333e6d3")} />
               ) : (
                 <NewSkillWizard
                   initialDraft={studioDraft}
@@ -5468,11 +5469,11 @@ export function CompanySkills() {
         {!streamlinedUiEnabled ? (
           <div className="px-4 pt-4">
             <Tabs value={legacyDiscoveryTab} onValueChange={(value) => setLegacyDiscoveryTab(value as "all" | "installed" | "catalog" | "bundled")}>
-              <TabsList variant="line" aria-label="Skills view">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="installed">Installed</TabsTrigger>
-                <TabsTrigger value="catalog">Catalog</TabsTrigger>
-                <TabsTrigger value="bundled">Bundled</TabsTrigger>
+              <TabsList variant="line" aria-label={tf("auto.1d74364ddb17b0ab")}>
+                <TabsTrigger value="all">{tf("text.All")}</TabsTrigger>
+                <TabsTrigger value="installed">{tf("text.Installed")}</TabsTrigger>
+                <TabsTrigger value="catalog">{tf("auto.3877d14889a9909b")}</TabsTrigger>
+                <TabsTrigger value="bundled">{tf("auto.79d3a1f108e8d9c3")}</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -5514,7 +5515,7 @@ export function CompanySkills() {
             setMoveDialog({
               skillIds: [card.skillId],
               title: `Move "${card.name}"`,
-              subtitle: "Choose a destination folder.",
+              subtitle: tf("auto.b2be2d288f7cf424"),
               currentFolderId: card.folderId ?? null,
             });
           } : undefined}
@@ -5544,12 +5545,12 @@ export function CompanySkills() {
             moveSkillToFolder.mutate({ itemId: skillId, folderId });
             pushToast({
               tone: "success",
-              title: "Skill moved",
+              title: tf("auto.f9a58f8339b50149"),
               body: folderId
                 ? `Moved "${card.name}" to ${skillFolderResult?.folders.find((folder) => folder.id === folderId)?.name ?? "folder"}.`
                 : `Moved "${card.name}" to Unfiled.`,
               action: {
-                label: "Undo",
+                label: tf("auto.a8283ade31856f71"),
                 onClick: () => moveSkillToFolder.mutate({ itemId: skillId, folderId: previousFolderId }),
               },
             });
@@ -5617,7 +5618,7 @@ export function CompanySkills() {
           onMoveToFolder={activeDetail ? () => setMoveDialog({
             skillIds: [activeDetail.id],
             title: `Move "${activeDetail.name}"`,
-            subtitle: "Choose a destination folder.",
+            subtitle: tf("auto.b2be2d288f7cf424"),
             currentFolderId: activeDetail.folderId ?? null,
           }) : undefined}
           updateSettingsPending={updateSkillSettings.isPending}
@@ -5635,17 +5636,17 @@ export function CompanySkills() {
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
-              Back to store
+              {tf("auto.c617a34850a6ef60")}
             </Link>
           </div>
           {catalogListQuery.isLoading || catalogDetailQuery.isLoading ? (
             <PageSkeleton variant="detail" />
           ) : !selectedCatalogSkill ? (
-            <EmptyState icon={Boxes} message="Catalog skill not found." />
+            <EmptyState icon={Boxes} message={tf("auto.c80134e7d504f2e4")} />
           ) : (
             <div className="grid gap-0 xl:grid-cols-(--gtc-30)">
               <aside className="border-b border-border px-3 py-4 xl:border-b-0 xl:border-r">
-                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Files</div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Files")}</div>
                 <SkillTree
                   nodes={buildTree(selectedCatalogSkill.files.map((file) => ({ path: file.path, kind: file.kind })))}
                   skillId={selectedCatalogSkill.id}
@@ -5686,7 +5687,7 @@ export function CompanySkills() {
           {skillsQuery.isLoading ? (
             <PageSkeleton variant="detail" />
           ) : (
-            <EmptyState icon={Boxes} message="Skill not found." />
+            <EmptyState icon={Boxes} message={tf("auto.97cd06e1a48e2a01")} />
           )}
         </div>
       )}

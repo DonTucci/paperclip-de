@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState, type ComponentProps, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import { Identity } from "@/components/Identity";
@@ -44,7 +45,7 @@ export function MemberMultiSelect({
   triggerFullWidth = true,
   triggerClassName,
   contentAlign = "start",
-  emptyMessage = "No members yet.",
+  emptyMessage = tf("auto.12dc83c54e6c9f84"),
   showSelectionPreview = true,
   filterPlaceholder = "Filter people",
   onOpenChange,
@@ -178,7 +179,7 @@ export function MemberMultiSelect({
                 );
               })}
               {filteredMembers.length === 0 ? (
-                <div className="px-3 py-4 text-sm text-muted-foreground">No matches.</div>
+                <div className="px-3 py-4 text-sm text-muted-foreground">{tf("auto.d6572bd2e77380ce")}</div>
               ) : null}
             </div>
           )}
@@ -189,7 +190,7 @@ export function MemberMultiSelect({
             <div className="flex items-center gap-2">
               {staged ? (
                 <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={pending}>
-                  Cancel
+                  {tf("text.Cancel")}
                 </Button>
               ) : null}
               <Button

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -398,7 +399,7 @@ export function FailedRunInboxRow({
                   "inline-flex h-4 w-4 items-center justify-center rounded-full transition-colors",
                   "hover:bg-blue-500/20",
                 )}
-                aria-label="Mark as read"
+                aria-label={tf("text.Mark as read")}
               >
                 <span className={cn(
                   "block h-2 w-2 rounded-full transition-opacity duration-300",
@@ -464,7 +465,7 @@ export function FailedRunInboxRow({
               type="button"
               onClick={onDismiss}
               className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
-              aria-label="Dismiss"
+              aria-label={tf("text.Dismiss")}
             >
               <X className="h-4 w-4" />
             </button>
@@ -488,7 +489,7 @@ export function FailedRunInboxRow({
             type="button"
             onClick={onDismiss}
             className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-            aria-label="Dismiss"
+            aria-label={tf("text.Dismiss")}
           >
             <X className="h-4 w-4" />
           </button>
@@ -547,7 +548,7 @@ function ApprovalInboxRow({
                   "inline-flex h-4 w-4 items-center justify-center rounded-full transition-colors",
                   "hover:bg-blue-500/20",
                 )}
-                aria-label="Mark as read"
+                aria-label={tf("text.Mark as read")}
               >
                 <span className={cn(
                   "block h-2 w-2 rounded-full transition-opacity duration-300",
@@ -596,7 +597,7 @@ function ApprovalInboxRow({
                   onClick={onApprove}
                   disabled={isPending}
                 >
-                  Approve
+                  {tf("text.Approve")}
                 </Button>
                 <Button
                   variant="destructive"
@@ -605,7 +606,7 @@ function ApprovalInboxRow({
                   onClick={onReject}
                   disabled={isPending}
                 >
-                  Reject
+                  {tf("text.Reject")}
                 </Button>
               </>
             ) : null}
@@ -620,7 +621,7 @@ function ApprovalInboxRow({
             onClick={onApprove}
             disabled={isPending}
           >
-            Approve
+            {tf("text.Approve")}
           </Button>
           <Button
             variant="destructive"
@@ -629,7 +630,7 @@ function ApprovalInboxRow({
             onClick={onReject}
             disabled={isPending}
           >
-            Reject
+            {tf("text.Reject")}
           </Button>
         </div>
       ) : null}
@@ -680,7 +681,7 @@ function JoinRequestInboxRow({
                   "inline-flex h-4 w-4 items-center justify-center rounded-full transition-colors",
                   "hover:bg-blue-500/20",
                 )}
-                aria-label="Mark as read"
+                aria-label={tf("text.Mark as read")}
               >
                 <span className={cn(
                   "block h-2 w-2 rounded-full transition-opacity duration-300",
@@ -719,7 +720,7 @@ function JoinRequestInboxRow({
             onClick={onApprove}
             disabled={isPending}
           >
-            Approve
+            {tf("text.Approve")}
           </Button>
           <Button
             variant="destructive"
@@ -728,7 +729,7 @@ function JoinRequestInboxRow({
             onClick={onReject}
             disabled={isPending}
           >
-            Reject
+            {tf("text.Reject")}
           </Button>
         </div>
       </div>
@@ -739,7 +740,7 @@ function JoinRequestInboxRow({
           onClick={onApprove}
           disabled={isPending}
         >
-          Approve
+          {tf("text.Approve")}
         </Button>
         <Button
           variant="destructive"
@@ -748,7 +749,7 @@ function JoinRequestInboxRow({
           onClick={onReject}
           disabled={isPending}
         >
-          Reject
+          {tf("text.Reject")}
         </Button>
       </div>
     </div>
@@ -881,7 +882,7 @@ function StreamlinedInbox() {
   });
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Inbox" }]);
+    setBreadcrumbs([{ label: tf("text.Inbox") }]);
   }, [setBreadcrumbs]);
 
   useEffect(() => {
@@ -1744,7 +1745,7 @@ function StreamlinedInbox() {
       navigate(`/approvals/${id}?resolved=approved`);
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to approve");
+      setActionError(err instanceof Error ? err.message: tf("auto.de0c2e40fd7a091d"));
     },
   });
 
@@ -1755,7 +1756,7 @@ function StreamlinedInbox() {
       queryClient.invalidateQueries({ queryKey: queryKeys.approvals.list(selectedCompanyId!) });
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to reject");
+      setActionError(err instanceof Error ? err.message: tf("auto.46960413b9a81e25"));
     },
   });
 
@@ -1770,7 +1771,7 @@ function StreamlinedInbox() {
       queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to approve join request");
+      setActionError(err instanceof Error ? err.message: tf("auto.3b65e5b7c998c9dc"));
     },
   });
 
@@ -1783,7 +1784,7 @@ function StreamlinedInbox() {
       queryClient.invalidateQueries({ queryKey: queryKeys.sidebarBadges(selectedCompanyId!) });
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to reject join request");
+      setActionError(err instanceof Error ? err.message: tf("auto.4d68f6e11d9ae57f"));
     },
   });
 
@@ -1810,8 +1811,8 @@ function StreamlinedInbox() {
     },
     onError: (error) => {
       pushToast({
-        title: "Run retry failed",
-        body: error instanceof Error ? error.message : "Unable to retry run",
+        title: tf("auto.243efbc1d68c5180"),
+        body: error instanceof Error ? error.message: tf("auto.537d0b3e65595899"),
         tone: "error",
       });
     },
@@ -1884,7 +1885,7 @@ function StreamlinedInbox() {
       return { companyId: selectedCompanyId, previousData };
     },
     onError: (err, id, context) => {
-      setActionError(err instanceof Error ? err.message : "Failed to archive task");
+      setActionError(err instanceof Error ? err.message: tf("auto.ab3328ec3513c7fb"));
       if (context?.companyId) clearLocalInboxArchive(context.companyId, id);
       setArchivingIssueIds((prev) => {
         const next = new Set(prev);
@@ -1925,7 +1926,7 @@ function StreamlinedInbox() {
       return { companyId: selectedCompanyId };
     },
     onError: (err, id, context) => {
-      setActionError(err instanceof Error ? err.message : "Failed to undo inbox archive");
+      setActionError(err instanceof Error ? err.message: tf("auto.f52fe16f6a79e73b"));
       if (context?.companyId) {
         beginLocalInboxArchive(context.companyId, id);
         boundLocalInboxArchive(context.companyId, id);
@@ -2331,7 +2332,7 @@ function StreamlinedInbox() {
   }, [selectedIndex]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={InboxIcon} message="Select an organization to view inbox." />;
+    return <EmptyState icon={InboxIcon} message={tf("auto.b389056406d3dd75")} />;
   }
 
   const hasRunFailures = failedRuns.length > 0;
@@ -2405,11 +2406,11 @@ function StreamlinedInbox() {
           <Tabs value={tab} onValueChange={(value) => navigate(`/inbox/${value}`)}>
             <PageTabBar
               items={[
-                { value: "mine", label: "Mine" },
-                { value: "recent", label: "Recent" },
-                { value: "unread", label: "Unread" },
-                { value: "blocked", label: "Blocked" },
-                { value: "all", label: "All" },
+                { value: "mine", label: tf("auto.f57afb7d275a26df") },
+                { value: "recent", label: tf("auto.690dbe9dc0993c42") },
+                { value: "unread", label: tf("auto.1b9f384c1436f607") },
+                { value: "blocked", label: tf("status.blocked") },
+                { value: "all", label: tf("text.All") },
               ]}
             />
           </Tabs>
@@ -2419,7 +2420,7 @@ function StreamlinedInbox() {
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search inbox…"
+              placeholder={tf("auto.d684b9b792bde6c0")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -2471,7 +2472,7 @@ function StreamlinedInbox() {
                     variant="outline"
                     size="icon"
                     className={cn("h-8 w-8 shrink-0", blockedGroupBy !== "none" && "bg-accent")}
-                    title="Group"
+                    title={tf("auto.34ca0e76608842ff")}
                   >
                     <Layers className="h-3.5 w-3.5" />
                   </Button>
@@ -2507,7 +2508,7 @@ function StreamlinedInbox() {
                   }));
                 }}
                 onResetColumns={() => setIssueColumns(DEFAULT_INBOX_ISSUE_COLUMNS)}
-                title="Choose which inbox columns stay visible"
+                title={tf("auto.ad899478db8b91da")}
                 iconOnly
               />
               <Popover>
@@ -2517,7 +2518,7 @@ function StreamlinedInbox() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 shrink-0"
-                    title="Sort"
+                    title={tf("auto.bec69036aa27e7fa")}
                   >
                     <ArrowUpDown className="h-3.5 w-3.5" />
                   </Button>
@@ -2550,7 +2551,7 @@ function StreamlinedInbox() {
                 size="icon"
                 className={cn("hidden h-8 w-8 shrink-0 sm:inline-flex", nestingEnabled && "bg-accent")}
                 onClick={toggleNesting}
-                title={nestingEnabled ? "Disable parent-child nesting" : "Enable parent-child nesting"}
+                title={nestingEnabled ? tf("auto.8c5a4b177b78f1f5") : tf("auto.18cf6dba7656852e")}
               >
                 <ListTree className="h-3.5 w-3.5" />
               </Button>
@@ -2591,7 +2592,7 @@ function StreamlinedInbox() {
                     variant="outline"
                     size="icon"
                     className={cn("h-8 w-8 shrink-0", groupBy !== "none" && "bg-accent")}
-                    title="Group"
+                    title={tf("auto.34ca0e76608842ff")}
                   >
                     <Layers className="h-3.5 w-3.5" />
                   </Button>
@@ -2633,7 +2634,7 @@ function StreamlinedInbox() {
                   }));
                 }}
                 onResetColumns={() => setIssueColumns(DEFAULT_INBOX_ISSUE_COLUMNS)}
-                title="Choose which inbox columns stay visible"
+                title={tf("auto.ad899478db8b91da")}
                 iconOnly
                 rowPresentation={streamlinedUiEnabled ? "task" : "legacy"}
               />
@@ -2652,14 +2653,14 @@ function StreamlinedInbox() {
                   <Dialog open={showMarkAllReadConfirm} onOpenChange={setShowMarkAllReadConfirm}>
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
-                        <DialogTitle>Mark all as read?</DialogTitle>
+                        <DialogTitle>{tf("auto.0bf166e29608656d")}</DialogTitle>
                         <DialogDescription>
                           This will mark {unreadIssueIds.length} unread {unreadIssueIds.length === 1 ? "item" : "items"} as read.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setShowMarkAllReadConfirm(false)}>
-                          Cancel
+                          {tf("text.Cancel")}
                         </Button>
                         <Button
                           onClick={() => {
@@ -2667,7 +2668,7 @@ function StreamlinedInbox() {
                             markAllReadMutation.mutate(unreadIssueIds);
                           }}
                         >
-                          Mark all as read
+                          {tf("auto.d7592650e1c90a85")}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -2808,7 +2809,7 @@ function StreamlinedInbox() {
                           type="button"
                           data-slot="icon-button"
                           className="inline-flex h-4 w-4 shrink-0 items-center justify-center"
-                          aria-label={isExpanded ? "Collapse sub-tasks" : "Expand sub-tasks"}
+                          aria-label={isExpanded ? tf("auto.b533f9e83cfd41b7") : tf("auto.45dcdcbb82678e42")}
                           onClick={(event) => {
                             event.preventDefault();
                             event.stopPropagation();
@@ -3052,7 +3053,7 @@ function StreamlinedInbox() {
                             className="shrink-0 text-(length:--text-micro) font-medium uppercase tracking-wider text-muted-foreground/70"
                             data-date-group-label=""
                           >
-                            Earlier
+                            {tf("auto.e10ae99074011888")}
                           </span>
                         </div>,
                       );
@@ -3267,7 +3268,7 @@ function StreamlinedInbox() {
           {showSeparatorBefore("alerts") && <Separator />}
           <div>
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Alerts
+              {tf("auto.f62e9267d196c761")}
             </h3>
             <div className="divide-y divide-border border border-border">
               {showAggregateAgentError && (
@@ -3286,7 +3287,7 @@ function StreamlinedInbox() {
                     type="button"
                     onClick={() => dismissAlert("alert:agent-errors")}
                     className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover/alert:opacity-100"
-                    aria-label="Dismiss"
+                    aria-label={tf("text.Dismiss")}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -3309,7 +3310,7 @@ function StreamlinedInbox() {
                     type="button"
                     onClick={() => dismissAlert("alert:budget")}
                     className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover/alert:opacity-100"
-                    aria-label="Dismiss"
+                    aria-label={tf("text.Dismiss")}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>

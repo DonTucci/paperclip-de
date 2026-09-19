@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { AdapterModel } from "../../api/agents";
 import type { Issue, Project } from "@paperclipai/shared";
 import { extractProviderIdWithFallback } from "../../lib/model-utils";
@@ -55,19 +56,19 @@ export function toDateTimeLocalValue(value: string | null | undefined) {
 
 export const ISSUE_THINKING_EFFORT_OPTIONS = {
   claude_local: [
-    { value: "", label: "Default" },
-    { value: "low", label: "Low" },
-    { value: "medium", label: "Medium" },
-    { value: "high", label: "High" },
+    { value: "", label: tf("text.Default") },
+    { value: "low", label: tf("auto.f793de205ead5ac3") },
+    { value: "medium", label: tf("auto.8e588cd187741f1c") },
+    { value: "high", label: tf("auto.c4ebc6d4a5832cd9") },
   ],
   opencode_local: [
-    { value: "", label: "Default" },
-    { value: "minimal", label: "Minimal" },
-    { value: "low", label: "Low" },
-    { value: "medium", label: "Medium" },
-    { value: "high", label: "High" },
-    { value: "xhigh", label: "X-High" },
-    { value: "max", label: "Max" },
+    { value: "", label: tf("text.Default") },
+    { value: "minimal", label: tf("auto.057b5de48d7b90f1") },
+    { value: "low", label: tf("auto.f793de205ead5ac3") },
+    { value: "medium", label: tf("auto.8e588cd187741f1c") },
+    { value: "high", label: tf("auto.c4ebc6d4a5832cd9") },
+    { value: "xhigh", label: tf("auto.393d3e4bf2eea43a") },
+    { value: "max", label: tf("auto.a1a5936d3b0f8a69") },
   ],
 } as const;
 

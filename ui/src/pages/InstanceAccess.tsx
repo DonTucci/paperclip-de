@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Shield, ShieldCheck } from "lucide-react";
@@ -22,9 +23,9 @@ export function InstanceAccess() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Settings", href: "/company/settings" },
-      { label: "Instance settings", href: "/company/settings/instance/general" },
-      { label: "Access" },
+      { label: tf("text.Settings"), href: "/company/settings" },
+      { label: tf("auto.07817164b305fb0a"), href: "/company/settings/instance/general" },
+      { label: tf("text.Access") },
     ]);
   }, [setBreadcrumbs]);
 
@@ -73,7 +74,7 @@ export function InstanceAccess() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.access.userCompanyAccess(selectedUserId!) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.access.adminUsers(search) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
-      pushToast({ title: "Organization access updated", tone: "success" });
+      pushToast({ title: tf("auto.478cd40e97893f84"), tone: "success" });
     },
   });
 
@@ -88,12 +89,12 @@ export function InstanceAccess() {
       if (selectedUserId) {
         await queryClient.invalidateQueries({ queryKey: queryKeys.access.userCompanyAccess(selectedUserId) });
       }
-      pushToast({ title: "Instance role updated", tone: "success" });
+      pushToast({ title: tf("auto.71730005923aae31"), tone: "success" });
     },
   });
 
   if (usersQuery.isLoading || !accountSettled || (usersQuery.isSuccess && companiesQuery.isPending)) {
-    return <div className="text-sm text-muted-foreground">Loading instance access…</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.880f9d0cbe87acbc")}</div>;
   }
 
   if (usersQuery.error) {
@@ -101,16 +102,15 @@ export function InstanceAccess() {
       usersQuery.error instanceof ApiError && usersQuery.error.status === 403
         ? "Instance admin access is required to manage users."
         : usersQuery.error instanceof Error
-          ? usersQuery.error.message
-          : "Failed to load users.";
+          ? usersQuery.error.message: tf("auto.29647e1097e821eb");
     return <div className="text-sm text-destructive">{message}</div>;
   }
 
   if (companiesQuery.error) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-destructive">Failed to load organizations. Try again before changing access.</p>
-        <Button onClick={() => void companiesQuery.refetch()}>Try again</Button>
+        <p className="text-sm text-destructive">{tf("auto.cc196023199e043d")}</p>
+        <Button onClick={() => void companiesQuery.refetch()}>{tf("text.Try again")}</Button>
       </div>
     );
   }
@@ -120,22 +120,22 @@ export function InstanceAccess() {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-lg font-semibold">Instance Access</h1>
+          <h1 className="text-lg font-semibold">{tf("auto.6769eb35c7abb676")}</h1>
         </div>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Search users, manage instance-admin status, and control which organizations they can access.
+          {tf("auto.995043b4498940dc")}
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-(--gtc-34)">
         <Card className="block space-y-4 p-4">
           <label className="block space-y-2 text-sm">
-            <span className="font-medium">Search users</span>
+            <span className="font-medium">{tf("auto.e4bb77af4bc57267")}</span>
             <input
               className="w-full rounded-md border border-border bg-background px-3 py-2"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by name or email"
+              placeholder={tf("auto.6936e681bac37ba7")}
             />
           </label>
           <div className="space-y-2">
@@ -169,12 +169,12 @@ export function InstanceAccess() {
 
         <Card className="block space-y-4 p-5">
           {!selectedUserId ? (
-            <div className="text-sm text-muted-foreground">Select a user to inspect instance access.</div>
+            <div className="text-sm text-muted-foreground">{tf("auto.e1de6b6894502024")}</div>
           ) : userAccessQuery.isLoading ? (
-            <div className="text-sm text-muted-foreground">Loading user access…</div>
+            <div className="text-sm text-muted-foreground">{tf("auto.4ab3611cbadebaeb")}</div>
           ) : userAccessQuery.error ? (
             <div className="text-sm text-destructive">
-              {userAccessQuery.error instanceof Error ? userAccessQuery.error.message : "Failed to load user access."}
+              {userAccessQuery.error instanceof Error ? userAccessQuery.error.message: tf("auto.12e7f244b9749e48")}
             </div>
           ) : (
             <>
@@ -198,9 +198,9 @@ export function InstanceAccess() {
 
               <div className="space-y-3">
                 <div>
-                  <h2 className="text-sm font-semibold">Organization access</h2>
+                  <h2 className="text-sm font-semibold">{tf("auto.0c44df0fc5e78cbc")}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Toggle organization membership for this user. New access defaults to an active operator membership.
+                    {tf("auto.fac5bb05202fe899")}
                   </p>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
@@ -238,7 +238,7 @@ export function InstanceAccess() {
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-sm font-semibold">Current memberships</h2>
+                <h2 className="text-sm font-semibold">{tf("auto.c9503ceab9582042")}</h2>
                 <div className="space-y-2">
                   {(userAccessQuery.data?.companyAccess ?? []).map((membership) => (
                     <div

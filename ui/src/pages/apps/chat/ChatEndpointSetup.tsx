@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { PhotonConnectStep } from "./PhotonConnectStep";
 import { EmailEndpointSetup } from "./EmailEndpointSetup";
 import {
@@ -103,7 +104,7 @@ export function isChatEndpointRepairing(
 
 function SetupRail({ step }: { step: number }) {
   return (
-    <ol className="space-y-2 text-sm" aria-label="Connection setup progress">
+    <ol className="space-y-2 text-sm" aria-label={tf("auto.17f5c180dcd19c5a")}>
       {["Choose agent", "Connect provider", "Try it"].map((label, index) => (
         <li key={label} className="flex items-center gap-2">
           <span
@@ -155,8 +156,8 @@ function ChatSdkEndpointSetup() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
-      { label: "Connect chat" },
+      { label: tf("text.Connectors"), href: "/apps" },
+      { label: tf("auto.611395e6c8c30ff5") },
     ]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs]);
@@ -246,8 +247,8 @@ function ChatSdkEndpointSetup() {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't start setup",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.afa41ad7b2b18400"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -331,8 +332,8 @@ function ChatSdkEndpointSetup() {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't generate webhook secret",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.4529e92e54bef99a"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -344,11 +345,10 @@ function ChatSdkEndpointSetup() {
     },
     onError: (error) =>
       pushToast({
-        title: "Test not complete",
+        title: tf("auto.34be17f884b5e9ca"),
         body:
           error instanceof Error
-            ? error.message
-            : "Send the provider message, then try again.",
+            ? error.message: tf("auto.9a8973a2159d7274"),
         tone: "error",
       }),
   });
@@ -356,13 +356,13 @@ function ChatSdkEndpointSetup() {
   if (!provider)
     return (
       <p className="text-sm text-destructive">
-        This chat provider is not supported.
+        {tf("auto.4998d8ff4ac69179")}
       </p>
     );
   if (!selectedCompanyId)
     return (
       <p className="text-sm text-muted-foreground">
-        Select an organization to connect chat.
+        {tf("auto.7bd1f24bd51df139")}
       </p>
     );
 
@@ -370,7 +370,7 @@ function ChatSdkEndpointSetup() {
     return (
       <div className="max-w-2xl space-y-6">
         <div>
-          <h1 className="text-xl font-bold">Choose how to connect</h1>
+          <h1 className="text-xl font-bold">{tf("auto.aeb54e4ff3f1e945")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             What should this {providerNames[provider]} connection do?
           </p>
@@ -382,7 +382,7 @@ function ChatSdkEndpointSetup() {
             onClick={() => setPurpose("chat")}
           >
             <span className="block text-sm font-semibold">
-              Chat with an agent
+              {tf("auto.73adffe32a9a861c")}
             </span>
             <span className="mt-1 block text-sm text-muted-foreground">
               People in {providerNames[provider]} can start and continue
@@ -395,7 +395,7 @@ function ChatSdkEndpointSetup() {
             onClick={() => navigate(toolHref)}
           >
             <span className="block text-sm font-semibold">
-              Use this connection as an agent tool
+              {tf("auto.3035ada6aaeb8638")}
             </span>
             <span className="mt-1 block text-sm text-muted-foreground">
               Let agents use {providerNames[provider]} actions and data while
@@ -427,7 +427,7 @@ function ChatSdkEndpointSetup() {
           <>
             <div>
               <h1 className="text-xl font-bold">
-                Which agent do you want to chat with?
+                {tf("auto.14eb4b2e20d36233")}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
                 This agent is permanent for the connection. Connect another
@@ -438,8 +438,8 @@ function ChatSdkEndpointSetup() {
               agents={activeAgents}
               value={agentId}
               onChange={setAgentId}
-              placeholder="Choose an active agent"
-              emptyMessage="No active agents are available."
+              placeholder={tf("auto.e6be8c7a1d2bd2b2")}
+              emptyMessage={tf("auto.972bd5aefeb8d14a")}
             />
             <div className="flex justify-end">
               <Button
@@ -460,7 +460,7 @@ function ChatSdkEndpointSetup() {
                 role="alert"
                 className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive"
               >
-                <p className="font-medium">Connection failed</p>
+                <p className="font-medium">{tf("auto.596c52f1eb65c1c3")}</p>
                 <p className="mt-1">{setupError}</p>
               </div>
             ) : null}
@@ -507,7 +507,7 @@ function ChatSdkEndpointSetup() {
         )}
         <div className="flex justify-start">
           <Button variant="ghost" onClick={() => navigate("/apps")}>
-            Save &amp; exit
+            {tf("auto.0bd63bf3d32e9119")}
           </Button>
         </div>
       </main>
@@ -546,7 +546,7 @@ function ProviderConnectStep({
   const { pushToast } = useToast();
   const reportCopyFailure = () =>
     pushToast({
-      title: "Couldn't copy to clipboard",
+      title: tf("auto.72ff542bf8a7669f"),
       body: "Select and copy the value manually.",
       tone: "error",
     });
@@ -617,8 +617,7 @@ function ProviderConnectStep({
       if (!privateKeyReadGuard.isCurrent(readRevision)) return;
       setPrivateKeyFileError(
         error instanceof Error
-          ? error.message
-          : "Paperclip couldn't read that file. Choose the .pem file again or paste the private key.",
+          ? error.message: tf("auto.f8fe4915aff591a1"),
       );
     } finally {
       if (privateKeyReadGuard.isCurrent(readRevision)) {
@@ -730,15 +729,15 @@ settings:
               commands: [
                 {
                   title: "/status",
-                  description: "Show the active Paperclip task status",
+                  description: tf("auto.5475e33e2aa2f555"),
                 },
                 {
                   title: "/new",
-                  description: "Start a new Paperclip task in this chat",
+                  description: tf("auto.7986d3fbf1404ed1"),
                 },
                 {
                   title: "/close",
-                  description: "Close the active chat conversation",
+                  description: tf("auto.0ac684eee59d6804"),
                 },
               ],
             },
@@ -853,9 +852,9 @@ settings:
           <li>
             Open BotFather and send <code>/newbot</code>.
           </li>
-          <li>Enter the bot display name.</li>
+          <li>{tf("auto.4feda67970851b6d")}</li>
           <li>
-            Choose an available username ending in <code>bot</code>.
+            Choose an available username ending in <code>{tf("auto.9d74932bdb6f21dc")}</code>.
           </li>
         </ol>
         <p className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
@@ -975,7 +974,7 @@ settings:
         <section className="space-y-3 rounded-lg border border-border p-4">
           <div>
             <h2 className="text-sm font-semibold">
-              Microsoft portal field map
+              {tf("auto.6a0f1431be43e023")}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Use these exact portal sections and reuse the same Application ID
@@ -984,45 +983,45 @@ settings:
           </div>
           <ol className="list-decimal space-y-3 pl-5 text-sm">
             <li>
-              <strong>Microsoft Entra admin center · App registrations</strong>:
-              select <strong>New registration</strong>, choose{" "}
+              <strong>{tf("auto.b4935613ed466494")}</strong>:
+              select <strong>{tf("auto.5c35cd89e8c7dab9")}</strong>, choose{" "}
               <strong>
-                Accounts in this organizational directory only (Single tenant)
+                {tf("auto.5c39323e4cafee73")}
               </strong>
-              , then select <strong>Register</strong>. Copy{" "}
-              <strong>Application (client) ID</strong> and{" "}
-              <strong>Directory (tenant) ID</strong>. Under{" "}
-              <strong>Certificates &amp; secrets · Client secrets</strong>,
-              select <strong>New client secret</strong> and copy its{" "}
-              <strong>Value</strong>, not its Secret ID.
+              , then select <strong>{tf("auto.bb7234ec12451361")}</strong>. Copy{" "}
+              <strong>{tf("auto.576111a7aee1dceb")}</strong> and{" "}
+              <strong>{tf("auto.1dc4abe275946291")}</strong>. Under{" "}
+              <strong>{tf("auto.5e46948358392f44")}</strong>,
+              select <strong>{tf("auto.02aac1d82e3ac550")}</strong> and copy its{" "}
+              <strong>{tf("text.Value")}</strong>, not its Secret ID.
             </li>
             <li>
-              <strong>Azure · Create Azure Bot</strong>: set{" "}
-              <strong>Microsoft App ID</strong> to{" "}
-              <strong>Single Tenant</strong>, set <strong>Creation type</strong>{" "}
-              to <strong>Use existing app registration</strong>, and enter the
+              <strong>{tf("auto.245287276b8338cd")}</strong>: set{" "}
+              <strong>{tf("auto.689f79d2ff9dfaa6")}</strong> to{" "}
+              <strong>{tf("auto.32517762f806ba5b")}</strong>, set <strong>{tf("auto.a90668dbd91b4bc3")}</strong>{" "}
+              to <strong>{tf("auto.e7a8befdbbcddbd8")}</strong>, and enter the
               Application ID and Tenant ID above. After creation, open{" "}
-              <strong>Settings · Configuration</strong> and paste the Paperclip{" "}
-              <strong>Messaging endpoint</strong>; then open{" "}
-              <strong>Settings · Channels</strong> and enable{" "}
-              <strong>Microsoft Teams</strong>.
+              <strong>{tf("auto.15674b2bdd655181")}</strong> and paste the Paperclip{" "}
+              <strong>{tf("auto.8dcb943dc3b29d06")}</strong>; then open{" "}
+              <strong>{tf("auto.010583e236aa46a5")}</strong> and enable{" "}
+              <strong>{tf("auto.a7b52b269a23c025")}</strong>.
             </li>
             <li>
-              <strong>Teams Developer Portal · Apps</strong>: select{" "}
-              <strong>New app</strong>. Under{" "}
-              <strong>Configure · App features · Bot</strong>, add an existing
+              <strong>{tf("auto.ee4c150d1f0529ee")}</strong>: select{" "}
+              <strong>{tf("auto.747f1473fa177808")}</strong>. Under{" "}
+              <strong>{tf("auto.e7d5d293927d1d28")}</strong>, add an existing
               bot using the same Application ID; enable{" "}
-              <strong>Personal</strong>, <strong>Team</strong>, and{" "}
-              <strong>Group chat</strong> scopes plus file support. Under{" "}
-              <strong>Configure · Permissions</strong>, add the two RSC{" "}
-              <strong>Application</strong> permissions shown below. Complete the
+              <strong>{tf("auto.845f9286400f4269")}</strong>, <strong>{tf("auto.5985039f106df054")}</strong>, and{" "}
+              <strong>{tf("auto.28c7d3f8b75de76f")}</strong> scopes plus file support. Under{" "}
+              <strong>{tf("auto.f45a200a679dd028")}</strong>, add the two RSC{" "}
+              <strong>{tf("auto.e7ad522ea327e5ba")}</strong> permissions shown below. Complete the
               required app details and icons, explain that the app can receive
               every message in an installed team or group chat, then download
               the app package.
             </li>
             <li>
-              <strong>Microsoft Teams · Apps · Manage your apps</strong>: select{" "}
-              <strong>Upload an app · Upload a custom app</strong>, choose the
+              <strong>{tf("auto.97fd174b0d1f4af1")}</strong>: select{" "}
+              <strong>{tf("auto.08d248a066d964aa")}</strong>, choose the
               downloaded package, and install it in each intended personal chat,
               group chat, or team. One team install covers its standard
               channels. Private and shared channels require a separate app
@@ -1033,7 +1032,7 @@ settings:
           </ol>
         </section>
         <label className="grid gap-2 text-sm font-medium">
-          Required Teams app manifest block
+          {tf("auto.55ea4fc31a9f5572")}
           <Textarea
             className="min-h-80 font-mono text-xs"
             readOnly
@@ -1066,7 +1065,7 @@ settings:
         </p>
         <p className="text-sm text-muted-foreground">
           Paperclip does not use Teams single sign-on in this release. The
-          copied <code>webApplicationInfo</code> entry only associates the RSC
+          copied <code>{tf("auto.05344a195a9ee374")}</code> entry only associates the RSC
           permissions with the same Entra Application ID. Its nonempty resource
           is an RSC placeholder; you do not need to register an Entra
           Application ID URI or add delegated Microsoft Graph permissions.
@@ -1080,7 +1079,7 @@ settings:
         </p>
         <p className="text-sm text-muted-foreground">
           This release supports personal chats, group chats, and standard team
-          channels—not private channels. <code>supportsFiles: true</code>{" "}
+          channels—not private channels. <code>{tf("auto.fc77b51a743ad76b")}</code>{" "}
           enables native file receipt and consent-based sending in personal
           chats; channel and group-chat files need a separate Microsoft Graph
           connection and are not ingested here.
@@ -1134,27 +1133,27 @@ settings:
               Paperclip homepage URL below, and leave user authorization off.
             </li>
             <li>
-              Keep <strong>Webhooks · Active</strong> on. Enter the Paperclip
+              Keep <strong>{tf("auto.dde916ab71216beb")}</strong> on. Enter the Paperclip
               webhook URL and the Paperclip-generated webhook secret below, and
-              keep <strong>Enable SSL verification</strong> selected.
+              keep <strong>{tf("auto.b817ccfbf8e63da2")}</strong> selected.
             </li>
             <li>
-              Under Repository permissions, set <strong>Issues</strong> and{" "}
-              <strong>Pull requests</strong> to{" "}
-              <strong>Read &amp; write</strong>. Leave every other permission at
+              Under Repository permissions, set <strong>{tf("auto.666067dd376e5d45")}</strong> and{" "}
+              <strong>{tf("auto.d9e3f260282517ed")}</strong> to{" "}
+              <strong>{tf("auto.5cf0e8247f391866")}</strong>. Leave every other permission at
               its default; Metadata remains read-only.
             </li>
             <li>
-              Subscribe to <strong>Issue comment</strong> (
-              <code>issue_comment</code>),{" "}
-              <strong>Pull request review comment</strong> (
-              <code>pull_request_review_comment</code>). GitHub sends{" "}
-              <code>installation</code> and{" "}
-              <code>installation_repositories</code> to every GitHub App
+              Subscribe to <strong>{tf("auto.b58fb1935afc1fba")}</strong> (
+              <code>{tf("auto.910090df4d77487b")}</code>),{" "}
+              <strong>{tf("auto.a480a0e12be358e1")}</strong> (
+              <code>{tf("auto.88ca27dbcc7a3941")}</code>). GitHub sends{" "}
+              <code>{tf("auto.561f0a3d84e3c5cf")}</code> and{" "}
+              <code>{tf("auto.579306a5743365be")}</code> to every GitHub App
               automatically; they are not selectable here.
             </li>
             <li>
-              Choose <strong>Only on this account</strong>, create the App, copy
+              Choose <strong>{tf("auto.bc291e525c9f31a5")}</strong>, create the App, copy
               its App ID, generate one private key, then install it on the
               selected repositories.
             </li>
@@ -1183,7 +1182,7 @@ settings:
         </Button>
         {field("appId", "GitHub App ID", "text")}
         <div className="grid gap-2 text-sm font-medium">
-          <label htmlFor="github-private-key">Private key (PEM)</label>
+          <label htmlFor="github-private-key">{tf("auto.1a5ad9860afa30b5")}</label>
           <div className="relative">
             {privateKeyVisible ? (
               <Textarea
@@ -1223,7 +1222,7 @@ settings:
             type="file"
             accept=".pem,.key,application/x-pem-file,application/pkcs8,text/plain"
             className="hidden"
-            aria-label="Choose GitHub App private key file"
+            aria-label={tf("auto.67623763440d6ff5")}
             onChange={loadPrivateKeyFile}
           />
           <div>
@@ -1232,7 +1231,7 @@ settings:
               variant="outline"
               onClick={() => privateKeyFileInputRef.current?.click()}
             >
-              Choose .pem file
+              {tf("auto.bd08402ee9406519")}
             </Button>
           </div>
           {privateKeyFileError ? (
@@ -1246,7 +1245,7 @@ settings:
               aria-live="polite"
               className="text-sm text-muted-foreground"
             >
-              Reading private key file…
+              {tf("auto.c5c9855e5cc20ea1")}
             </p>
           ) : privateKeyFileLoaded ? (
             <p
@@ -1254,16 +1253,16 @@ settings:
               aria-live="polite"
               className="text-sm text-muted-foreground"
             >
-              Private key loaded. It stays in this form until you connect.
+              {tf("auto.13a97342ac8719a8")}
             </p>
           ) : null}
         </div>
         <div className="grid gap-2">
-          <p className="text-sm font-medium">Webhook secret</p>
+          <p className="text-sm font-medium">{tf("auto.342da97208cceb8a")}</p>
           {generatedWebhookSecret ? (
             <>
               <Input
-                aria-label="Generated webhook secret"
+                aria-label={tf("auto.90e15bc010e364c9")}
                 className="font-mono text-xs"
                 readOnly
                 value={generatedWebhookSecret}
@@ -1294,7 +1293,7 @@ settings:
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Copy this value now. Paperclip will not show it again.
+                {tf("auto.32126b2c9c47a002")}
               </p>
             </>
           ) : (
@@ -1365,7 +1364,7 @@ settings:
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-xl font-bold">Finish Slack setup</h1>
+          <h1 className="text-xl font-bold">{tf("auto.72cf69cec6f5d578")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Point the Slack app at Paperclip now that its signing secret is
             connected.
@@ -1374,7 +1373,7 @@ settings:
         {endpointValue("Paperclip webhook URL", endpoint.setup?.webhookUrl)}
         {endpointValue("Slack command", slackCommand)}
         <div className="rounded-lg border border-border p-3 text-sm">
-          <p className="font-medium">Use the registered command</p>
+          <p className="font-medium">{tf("auto.7c12f003e49ca6d8")}</p>
           <p className="mt-1 text-muted-foreground">
             Start work with <code>{slackCommand} investigate this</code>. In a
             direct message, use <code>{slackCommand} status</code>,{" "}
@@ -1385,8 +1384,8 @@ settings:
         </div>
         <ol className="list-decimal space-y-2 pl-5 text-sm">
           <li>
-            Return to <strong>App Manifest</strong> in Slack and click{" "}
-            <strong>Save Changes</strong>. The copied manifest already contains
+            Return to <strong>{tf("auto.eac077c3004485ba")}</strong> in Slack and click{" "}
+            <strong>{tf("auto.35322b5bb5a218a1")}</strong>. The copied manifest already contains
             the event, interaction, and slash-command URLs. Slack verifies the
             Events URL when you save; Paperclip records Interactivity and slash
             command health only after each signed callback is observed.
@@ -1409,7 +1408,7 @@ settings:
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold">Connect a Slack app</h1>
+        <h1 className="text-xl font-bold">{tf("auto.7b2ecfc5254bf7f9")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {repairing
             ? "Reconnect verifies or replaces credentials for this same Slack app. It does not reinstall the app or change its workspace or channel membership. Leave credentials blank to reuse the saved values."
@@ -1419,32 +1418,32 @@ settings:
       <ol className="list-decimal space-y-2 pl-5 text-sm">
         <li>
           Copy the manifest, then create a Slack app{" "}
-          <strong>From an app manifest</strong> in the target workspace.
+          <strong>{tf("auto.203de75ae101714d")}</strong> in the target workspace.
         </li>
         <li>
-          Open <strong>OAuth &amp; Permissions</strong>, install the app to the
+          {tf("text.Open")} <strong>{tf("auto.552008101593cea5")}</strong>, install the app to the
           workspace, and copy its Bot User OAuth Token.
         </li>
         <li>
-          Open <strong>Basic Information</strong> and copy its Signing Secret.
+          {tf("text.Open")} <strong>{tf("auto.d094b334d8099b1e")}</strong> and copy its Signing Secret.
         </li>
       </ol>
       <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-muted-foreground">Slack app name</span>
+          <span className="text-muted-foreground">{tf("auto.b6896b3aed424d71")}</span>
           <code>{slackAppName}</code>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-muted-foreground">Bot display name</span>
+          <span className="text-muted-foreground">{tf("auto.55564bb9b1d7cdbf")}</span>
           <code>{slackBotName}</code>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <span className="text-muted-foreground">Slash command</span>
+          <span className="text-muted-foreground">{tf("auto.85dec3aee05fe0d3")}</span>
           <code>{slackCommand}</code>
         </div>
       </div>
       <label className="grid gap-2 text-sm font-medium">
-        Slack app manifest
+        {tf("auto.3d57b60515962088")}
         <Textarea
           className="min-h-56 font-mono text-xs"
           readOnly
@@ -1541,11 +1540,11 @@ function TryStep({
           ? "start a new channel post and mention the agent again"
           : "send a new root mention to the agent";
   const identityGuidance = provider === "imessage-photon" && principalsQuery.isSuccess && (identities.length === 0 || unlinkedIdentities.length > 0)
-    ? { tone: "info" as const, title: "Link your Messages identity", body: "Send one message to discover your phone number or Apple account address, then link that exact identity in Access. Send a fresh request after linking; earlier messages do not start work." }
+    ? { tone: "info" as const, title: tf("auto.6f8fcedaa1c25992"), body: "Send one message to discover your phone number or Apple account address, then link that exact identity in Access. Send a fresh request after linking; earlier messages do not start work." }
     : principalsQuery.isError
     ? {
         tone: "warning" as const,
-        title: "Identity readiness could not be checked",
+        title: tf("auto.eadefdc5c2de902a"),
         body: `Review Access before expecting an agent reply. After linking the account you are testing, ${freshConversationInstruction}.`,
       }
     : !principalsQuery.isSuccess || guestIsolationState === "loading"
@@ -1554,7 +1553,7 @@ function TryStep({
         ? guestIsolationState === "disabled"
           ? {
               tone: "warning" as const,
-              title: "Link the account you’re testing",
+              title: tf("auto.8e3ed069cffaf158"),
               body:
                 provider === "telegram"
                   ? "Tap Start in Telegram to discover your account; the welcome does not start an agent run. Link the account privately in Access, then return and send the test message."
@@ -1562,7 +1561,7 @@ function TryStep({
             }
           : {
               tone: "info" as const,
-              title: "Your first message identifies your account",
+              title: tf("auto.c6aabd33580acde8"),
               body:
                 provider === "telegram"
                   ? "Tap Start in Telegram to discover your account. Until linked, it is a restricted guest and still needs a sandbox-backed isolated run; test that path intentionally, or link it in Access and then send the test message."
@@ -1572,12 +1571,12 @@ function TryStep({
           ? guestIsolationState === "disabled"
             ? {
                 tone: "warning" as const,
-                title: "Link the account you’re testing",
+                title: tf("auto.8e3ed069cffaf158"),
                 body: `An observed external account is unlinked, and isolated guest work is off, so it cannot safely start ${agentName}. Link the account in Access, then ${freshConversationInstruction}; Paperclip does not replay the refused request.`,
               }
             : {
                 tone: "info" as const,
-                title: "Unlinked identity detected",
+                title: tf("auto.f9a121ab44124ed5"),
                 body: `An unlinked account is a restricted guest and still needs a sandbox-backed isolated run. Test guest access intentionally, or link the account in Access and then ${freshConversationInstruction}.`,
               }
           : null;
@@ -1631,13 +1630,13 @@ function TryStep({
           Try {agentName} in {providerNames[provider]}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Complete this real conversation to finish setup.
+          {tf("auto.fae6c4770a9b518c")}
         </p>
       </div>
       {(!principalsQuery.isSuccess || guestIsolationState === "loading") &&
       !principalsQuery.isError ? (
         <p role="status" className="text-sm text-muted-foreground">
-          Checking identity and guest readiness…
+          {tf("auto.572f064e1675bbbb")}
         </p>
       ) : null}
       {identityGuidance ? (
@@ -1657,7 +1656,7 @@ function TryStep({
             variant="outline"
             onClick={onOpenAccess}
           >
-            Review identity access
+            {tf("auto.31688e7ebbfc7581")}
           </Button>
         </div>
       ) : null}

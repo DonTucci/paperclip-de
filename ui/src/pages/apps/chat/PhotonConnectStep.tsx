@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export function PhotonConnectStep({
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <h1 className="text-xl font-bold">Connect iMessage Photon</h1>
+        <h1 className="text-xl font-bold">{tf("auto.32def631882df822")}</h1>
         <p className="text-sm text-muted-foreground">
           Connect {agentName} to Photon Cloud. Pro supports direct messages through
           a shared line. Dedicated numbers also support individually enabled groups.
@@ -58,7 +59,7 @@ export function PhotonConnectStep({
             target="_blank"
             rel="noreferrer"
           >
-            Photon dashboard
+            {tf("auto.5da11f56acd1703c")}
           </a>
           {" · "}
           <a
@@ -67,7 +68,7 @@ export function PhotonConnectStep({
             target="_blank"
             rel="noreferrer"
           >
-            Photon line setup
+            {tf("auto.d3a4d1f056e94553")}
           </a>
         </p>
       </div>
@@ -79,7 +80,7 @@ export function PhotonConnectStep({
         </p>
       )}
       <label className="grid gap-2 text-sm font-medium">
-        Project ID
+        {tf("auto.e511470b21a90cea")}
         <Input
           value={projectId}
           autoComplete="off"
@@ -91,7 +92,7 @@ export function PhotonConnectStep({
         />
       </label>
       <label className="grid gap-2 text-sm font-medium">
-        Project secret
+        {tf("auto.e34f019ab7220675")}
         <Input
           type="password"
           value={projectSecret}

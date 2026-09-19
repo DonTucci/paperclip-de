@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Loader2, RotateCcw, Undo2 } from "lucide-react";
@@ -71,8 +72,8 @@ export function StalledReviewActions({
     },
     onError: (error) => {
       pushToast({
-        title: "Could not record the review decision",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.ac26aaecc6ab4073"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       });
     },
@@ -104,7 +105,7 @@ export function StalledReviewActions({
       <Textarea
         value={note}
         onChange={(event) => setNote(event.target.value)}
-        placeholder="Add a note — required to request changes, optional otherwise…"
+        placeholder={tf("auto.80f4b2f51f381f41")}
         className="min-h-16 text-sm"
         data-testid="stalled-review-note"
         disabled={pending}

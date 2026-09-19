@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, AlertTriangle, FileQuestion, Plus, X } from "lucide-react";
@@ -122,7 +123,7 @@ export function buildSearchUrl(
 }
 
 function shapeError(error: unknown): { message: string; status?: number } {
-  if (!error) return { message: "Unknown error" };
+  if (!error) return { message: tf("auto.27c2ccd962c2b8dc") };
   if (error instanceof Error) {
     const status = (error as Error & { status?: number }).status;
     return { message: error.message, status: typeof status === "number" ? status : undefined };
@@ -156,7 +157,7 @@ export function Search() {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Search" }]);
+    setBreadcrumbs([{ label: tf("text.Search") }]);
   }, [setBreadcrumbs]);
 
   useEffect(() => {
@@ -545,7 +546,7 @@ export function Search() {
   return (
     <div className="flex h-full min-h-0 flex-col" data-page="search">
       <div className="border-b border-border px-4 py-3 sm:px-6">
-        <h1 className="sr-only">Search</h1>
+        <h1 className="sr-only">{tf("text.Search")}</h1>
         <div className="relative">
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -565,15 +566,15 @@ export function Search() {
                 }
               }
             }}
-            placeholder="Search tasks, comments, documents, artifacts, agents, projects…"
-            aria-label="Search query"
+            placeholder={tf("auto.e395aedd49f7c051")}
+            aria-label={tf("auto.9eef05233ecfc1fb")}
             className="h-10 pl-9 pr-20 text-sm"
           />
           {draftQuery.length > 0 ? (
             <button
               type="button"
               onClick={handleClear}
-              aria-label="Clear search"
+              aria-label={tf("auto.3b7ea51793e9d906")}
               className="absolute right-12 top-1/2 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-accent/50"
             >
               <X className="h-3.5 w-3.5" />
@@ -617,9 +618,9 @@ export function Search() {
             </div>
           ) : (
             <span className="truncate">
-              Try <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">status:todo</code>,{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">assignee:me</code>,{" "}
-              or <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">updated:&gt;7d</code>.
+              Try <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">{tf("auto.b75be1de0c42edb4")}</code>,{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">{tf("auto.8c9d6707f7dd7053")}</code>,{" "}
+              or <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">{tf("auto.3fc5865a4d766c1c")}</code>.
             </span>
           )}
         </div>
@@ -763,15 +764,15 @@ function SearchTabContent({
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 py-10 sm:px-6">
         <div>
-          <h2 className="text-lg font-semibold">Type to search organization memory.</h2>
+          <h2 className="text-lg font-semibold">{tf("auto.cb201d7ceaf215f8")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tasks, comments, plan documents, artifacts, agents, projects — same surface, ranked by relevance.
+            {tf("auto.ea90c709ce3aa228")}
           </p>
         </div>
         {recentSearches.length > 0 ? (
           <div>
             <div className="mb-2 text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-              Recent searches
+              {tf("auto.228c84b5a56e6bce")}
             </div>
             <ul className="flex flex-col divide-y divide-border rounded-md border border-border">
               {recentSearches.map((entry) => (
@@ -791,11 +792,11 @@ function SearchTabContent({
         ) : null}
         <ul className="space-y-1 text-xs text-muted-foreground">
           <li>
-            <span className="font-medium text-foreground">Identifier lookup:</span> type{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">PAP-123</code> to jump straight to a task.
+            <span className="font-medium text-foreground">{tf("auto.492ca8934fe835bf")}</span> type{" "}
+            <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">{tf("auto.e18ea121d2c10160")}</code> to jump straight to a task.
           </li>
           <li>
-            <span className="font-medium text-foreground">Quoted phrases:</span> wrap a phrase in quotes to match the
+            <span className="font-medium text-foreground">{tf("auto.9efd02faeb841a85")}</span> wrap a phrase in quotes to match the
             exact sequence.
           </li>
           <li>
@@ -812,17 +813,17 @@ function SearchTabContent({
     return (
       <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center gap-3 px-4 py-12 text-center">
         <AlertTriangle className="h-10 w-10 text-destructive" aria-hidden />
-        <div className="text-base font-semibold">Couldn’t run that search</div>
+        <div className="text-base font-semibold">{tf("auto.8e9caef82caab22c")}</div>
         <p className="text-sm text-muted-foreground">
           {status ? `The server returned ${status}.` : "The request failed."} Your input and filters are still here, so
           you can retry or fall back to the Tasks filter.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Button onClick={refetch} variant="default" size="sm">
-            Retry
+            {tf("text.Retry")}
           </Button>
           <Button onClick={navigateIssuesFallback} variant="outline" size="sm">
-            Open Tasks filter view
+            {tf("auto.841ffda7cc0be0e3")}
           </Button>
         </div>
       </div>
@@ -868,23 +869,23 @@ function SearchTabContent({
         <div className="flex flex-wrap items-center justify-center gap-2">
           {scope !== "all" ? (
             <Button onClick={showAllScope} size="sm" variant="outline">
-              Search all scopes
+              {tf("auto.5bcc0794472210ea")}
             </Button>
           ) : null}
           <Button onClick={openNewIssue} size="sm" variant="default">
             <Plus className="mr-1.5 h-4 w-4" />
-            Create task from this query
+            {tf("auto.ab10ebff65e7a826")}
           </Button>
           <Button onClick={navigateIssuesFallback} size="sm" variant="ghost">
-            Open Tasks filter view
+            {tf("auto.841ffda7cc0be0e3")}
           </Button>
         </div>
         <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
-          <li>Try fewer tokens or a single distinctive term.</li>
+          <li>{tf("auto.2fc7f119e3c1d059")}</li>
           <li>
-            Use an identifier shortcut like <code className="rounded bg-muted px-1 py-0.5">PAP-123</code>.
+            Use an identifier shortcut like <code className="rounded bg-muted px-1 py-0.5">{tf("auto.e18ea121d2c10160")}</code>.
           </li>
-          <li>Wrap multi-word phrases in quotes.</li>
+          <li>{tf("auto.bc38db20b3e52481")}</li>
         </ul>
       </div>
     );
@@ -906,7 +907,7 @@ function SearchTabContent({
             ? ` · ${activeFilterCount} ${activeFilterCount === 1 ? "filter" : "filters"} active`
             : ""}
         </span>
-        {isFetching ? <span aria-live="polite" className="normal-case tracking-normal">Updating…</span> : null}
+        {isFetching ? <span aria-live="polite" className="normal-case tracking-normal">{tf("auto.dfe40efe921fe88e")}</span> : null}
       </div>
       <div className="flex flex-col gap-y-1 pb-10">
         {results.map((result) => (

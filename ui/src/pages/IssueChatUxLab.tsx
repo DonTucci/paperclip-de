@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 // token-extraction: allowlisted — intentional one-off decoration (DECISION-SHEET.md B1
 // user ruling). The bg-[...gradient...] / shadow-[...] literals in this demo/UX-lab page
 // are deliberate one-off decoration, reverted from --gradient-extract-*/--shadow-extract-*
@@ -150,9 +151,9 @@ export function IssueChatUxLab() {
           <div className="p-6 sm:p-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/[0.08] px-3 py-1 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-cyan-700 dark:text-cyan-300">
               <FlaskConical className="h-3.5 w-3.5" />
-              Chat UX Lab
+              {tf("auto.29357d164d940f63")}
             </div>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight">Issue chat review surface</h1>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight">{tf("auto.45a3140a8ffaf055")}</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
               This page exercises the real assistant-ui issue chat with fixture-backed messages. Use it to review
               spacing, chronology, running states, tool rendering, activity rows, queueing, and composer behavior
@@ -164,10 +165,10 @@ export function IssueChatUxLab() {
                 /tests/ux/chat
               </Badge>
               <Badge variant="outline" className="rounded-full px-3 py-1 text-(length:--text-nano) uppercase tracking-(--tracking-caps)">
-                assistant-ui thread
+                {tf("auto.8fdcdb840d4fd3e4")}
               </Badge>
               <Badge variant="outline" className="rounded-full px-3 py-1 text-(length:--text-nano) uppercase tracking-(--tracking-caps)">
-                fixture-backed live run
+                {tf("auto.27c30344c4357650")}
               </Badge>
             </div>
 
@@ -180,7 +181,7 @@ export function IssueChatUxLab() {
                 className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Route className="h-3.5 w-3.5" />
-                Jump to live execution preview
+                {tf("auto.9cd83124f285f6c6")}
               </a>
             </div>
           </div>
@@ -188,7 +189,7 @@ export function IssueChatUxLab() {
           <aside className="border-t border-border/60 bg-background/70 p-6 lg:border-l lg:border-t-0">
             <div className="mb-4 flex items-center gap-2 text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
               <WandSparkles className="h-4 w-4 text-cyan-700 dark:text-cyan-300" />
-              Covered states
+              {tf("auto.0e6b1d07913bc5d2")}
             </div>
             <div className="space-y-3">
               {highlights.map((highlight) => (
@@ -207,20 +208,20 @@ export function IssueChatUxLab() {
       <LabSection
         id="rotating-text"
         eyebrow="Animation demo"
-        title="Rotating reasoning text"
-        description="Isolated ticker that cycles sample reasoning lines on a timer. The outgoing line slides up and fades out while the incoming line slides up from below. Runs in a loop so you can tune timing and easing without needing a live stream."
+        title={tf("auto.c4c0ead35b3d7531")}
+        description={tf("auto.45daa09976b85ee5")}
         accentClassName="bg-[linear-gradient(180deg,rgba(168,85,247,0.06),transparent_28%),var(--background)]"
       >
         <div className="space-y-4">
           <div className="rounded-xl border border-border/60 bg-accent/10 p-4">
             <div className="mb-2 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-              Default interval (2.2s)
+              {tf("auto.1d0699d9729e2c4b")}
             </div>
             <RotatingReasoningDemo />
           </div>
           <div className="rounded-xl border border-border/60 bg-accent/10 p-4">
             <div className="mb-2 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-              Fast interval (1s) — stress test
+              {tf("auto.03135fd02c1806c5")}
             </div>
             <RotatingReasoningDemo intervalMs={1000} />
           </div>
@@ -230,35 +231,35 @@ export function IssueChatUxLab() {
       <LabSection
         id="working-tokens"
         eyebrow="Status tokens"
-        title="Working / Worked header verb"
+        title={tf("auto.4f96256faa861600")}
         description='The "Working" token uses the shimmer-text gradient sweep to signal an active run. Once the run completes it becomes the static "Worked" token.'
         accentClassName="bg-[linear-gradient(180deg,rgba(16,185,129,0.06),transparent_28%),var(--background)]"
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-border/60 bg-accent/10 p-4">
             <div className="mb-3 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-              Active run — shimmer
+              {tf("auto.47dc1effab360866")}
             </div>
             <div className="flex items-center gap-2.5 rounded-lg px-1 py-2">
               <span className="inline-flex items-center gap-2 text-sm font-medium text-foreground/80">
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
-                <span className="shimmer-text">Working</span>
+                <span className="shimmer-text">{tf("auto.a92f0449a9f7235b")}</span>
               </span>
-              <span className="text-xs text-muted-foreground/60">for 12s</span>
+              <span className="text-xs text-muted-foreground/60">{tf("auto.96a2218c8334994f")}</span>
             </div>
           </div>
           <div className="rounded-xl border border-border/60 bg-accent/10 p-4">
             <div className="mb-3 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-              Completed run — static
+              {tf("auto.0924a54a4ff4bd15")}
             </div>
             <div className="flex items-center gap-2.5 rounded-lg px-1 py-2">
               <span className="inline-flex items-center gap-2 text-sm font-medium text-foreground/80">
                 <span className="flex h-4 w-4 shrink-0 items-center justify-center">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/70" />
                 </span>
-                Worked
+                {tf("auto.e7f93aad5026eeaf")}
               </span>
-              <span className="text-xs text-muted-foreground/60">for 1 min 24s</span>
+              <span className="text-xs text-muted-foreground/60">{tf("auto.57b68c4f3abfa0f9")}</span>
             </div>
           </div>
         </div>
@@ -267,8 +268,8 @@ export function IssueChatUxLab() {
       <LabSection
         id="live-execution"
         eyebrow="Primary preview"
-        title="Live execution thread"
-        description="Shows the fully active state: timeline events, historical run marker, a running assistant reply with reasoning and tools, and a queued follow-up from the user."
+        title={tf("auto.90f82992bb9b8bc4")}
+        description={tf("auto.729cf126ccaa0d46")}
         accentClassName="bg-[linear-gradient(180deg,rgba(6,182,212,0.05),transparent_28%),var(--background)]"
       >
         <IssueChatThread
@@ -298,7 +299,7 @@ export function IssueChatUxLab() {
 
       <LabSection
         eyebrow="Submitting state"
-        title="Pending message bubble"
+        title={tf("auto.e4452d63c65c0eb7")}
         description='When a user sends a message, the bubble briefly shows a "Sending..." label at reduced opacity until the server confirms receipt. This preview renders that transient state.'
         accentClassName="bg-[linear-gradient(180deg,rgba(59,130,246,0.06),transparent_28%),var(--background)]"
       >
@@ -319,8 +320,8 @@ export function IssueChatUxLab() {
       <div className="grid gap-6 xl:grid-cols-2">
         <LabSection
           eyebrow="Settled review"
-          title="Durable comments and feedback"
-          description="Shows the post-run state: assistant comment feedback controls, historical run context, and timeline reassignment without any active stream."
+          title={tf("auto.c7c7176aba75d2ac")}
+          description={tf("auto.4cbacd256d6ce593")}
           accentClassName="bg-[linear-gradient(180deg,rgba(168,85,247,0.05),transparent_26%),var(--background)]"
         >
           <IssueChatThread
@@ -343,8 +344,8 @@ export function IssueChatUxLab() {
         <div className="space-y-6">
           <LabSection
             eyebrow="Empty thread"
-            title="Empty state and disabled composer"
-            description="Keeps the message area visible even when there is no thread yet, and replaces the composer with an explicit warning when replies are blocked."
+            title={tf("auto.33b198a434c12abe")}
+            description={tf("auto.63bbc394f8550766")}
             accentClassName="bg-[linear-gradient(180deg,rgba(245,158,11,0.08),transparent_26%),var(--background)]"
           >
             <IssueChatThread
@@ -365,27 +366,27 @@ export function IssueChatUxLab() {
             <CardHeader className="px-5 pt-5 pb-0">
               <div className="flex items-center gap-2 text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
                 <MessagesSquare className="h-4 w-4 text-cyan-700 dark:text-cyan-300" />
-                Review checklist
+                {tf("auto.a623a46394632f2e")}
               </div>
-              <CardTitle className="text-lg">What to evaluate on this page</CardTitle>
+              <CardTitle className="text-lg">{tf("auto.dfc861e2fc8daafa")}</CardTitle>
               <CardDescription>
-                This route should be the fastest way to inspect the chat system before or after tweaks.
+                {tf("auto.1c3b9683dfa5c71f")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 px-5 pb-5 pt-0 text-sm text-muted-foreground">
               <div className="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
                 <div className="mb-1 flex items-center gap-2 font-medium text-foreground">
                   <Bot className="h-4 w-4 text-cyan-700 dark:text-cyan-300" />
-                  Message hierarchy
+                  {tf("auto.46e6251884eaf983")}
                 </div>
-                Check that user, assistant, and system rows scan differently without feeling like separate products.
+                {tf("auto.7e4983814408ba39")}
               </div>
               <div className="rounded-2xl border border-border/70 bg-background/80 px-4 py-3">
                 <div className="mb-1 flex items-center gap-2 font-medium text-foreground">
                   <Sparkles className="h-4 w-4 text-cyan-700 dark:text-cyan-300" />
-                  Stream polish
+                  {tf("auto.f1fc4e83c4c07c35")}
                 </div>
-                Watch the live preview for reasoning density, tool expansion behavior, and queued follow-up readability.
+                {tf("auto.4f2db64a023376f8")}
               </div>
             </CardContent>
           </Card>

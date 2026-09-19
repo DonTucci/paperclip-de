@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { UIAdapterModule } from "../types";
 import { parseKimiStdoutLine } from "@paperclipai/adapter-kimi-local/ui";
 import { KimiLocalConfigFields } from "./config-fields";
@@ -5,7 +6,7 @@ import { buildKimiLocalConfig } from "@paperclipai/adapter-kimi-local/ui";
 
 export const kimiLocalUIAdapter: UIAdapterModule = {
   type: "kimi_local",
-  label: "Kimi Code",
+  label: tf("auto.0c486180bb8a7b51"),
   parseStdoutLine: parseKimiStdoutLine,
   ConfigFields: KimiLocalConfigFields,
   buildAdapterConfig: buildKimiLocalConfig,

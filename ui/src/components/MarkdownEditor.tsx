@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   Component,
   type ClipboardEvent,
@@ -894,7 +895,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorRef, MarkdownEditorProps>
           if (!looksEmpty()) return;
           setRichEditorError({
             code: "MDE-EMPTY",
-            message: "Rich editor failed to load content",
+            message: tf("auto.5439d5568df048a3"),
           });
         }, RICH_EDITOR_EMPTY_CONFIRM_MS);
       }, RICH_EDITOR_EMPTY_CHECK_MS);
@@ -953,7 +954,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorRef, MarkdownEditorProps>
             }, 100);
             return src;
           } catch (err) {
-            const message = err instanceof Error ? err.message : "Image upload failed";
+            const message = err instanceof Error ? err.message: tf("auto.3c5479c9819d932e");
             setUploadError(message);
             throw err;
           }
@@ -1327,7 +1328,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorRef, MarkdownEditorProps>
               setRichEditorError(null);
             }}
           >
-            Retry rich editor
+            {tf("auto.a4cbab20343b714d")}
           </button>
         </div>
         <textarea
@@ -1617,27 +1618,27 @@ export const MarkdownEditor = forwardRef<MarkdownEditorRef, MarkdownEditorProps>
                 )}
                 {option.kind === "issue" && (
                   <span className="ml-auto text-(length:--text-nano) uppercase tracking-wide text-muted-foreground">
-                    Task
+                    {tf("text.Task")}
                   </span>
                 )}
                 {option.kind === "project" && option.projectId && (
                   <span className="ml-auto text-(length:--text-nano) uppercase tracking-wide text-muted-foreground">
-                    Project
+                    {tf("text.Project")}
                   </span>
                 )}
                 {option.kind === "user" && (
                   <span className="ml-auto text-(length:--text-nano) uppercase tracking-wide text-muted-foreground">
-                    User
+                    {tf("auto.b512d97e7cbf97c2")}
                   </span>
                 )}
                 {option.kind === "skill" && (
                   <span className="ml-auto text-(length:--text-nano) uppercase tracking-wide text-muted-foreground">
-                    Skill
+                    {tf("text.Skill")}
                   </span>
                 )}
                 {option.kind === "routine" && (
                   <span className="ml-auto text-(length:--text-nano) uppercase tracking-wide text-muted-foreground">
-                    Routine
+                    {tf("text.Routine")}
                   </span>
                 )}
                 {option.kind === "action" && (

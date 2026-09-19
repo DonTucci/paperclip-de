@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 import { deriveOriginatingActor, type Issue } from "@paperclipai/shared";
 import { Columns3 } from "lucide-react";
@@ -111,7 +112,7 @@ export function IssueColumnPicker({
           variant={iconOnly ? "outline" : "ghost"}
           size={iconOnly ? "icon" : "sm"}
           className={iconOnly ? "h-8 w-8 shrink-0" : "hidden h-8 shrink-0 px-2 text-xs sm:inline-flex"}
-          title="Columns"
+          title={tf("auto.53aade77cd69a77b")}
         >
           <Columns3 className={iconOnly ? "h-3.5 w-3.5" : "mr-1 h-3.5 w-3.5"} />
           {!iconOnly && "Columns"}
@@ -121,7 +122,7 @@ export function IssueColumnPicker({
         <DropdownMenuLabel className="px-2 pb-1 pt-1.5">
           <div className="space-y-1">
             <div className="text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-              Desktop task rows
+              {tf("auto.9ead53dfc53b755c")}
             </div>
             <div className="text-sm font-medium text-foreground">
               {title}
@@ -156,10 +157,10 @@ export function IssueColumnPicker({
           >
             <span className="flex flex-col gap-0.5">
               <span className="text-sm font-medium text-foreground">
-                Date group separators
+                {tf("auto.738875ead75bf14a")}
               </span>
               <span className="text-xs leading-relaxed text-muted-foreground">
-                Show Today, Yesterday, and Earlier rules on newest-first task lists.
+                {tf("auto.2c8dbf56bfbf4a50")}
               </span>
             </span>
           </DropdownMenuCheckboxItem>
@@ -169,8 +170,8 @@ export function IssueColumnPicker({
           onSelect={onResetColumns}
           className="rounded-lg px-3 py-2 text-sm"
         >
-          Reset defaults
-          <span className="ml-auto text-xs text-muted-foreground">status, id, updated</span>
+          {tf("auto.4542d49a520543f9")}
+          <span className="ml-auto text-xs text-muted-foreground">{tf("auto.5fd9f7e236a0f8bd")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -235,7 +236,7 @@ export function InboxIssueMetaLeading({
               "text-blue-600 dark:text-blue-400",
             )}
           >
-            Live
+            {tf("auto.b64ac05f17e64d03")}
           </span>
         </Badge>
       )}
@@ -347,7 +348,7 @@ export function InboxIssueTrailingColumns({
 
           return (
             <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">
-              Unassigned
+              {tf("auto.14d33bd014e6b4e7")}
             </span>
           );
         }
@@ -393,7 +394,7 @@ export function InboxIssueTrailingColumns({
 
           return (
             <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">
-              Unknown
+              {tf("auto.b764cdc0eab71374")}
             </span>
           );
         }
@@ -419,7 +420,7 @@ export function InboxIssueTrailingColumns({
 
           return (
             <span key={column} className="min-w-0 truncate text-xs text-muted-foreground">
-              No project
+              {tf("auto.f34c2be0d1c5f562")}
             </span>
           );
         }
@@ -476,7 +477,7 @@ export function InboxIssueTrailingColumns({
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="top" sideOffset={6}>
-                    Filter by workspace
+                    {tf("auto.7e5aae00f559b341")}
                   </TooltipContent>
                 </Tooltip>
               ) : (
@@ -496,7 +497,7 @@ export function InboxIssueTrailingColumns({
               {parentIdentifier ? (
                 <span className="font-mono">{parentIdentifier}</span>
               ) : (
-                <span className="italic">Sub-task</span>
+                <span className="italic">{tf("auto.17aa97a09b7fbc27")}</span>
               )}
             </span>
           );

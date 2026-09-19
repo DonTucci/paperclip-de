@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useCallback,
   useEffect,
@@ -442,7 +443,7 @@ export function TaskSidePanel({
   useEffect(() => {
     if (activeTab) return;
     window.requestAnimationFrame(() => {
-      bodyRef.current?.querySelector<HTMLInputElement>('input[aria-label="Search tabs and resources…"]')?.focus();
+      bodyRef.current?.querySelector<HTMLInputElement>("input")?.focus();
     });
   }, [activeTab]);
 
@@ -497,12 +498,12 @@ export function TaskSidePanel({
 
   const launcherSections = useMemo<SidePanelLauncherSection[]>(() => {
     const primary: SidePanelLauncherItem[] = [
-      { id: "properties", label: "Properties", icon: <SlidersHorizontal />, alreadyOpen: controller.tabs.some((tab) => tab.id === "properties") },
+      { id: "properties", label: tf("auto.ae43692b2a310b8e"), icon: <SlidersHorizontal />, alreadyOpen: controller.tabs.some((tab) => tab.id === "properties") },
       ...(subtasksAvailable ? [{ id: "subtasks", label: taskLabel, description: tasksTab?.hasError ? "Could not load all tasks" : `${taskCount} total`, icon: <ListTree />, alreadyOpen: controller.tabs.some((tab) => tab.id === "subtasks") }] : []),
-      { id: "artifacts", label: "Artifacts", icon: <Box />, alreadyOpen: controller.tabs.some((tab) => tab.id === "artifacts") },
+      { id: "artifacts", label: tf("text.Artifacts"), icon: <Box />, alreadyOpen: controller.tabs.some((tab) => tab.id === "artifacts") },
     ];
     if (fileTabsEnabled) {
-      primary.push({ id: "files", label: "Files", icon: <FolderOpen />, shortcut: "G F", alreadyOpen: controller.tabs.some((tab) => tab.id === "files") });
+      primary.push({ id: "files", label: tf("text.Files"), icon: <FolderOpen />, shortcut: "G F", alreadyOpen: controller.tabs.some((tab) => tab.id === "files") });
     }
     const documentItems: SidePanelLauncherItem[] = [
       ...(planDocument ? [{
@@ -524,10 +525,10 @@ export function TaskSidePanel({
         })),
     ];
     const sections: SidePanelLauncherSection[] = [
-      { id: "open", label: "Open", items: primary },
+      { id: "open", label: tf("text.Open"), items: primary },
     ];
     if (documentItems.length > 0) {
-      sections.push({ id: "documents", label: "Task documents", items: documentItems });
+      sections.push({ id: "documents", label: tf("auto.9635582975ed4996"), items: documentItems });
     }
     if (fileTabsEnabled) {
       const recentItems = recentFilesQuery.data?.state === "available"
@@ -541,7 +542,7 @@ export function TaskSidePanel({
         : [];
       sections.push({
         id: "recent-files",
-        label: "Recent workspace files",
+        label: tf("auto.e214a7aab17133cd"),
         items: recentItems,
         loading: recentFilesQuery.isLoading,
         error: recentFilesQuery.isError ? "Recent files are temporarily unavailable." : null,
@@ -600,7 +601,7 @@ export function TaskSidePanel({
               ? "h-(--side-panel-tab-height) w-(--side-panel-tab-height) rounded-md"
               : "h-(--side-panel-tab-height) w-(--side-panel-tab-height) rounded-(--side-panel-control-radius)",
           )}
-          aria-label="Open a new tab"
+          aria-label={tf("auto.2b75279f7878c031")}
         >
           <Plus aria-hidden />
         </Button>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   CircleCheck,
   CircleAlert,
@@ -12,28 +13,28 @@ export type TestState = "idle" | "running" | "pass" | "fail";
 
 const copy = {
   idle: {
-    title: "Test your agent",
-    description: "Check that your runtime and model can respond.",
+    title: tf("auto.bcf9391cef9abd0c"),
+    description: tf("auto.0325fd6d4e81471f"),
     action: "Run test",
   },
   running: {
-    title: "Testing connection",
-    description: "Checking the runtime and waiting for a model response…",
+    title: tf("auto.04dfed9c1dcdcb4a"),
+    description: tf("auto.a1c61e0777f0a51c"),
     action: "Testing…",
   },
   pass: {
-    title: "Connection successful",
-    description: "Your runtime checks passed. Review the details below.",
+    title: tf("auto.856dd8c8677b1f8f"),
+    description: tf("auto.4edd56668f397335"),
     action: "Test again",
   },
   warn: {
-    title: "Connection needs attention",
-    description: "Review the test details before running your agent.",
+    title: tf("auto.4f1fc01dc19d3255"),
+    description: tf("auto.a186aaf27c8a0782"),
     action: "Test again",
   },
   fail: {
-    title: "Couldn't connect",
-    description: "Check your model and provider connection, then try again.",
+    title: tf("auto.babe5b3844e244f5"),
+    description: tf("auto.c7c75083b81f3cf2"),
     action: "Retry test",
   },
 } as const;
@@ -62,7 +63,7 @@ export function RuntimeTestCard({
           : Play;
   return (
     <section
-      aria-label="Runtime test"
+      aria-label={tf("auto.a3b5b9078336bc8f")}
       className="rounded-lg border border-border bg-card"
     >
       <div className="flex items-start gap-3 p-4 sm:items-center">
@@ -117,7 +118,7 @@ export function RuntimeTestCard({
               aria-hidden="true"
               className="size-3 transition-transform group-open:rotate-90"
             />
-            Test details
+            {tf("auto.7cc561a55b3b3180")}
           </summary>
           <ul className="space-y-3 px-4 pb-4">
             {result.checks.map((check) => (

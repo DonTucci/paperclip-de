@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, HelpCircle } from "lucide-react";
 import { isValidRoutineDateString, syncRoutineVariablesWithTemplate, type RoutineVariable } from "@paperclipai/shared";
@@ -83,7 +84,7 @@ export function RoutineVariablesEditor({
     <Collapsible open={open} onOpenChange={setOpen} className="overflow-hidden rounded-lg border border-border/70">
       <CollapsibleTrigger className="flex w-full items-center justify-between px-3 py-2 text-left">
         <div>
-          <p className="text-sm font-medium">Variables</p>
+          <p className="text-sm font-medium">{tf("text.Variables")}</p>
           <p className="text-xs text-muted-foreground">
             Detected from `{"{{name}}"}` placeholders in the title and instructions.
           </p>
@@ -98,13 +99,13 @@ export function RoutineVariablesEditor({
                 {`{{${variable.name}}}`}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                Prompt the user for this value before each manual run.
+                {tf("auto.2b4cc78d81088557")}
               </span>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label className="text-xs">Label</Label>
+                <Label className="text-xs">{tf("auto.0e66373f45dcf3dd")}</Label>
                 <Input
                   value={variable.label ?? ""}
                   onChange={(event) => onChange(updateVariableList(syncedVariables, variable.name, (current) => ({
@@ -116,7 +117,7 @@ export function RoutineVariablesEditor({
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs">Type</Label>
+                <Label className="text-xs">{tf("text.Type")}</Label>
                 <Select
                   value={variable.type}
                   onValueChange={(type) => onChange(updateVariableList(syncedVariables, variable.name, (current) => ({
@@ -139,7 +140,7 @@ export function RoutineVariablesEditor({
 
               <div className="space-y-1.5 md:col-span-2">
                 <div className="flex items-center justify-between gap-3">
-                  <Label className="text-xs">Default value</Label>
+                  <Label className="text-xs">{tf("auto.e6fdffbb82b605ae")}</Label>
                   <label className="flex items-center gap-2 text-xs text-muted-foreground">
                     <input
                       type="checkbox"
@@ -149,7 +150,7 @@ export function RoutineVariablesEditor({
                         required: event.target.checked,
                       })))}
                     />
-                    Required
+                    {tf("text.Required")}
                   </label>
                 </div>
 
@@ -174,15 +175,15 @@ export function RoutineVariablesEditor({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="__unset__">No default</SelectItem>
-                      <SelectItem value="true">True</SelectItem>
-                      <SelectItem value="false">False</SelectItem>
+                      <SelectItem value="__unset__">{tf("auto.706e7d9f0e1dc1ec")}</SelectItem>
+                      <SelectItem value="true">{tf("auto.3cbc87c7681f34db")}</SelectItem>
+                      <SelectItem value="false">{tf("auto.60a33e6cf5151f2d")}</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : variable.type === "select" ? (
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="space-y-1.5">
-                      <Label className="text-xs">Options</Label>
+                      <Label className="text-xs">{tf("auto.d0db8b5e364b6989")}</Label>
                       <Input
                         value={variable.options.join(", ")}
                         onChange={(event) => {
@@ -196,11 +197,11 @@ export function RoutineVariablesEditor({
                                 : null,
                           })));
                         }}
-                        placeholder="high, medium, low"
+                        placeholder={tf("auto.04d2e278bffe58ff")}
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-xs">Default option</Label>
+                      <Label className="text-xs">{tf("auto.e98cdb115555b9b7")}</Label>
                       <Select
                         value={typeof variable.defaultValue === "string" ? variable.defaultValue : "__unset__"}
                         onValueChange={(next) => onChange(updateVariableList(syncedVariables, variable.name, (current) => ({
@@ -209,10 +210,10 @@ export function RoutineVariablesEditor({
                         })))}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="No default" />
+                          <SelectValue placeholder={tf("auto.706e7d9f0e1dc1ec")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="__unset__">No default</SelectItem>
+                          <SelectItem value="__unset__">{tf("auto.706e7d9f0e1dc1ec")}</SelectItem>
                           {variable.options.map((option) => (
                             <SelectItem key={option} value={option}>{option}</SelectItem>
                           ))}
@@ -237,7 +238,7 @@ export function RoutineVariablesEditor({
                       ...current,
                       defaultValue: event.target.value || null,
                     })))}
-                    placeholder={variable.type === "number" ? "42" : "Default value"}
+                    placeholder={variable.type === "number" ? "42" : tf("auto.e6fdffbb82b605ae")}
                   />
                 )}
               </div>
@@ -259,12 +260,12 @@ const BUILTIN_VARIABLE_DOCS: BuiltinVariableDoc[] = [
   {
     name: "date",
     example: "2026-04-28",
-    description: "Current date in YYYY-MM-DD format (UTC) at the time the routine runs.",
+    description: tf("auto.2855ef35c0c13614"),
   },
   {
     name: "timestamp",
     example: "April 28, 2026 at 12:17 PM UTC",
-    description: "Human-readable date and time (UTC) at the time the routine runs.",
+    description: tf("auto.43844b717c0fcb8f"),
   },
 ];
 
@@ -281,7 +282,7 @@ export function RoutineVariablesHint() {
           type="button"
           onClick={() => setHelpOpen(true)}
           className="shrink-0 rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Show variable help"
+          aria-label={tf("auto.e638b7dd849900bd")}
         >
           <HelpCircle className="h-3.5 w-3.5" />
         </button>
@@ -290,16 +291,16 @@ export function RoutineVariablesHint() {
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
-            <DialogTitle>Routine variables</DialogTitle>
+            <DialogTitle>{tf("auto.991b3b5169c17628")}</DialogTitle>
             <DialogDescription>
-              How to prompt for inputs and which variables Paperclip fills in automatically.
+              {tf("auto.c32330f9aff60e36")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-5 text-sm">
             <section className="space-y-2">
               <h3 className="text-xs font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-                Custom variables
+                {tf("auto.6e1560c270da67ed")}
               </h3>
               <p className="text-muted-foreground">
                 Type{" "}
@@ -307,20 +308,20 @@ export function RoutineVariablesHint() {
                   {"{{variable_name}}"}
                 </code>{" "}
                 anywhere in the title or instructions. Paperclip detects each placeholder, lists it
-                under <span className="font-medium text-foreground">Variables</span>, and prompts
+                under <span className="font-medium text-foreground">{tf("text.Variables")}</span>, and prompts
                 for a value before each run.
               </p>
               <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
-                <li>Names must start with a letter and may use letters, numbers, and underscores.</li>
-                <li>Pick a type (text, textarea, number, boolean, select, date), default value, and whether it is required.</li>
-                <li>Variable names ending in capital Date, such as startDate, are created as date variables by default.</li>
-                <li>The same name reused across the title and instructions is treated as one variable.</li>
+                <li>{tf("auto.00f8d741f5af0681")}</li>
+                <li>{tf("auto.a1bc2c5f2f1fe8c2")}</li>
+                <li>{tf("auto.b3b6177f964bfb2a")}</li>
+                <li>{tf("auto.1d070af9f6d139b9")}</li>
               </ul>
             </section>
 
             <section className="space-y-2">
               <h3 className="text-xs font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-                Built-in variables
+                {tf("auto.d6a95f07940aaef2")}
               </h3>
               <p className="text-muted-foreground">
                 These are filled in automatically — no setup needed and they will not appear in the
@@ -330,9 +331,9 @@ export function RoutineVariablesHint() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-muted/40 text-muted-foreground">
                     <tr>
-                      <th className="px-3 py-2 font-medium">Placeholder</th>
-                      <th className="px-3 py-2 font-medium">Example</th>
-                      <th className="px-3 py-2 font-medium">Description</th>
+                      <th className="px-3 py-2 font-medium">{tf("auto.f4b24fed0274a316")}</th>
+                      <th className="px-3 py-2 font-medium">{tf("auto.d029f87e3d80f8fd")}</th>
+                      <th className="px-3 py-2 font-medium">{tf("text.Description")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/70">

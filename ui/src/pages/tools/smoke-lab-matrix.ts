@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   SMOKE_RUN_STEP_PATHS,
   type SmokeRun,
@@ -19,13 +20,13 @@ import {
  */
 
 export const SMOKE_PATH_LABELS: Record<SmokeRunStepPath, { title: string; detail: string }> = {
-  P1: { title: "Remote HTTP · OAuth", detail: "HTTP MCP fixture behind the fake OAuth provider" },
-  P2: { title: "Remote HTTP · API key", detail: "HTTP MCP fixture with a static bearer key" },
-  P3: { title: "Local stdio (template)", detail: "stdio fixture via the runtime supervisor" },
-  P4: { title: "Plugin integration", detail: "plugin-provided catalog entry + install flow" },
-  P5: { title: "Paste-a-config import", detail: "prosumer import via Advanced setup" },
-  P6: { title: "Token broker / gateway", detail: "run-scoped connection token, TTL + scope checks" },
-  P7: { title: "Governance surfaces", detail: "profiles, ask-first rules, quarantine" },
+  P1: { title: tf("auto.d454eec033fa76d5"), detail: "HTTP MCP fixture behind the fake OAuth provider" },
+  P2: { title: tf("auto.8f973a6655333113"), detail: "HTTP MCP fixture with a static bearer key" },
+  P3: { title: tf("auto.6c513ea3158582e1"), detail: "stdio fixture via the runtime supervisor" },
+  P4: { title: tf("auto.d16a5ed6881c107c"), detail: "plugin-provided catalog entry + install flow" },
+  P5: { title: tf("auto.6c5d14db7d770205"), detail: "prosumer import via Advanced setup" },
+  P6: { title: tf("auto.956ed61e5747b845"), detail: "run-scoped connection token, TTL + scope checks" },
+  P7: { title: tf("auto.d4f86297b95cdf0f"), detail: "profiles, ask-first rules, quarantine" },
 };
 
 export interface LifecycleStage {
@@ -37,14 +38,14 @@ export interface LifecycleStage {
 
 /** The PAP-12373 governed lifecycle, in order (plan §3). */
 export const LIFECYCLE_STAGES: LifecycleStage[] = [
-  { key: "connect", label: "Connect", match: ["connect", "oauth", "login", "auth"] },
-  { key: "discover", label: "Discover catalog", match: ["discover", "catalog", "list-tools"] },
-  { key: "read", label: "Allowed read", match: ["read", "allowed"] },
-  { key: "write", label: "Ask-first write", match: ["write", "approve", "ask-first", "askfirst", "review"] },
-  { key: "deny", label: "Denied call", match: ["deny", "denied", "block", "forbidden"] },
-  { key: "quarantine", label: "Schema-change quarantine", match: ["quarantine", "schema"] },
-  { key: "revoke", label: "Revoke", match: ["revoke"] },
-  { key: "audit", label: "Audit evidence", match: ["audit", "activity", "evidence"] },
+  { key: "connect", label: tf("text.Connect"), match: ["connect", "oauth", "login", "auth"] },
+  { key: "discover", label: tf("auto.816990c99738b4b8"), match: ["discover", "catalog", "list-tools"] },
+  { key: "read", label: tf("auto.c4e65f38b6a83ca7"), match: ["read", "allowed"] },
+  { key: "write", label: tf("auto.5fe97dc1a4700901"), match: ["write", "approve", "ask-first", "askfirst", "review"] },
+  { key: "deny", label: tf("auto.a60746719ea55c3f"), match: ["deny", "denied", "block", "forbidden"] },
+  { key: "quarantine", label: tf("auto.6798160d686196f2"), match: ["quarantine", "schema"] },
+  { key: "revoke", label: tf("auto.87e6d00bbf53ec5a"), match: ["revoke"] },
+  { key: "audit", label: tf("auto.74dbcfd2a32d9701"), match: ["audit", "activity", "evidence"] },
 ];
 
 /** Fold a free-form scenario step onto a canonical lifecycle stage, or null. */

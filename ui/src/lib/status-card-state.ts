@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { StatusCard, StatusCardRefreshPolicy } from "@paperclipai/shared";
 
 /**
@@ -52,60 +53,60 @@ export const STATUS_CARD_LIFECYCLE_PRESENTATION: Record<
   StatusCardLifecyclePresentation
 > = {
   compiling: {
-    label: "Setting up",
+    label: tf("auto.dbdf27e5db8d8cde"),
     dotClassName: "bg-cyan-400 animate-pulse",
-    description: "Just created; setting up and generating the first summary.",
+    description: tf("auto.226c1e3f36fbef63"),
     dashedBorder: true,
     keepsLastSummary: false,
   },
   fresh: {
-    label: "Fresh",
+    label: tf("auto.f810b66877419ce9"),
     dotClassName: "bg-emerald-400",
-    description: "Summary reflects all known changes; nothing pending.",
+    description: tf("auto.52934f2aadb12235"),
     dashedBorder: false,
     keepsLastSummary: true,
   },
   stale: {
-    label: "Stale",
+    label: tf("auto.40c9e59c5e152b0a"),
     dotClassName: "bg-amber-400",
-    description: "Changes are pending since the last update.",
+    description: tf("auto.c681361c78132942"),
     dashedBorder: false,
     keepsLastSummary: true,
   },
   updating: {
     // Blue (distinct from fresh-emerald and compiling-cyan) so an in-flight
     // update never reads as "fresh" on a glance-scan of the board.
-    label: "Updating",
+    label: tf("auto.0b5260e1b4054f46"),
     dotClassName: "bg-blue-500 animate-pulse",
-    description: "An update is streaming in now.",
+    description: tf("auto.0b749ec601a2c86c"),
     dashedBorder: false,
     keepsLastSummary: true,
   },
   error: {
-    label: "Error",
+    label: tf("text.Error"),
     dotClassName: "bg-red-500",
-    description: "The last run failed; the last good summary stays visible.",
+    description: tf("auto.3a1419dd214ce615"),
     dashedBorder: false,
     keepsLastSummary: true,
   },
   paused_budget: {
-    label: "Paused — budget",
+    label: tf("auto.62ae66772ab1775e"),
     dotClassName: "bg-orange-400",
-    description: "The daily token cap was hit; auto-updates are suspended.",
+    description: tf("auto.7fb1a09a16453810"),
     dashedBorder: false,
     keepsLastSummary: true,
   },
   paused_hours: {
-    label: "Paused — hours",
+    label: tf("auto.9e02926799bef4c0"),
     dotClassName: "bg-orange-400",
-    description: "Outside active hours; changes batch into one update at window open.",
+    description: tf("auto.5fc8333c38cda73f"),
     dashedBorder: false,
     keepsLastSummary: true,
   },
   archived: {
-    label: "Archived",
+    label: tf("text.Archived"),
     dotClassName: "bg-muted-foreground/50",
-    description: "No auto-updates and no watches. Restore to start watching again.",
+    description: tf("auto.cd8313f2af4f1e1d"),
     dashedBorder: false,
     keepsLastSummary: true,
   },

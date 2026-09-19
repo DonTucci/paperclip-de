@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { HeartbeatRun, RoutineRunSummary } from "@paperclipai/shared";
@@ -60,7 +61,7 @@ function RoutineScopedRuns({
   if (isLoading) {
     return (
       <div className="border-y border-border py-14 text-center text-sm text-muted-foreground">
-        Loading routine runs…
+        {tf("auto.7a7812b78692dd27")}
       </div>
     );
   }
@@ -69,24 +70,24 @@ function RoutineScopedRuns({
     return (
       <div className="flex flex-col items-center gap-3 border-y border-border py-14 text-center">
         <p className="text-sm text-muted-foreground">{error.message}</p>
-        <Button variant="outline" size="sm" onClick={onRetry}>Try again</Button>
+        <Button variant="outline" size="sm" onClick={onRetry}>{tf("text.Try again")}</Button>
       </div>
     );
   }
 
   if (runs.length === 0) {
-    return <EmptyState icon={Activity} message="No routine runs yet." />;
+    return <EmptyState icon={Activity} message={tf("auto.6af68ecae1f6786a")} />;
   }
 
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Routine runs</h2>
+        <h2 className="text-lg font-semibold text-foreground">{tf("auto.567cf1c7f451239f")}</h2>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Executions created by this routine, newest first.
+          {tf("auto.1cf14f843ed33beb")}
         </p>
       </div>
-      <ul className="divide-y divide-border border-y border-border" aria-label="Routine runs">
+      <ul className="divide-y divide-border border-y border-border" aria-label={tf("auto.567cf1c7f451239f")}>
         {runs.map((run) => {
           const content = (
             <>
@@ -201,7 +202,7 @@ export function AuditRuns({ companyId, routineId }: { companyId: string; routine
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Runs</h2>
+        <h2 className="text-lg font-semibold text-foreground">{tf("text.Runs")}</h2>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
           Recent agent executions across the organization. Open a run to inspect its transcript,
           output, and task context.
@@ -210,13 +211,13 @@ export function AuditRuns({ companyId, routineId }: { companyId: string; routine
 
       <div className="flex flex-wrap items-end gap-3 border-y border-border py-3">
         <label className="grid gap-1 text-(length:--text-micro) font-medium text-muted-foreground">
-          <span>Agent</span>
+          <span>{tf("text.Agent")}</span>
           <Select value={agentId} onValueChange={(value) => updateFilter("agentId", value)}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="All agents" />
+              <SelectValue placeholder={tf("auto.54c32d3e2cfa1cc8")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>All agents</SelectItem>
+              <SelectItem value={ALL}>{tf("auto.54c32d3e2cfa1cc8")}</SelectItem>
               {(agents.data ?? []).map((agent) => (
                 <SelectItem key={agent.id} value={agent.id}>
                   {agent.name}
@@ -226,13 +227,13 @@ export function AuditRuns({ companyId, routineId }: { companyId: string; routine
           </Select>
         </label>
         <label className="grid gap-1 text-(length:--text-micro) font-medium text-muted-foreground">
-          <span>Status</span>
+          <span>{tf("text.Status")}</span>
           <Select value={status} onValueChange={(value) => updateFilter("runStatus", value)}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="All statuses" />
+              <SelectValue placeholder={tf("auto.8ee57323a6f24cc7")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ALL}>All statuses</SelectItem>
+              <SelectItem value={ALL}>{tf("auto.8ee57323a6f24cc7")}</SelectItem>
               {statuses.map((value) => (
                 <SelectItem key={value} value={value}>
                   {readableSource(value)}
@@ -243,31 +244,31 @@ export function AuditRuns({ companyId, routineId }: { companyId: string; routine
         </label>
         {agentId !== ALL || status !== ALL ? (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Clear filters
+            {tf("text.Clear filters")}
           </Button>
         ) : null}
       </div>
 
       {runs.isLoading ? (
         <div className="border-y border-border py-14 text-center text-sm text-muted-foreground">
-          Loading runs…
+          {tf("auto.8438ea394d1520d9")}
         </div>
       ) : runs.error ? (
         <div className="flex flex-col items-center gap-3 border-y border-border py-14 text-center">
           <p className="text-sm text-muted-foreground">
-            {runs.error instanceof Error ? runs.error.message : "Failed to load runs."}
+            {runs.error instanceof Error ? runs.error.message: tf("auto.feb60871020dd19a")}
           </p>
           <Button variant="outline" size="sm" onClick={() => runs.refetch()}>
-            Try again
+            {tf("text.Try again")}
           </Button>
         </div>
       ) : visibleRuns.length === 0 ? (
         <EmptyState
           icon={agentId !== ALL || status !== ALL ? CircleDotDashed : Activity}
-          message={agentId !== ALL || status !== ALL ? "No runs match these filters." : "No runs yet."}
+          message={agentId !== ALL || status !== ALL ? tf("auto.aedae6e517ebb7db") : tf("auto.72a85758b69c1d33")}
         />
       ) : (
-        <ul className="divide-y divide-border border-y border-border" aria-label="Recent runs">
+        <ul className="divide-y divide-border border-y border-border" aria-label={tf("auto.237112b89b77be8e")}>
           {visibleRuns.map((run) => {
             const agent = agentById.get(run.agentId);
             const summary = runSummary(run);

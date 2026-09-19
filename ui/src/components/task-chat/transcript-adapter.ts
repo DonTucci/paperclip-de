@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Live adapter: map a run's streaming TranscriptEntry[] (from
  * useLiveRunTranscripts — the same source the current thread consumes) into the
@@ -981,7 +982,7 @@ export function transcriptToTaskChatItems(
           kind: "usage",
           ...(entry.subtype === "paperclip_runner_session_usage"
             ? {
-                label: "Provider session total",
+                label: tf("auto.4c72ae7d1d481bee"),
                 detail:
                   entry.text ||
                   "This cumulative usage can include earlier runs in the resumed provider session.",
@@ -1628,8 +1629,7 @@ function phaseSummary(
     (item) => item.kind === "marker" && item.variant === "interrupted",
   );
   return interrupted?.kind === "marker"
-    ? interrupted.label
-    : "No tool activity";
+    ? interrupted.label: tf("auto.afb6077d95410862");
 }
 
 /**
@@ -2102,11 +2102,11 @@ export function deriveRunStatusLabel(entries: readonly TranscriptEntry[]): {
         }
       }
       const selfTalk = flattenSelfTalk(parts.join(""));
-      return { label: "Responding", selfTalk: selfTalk || undefined };
+      return { label: tf("auto.98047c1e6a79f788"), selfTalk: selfTalk || undefined };
     }
-    if (entry.kind === "thinking") return { label: "Thinking" };
+    if (entry.kind === "thinking") return { label: tf("auto.a20d12c5e9c428c3") };
     if (entry.kind === "system" && entry.text === "Reasoning started")
-      return { label: "Thinking" };
+      return { label: tf("auto.a20d12c5e9c428c3") };
   }
-  return { label: "Running" };
+  return { label: tf("text.Running") };
 }

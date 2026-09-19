@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -187,7 +188,7 @@ export function ConnectionIntentInteractionBody({
       : interaction.status === "rejected"
         ? {
             icon: XCircle,
-            title: "Connection declined",
+            title: tf("auto.b17945c0569a4120"),
             body: isAi ? "The task still needs a working AI connection before it can run." : `${interaction.payload.requestingAgentName} was notified and can continue without it.`,
           }
         : interaction.status === "expired"
@@ -267,19 +268,18 @@ export function ConnectionIntentInteractionBody({
               ) : setupQuery.isError ? (
                 <div className="py-8 text-center">
                   <p className="font-medium text-foreground">
-                    Couldn’t load connection setup
+                    {tf("auto.a1ed99c5ed036e7e")}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {setupQuery.error instanceof Error
-                      ? setupQuery.error.message
-                      : "Try again."}
+                      ? setupQuery.error.message: tf("auto.a0c2cc1374d94994")}
                   </p>
                   <Button
                     className="mt-4"
                     variant="outline"
                     onClick={() => setupQuery.refetch()}
                   >
-                    Try again
+                    {tf("text.Try again")}
                   </Button>
                 </div>
               ) : setupProps ? (
@@ -309,7 +309,7 @@ export function ConnectionIntentInteractionBody({
         {" "}You can continue here once it is restored.
       </p>
     : setupQuery.data?.aiConnection && setupQuery.data.aiConnection.mode !== "responsible_user"
-      ? <p role="status" className="text-sm text-muted-foreground">The selected account is no longer available to you. Ask its owner to restore access, or choose an available AI connection in the agent’s settings.</p>
+      ? <p role="status" className="text-sm text-muted-foreground">{tf("auto.fbec3492385289f4")}</p>
       : setupQuery.data?.aiConnection ? <AiConnectionCredentialStep
           companyId={interaction.companyId}
           provider={setupQuery.data.aiConnection.provider}
@@ -363,7 +363,7 @@ export function ConnectionIntentInteractionBody({
             disabled={declineMutation.isPending || completeMutation.isPending || authorizing}
             onClick={() => declineMutation.mutate()}
           >
-            Not now
+            {tf("auto.a0e63d7c7125d29a")}
           </Button>}
           {isAi ? <Button type="button" disabled={completeMutation.isPending} onClick={() => open ? closeSetup() : setOpen(true)}>
             <Plug className="h-4 w-4" />{open ? "Close setup" : "Fix connection"}
@@ -394,7 +394,7 @@ export function ConnectionIntentInteractionBody({
                   Connect {interaction.payload.serviceName}
                 </DialogTitle>
                 <DialogDescription>
-                  Complete connection setup without leaving this task.
+                  {tf("auto.759ccded9f4fde4a")}
                 </DialogDescription>
               </DialogHeader>
               {setupContent}
@@ -414,8 +414,7 @@ export function ConnectionIntentInteractionBody({
                   completeMutation.error ??
                   declineMutation.error ??
                   phaseMutation.error
-                )?.message
-              : "Couldn’t update this connection request."}
+                )?.message: tf("auto.1a99d1bb21231288")}
           </p>
         ) : null}
       </div>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Link, useNavigate, useLocation } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -49,11 +50,11 @@ export const AGENT_FILTER_TABS = ["all", "active", "paused", "error", "builtin"]
 type FilterTab = (typeof AGENT_FILTER_TABS)[number];
 
 const AGENT_FILTER_TAB_ITEMS: { value: FilterTab; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "paused", label: "Paused" },
-  { value: "error", label: "Error" },
-  { value: "builtin", label: "Built-in" },
+  { value: "all", label: tf("text.All") },
+  { value: "active", label: tf("text.Active") },
+  { value: "paused", label: tf("text.Paused") },
+  { value: "error", label: tf("text.Error") },
+  { value: "builtin", label: tf("auto.1f43948106d1d47f") },
 ];
 
 function isFilterTab(value: string): value is FilterTab {
@@ -67,15 +68,15 @@ interface EnvironmentDescriptor {
 }
 
 const localEnvironmentDescriptor: EnvironmentDescriptor = {
-  label: "Local",
+  label: tf("text.Local"),
   detail: "Paperclip host",
-  title: "Local - Paperclip host",
+  title: tf("auto.369767d8f0c4a3f6"),
 };
 
 const loadingEnvironmentDescriptor: EnvironmentDescriptor = {
   label: "—",
   detail: "Loading environment",
-  title: "Loading environment",
+  title: tf("auto.07bae8d39556bb5e"),
 };
 
 // Agents in these states never appear in the agents list — `terminated` is
@@ -146,7 +147,7 @@ function describeEnvironment(
 
 function describeMissingEnvironment(environmentId: string): EnvironmentDescriptor {
   return {
-    label: "Unknown environment",
+    label: tf("auto.ea7edbd56b1ce88c"),
     detail: environmentId.slice(0, 8),
     title: `Unknown environment - ${environmentId}`,
   };
@@ -317,7 +318,7 @@ export function Agents() {
   }, [agents, environmentsById, environmentCapabilities, instanceSettings?.defaultEnvironmentId]);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Agents" }]);
+    setBreadcrumbs([{ label: tf("text.Agents") }]);
   }, [setBreadcrumbs]);
 
   useEffect(() => {
@@ -327,7 +328,7 @@ export function Agents() {
   }, [builtInAgentsEnabled, instanceSettings, navigate, requestedTab, selectedCompanyId]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Bot} message="Select a company to view agents." />;
+    return <EmptyState icon={Bot} message={tf("auto.d41551a22324ce53")} />;
   }
 
   if (isLoading) {
@@ -374,7 +375,7 @@ export function Agents() {
               variant="outline"
               onClick={() => setConfigureState(builtInState)}
             >
-              Set up
+              {tf("auto.4da10f1fbb17cac2")}
             </Button>
           </span>
         )}
@@ -400,7 +401,7 @@ export function Agents() {
           resourceMembershipState(membershipsQuery.data, "agent", agent.id) === "left" ? "sm:text-foreground/55" : "",
         )}
         leading={hasInvalidOrgChain ? (
-          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" aria-label="Invalid reporting chain" />
+          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" aria-label={tf("auto.bf9c6d9dc8a902fc")} />
         ) : (
           <AgentStatusCapsule status={agent.status} />
         )}
@@ -491,15 +492,15 @@ export function Agents() {
         <div className="flex items-center gap-2">
           {/* View toggle */}
           {!forceListView && (
-            <div className="flex items-center border border-border" role="group" aria-label="View mode">
+            <div className="flex items-center border border-border" role="group" aria-label={tf("auto.18997f2413b5dcc8")}>
               <button
                 className={cn(
                   "p-1.5 transition-colors",
                   effectiveView === "list" ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent/50"
                 )}
                 onClick={() => setView("list")}
-                title="List view"
-                aria-label="List view"
+                title={tf("auto.5d8c3e1b635eed6f")}
+                aria-label={tf("auto.5d8c3e1b635eed6f")}
                 aria-pressed={effectiveView === "list"}
               >
                 <List className="h-3.5 w-3.5" />
@@ -510,8 +511,8 @@ export function Agents() {
                   effectiveView === "org" ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent/50"
                 )}
                 onClick={() => setView("org")}
-                title="Org chart view"
-                aria-label="Org chart view"
+                title={tf("auto.a33c82404434fb9d")}
+                aria-label={tf("auto.a33c82404434fb9d")}
                 aria-pressed={effectiveView === "org"}
               >
                 <GitBranch className="h-3.5 w-3.5" />
@@ -520,7 +521,7 @@ export function Agents() {
           )}
           <Button size="sm" variant="outline" onClick={openNewAgent}>
             <Plus className="h-3.5 w-3.5 mr-1.5" />
-            New Agent
+            {tf("text.New Agent")}
           </Button>
         </div>
       </div>
@@ -534,8 +535,8 @@ export function Agents() {
       {agents && agents.length === 0 && (
         <EmptyState
           icon={Bot}
-          message="Create your first agent to get started."
-          action="New Agent"
+          message={tf("auto.14bccad41688263f")}
+          action={tf("text.New Agent")}
           onAction={openNewAgent}
         />
       )}
@@ -549,7 +550,7 @@ export function Agents() {
 
       {effectiveView === "list" && agents && agents.length > 0 && filtered.length === 0 && (
         <p className="text-sm text-muted-foreground text-center py-8">
-          No agents match the selected status.
+          {tf("auto.8b96d18f07361419")}
         </p>
       )}
 
@@ -578,13 +579,13 @@ export function Agents() {
 
       {effectiveView === "org" && orgTree && orgTree.length > 0 && filteredOrg.length === 0 && (
         <p className="text-sm text-muted-foreground text-center py-8">
-          No agents match the selected status.
+          {tf("auto.8b96d18f07361419")}
         </p>
       )}
 
       {effectiveView === "org" && orgTree && orgTree.length === 0 && (
         <p className="text-sm text-muted-foreground text-center py-8">
-          No organizational hierarchy defined.
+          {tf("auto.7ac9886550455b61")}
         </p>
       )}
       {configureState && selectedCompanyId && (
@@ -653,7 +654,7 @@ function OrgTreeNode({
         )}
       >
         {hasInvalidOrgChain ? (
-          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500" aria-label="Invalid reporting chain" />
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500" aria-label={tf("auto.bf9c6d9dc8a902fc")} />
         ) : (
           <AgentStatusCapsule status={node.status} />
         )}
@@ -679,7 +680,7 @@ function OrgTreeNode({
                   }}
                 >
                   <Button size="xs" variant="outline" onClick={() => onConfigureBuiltIn(builtInState)}>
-                    Set up
+                    {tf("auto.4da10f1fbb17cac2")}
                   </Button>
                 </span>
               )}

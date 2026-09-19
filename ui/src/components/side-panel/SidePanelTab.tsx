@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent, type ReactNode, type Ref } from "react";
 import { X } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -100,7 +101,7 @@ export function SidePanelTab({
             type="button"
             role="tab"
             data-side-panel-tab-target={id}
-            data-side-panel-tab-tooltip={labelIsTruncated ? "enabled" : "disabled"}
+            data-side-panel-tab-tooltip={labelIsTruncated ? tf("auto.fb9cf75606b4070d") : tf("auto.17eb3c0168d0d7b2")}
             id={`side-panel-tab-${id}`}
             aria-controls={`side-panel-content-${id}`}
             aria-selected={active}

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { AlertTriangle } from "lucide-react";
 export function EmailSafetyNotice() {
   return (
@@ -9,7 +10,7 @@ export function EmailSafetyNotice() {
         <AlertTriangle className="size-4 shrink-0 text-(--status-agent-paused)" />
         <div className="space-y-1">
           <p className="text-sm font-medium">
-            Anyone can email an unrestricted inbox
+            {tf("auto.850d77abd7ec6462")}
           </p>
           <p className="text-sm text-muted-foreground">
             Incoming email can create tasks and trigger agent work. Set up an
@@ -28,7 +29,7 @@ export function EmailSafetyNotice() {
           rel="noreferrer"
           className="underline underline-offset-4"
         >
-          Open AgentMail ↗
+          {tf("auto.1d9d67d1ac149a40")}
         </a>
         <a
           href="https://docs.agentmail.to/knowledge-base/allowlists-blocklists"
@@ -36,7 +37,7 @@ export function EmailSafetyNotice() {
           rel="noreferrer"
           className="text-muted-foreground underline underline-offset-4"
         >
-          Set up allowlists ↗
+          {tf("auto.0bf5ad9e26216bfc")}
         </a>
       </div>
     </div>

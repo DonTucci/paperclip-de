@@ -1,24 +1,25 @@
+import { tf } from "@/i18n/fork";
 import { Database, Gauge, ReceiptText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const SURFACES = [
   {
-    title: "Inference ledger",
-    description: "Request-scoped usage and billed runs from cost_events.",
+    title: tf("auto.41faba7cc38d6027"),
+    description: tf("auto.80135fc7038b8e97"),
     icon: Database,
     points: ["tokens + billed dollars", "provider, biller, model", "subscription and overage aware"],
     tone: "from-sky-500/12 via-sky-500/6 to-transparent",
   },
   {
-    title: "Finance ledger",
-    description: "Account-level charges that are not one prompt-response pair.",
+    title: tf("auto.46bfab69ff187f2f"),
+    description: tf("auto.5f1e31b27c3e9193"),
     icon: ReceiptText,
     points: ["top-ups, refunds, fees", "Bedrock provisioned or training charges", "credit expiries and adjustments"],
     tone: "from-amber-500/14 via-amber-500/6 to-transparent",
   },
   {
-    title: "Live quotas",
-    description: "Provider or biller windows that can stop traffic in real time.",
+    title: tf("auto.d7cd0a58c6713ccf"),
+    description: tf("auto.c4f5142f91accff0"),
     icon: Gauge,
     points: ["provider quota windows", "biller credit systems", "errors surfaced directly"],
     tone: "from-emerald-500/14 via-emerald-500/6 to-transparent",
@@ -31,7 +32,7 @@ export function AccountingModelCard() {
       <div className="absolute inset-0 bg-(image:--gradient-extract-3)" />
       <CardHeader className="relative px-5 pt-5 pb-2">
         <CardTitle className="text-sm font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-          Accounting model
+          {tf("auto.811f1fa2a5af2e68")}
         </CardTitle>
         <CardDescription className="max-w-2xl text-sm leading-6">
           Paperclip now separates request-level inference usage from account-level finance events.

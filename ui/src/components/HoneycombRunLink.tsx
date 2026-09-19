@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,10 +43,10 @@ export function HoneycombRunLink({
         href={href}
         target="_blank"
         rel="noreferrer"
-        title="Open this run's task.run trace query in Honeycomb"
+        title={tf("auto.b056c2702cac3eda")}
       >
         <ExternalLink />
-        View in Honeycomb
+        {tf("auto.358cde948ef1e415")}
       </a>
     </Button>
   );

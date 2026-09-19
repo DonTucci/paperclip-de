@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useCaseHref } from "@/lib/router";
 import { casesApi, type CaseLinkRole } from "@/api/cases";
@@ -37,7 +38,7 @@ export function IssueCasesPanel({ issueId }: { issueId: string }) {
 
   return (
     <section className="space-y-2">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Cases</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("nav.cases")}</h3>
       <div className="space-y-1">
         {links.map((link) => (
           <Link

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Sandboxed Worker bootstrap for external adapter UI parsers.
  *
@@ -131,13 +132,13 @@ self.onmessage = function (e) {
       }
 
       if (!parseStdoutLine) {
-        self.postMessage({ type: "error", message: "Parser module exports no usable parseStdoutLine or createStdoutParser" });
+        self.postMessage({ type: "error", message: tf("auto.9bdac60d98ef1fe9") });
         return;
       }
 
       self.postMessage({ type: "ready" });
     } catch (err) {
-      self.postMessage({ type: "error", message: "Parser init failed: " + (err && err.message || String(err)) });
+      self.postMessage({ type: "error", message: tf("auto.b2e7a8bd7e129c77") + (err && err.message || String(err)) });
     }
     return;
   }

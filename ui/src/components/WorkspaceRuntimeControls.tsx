@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   WorkspaceCommandDefinition,
   RuntimeExposureStatus,
@@ -222,13 +223,13 @@ function isActiveStatusLabel(statusLabel: string) {
 function exposureFailureCopy(exposure: RuntimeExposureStatus | null) {
   if (exposure?.state === "failed") {
     return {
-      label: "HTTPS unavailable",
+      label: tf("auto.0c011e774a5bc673"),
       remediation: "Check the Tailscale broker and node HTTPS configuration.",
     };
   }
   if (exposure?.state === "cleanup_pending") {
     return {
-      label: "HTTPS cleanup pending",
+      label: tf("auto.6727ed53bf2ccee0"),
       remediation: "Restart the host broker before reusing this port.",
     };
   }
@@ -566,7 +567,7 @@ export function WorkspaceRuntimeControls({
     <div className={cn("space-y-4", className)}>
       <div className={cn("border border-border/70 bg-background p-3", square ? "rounded-none" : "rounded-xl")}>
         <div className="space-y-1">
-          <div className="text-xs font-medium uppercase tracking-(--tracking-eyebrow) text-muted-foreground">Workspace commands</div>
+          <div className="text-xs font-medium uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("auto.6cc6282c5ab30392")}</div>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline"
               className={cn(
@@ -590,8 +591,8 @@ export function WorkspaceRuntimeControls({
       </div>
 
       <CommandSection
-        title="Services"
-        description="Long-running commands that Paperclip can supervise for this workspace."
+        title={tf("auto.604dce445e326d95")}
+        description={tf("auto.ed1be5cc288bf44e")}
         items={resolvedSections.services}
         emptyMessage={resolvedServiceEmptyMessage}
         disabledHint={visibleDisabledHint}
@@ -602,8 +603,8 @@ export function WorkspaceRuntimeControls({
       />
 
       <CommandSection
-        title="Jobs"
-        description="One-shot commands that run now and exit when they finish."
+        title={tf("auto.2f17a0f8d518e491")}
+        description={tf("auto.9b358ae2380d7f6e")}
         items={resolvedSections.jobs}
         emptyMessage={jobEmptyMessage}
         isPending={isPending}
@@ -614,8 +615,8 @@ export function WorkspaceRuntimeControls({
 
       {resolvedSections.otherServices.length > 0 ? (
         <CommandSection
-          title="Untracked services"
-          description="Running services that no longer match the current workspace command config."
+          title={tf("auto.87bd9a2e2d135bf7")}
+          description={tf("auto.b3169d3dc6d79df6")}
           items={resolvedSections.otherServices}
           emptyMessage=""
           isPending={isPending}

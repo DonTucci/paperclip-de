@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import type { FeedbackDataSharingPreference, FeedbackVoteValue } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
@@ -124,7 +125,7 @@ export function OutputFeedbackButtons({
           onClick={() => handleVote("up")}
         >
           <ThumbsUp className="mr-1.5 h-3.5 w-3.5" />
-          Helpful
+          {tf("auto.63c432db3ebb9aec")}
         </Button>
         <Button
           type="button"
@@ -135,17 +136,17 @@ export function OutputFeedbackButtons({
           onClick={() => handleVote("down")}
         >
           <ThumbsDown className="mr-1.5 h-3.5 w-3.5" />
-          Needs work
+          {tf("auto.738a3278e945747c")}
         </Button>
         {rightSlot ? <div className="ml-auto">{rightSlot}</div> : null}
       </div>
       {collectingDownvoteReason ? (
         <div className="mt-2 rounded-md border border-border/60 bg-accent/20 p-3">
-          <div className="mb-2 text-sm font-medium">What could have been better?</div>
+          <div className="mb-2 text-sm font-medium">{tf("auto.829e701d9a216100")}</div>
           <Textarea
             value={downvoteReason}
             onChange={(event) => setDownvoteReason(event.target.value)}
-            placeholder="Add a short note"
+            placeholder={tf("auto.1adb884ad7345cf3")}
             className="min-h-20 resize-y bg-background"
             disabled={disabled || isSaving}
           />
@@ -161,7 +162,7 @@ export function OutputFeedbackButtons({
                 setDownvoteAllowSharing(undefined);
               }}
             >
-              Dismiss
+              {tf("text.Dismiss")}
             </Button>
             <Button
               type="button"
@@ -191,7 +192,7 @@ export function OutputFeedbackButtons({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save your feedback sharing preference</DialogTitle>
+            <DialogTitle>{tf("auto.1c562b5e2b712a50")}</DialogTitle>
             <DialogDescription>
               Choose whether voted AI outputs can be shared with Paperclip Labs. This
               answer becomes the default for future thumbs up and thumbs down votes.
@@ -199,16 +200,16 @@ export function OutputFeedbackButtons({
           </DialogHeader>
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>
-              This vote is always saved locally.
+              {tf("auto.a7cd6ce4e69c38e2")}
             </p>
             <p>
-              Choose <span className="font-medium text-foreground">Always allow</span> to share
+              {tf("auto.c7f937836f5d82d5")} <span className="font-medium text-foreground">{tf("auto.977618bd8bc7eef4")}</span> to share
               this vote and future voted AI outputs. Choose{" "}
-              <span className="font-medium text-foreground">Don't allow</span> to keep this vote
+              <span className="font-medium text-foreground">{tf("auto.9803bdd2047b1343")}</span> to keep this vote
               and future votes local.
             </p>
             <p>
-              You can change this later in Settings &gt; General.
+              {tf("auto.46238be658a5b085")}
             </p>
             {termsUrl ? (
               <a
@@ -217,7 +218,7 @@ export function OutputFeedbackButtons({
                 rel="noreferrer"
                 className="inline-flex text-sm text-foreground underline underline-offset-4"
               >
-                Read our terms of service
+                {tf("auto.50aceeb579a2002a")}
               </a>
             ) : null}
           </div>

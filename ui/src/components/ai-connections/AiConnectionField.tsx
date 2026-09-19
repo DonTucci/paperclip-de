@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -138,7 +139,7 @@ export function AiConnectionField({
               variant="ghost"
               onClick={() => setPendingAdoption(undefined)}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               onClick={() => {
@@ -146,7 +147,7 @@ export function AiConnectionField({
                 setPendingAdoption(undefined);
               }}
             >
-              Use this binding when saved
+              {tf("auto.3a51030edbf8f9da")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -154,7 +155,7 @@ export function AiConnectionField({
       <Dialog open={connecting} onOpenChange={setConnecting}>
         <DialogContent className="max-h-(--sz-85vh) overflow-y-auto sm:max-w-2xl" onCloseAutoFocus={restoreFocus}>
           <DialogHeader>
-            <DialogTitle>Connect account</DialogTitle>
+            <DialogTitle>{tf("auto.f7d845186faa7ab8")}</DialogTitle>
           </DialogHeader>
           <AiConnectionCredentialStep
             companyId={companyId}

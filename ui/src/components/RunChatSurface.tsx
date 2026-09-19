@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { memo, useMemo } from "react";
 import type { TranscriptEntry } from "../adapters";
 import type { LiveRunForIssue } from "../api/heartbeats";
@@ -59,7 +60,7 @@ export const RunChatSurface = memo(function RunChatSurface({
       showComposer={false}
       showJumpToLatest={false}
       variant="embedded"
-      emptyMessage={active ? "Waiting for run output..." : "No run output captured."}
+      emptyMessage={active ? tf("auto.f38cf8a6ba74336f") : tf("auto.8f98f86f8e16cde0")}
       enableLiveTranscriptPolling={false}
       transcriptsByRunId={transcriptsByRunId}
       hasOutputForRun={(runId) => runId === run.id && hasOutput}

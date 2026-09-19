@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type MouseEvent } from "react";
 import type { Issue } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
@@ -77,13 +78,13 @@ export function RemovableIssueReferencePill({
                 <DropdownMenuItem asChild>
                   <Link to={`/issues/${issue.identifier}`}>
                     <ArrowUpRight className="h-4 w-4" />
-                    Visit task
+                    {tf("auto.ecacc67b009d5b68")}
                   </Link>
                 </DropdownMenuItem>
               ) : null}
               <DropdownMenuItem variant="destructive" onSelect={openRemoveConfirmation}>
                 <X className="h-4 w-4" />
-                Remove blocker
+                {tf("auto.76792aa60019fa0e")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -124,17 +125,17 @@ export function RemovableIssueReferencePill({
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Remove blocker?</DialogTitle>
+            <DialogTitle>{tf("auto.b7d963b0caf9a632")}</DialogTitle>
             <DialogDescription>
               Remove {confirmLabel} as a blocker for this task.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">{tf("text.Cancel")}</Button>
             </DialogClose>
             <Button type="button" variant="destructive" onClick={confirmRemove}>
-              Remove blocker
+              {tf("auto.76792aa60019fa0e")}
             </Button>
           </DialogFooter>
         </DialogContent>

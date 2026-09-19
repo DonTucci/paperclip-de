@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { isValidElement, memo, useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Copy, ExternalLink, WrapText } from "lucide-react";
@@ -632,7 +633,7 @@ function CodeBlock({
         <button
           type="button"
           onClick={handleCopy}
-          aria-label="Copy code"
+          aria-label={tf("auto.49a0053f3b0d5045")}
           title={copyLabel}
           className="paperclip-markdown-codeblock-action paperclip-markdown-codeblock-copy"
           style={codeBlockActionStyle}
@@ -678,8 +679,7 @@ function MermaidDiagramBlock({ source, darkMode }: { source: string; darkMode: b
         if (!active) return;
         const message =
           err instanceof Error && err.message
-            ? err.message
-            : "Failed to render Mermaid diagram.";
+            ? err.message: tf("auto.ce8bc46c0433e649");
         setError(message);
       });
 
@@ -785,7 +785,7 @@ function MarkdownBodyImpl({
       </blockquote>
     ),
     table: ({ node: _node, style: tableStyle, children: tableChildren, ...tableProps }) => (
-      <div className="paperclip-markdown-table-scroll" role="region" aria-label="Scrollable table" tabIndex={0}>
+      <div className="paperclip-markdown-table-scroll" role="region" aria-label={tf("auto.92d78d88918e2a9e")} tabIndex={0}>
         <table {...tableProps} style={tableStyle as React.CSSProperties | undefined}>
           {tableChildren}
         </table>

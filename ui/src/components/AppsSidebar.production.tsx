@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ChevronLeft, AppWindow, Store, ShieldQuestion } from "lucide-react";
 import { Link } from "@/lib/router";
 import { useCompany } from "@/context/CompanyContext";
@@ -49,33 +50,33 @@ export function AppsSidebar() {
         </Link>
         <div className="flex items-center gap-2 px-2 py-1">
           <AppWindow className="h-4 w-4 text-muted-foreground shrink-0" />
-          <span className="flex-1 truncate text-sm font-bold text-foreground">Connectors</span>
+          <span className="flex-1 truncate text-sm font-bold text-foreground">{tf("text.Connectors")}</span>
         </div>
       </div>
 
       <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-auto-hide px-3 py-2">
         <div className="px-3 pb-1 text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-          Connectors
+          {tf("text.Connectors")}
         </div>
         <div className="flex flex-col gap-0.5">
-          <SidebarNavItem to="/apps" label="Browse" icon={Store} end />
+          <SidebarNavItem to="/apps" label={tf("auto.3227aa9666253f7a")} icon={Store} end />
           <SidebarNavItem
             to="/apps/review"
-            label="Review"
+            label={tf("auto.aff0766a5290e117")}
             icon={ShieldQuestion}
             badge={reviewCount > 0 ? reviewCount : undefined}
             badgeTone="warning"
-            badgeLabel="waiting for your OK"
+            badgeLabel={tf("auto.ee8bba46e5333c77")}
           />
         </div>
         <div className="px-3 pb-1 pt-4 text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-          Developer
+          {tf("auto.3fb7b39416f1d067")}
         </div>
         <p className="px-3 pb-1.5 text-(length:--text-micro) leading-snug text-muted-foreground/70">
-          Advanced setup for developers. Most teams never open this.
+          {tf("auto.c01c9805526801b4")}
         </p>
         <div className="flex flex-col gap-0.5">
-          <SidebarNavItem to="/apps/connections" label="Connections" icon={AppWindow} end />
+          <SidebarNavItem to="/apps/connections" label={tf("text.Connections")} icon={AppWindow} end />
           {developerTabs.map((tab) => (
             <SidebarNavItem
               key={tab.key}

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useContext, useState, type CSSProperties } from "react";
 import { IssueGalleryContext } from "@/context/IssueGalleryContext";
 import { ImageGalleryModal } from "@/components/ImageGalleryModal";
@@ -33,34 +34,34 @@ export function stateChipFor(
   reviewState: IssueWorkProduct["reviewState"] | string | null | undefined,
 ): StateChip | null {
   if (reviewState === "changes_requested" || status === "changes_requested") {
-    return { label: "Changes requested", tone: "failure" };
+    return { label: tf("auto.10a92a8ad3ee5891"), tone: "failure" };
   }
   if (reviewState === "needs_board_review" || status === "ready_for_review") {
-    return { label: "Review", tone: "review" };
+    return { label: tf("auto.aff0766a5290e117"), tone: "review" };
   }
   if (["failed", "unhealthy", "down"].includes(status ?? "")) {
-    return { label: "Failed", tone: "failure" };
+    return { label: tf("text.Failed"), tone: "failure" };
   }
   if (["pending", "opening"].includes(status ?? "")) {
     return { label: status === "opening" ? "Opening" : "Pending", tone: "progress", dashed: true };
   }
   if (kind === "pull_request" && (status === "active" || status === "open")) {
-    return { label: "Open", tone: "progress" };
+    return { label: tf("text.Open"), tone: "progress" };
   }
   if (kind === "pull_request" && status === "draft") {
-    return { label: "Draft", tone: "review" };
+    return { label: tf("status.draft"), tone: "review" };
   }
   if (kind === "pull_request" && status === "merged") {
-    return { label: "Merged", tone: "success" };
+    return { label: tf("auto.bd0a06202c440a9e"), tone: "success" };
   }
   if (kind === "pull_request" && status === "closed") {
-    return { label: "Closed", tone: "neutral" };
+    return { label: tf("status.closed"), tone: "neutral" };
   }
   if (kind === "runtime_service" && status === "active") {
-    return { label: "Running", tone: "progress" };
+    return { label: tf("text.Running"), tone: "progress" };
   }
   if (kind === "runtime_service" && status === "closed") {
-    return { label: "Stopped", tone: "failure" };
+    return { label: tf("auto.1a4f630ac1b69fd0"), tone: "failure" };
   }
   return null;
 }
@@ -136,7 +137,7 @@ export function RichWorkProductCard({ workProduct, href, variant = "card" }: Ric
   const isVideo = isVideoLikeOutput(contentType, stringMeta(metadata, "originalFilename"));
   let Icon: LucideIcon = File;
   let meta: Array<string | null> = [];
-  let action = "Open preview";
+  let action = tf("auto.f7afe3dde18c1446");
 
   switch (workProduct.type) {
     case "pull_request": {
@@ -146,18 +147,18 @@ export function RichWorkProductCard({ workProduct, href, variant = "card" }: Ric
       const base = stringMeta(metadata, "baseRef", "base", "baseBranch");
       const head = stringMeta(metadata, "headRef", "head", "headBranch", "branch");
       meta = [repository, number ? `#${number.replace(/^#/, "")}` : null, base && head ? `${base} ← ${head}` : null, urlLabel(workProduct.url)];
-      action = "Open on GitHub";
+      action = tf("auto.03f69885814b5b7a");
       break;
     }
     case "commit":
       Icon = GitCommit;
       meta = [stringMeta(metadata, "shortSha", "sha")?.slice(0, 8) ?? workProduct.externalId?.slice(0, 8) ?? null, stringMeta(metadata, "branch", "branchName"), urlLabel(workProduct.url)];
-      action = "Open on GitHub";
+      action = tf("auto.03f69885814b5b7a");
       break;
     case "branch":
       Icon = GitBranch;
       meta = [stringMeta(metadata, "repository", "repo", "repositoryName"), stringMeta(metadata, "branch", "branchName") ?? workProduct.externalId, urlLabel(workProduct.url)];
-      action = "Open on GitHub";
+      action = tf("auto.03f69885814b5b7a");
       break;
     case "artifact": {
       Icon = isImage ? Image : isVideo ? Film : File;
@@ -169,17 +170,17 @@ export function RichWorkProductCard({ workProduct, href, variant = "card" }: Ric
     case "document":
       Icon = FileText;
       meta = ["Document", stringMeta(metadata, "revision", "revisionNumber") ? `rev ${stringMeta(metadata, "revision", "revisionNumber")}` : null];
-      action = "Open document";
+      action = tf("auto.07e93c9ea2c61d95");
       break;
     case "preview_url":
       Icon = Globe;
       meta = [urlLabel(workProduct.url)];
-      action = "Open preview";
+      action = tf("auto.f7afe3dde18c1446");
       break;
     case "runtime_service":
       Icon = Server;
       meta = [stringMeta(metadata, "service", "serviceName") ?? workProduct.provider, stringMeta(metadata, "port") ? `port ${stringMeta(metadata, "port")}` : null];
-      action = "Open service";
+      action = tf("auto.40f3c53f26e85116");
       break;
   }
 
@@ -189,9 +190,9 @@ export function RichWorkProductCard({ workProduct, href, variant = "card" }: Ric
   const unhealthyChip =
     workProduct.healthStatus === "unhealthy"
       ? workProduct.type === "preview_url"
-        ? { label: "Down", tone: "failure" as const }
+        ? { label: tf("auto.b86d11af79188e58"), tone: "failure" as const }
         : workProduct.type === "runtime_service" && workProduct.status !== "closed"
-          ? { label: "Unhealthy", tone: "failure" as const }
+          ? { label: tf("auto.317b1fbc1e13beeb"), tone: "failure" as const }
           : null
       : null;
   const chip =

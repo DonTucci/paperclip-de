@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { IssueRelatedWorkItem, IssueRelatedWorkSummary } from "@paperclipai/shared";
 import { IssueReferencePill } from "./IssueReferencePill";
 import { ExternalObjectPill } from "./ExternalObjectPill";
@@ -111,9 +112,9 @@ function ExternalObjectsSection({
   return (
     <section className="space-y-3 rounded-lg border border-border p-3">
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold">External objects</h3>
+        <h3 className="text-sm font-semibold">{tf("auto.9279c11de25294b9")}</h3>
         <p className="text-xs text-muted-foreground">
-          Remote work referenced from this issue — pull requests, deployments, tickets in other systems, and more.
+          {tf("auto.3c65ef5ce44eafe1")}
         </p>
       </div>
 
@@ -126,15 +127,15 @@ function ExternalObjectsSection({
               onClick={onRetry}
               className="text-primary underline-offset-2 hover:underline"
             >
-              Retry
+              {tf("text.Retry")}
             </button>
           ) : null}
         </p>
       ) : isLoading ? (
-        <p className="text-xs text-muted-foreground">Loading external objects…</p>
+        <p className="text-xs text-muted-foreground">{tf("auto.d80d5f6cd3b1f5a7")}</p>
       ) : sorted.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          This issue does not reference any external objects yet.
+          {tf("auto.e44c5d10ee56aa8b")}
         </p>
       ) : (
         <ul className="-mx-1 flex flex-col">
@@ -191,8 +192,8 @@ export function IssueRelatedWorkPanel({
   return (
     <div className="space-y-3">
       <Section
-        title="References"
-        description="Other tasks this task currently points at in its title, description, comments, or documents."
+        title={tf("auto.69824d3b0e70ca6a")}
+        description={tf("auto.2fd8c15a7e741418")}
         items={outbound}
         emptyLabel="This task does not reference any other tasks yet."
       />
@@ -205,8 +206,8 @@ export function IssueRelatedWorkPanel({
         />
       ) : null}
       <Section
-        title="Referenced by"
-        description="Other tasks that currently point at this task."
+        title={tf("auto.b65181bd6bc27f70")}
+        description={tf("auto.b7a48cc851aec97d")}
         items={inbound}
         emptyLabel="No other tasks reference this task yet."
       />

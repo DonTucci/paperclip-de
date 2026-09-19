@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "../lib/utils";
 import { MarkdownBody, type MarkdownExternalReferenceMap } from "./MarkdownBody";
@@ -60,7 +61,7 @@ export function InlineEditor({
   onSave,
   as: Tag = "span",
   className,
-  placeholder = "Click to edit...",
+  placeholder = tf("auto.f946cfd876474ac9"),
   multiline = false,
   nullable = false,
   imageUploadHandler,

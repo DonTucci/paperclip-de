@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ExternalLink, Paperclip, Radio } from "lucide-react";
@@ -49,42 +50,42 @@ type PublicationFeedback = {
 
 const publicationFeedback: Record<ChatPublicationState, PublicationFeedback> = {
   awaiting_consent: {
-    title: "Waiting for file consent",
+    title: tf("auto.56991603ef07ec88"),
     body: "The recipient must accept the file card in Microsoft Teams. The file is not delivered yet; this send identity is kept while Paperclip waits.",
     tone: "info",
   },
   published: {
-    title: "Sent to channel",
+    title: tf("auto.255e703026df6939"),
     body: "The board update was published to the connected conversation.",
     tone: "success",
   },
   pending: {
-    title: "Queued for channel",
+    title: tf("auto.cf7ce8fc473fdd1f"),
     body: "Delivery is still pending. Your draft is kept until Paperclip confirms publication.",
     tone: "info",
   },
   streaming: {
-    title: "Publishing to channel",
+    title: tf("auto.c303056d1a7fc1d0"),
     body: "Delivery is still in progress. Your draft is kept until Paperclip confirms publication.",
     tone: "info",
   },
   retry: {
-    title: "Delivery retry scheduled",
+    title: tf("auto.d4db8f711cdc2524"),
     body: "Paperclip will retry this publication. Your draft and retry identity are kept.",
     tone: "warn",
   },
   delivery_unknown: {
-    title: "Delivery not confirmed",
+    title: tf("auto.521724ca574ab055"),
     body: "The provider may have accepted this update. Resolve it in Activity before trying again to avoid a duplicate.",
     tone: "warn",
   },
   failed: {
-    title: "Channel delivery failed",
+    title: tf("auto.ce13a3ab2ef645e2"),
     body: "Your draft is kept. Open Activity to retry this same publication safely.",
     tone: "error",
   },
   cancelled: {
-    title: "Channel delivery cancelled",
+    title: tf("auto.c918fc9f2e23ad23"),
     body: "Your draft is kept. Some parts may already have been published; check Activity before starting a new send.",
     tone: "info",
   },
@@ -335,7 +336,7 @@ function ConnectedTaskComposer({
       pushToast({
         ...feedback,
         action: {
-          label: "View activity",
+          label: tf("auto.4bf3f8ddd7bf23d2"),
           href: `/apps/chat/${binding!.endpointId}/activity`,
         },
       });
@@ -358,14 +359,14 @@ function ConnectedTaskComposer({
         setUnconfirmedRequest(false);
         invalidateTask();
         pushToast({
-          title: "Update was not sent",
+          title: tf("auto.313813f30237c2d7"),
           body: "A selected file already belongs to another comment. Edit the rejected send to correct the selection.",
           tone: "error",
         });
         return;
       }
       pushToast({
-        title: "Couldn't confirm channel delivery",
+        title: tf("auto.c3e0510dffa91133"),
         body:
           error instanceof Error
             ? `${error.message} Your draft is kept; retrying here reuses the same request identity.`
@@ -403,7 +404,7 @@ function ConnectedTaskComposer({
     } catch (error) {
       if (mounted.current) {
         setUploadError(
-          `${error instanceof Error ? error.message : "Upload could not be confirmed."} No channel message was sent. Check task files before retrying the upload.`,
+          `${error instanceof Error ? error.message: tf("auto.67f1fbc0085fbcd9")} No channel message was sent. Check task files before retrying the upload.`,
         );
       }
     } finally {
@@ -466,14 +467,14 @@ function ConnectedTaskComposer({
     canDismissBoardSendBatch(batch) && batch!.published < batch!.total;
   const currentFeedback = mixedTerminal
     ? {
-        title: "Delivery settled with mixed outcomes",
+        title: tf("auto.308794c8f3a75825"),
         body: "Not every part was confirmed delivered. Review the outcomes below; dismissing this receipt does not resend anything.",
         tone: "info" as const,
       }
     : currentPublication?.state === "cancelled" &&
         (batch?.awaitingConsent ?? 0) > 0
       ? {
-          title: "Waiting for remaining file consent",
+          title: tf("auto.15cf54330d2bc4b9"),
           body: "Some parts have settled. The remaining file cards still need the recipient's response; this send stays locked until the whole batch is resolved.",
           tone: "info" as const,
         }
@@ -483,7 +484,7 @@ function ConnectedTaskComposer({
   const activityPath = `/apps/chat/${binding.endpointId}/activity`;
   return (
     <section
-      aria-label="External conversation"
+      aria-label={tf("auto.051d5bb3be53eca2")}
       className="space-y-3 rounded-lg border border-border bg-muted/40 p-3 text-sm"
     >
       <div className="flex flex-wrap items-center gap-3">
@@ -512,11 +513,11 @@ function ConnectedTaskComposer({
             variant="outline"
             onClick={() => setComposing((value) => !value)}
           >
-            Send to channel
+            {tf("auto.dface7aaaa742f0c")}
           </Button>
           <Button asChild size="sm" variant="ghost">
             <Link to={`/apps/chat/${binding.endpointId}/conversations`}>
-              Connection
+              {tf("auto.639a40e82b9a96f0")}
             </Link>
           </Button>
         </div>
@@ -527,7 +528,7 @@ function ConnectedTaskComposer({
             className="text-xs font-medium"
             htmlFor="external-board-update"
           >
-            Board update
+            {tf("auto.6e1dcf6a784f036c")}
           </label>
           <Textarea
             id="external-board-update"
@@ -545,11 +546,11 @@ function ConnectedTaskComposer({
               idempotencyKey.current = null;
               publish.reset();
             }}
-            placeholder="Write only what should be visible in the provider conversation."
+            placeholder={tf("auto.c5a8ffd5cb403118")}
           />
           {selectedAttachmentIds.length > 0 && !body.trim() && (
             <p className="text-xs text-muted-foreground">
-              Add a message to send with your files.
+              {tf("auto.680f3ab6f7a02849")}
             </p>
           )}
           <div className="flex flex-wrap items-center gap-2">
@@ -557,7 +558,7 @@ function ConnectedTaskComposer({
               ref={fileInput}
               type="file"
               className="hidden"
-              aria-label="Attach file to channel update"
+              aria-label={tf("auto.59a735f69578612f")}
               disabled={uploadDisabled}
               onChange={(event) => {
                 const file = event.target.files?.[0];
@@ -576,7 +577,7 @@ function ConnectedTaskComposer({
               {uploading ? "Uploading…" : "Attach file"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Files stay on this task until you send them to the channel.
+              {tf("auto.c68a82b033538667")}
             </p>
           </div>
           {uploadError && (
@@ -658,7 +659,7 @@ function ConnectedTaskComposer({
               role="alert"
               className="space-y-1 rounded-md border border-border bg-background p-3 text-xs"
             >
-              <p className="font-medium">Update was not sent</p>
+              <p className="font-medium">{tf("auto.313813f30237c2d7")}</p>
               <p className="text-muted-foreground">
                 A selected file already belongs to another comment. This request
                 was rejected before any channel message was queued. Your exact
@@ -697,7 +698,7 @@ function ConnectedTaskComposer({
                   publish.reset();
                 }}
               >
-                Edit rejected send
+                {tf("auto.c342fb93adc4d25c")}
               </Button>
             </div>
           )}
@@ -709,7 +710,7 @@ function ConnectedTaskComposer({
                 role="alert"
                 className="space-y-1 rounded-md border border-border bg-background p-3 text-xs"
               >
-                <p className="font-medium">Delivery result not confirmed</p>
+                <p className="font-medium">{tf("auto.68d563e3850fba7b")}</p>
                 <p className="text-muted-foreground">
                   Your exact draft and request identity are kept. Retry safely
                   to learn the authoritative publication state without creating
@@ -719,7 +720,7 @@ function ConnectedTaskComposer({
                   className="inline-block font-medium underline underline-offset-4"
                   to={activityPath}
                 >
-                  Open Activity
+                  {tf("auto.b2a9770667ad274c")}
                 </Link>
               </div>
             )}
@@ -760,7 +761,7 @@ function ConnectedTaskComposer({
               {batch?.parts?.some((part) => part.fileTransfer) && (
                 <ul
                   className="space-y-1 text-muted-foreground"
-                  aria-label="File delivery outcomes"
+                  aria-label={tf("auto.e0229aa59efcc9ed")}
                 >
                   {batch.parts
                     .filter((part) => part.fileTransfer)
@@ -787,7 +788,7 @@ function ConnectedTaskComposer({
                 className="inline-block font-medium underline underline-offset-4"
                 to={activityPath}
               >
-                Open Activity
+                {tf("auto.b2a9770667ad274c")}
               </Link>
               {dismissible && (
                 <Button
@@ -817,14 +818,14 @@ function ConnectedTaskComposer({
                     publish.reset();
                   }}
                 >
-                  Dismiss delivery receipt
+                  {tf("auto.e6d60fbc843c8d0c")}
                 </Button>
               )}
             </div>
           )}
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              Ordinary board comments remain Paperclip-only.
+              {tf("auto.9add383460a6d787")}
             </p>
             <Button
               size="sm"

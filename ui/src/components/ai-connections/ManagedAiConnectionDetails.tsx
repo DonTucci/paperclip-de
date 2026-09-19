@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { heartbeatsApi } from "@/api/heartbeats";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -99,7 +100,7 @@ export function ManagedAiConnectionDetails({
           <div className="space-y-2">
             {runs.error && (
               <p role="alert">
-                Could not load active runs. Retry before revoking.
+                {tf("auto.2404295f03569f1c")}
               </p>
             )}
             {runs.data?.map((run) => (
@@ -116,7 +117,7 @@ export function ManagedAiConnectionDetails({
                   disabled={stop.isPending}
                   onClick={() => stop.mutate(run.id)}
                 >
-                  Stop run
+                  {tf("auto.b7ec68a21ea3795d")}
                 </Button>
               </div>
             ))}

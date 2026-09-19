@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ExecutionBlocker } from "@paperclipai/shared";
 import { agentsApi } from "../api/agents";
@@ -29,7 +30,7 @@ export function ExecutionBlockerNotice({ companyId, issueId, blocker, onRetried 
     },
   });
   return (
-    <div role="status" aria-label="Task recovery" className="mx-(--sz-execution-blocker-inline) my-(--sz-execution-blocker-block) flex flex-wrap items-center justify-between execution-blocker-notice border border-border bg-muted text-foreground">
+    <div role="status" aria-label={tf("auto.4646b234c6535c75")} className="mx-(--sz-execution-blocker-inline) my-(--sz-execution-blocker-block) flex flex-wrap items-center justify-between execution-blocker-notice border border-border bg-muted text-foreground">
       <span>{blocker.cause === "legacy_execution_requires_reconciliation" ? "Automatic recovery of this task stopped." : blocker.nextAction}</span>
       {failedRun && (
         <Button variant="outline" size="sm" disabled={retry.isPending} onClick={() => retry.mutate()}>

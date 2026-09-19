@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { DashboardRunActivityDay, HeartbeatRun } from "@paperclipai/shared";
 
 /* ---- Utilities ---- */
@@ -127,13 +128,13 @@ export function RunActivityChart(props: RunChartProps) {
   const hasData = activity.some(v => v.total > 0);
   const hasRecovered = activity.some(v => v.recovered > 0);
 
-  if (!hasData) return <p className="text-xs text-muted-foreground">No runs yet</p>;
+  if (!hasData) return <p className="text-xs text-muted-foreground">{tf("auto.306b45db20163464")}</p>;
 
   const legendItems = [
-    { color: runSegmentColors.succeeded, label: "Succeeded" },
-    ...(hasRecovered ? [{ color: runSegmentColors.recovered, label: "Recovered" }] : []),
-    { color: runSegmentColors.failed, label: "Failed" },
-    { color: runSegmentColors.other, label: "Other" },
+    { color: runSegmentColors.succeeded, label: tf("status.succeeded") },
+    ...(hasRecovered ? [{ color: runSegmentColors.recovered, label: tf("auto.37ce0a91ee27ce92") }] : []),
+    { color: runSegmentColors.failed, label: tf("text.Failed") },
+    { color: runSegmentColors.other, label: tf("auto.f97e9da0e3b879f0") },
   ];
 
   return (
@@ -188,7 +189,7 @@ export function PriorityChart({ issues }: { issues: { priority: string; createdA
   const maxValue = Math.max(...Array.from(grouped.values()).map(v => Object.values(v).reduce((a, b) => a + b, 0)), 1);
   const hasData = Array.from(grouped.values()).some(v => Object.values(v).reduce((a, b) => a + b, 0) > 0);
 
-  if (!hasData) return <p className="text-xs text-muted-foreground">No tasks</p>;
+  if (!hasData) return <p className="text-xs text-muted-foreground">{tf("auto.9c2f4744b6f0b056")}</p>;
 
   return (
     <div>
@@ -263,7 +264,7 @@ export function IssueStatusChart({ issues }: { issues: { status: string; created
   const maxValue = Math.max(...Array.from(grouped.values()).map(v => Object.values(v).reduce((a, b) => a + b, 0)), 1);
   const hasData = allStatuses.size > 0;
 
-  if (!hasData) return <p className="text-xs text-muted-foreground">No tasks</p>;
+  if (!hasData) return <p className="text-xs text-muted-foreground">{tf("auto.9c2f4744b6f0b056")}</p>;
 
   return (
     <div>
@@ -299,7 +300,7 @@ export function SuccessRateChart(props: RunChartProps) {
   const grouped = new Map(activity.map((day) => [day.date, day]));
 
   const hasData = activity.some(v => v.total > 0);
-  if (!hasData) return <p className="text-xs text-muted-foreground">No runs yet</p>;
+  if (!hasData) return <p className="text-xs text-muted-foreground">{tf("auto.306b45db20163464")}</p>;
 
   return (
     <div>

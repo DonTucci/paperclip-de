@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@/lib/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -425,15 +426,15 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search skills"
+                placeholder={tf("auto.76c02b7eddcaa320")}
                 className="h-8 w-full pl-8 sm:w-56"
-                aria-label="Search skills"
+                aria-label={tf("auto.76c02b7eddcaa320")}
               />
             </div>
             <Button asChild variant="outline" size="sm" className="shrink-0">
               <Link to="/skills" className="no-underline">
                 <Store className="h-3.5 w-3.5" />
-                Browse skills store
+                {tf("auto.0b01a8a31bb47b2e")}
               </Link>
             </Button>
           </div>
@@ -441,7 +442,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
 
         {syncSkills.isError ? (
           <p className="text-xs text-destructive">
-            {syncSkills.error instanceof Error ? syncSkills.error.message : "Failed to update skills"}
+            {syncSkills.error instanceof Error ? syncSkills.error.message: tf("auto.6de194e3d7008412")}
           </p>
         ) : null}
       </div>
@@ -470,7 +471,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                 className="inline-flex shrink-0 items-center gap-1 rounded-md border border-amber-400/50 px-2 py-0.5 font-medium transition-colors hover:bg-amber-100/60 dark:hover:bg-amber-900/30"
               >
                 <X className="h-3 w-3" />
-                Remove
+                {tf("text.Remove")}
               </button>
             </div>
           ))}
@@ -483,7 +484,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
         <EmptyLibraryCard />
       ) : (
         <div className="space-y-4">
-          <SkillSection title="Enabled on this agent" count={filteredEnabled.length}>
+          <SkillSection title={tf("auto.ec0548ebf27ef1c3")} count={filteredEnabled.length}>
             {filteredEnabled.length > 0 ? (
               filteredEnabled.map((row) => renderRow(row, "enabled"))
             ) : (
@@ -493,7 +494,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
             )}
           </SkillSection>
 
-          <SkillSection title="Available from the library" count={filteredAvailable.length}>
+          <SkillSection title={tf("auto.e90e50ff31d62999")} count={filteredAvailable.length}>
             {filteredAvailable.length > 0 ? (
               filteredAvailable.map((row) => renderRow(row, "available"))
             ) : (
@@ -518,7 +519,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                     )}
                   />
                   <span className="text-xs font-medium text-muted-foreground">
-                    Automatic and detected skills (read-only)
+                    {tf("auto.1f07f74bfe0f7674")}
                   </span>
                   <span className="text-xs text-muted-foreground/70">{filteredDetected.length}</span>
                 </CollapsibleTrigger>
@@ -528,7 +529,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                       <AgentSkillRow key={row.key} variant="readonly" data={row} />
                     ))
                   ) : (
-                    <SectionEmpty>No detected skills match your search.</SectionEmpty>
+                    <SectionEmpty>{tf("auto.cb9b55e289e80d49")}</SectionEmpty>
                   )}
                 </CollapsibleContent>
               </div>
@@ -557,7 +558,7 @@ function SaveStatusChip({
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Saving…
+        {tf("auto.23e39291d6135814")}
       </span>
     );
   }
@@ -565,7 +566,7 @@ function SaveStatusChip({
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-destructive">
         <AlertCircle className="h-3.5 w-3.5" />
-        Couldn’t save
+        {tf("auto.a018b7a8a188861c")}
       </span>
     );
   }
@@ -573,14 +574,14 @@ function SaveStatusChip({
     return (
       <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Saving soon…
+        {tf("auto.b9673b37a677765e")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-(--status-task-done)">
       <CheckCircle2 className="h-3.5 w-3.5" />
-      Saved
+      {tf("auto.b5c120b316c237a0")}
     </span>
   );
 }
@@ -614,15 +615,15 @@ function EmptyLibraryCard() {
     <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border px-6 py-10 text-center">
       <Store className="h-8 w-8 text-muted-foreground/60" />
       <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground">No skills in the organization library</p>
+        <p className="text-sm font-medium text-foreground">{tf("auto.fe9778c7f1312d7a")}</p>
         <p className="text-xs text-muted-foreground">
-          Install skills to the organization, then enable them on this agent.
+          {tf("auto.20cac58dcb6ab252")}
         </p>
       </div>
       <Button asChild variant="outline" size="sm">
         <Link to="/skills" className="no-underline">
           <Store className="h-3.5 w-3.5" />
-          Browse skills store
+          {tf("auto.0b01a8a31bb47b2e")}
         </Link>
       </Button>
     </div>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   Issue,
   IssuePriority,
@@ -41,7 +42,7 @@ export function summarizeRoutineSchedule(triggers: RoutineTrigger[]): RoutineSch
     .sort((left, right) => left.getTime() - right.getTime())[0] ?? null;
 
   if (schedules.length === 0) {
-    return { label: "No active schedule", detail: "Manual runs only", nextRunAt: null };
+    return { label: tf("auto.4624e546d7a67e0e"), detail: "Manual runs only", nextRunAt: null };
   }
 
   const first = schedules[0]!;
@@ -155,32 +156,32 @@ export function RoutineOverview() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <OverviewFact
           icon={Repeat}
-          label="State"
+          label={tf("auto.a3b50c476732c740")}
           value={<StatusBadge status={automationState} />}
           detail={hasLiveRun ? "A run is active now" : "No active run"}
         />
         <OverviewFact
           icon={CalendarClock}
-          label="Schedule"
+          label={tf("text.Schedule")}
           value={schedule.label}
           detail={<span className="font-mono">{schedule.detail}</span>}
         />
         <OverviewFact
           icon={Clock3}
-          label="Next run"
+          label={tf("auto.b3c0ab96930c9e21")}
           value={schedule.nextRunAt ? formatRoutineTimestamp(schedule.nextRunAt) : "Not scheduled"}
           detail={schedule.nextRunAt ? "Scheduled" : "Add or enable a schedule"}
         />
         <OverviewFact
           icon={Play}
-          label="Last run"
+          label={tf("auto.512a48218ba21791")}
           value={lastRun ? <StatusBadge status={lastRun.status} /> : "No runs yet"}
           detail={lastRun ? formatRoutineTimestamp(lastRun.triggeredAt) : "Run manually or wait for the schedule"}
         />
       </div>
 
       <section className="flex flex-col gap-2" aria-labelledby="routine-agent-heading">
-        <h2 id="routine-agent-heading" className="text-sm font-semibold">Default agent</h2>
+        <h2 id="routine-agent-heading" className="text-sm font-semibold">{tf("auto.94da52ecd6c5c3b7")}</h2>
         {currentAssignee ? (
           <Link
             to={`/agents/${currentAssignee.urlKey ?? currentAssignee.id}`}
@@ -190,31 +191,31 @@ export function RoutineOverview() {
             {currentAssignee.name}
           </Link>
         ) : (
-          <p className="text-sm text-muted-foreground">No default agent. Automatic triggers remain paused.</p>
+          <p className="text-sm text-muted-foreground">{tf("auto.d047f6c7a3af88d3")}</p>
         )}
       </section>
 
       <section className="flex flex-col gap-2" aria-labelledby="routine-description-heading">
-        <h2 id="routine-description-heading" className="text-sm font-semibold">Description</h2>
+        <h2 id="routine-description-heading" className="text-sm font-semibold">{tf("text.Description")}</h2>
         {routine.description?.trim() ? (
           <MarkdownBody className="text-sm text-foreground" linkIssueReferences>
             {routine.description}
           </MarkdownBody>
         ) : (
-          <p className="text-sm text-muted-foreground">No description yet.</p>
+          <p className="text-sm text-muted-foreground">{tf("auto.6d962a3d4e519cf7")}</p>
         )}
       </section>
 
       <section className="flex flex-col gap-2" aria-labelledby="routine-recent-runs-heading">
         <div className="flex items-center justify-between gap-3">
-          <h2 id="routine-recent-runs-heading" className="text-sm font-semibold">Recent runs</h2>
+          <h2 id="routine-recent-runs-heading" className="text-sm font-semibold">{tf("auto.237112b89b77be8e")}</h2>
           <Button variant="ghost" size="sm" asChild>
-            <Link to={routineRunsAuditHref(routine.id)}>View all runs</Link>
+            <Link to={routineRunsAuditHref(routine.id)}>{tf("auto.346de5a03a7af536")}</Link>
           </Button>
         </div>
         {recentRuns.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
-            No runs yet. Run the routine now or wait for its schedule.
+            {tf("auto.1d0eb00e615cb587")}
           </p>
         ) : (
           <div className="flex flex-col gap-0.5">
@@ -241,7 +242,7 @@ export function RoutineOverview() {
           </div>
         )}
         <Button variant="link" size="sm" className="w-fit px-0" asChild>
-          <Link to={routineActivityAuditHref(routine.id)}>View routine activity</Link>
+          <Link to={routineActivityAuditHref(routine.id)}>{tf("auto.cd1bd79b59000918")}</Link>
         </Button>
       </section>
     </div>

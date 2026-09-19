@@ -10,6 +10,7 @@ import {
   taskStatusVarDefault,
 } from "../lib/status-colors";
 import { StatusGlyph } from "./StatusGlyph";
+import { statusLabel } from "../i18n/fork";
 
 /** Inline `--sc` local var pointing a status helper at a base-hue CSS var. */
 function scStyle(cssVar: string): CSSProperties {
@@ -35,7 +36,7 @@ export function StatusBadge({ status, label }: { status: string; label?: string 
         statusBadge[status] ?? statusBadgeDefault
       )}
     >
-      {label ?? status.replace(/[_-]/g, " ")}
+      {label ?? statusLabel(status, status.replace(/[_-]/g, " "))}
     </span>
   );
 }
@@ -53,7 +54,7 @@ export function AgentStatusBadge({ status }: { status: string }) {
       className="status-chip inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium leading-none whitespace-nowrap shrink-0"
       style={scStyle(cssVar)}
     >
-      {label.replace(/_/g, " ")}
+      {statusLabel(label, label.replace(/_/g, " "))}
     </span>
   );
 }
@@ -94,7 +95,7 @@ export function IssueStatusBadge({ status }: { status: string }) {
       style={scStyle(cssVar)}
     >
       <StatusGlyph status={status} size="sm" />
-      {sentenceCaseStatus(status)}
+      {statusLabel(status, sentenceCaseStatus(status))}
     </span>
   );
 }

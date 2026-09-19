@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useCallback,
   useEffect,
@@ -77,7 +78,7 @@ function normalizeError(error: unknown): FileViewerErrorShape {
   if (error instanceof Error) {
     return { status: 0, code: "", message: error.message };
   }
-  return { status: 0, code: "", message: "Something went wrong." };
+  return { status: 0, code: "", message: tf("auto.0c953ab32c603ec4") };
 }
 
 function formatBytes(size: number | null | undefined): string | null {
@@ -121,48 +122,48 @@ export function describeDenial(code: string, fallback: string): { title: string;
   if (lower.includes("policy") || lower.includes("denied") || lower.includes("sensitive")) {
     return {
       icon: <Lock aria-hidden="true" className="h-6 w-6 text-amber-500" />,
-      title: "Viewer blocked for this file",
+      title: tf("auto.2d9ad26c04e28f70"),
       body: "This file is not available through the viewer because it may contain sensitive data.",
     };
   }
   if (lower.includes("outside") || lower.includes("traversal")) {
     return {
       icon: <Ban aria-hidden="true" className="h-6 w-6 text-red-500" />,
-      title: "Path is outside the workspace",
+      title: tf("auto.aa3ce27795fd7967"),
       body: "The viewer can only open files that live under the issue's workspace.",
     };
   }
   if (lower.includes("archive") || lower.includes("cleaned")) {
     return {
       icon: <FolderOpen aria-hidden="true" className="h-6 w-6 text-muted-foreground" />,
-      title: "Workspace is no longer available",
+      title: tf("auto.cb2826c669f7ae88"),
       body: "The isolated worktree for this issue has been cleaned up, so files cannot be previewed.",
     };
   }
   if (lower.includes("remote")) {
     return {
       icon: <AlertTriangle aria-hidden="true" className="h-6 w-6 text-amber-500" />,
-      title: "Remote workspace preview not supported",
+      title: tf("auto.118565fc423845cf"),
       body: "This workspace is hosted remotely and is not available for inline preview yet.",
     };
   }
   if (lower.includes("too_large") || lower.includes("size")) {
     return {
       icon: <AlertTriangle aria-hidden="true" className="h-6 w-6 text-amber-500" />,
-      title: "File is too large to preview",
+      title: tf("auto.af94fcfb32e664dd"),
       body: "This file exceeds the supported preview size.",
     };
   }
   if (lower.includes("binary") || lower.includes("unsupported")) {
     return {
       icon: <AlertTriangle aria-hidden="true" className="h-6 w-6 text-amber-500" />,
-      title: "Preview not supported for this file type",
+      title: tf("auto.c55ca58614217c33"),
       body: "This file does not have a text, image, or video preview available.",
     };
   }
   return {
     icon: <Ban aria-hidden="true" className="h-6 w-6 text-red-500" />,
-    title: "Can't preview this file",
+    title: tf("auto.31b952ec7214d9de"),
     body: fallback || "The viewer was unable to load this file.",
   };
 }
@@ -224,7 +225,7 @@ export function FileViewerMetadataRow({
           ) : null}
         </>
       ) : state ? (
-        <span className="h-3 w-28 rounded bg-muted animate-pulse" aria-label="Loading file details" />
+        <span className="h-3 w-28 rounded bg-muted animate-pulse" aria-label={tf("auto.768d734af4794369")} />
       ) : null}
     </div>
   );
@@ -275,7 +276,7 @@ export function FileContentViewer({ content, highlightedLine, onLoaded }: FileCo
       return (
         <FileViewerStateView
           icon={<AlertTriangle aria-hidden="true" className="h-6 w-6 text-amber-500" />}
-          title="Image preview unavailable"
+          title={tf("auto.637262a20bd52f66")}
         />
       );
     }
@@ -298,7 +299,7 @@ export function FileContentViewer({ content, highlightedLine, onLoaded }: FileCo
       return (
         <FileViewerStateView
           icon={<AlertTriangle aria-hidden="true" className="h-6 w-6 text-amber-500" />}
-          title="Video preview unavailable"
+          title={tf("auto.ba6b8bccdba03d34")}
         />
       );
     }
@@ -320,7 +321,7 @@ export function FileContentViewer({ content, highlightedLine, onLoaded }: FileCo
     return (
       <FileViewerStateView
         icon={<AlertTriangle aria-hidden="true" className="h-6 w-6 text-amber-500" />}
-        title="Preview not supported for this file type"
+        title={tf("auto.c55ca58614217c33")}
         body={resource.contentType ? `Content type: ${resource.contentType}` : undefined}
       />
     );
@@ -382,15 +383,15 @@ export function FileContentViewer({ content, highlightedLine, onLoaded }: FileCo
       <div className="absolute right-3 top-3 z-20">
         <div
           role="group"
-          aria-label="Markdown preview mode"
+          aria-label={tf("auto.7d6f9f68445c8539")}
           className="inline-flex rounded-md border border-border bg-background/95 p-0.5 shadow-sm backdrop-blur"
         >
           <Button
             type="button"
             variant={markdownMode === "rendered" ? "secondary" : "ghost"}
             size="icon-sm"
-            aria-label="Show rendered Markdown"
-            title="Rendered Markdown"
+            aria-label={tf("auto.a2755a357860567a")}
+            title={tf("auto.021ce6464fdbd9ab")}
             aria-pressed={markdownMode === "rendered"}
             onClick={() => setMarkdownMode("rendered")}
             className={cn(
@@ -404,8 +405,8 @@ export function FileContentViewer({ content, highlightedLine, onLoaded }: FileCo
             type="button"
             variant={markdownMode === "raw" ? "secondary" : "ghost"}
             size="icon-sm"
-            aria-label="Show raw Markdown"
-            title="Raw Markdown"
+            aria-label={tf("auto.399bc52a75485dab")}
+            title={tf("auto.f41bae51b2f2f711")}
             aria-pressed={markdownMode === "raw"}
             onClick={() => setMarkdownMode("raw")}
             className={cn(
@@ -442,7 +443,7 @@ function LoadingView({ elapsedMs }: { elapsedMs: number }) {
   if (elapsedMs < 400) {
     return (
       <div className="flex-1 space-y-2 p-6" aria-busy="true" aria-live="polite">
-        <span className="sr-only">Loading file preview</span>
+        <span className="sr-only">{tf("auto.7b144afcb8ba28ac")}</span>
         {Array.from({ length: 10 }).map((_, index) => (
           <div key={index} className="h-3 rounded bg-muted animate-pulse" style={{ width: `${90 - index * 6}%` }} />
         ))}
@@ -457,7 +458,7 @@ function LoadingView({ elapsedMs }: { elapsedMs: number }) {
     >
       <div className="flex items-center gap-2 text-muted-foreground">
         <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
-        Loading file preview...
+        {tf("auto.33454f00f2cb54cd")}
       </div>
     </div>
   );
@@ -761,10 +762,10 @@ export function FileViewerSheet({
                   size="sm"
                   onClick={() => viewer.backToFiles()}
                   className="h-7 gap-1 px-2 text-xs"
-                  aria-label="Back to files"
+                  aria-label={tf("auto.f911e3dbe7ed1720")}
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
-                  Back to files
+                  {tf("auto.f911e3dbe7ed1720")}
                 </Button>
               ) : null}
               {state ? (
@@ -778,8 +779,8 @@ export function FileViewerSheet({
                     <a
                       href={downloadUrl}
                       download={resolvedResource?.title ?? basename(state.path)}
-                      aria-label="Download file"
-                      title="Download file"
+                      aria-label={tf("auto.9de4149fb9716cfc")}
+                      title={tf("auto.9de4149fb9716cfc")}
                     >
                       <Download className="h-4 w-4" />
                     </a>
@@ -792,8 +793,8 @@ export function FileViewerSheet({
                   variant="ghost"
                   size="icon-sm"
                   onClick={handleCopyContent}
-                  aria-label={copiedField === "content" ? "Copied file contents" : "Copy file contents"}
-                  title={copiedField === "content" ? "Copied contents" : "Copy file contents"}
+                  aria-label={copiedField === "content" ? tf("auto.b4dbbc32c9e0f03d") : tf("auto.b3278e5f53cc34b0")}
+                  title={copiedField === "content" ? tf("auto.6604ead1f5fb5265") : tf("auto.b3278e5f53cc34b0")}
                   className="h-7 w-7"
                 >
                   {copyingField === "content" ? (
@@ -811,8 +812,8 @@ export function FileViewerSheet({
                   variant="ghost"
                   size="icon-sm"
                   onClick={handleCopyLink}
-                  aria-label={copiedField === "link" ? "Copied file view link" : "Copy link to this file view"}
-                  title={copiedField === "link" ? "Copied link" : "Copy link"}
+                  aria-label={copiedField === "link" ? tf("auto.b2acd5751d8a9697") : tf("auto.ed399e88a77e9916")}
+                  title={copiedField === "link" ? tf("auto.933540542c9dcebf") : tf("text.Copy link")}
                   className="h-7 w-7"
                 >
                   {copyingField === "link" ? (
@@ -830,8 +831,8 @@ export function FileViewerSheet({
                 size="icon-sm"
                 onClick={() => handleOpenChange(false)}
                 className="h-7 w-7"
-                aria-label="Close file viewer"
-                title="Close"
+                aria-label={tf("auto.ca47c733c6d0598c")}
+                title={tf("text.Close")}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -871,7 +872,7 @@ export function FileViewerSheet({
               <div
                 role="separator"
                 aria-orientation="vertical"
-                aria-label="Resize file tree"
+                aria-label={tf("auto.8c62ea073f353cd6")}
                 aria-valuemin={MIN_FILE_TREE_WIDTH}
                 aria-valuemax={MAX_FILE_TREE_WIDTH}
                 aria-valuenow={fileTreeWidth}
@@ -956,17 +957,17 @@ export function FileViewerBody({
       return (
         <FileViewerStateView
           icon={<FileSearch aria-hidden="true" className="h-6 w-6 text-muted-foreground" />}
-          title="File not found"
+          title={tf("auto.3521021a2e875fbc")}
           body="That file was not found in the active workspace."
           actions={
             <>
               {onFallbackToProject ? (
                 <Button type="button" variant="secondary" size="sm" onClick={onFallbackToProject}>
-                  Try project workspace
+                  {tf("auto.ec57088f91b5109b")}
                 </Button>
               ) : null}
               <Button type="button" variant="ghost" size="sm" onClick={onRetry}>
-                <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> Retry
+                <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> {tf("text.Retry")}
               </Button>
             </>
           }
@@ -977,7 +978,7 @@ export function FileViewerBody({
       return (
         <FileViewerStateView
           icon={<FolderOpen aria-hidden="true" className="h-6 w-6 text-muted-foreground" />}
-          title="No workspace available"
+          title={tf("auto.8621cdb8240db314")}
           body="This issue does not have a workspace that supports preview yet."
         />
       );
@@ -990,7 +991,7 @@ export function FileViewerBody({
         body={denial.body}
         actions={
           <Button type="button" variant="ghost" size="sm" onClick={onRetry}>
-            <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> Retry
+            <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> {tf("text.Retry")}
           </Button>
         }
       />
@@ -1004,7 +1005,7 @@ export function FileViewerBody({
     return (
       <FileViewerStateView
         icon={<Cloud aria-hidden="true" className="h-6 w-6 text-muted-foreground" />}
-        title="Remote workspace preview coming soon"
+        title={tf("auto.e823cbb5ec17da94")}
         body="This workspace is hosted remotely; inline previews are not supported yet."
       />
     );
@@ -1029,7 +1030,7 @@ export function FileViewerBody({
         body={denial.body}
         actions={
           <Button type="button" variant="ghost" size="sm" onClick={onRetry}>
-            <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> Retry
+            <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> {tf("text.Retry")}
           </Button>
         }
       />

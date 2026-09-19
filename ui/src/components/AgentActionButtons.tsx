@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "@/lib/router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -52,7 +53,7 @@ import type {
 export function RunButton({
   onClick,
   disabled,
-  label = "Run now",
+  label = tf("text.Run now"),
   size = "sm",
 }: {
   onClick: () => void;
@@ -85,7 +86,7 @@ export function PauseResumeButton({
     return (
       <Button variant="outline" size={size} onClick={onResume} disabled={disabled}>
         <Play className="h-3.5 w-3.5 sm:mr-1" />
-        <span className="hidden sm:inline">Resume</span>
+        <span className="hidden sm:inline">{tf("text.Resume")}</span>
       </Button>
     );
   }
@@ -93,7 +94,7 @@ export function PauseResumeButton({
   return (
     <Button variant="outline" size={size} onClick={onPause} disabled={disabled}>
       <Pause className="h-3.5 w-3.5 sm:mr-1" />
-      <span className="hidden sm:inline">Pause</span>
+      <span className="hidden sm:inline">{tf("text.Pause")}</span>
     </Button>
   );
 }
@@ -114,10 +115,10 @@ export function ClearErrorButton({
       onClick={onClick}
       disabled={disabled}
       className="border-destructive/60 text-destructive hover:bg-destructive/10 hover:text-destructive dark:border-destructive/50"
-      aria-label="Clear error and return agent to idle"
+      aria-label={tf("auto.3fa076871930df3c")}
     >
       <CheckCircle2 className="h-3.5 w-3.5 sm:mr-1" />
-      <span className="hidden sm:inline">Clear error</span>
+      <span className="hidden sm:inline">{tf("auto.62eb53cf43f8d762")}</span>
     </Button>
   );
 }
@@ -249,7 +250,7 @@ export function AgentActionButtons({
       if (onActionError) {
         onActionError(message);
       } else {
-        pushToast({ title: "Action failed", body: message, tone: "error" });
+        pushToast({ title: tf("auto.6e1704d8eca96bd7"), body: message, tone: "error" });
       }
     },
     [onActionError, pushToast],
@@ -291,7 +292,7 @@ export function AgentActionButtons({
       }
     },
     onError: (err) => {
-      reportError(err instanceof Error ? err.message : "Action failed");
+      reportError(err instanceof Error ? err.message: tf("auto.6e1704d8eca96bd7"));
     },
   });
 
@@ -309,7 +310,7 @@ export function AgentActionButtons({
       }
     },
     onError: (err) => {
-      reportError(err instanceof Error ? err.message : "Failed to start traced run");
+      reportError(err instanceof Error ? err.message: tf("auto.0dc289882e0b9a8b"));
     },
   });
 
@@ -335,14 +336,14 @@ export function AgentActionButtons({
       if (resolvedCompanyId) {
         await queryClient.invalidateQueries({ queryKey: queryKeys.agents.list(resolvedCompanyId) });
       }
-      pushToast({ title: "Agent duplicated", body: createdAgent.name, tone: "success" });
+      pushToast({ title: tf("auto.eec8cfadc3543276"), body: createdAgent.name, tone: "success" });
       if (!confirmLateNavigationChanges(duplicateStartedDirtyRef)) return;
       navigate(`/agents/${agentRouteRef(createdAgent)}/dashboard`);
     },
     onError: (err) => {
-      const message = err instanceof Error ? err.message : "Failed to duplicate agent";
+      const message = err instanceof Error ? err.message: tf("auto.ee1f45283c175884");
       onActionError?.(message);
-      pushToast({ title: "Could not duplicate agent", body: message, tone: "error" });
+      pushToast({ title: tf("auto.db10f77ebeb7f8c9"), body: message, tone: "error" });
     },
   });
 
@@ -363,7 +364,7 @@ export function AgentActionButtons({
       queryClient.invalidateQueries({ queryKey: queryKeys.agents.taskSessions(agent.id) });
     },
     onError: (err) => {
-      reportError(err instanceof Error ? err.message : "Failed to reset session");
+      reportError(err instanceof Error ? err.message: tf("auto.0ecbdfe91e4c0dd4"));
     },
   });
 
@@ -384,10 +385,10 @@ export function AgentActionButtons({
       {persistentProviderTrace ? (
         <span
           className="hidden items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary lg:inline-flex"
-          title="Exact provider traffic will be captured for future runs and retained for up to 24 hours."
+          title={tf("auto.43068965efe2eeb0")}
         >
           <Bug className="h-3.5 w-3.5" />
-          Raw tracing on
+          {tf("auto.9723e80b5a39df4e")}
         </span>
       ) : null}
       <Button
@@ -418,10 +419,10 @@ export function AgentActionButtons({
             providerTraceAction.mutate();
           }}
           disabled={assignAndRunDisabled}
-          title="Capture exact provider traffic for this run (expires after 24 hours)"
+          title={tf("auto.075981626599d2f8")}
         >
           <Bug className="h-3.5 w-3.5 sm:mr-1" />
-          <span className="hidden sm:inline">Run with provider trace</span>
+          <span className="hidden sm:inline">{tf("auto.8de1dcba151de20b")}</span>
         </Button>
       )}
       {isError ? (
@@ -449,9 +450,9 @@ export function AgentActionButtons({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{tf("text.Cancel")}</AlertDialogCancel>
               <AlertDialogAction onClick={() => agentAction.mutate("pause")}>
-                Pause anyway
+                {tf("auto.eb9e4103b0a48b2d")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -486,13 +487,13 @@ export function AgentActionButtons({
             className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
             onClick={() => {
               void copyTextToClipboard(agent.id).catch(() => {
-                pushToast({ title: "Copy failed", body: "Clipboard access is unavailable.", tone: "error" });
+                pushToast({ title: tf("auto.5b50e7a693fee952"), body: "Clipboard access is unavailable.", tone: "error" });
               });
               setMoreOpen(false);
             }}
           >
             <Copy className="h-3 w-3" />
-            Copy Agent ID
+            {tf("auto.48fe747f5f5b8bf0")}
           </button>
           <button
             className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
@@ -502,7 +503,7 @@ export function AgentActionButtons({
             }}
           >
             <RotateCcw className="h-3 w-3" />
-            Reset Sessions
+            {tf("auto.03984477f11971b6")}
           </button>
           {!hideTerminate && (
             <button
@@ -514,7 +515,7 @@ export function AgentActionButtons({
               }}
             >
               <Trash2 className="h-3 w-3" />
-              Terminate
+              {tf("auto.f913f09210e8cbbc")}
             </button>
           )}
         </PopoverContent>

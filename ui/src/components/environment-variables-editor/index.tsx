@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   forwardRef,
   useCallback,
@@ -450,8 +451,8 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
         <>
           {/* Header (desktop only) */}
           <div className="hidden gap-x-1.5 @[40rem]/env:grid @[40rem]/env:grid-cols-(--gtc-14)">
-            <span className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">Name</span>
-            <span className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">Value</span>
+            <span className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Name")}</span>
+            <span className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">{tf("text.Value")}</span>
             <span />
           </div>
 
@@ -484,7 +485,7 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
           })}
         </>
       ) : (
-        <p className="text-sm text-muted-foreground">No environment variables</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.620e429338127cd1")}</p>
       )}
 
       {/* Footer bar */}
@@ -496,14 +497,14 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
           className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
         >
           <Plus className="size-3.5" />
-          Add variable
+          {tf("auto.e10f539e38e1a105")}
         </button>
 
         {quickBind.length > 0 && !disabled ? (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="inline-flex items-center gap-1 text-(length:--text-micro) text-muted-foreground/70">
               <KeyRound className="size-3" />
-              Recently used:
+              {tf("auto.69bdec2db570cdf0")}
             </span>
             {quickBind.map((secret) => (
               <button
@@ -529,7 +530,7 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
           <div className="flex min-w-0 flex-col gap-0.5">
             <div className="flex items-center gap-2 text-sm font-medium">
               <span className="size-2 rounded-full bg-amber-500 shadow-(--shadow-extract-13)" />
-              <span>Unsaved changes</span>
+              <span>{tf("auto.a710c2b90913b537")}</span>
             </div>
             {changeSummaryText ? (
               <p className="min-w-0 truncate pl-4 text-xs text-amber-950/80 dark:text-amber-100/80" title={changeSummaryText}>
@@ -544,7 +545,7 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
               className="inline-flex h-9 items-center gap-1.5 rounded-md border border-amber-500/30 bg-background px-3 text-sm font-medium text-foreground transition-colors hover:bg-amber-500/10 dark:bg-background/80"
             >
               <RotateCcw className="size-4" />
-              Revert
+              {tf("auto.0026c505347863ae")}
             </button>
             <button
               type="button"
@@ -552,7 +553,7 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
               className="inline-flex h-9 items-center gap-1.5 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               <Save className="size-4" />
-              Save
+              {tf("text.Save")}
             </button>
           </div>
         </div>

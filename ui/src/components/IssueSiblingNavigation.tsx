@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Issue } from "@paperclipai/shared";
 import type { IssueSiblingNavigation as IssueSiblingNavigationState } from "@/lib/issue-detail-subissues";
@@ -16,7 +17,7 @@ export function IssueSiblingNavigation({ navigation, linkState }: IssueSiblingNa
 
   return (
     <nav
-      aria-label="Sub-task navigation"
+      aria-label={tf("auto.7df4565e400f7e7f")}
       className="mt-4 flex flex-col gap-3 sm:mt-6 sm:grid sm:grid-cols-2"
     >
       {navigation.previous ? (

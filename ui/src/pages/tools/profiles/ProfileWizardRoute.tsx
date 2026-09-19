@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect } from "react";
 import { useParams, useSearchParams } from "@/lib/router";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
@@ -29,15 +30,15 @@ export function ProfileWizardRoute({ mode }: { mode: "new" | "edit" }) {
   useEffect(() => {
     setBreadcrumbs([
       { label: selectedCompany?.name ?? "Organization", href: "/dashboard" },
-      { label: "Apps", href: "/apps" },
-      { label: "Access profiles", href: advancedTabHref("profiles") },
+      { label: tf("auto.89dd748442c19485"), href: "/apps" },
+      { label: tf("auto.2471292ff715cc6a"), href: advancedTabHref("profiles") },
       { label: mode === "edit" ? "Resume draft" : "New profile" },
     ]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs, selectedCompany?.name, mode]);
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select an organization to create a profile.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.3f7c06e0244c3567")}</div>;
   }
 
   return (
@@ -48,7 +49,7 @@ export function ProfileWizardRoute({ mode }: { mode: "new" | "edit" }) {
             {mode === "edit" ? "Finish your profile" : "New access profile"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Choose which tools this profile allows, then assign it to the agents that need them.
+            {tf("auto.7c7739c8eabed782")}
           </p>
         </header>
         <ProfileWizard

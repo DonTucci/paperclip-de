@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useState } from "react";
 import { Link2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,8 +46,8 @@ export function ManagedOAuthHandoffState({
           </p>
           {failed ? (
             <div className="mt-6 flex items-center gap-2">
-              <Button type="button" onClick={onRetry}>Try again</Button>
-              <Button type="button" variant="ghost" onClick={onCancel}>Return to Paperclip</Button>
+              <Button type="button" onClick={onRetry}>{tf("text.Try again")}</Button>
+              <Button type="button" variant="ghost" onClick={onCancel}>{tf("auto.7cb9e4e1973daded")}</Button>
             </div>
           ) : null}
         </div>
@@ -80,7 +81,7 @@ export function PaperclipCloudOAuthHandoffPage() {
       navigateTopLevel(target.url);
     } catch (caught) {
       setPhase("error");
-      setError(caught instanceof Error ? caught.message : "Paperclip couldn’t prepare secure sign-in.");
+      setError(caught instanceof Error ? caught.message: tf("auto.6d9096f6cb95a3b1"));
     }
   }, []);
 

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -137,7 +138,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
       navigateTopLevel(target.url);
     } catch (error) {
       setOAuthPhase("error");
-      setOAuthError(error instanceof Error ? error.message : "Paperclip couldn’t start secure sign-in. Try again.");
+      setOAuthError(error instanceof Error ? error.message: tf("auto.47928280e9721837"));
     }
   };
 
@@ -148,8 +149,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
       setOAuthPhase("error");
       setOAuthError(
         error instanceof Error
-          ? error.message
-          : "Paperclip couldn’t start secure sign-in. Try again.",
+          ? error.message: tf("auto.47928280e9721837"),
       );
     },
   });
@@ -255,14 +255,14 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
     <div className="space-y-5">
       <div className="flex max-w-2xl items-start gap-1.5">
         <p className="text-sm text-muted-foreground">
-          Paste the MCP config snippet from the tool's README and we'll turn it into a friendly setup.
+          {tf("auto.1f218ff8738ba467")}
         </p>
         <McpConfigHelpDialog />
       </div>
       <p className="text-xs text-muted-foreground">
         Just a URL?{" "}
         <Link to="/apps" className="text-primary hover:underline">
-          Browse planned app connections
+          {tf("auto.342995c7321f37e4")}
         </Link>{" "}
         instead.
       </p>
@@ -285,7 +285,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
           <p className="text-xs text-amber-600">{localParseError}</p>
         ) : (
           <p className="text-xs text-muted-foreground">
-            Paste an MCP config — the snippet a README tells you to copy.
+            {tf("auto.59ed50f2e858bccb")}
           </p>
         )}
       </div>
@@ -298,7 +298,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
           {importMutation.isPending ? "Checking…" : "Check config"}
         </Button>
         <span className="text-xs text-muted-foreground">
-          We'll read it and show what we found before anything is saved.
+          {tf("auto.e36240cda6e7b72c")}
         </span>
       </div>
 
@@ -307,7 +307,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
       {preview ? (
         drafts.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-            We couldn't find an app in that config. Double-check you pasted the whole snippet.
+            {tf("auto.e68580b6a601034b")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -410,7 +410,7 @@ function DraftCard({
 
       {onCheck ? (
         <label className="mt-4 block max-w-sm space-y-1 text-xs font-medium text-foreground">
-          Connection name
+          {tf("auto.686d4d5d8ecd1a79")}
           <Input
             value={connectionName}
             onChange={(event) => onConnectionNameChange(event.target.value)}
@@ -436,7 +436,7 @@ function DraftCard({
                   type="password"
                   value={credentialValues[credentialValueKey(draft, field.configPath)] ?? ""}
                   onChange={(event) => onCredentialChange(field.configPath, event.target.value)}
-                  placeholder="Paste replacement value"
+                  placeholder={tf("auto.297ff20dad01b89c")}
                   className="h-8 max-w-sm text-xs"
                 />
               </div>
@@ -445,10 +445,10 @@ function DraftCard({
         </div>
       ) : draft.credentialRefs.length > 0 ? (
         <p className="mt-3 text-xs text-muted-foreground">
-          Keys from this config stay draft-only until an admin maps them to an approved template.
+          {tf("auto.c7c73829da15b2e7")}
         </p>
       ) : (
-        <p className="mt-3 text-xs text-muted-foreground">No keys needed for this one.</p>
+        <p className="mt-3 text-xs text-muted-foreground">{tf("auto.0f5035a9b499fa2c")}</p>
       )}
 
       {draft.warnings.length > 0 ? (
@@ -493,7 +493,7 @@ function CatalogReview({
             Review actions for {result.application.name}
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Health and catalog checks passed. Every discovered action starts allowed; you can narrow access after activation.
+            {tf("auto.cd29bd5489d6786f")}
           </p>
         </div>
         <Button size="sm" onClick={onFinish} disabled={finishing || enabledCount === 0 || Boolean(activatedName)}>
@@ -502,7 +502,7 @@ function CatalogReview({
         </Button>
       </div>
       <ActionGroup
-        title="Read-only"
+        title={tf("auto.72bb90897ab1eadc")}
         actions={result.actions.readOnly}
         enabled={enabled}
         onToggle={onToggle}
@@ -510,7 +510,7 @@ function CatalogReview({
         askFirstLevels={askFirstLevels}
       />
       <ActionGroup
-        title="Can make changes"
+        title={tf("auto.0bf247bbb3ae9bf2")}
         actions={result.actions.canMakeChanges}
         enabled={enabled}
         onToggle={onToggle}
@@ -546,10 +546,10 @@ function ActionGroup({
         <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</div>
         <div className="flex gap-2">
           <Button type="button" size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => onBulk(true)}>
-            Turn all on
+            {tf("auto.08f6d3f555b7c1f5")}
           </Button>
           <Button type="button" size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => onBulk(false)}>
-            Turn all off
+            {tf("auto.59d74fd7dc6c7617")}
           </Button>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect } from "react";
 import { Link, useLocation } from "@/lib/router";
 import { AlertTriangle, Compass } from "lucide-react";
@@ -19,7 +20,7 @@ export function NotFoundPage({ scope = "global", requestedPrefix }: NotFoundPage
   const { companies, selectedCompany } = useCompany();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Not Found" }]);
+    setBreadcrumbs([{ label: tf("auto.0019dfc4b32d63c1") }]);
   }, [setBreadcrumbs]);
 
   const fallbackCompany = selectedCompany ?? companies[0] ?? null;
@@ -54,11 +55,11 @@ export function NotFoundPage({ scope = "global", requestedPrefix }: NotFoundPage
           <Button asChild>
             <Link to={dashboardHref}>
               <Compass className="mr-1.5 h-4 w-4" />
-              Open dashboard
+              {tf("text.Open dashboard")}
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/">Go home</Link>
+            <Link to="/">{tf("text.Go home")}</Link>
           </Button>
         </div>
       </Card>

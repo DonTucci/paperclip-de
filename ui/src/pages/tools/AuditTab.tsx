@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, ScrollText } from "lucide-react";
@@ -30,29 +31,29 @@ const ALL = "__all";
 
 /** Outcome chip vocabulary (spec §4C / §5): Allowed · Blocked · Asked first · Failed · Waiting. */
 const OUTCOME_META: Record<ToolAuditOutcome, { label: string; status: string }> = {
-  allowed: { label: "Allowed", status: "allowed" },
-  blocked: { label: "Blocked", status: "denied" },
-  asked_first: { label: "Asked first", status: "require-approval" },
-  waiting: { label: "Waiting", status: "deferred" },
-  failed: { label: "Failed", status: "failed" },
-  unknown: { label: "Recorded", status: "unchecked" },
+  allowed: { label: tf("auto.1bb201d188352e9b"), status: "allowed" },
+  blocked: { label: tf("status.blocked"), status: "denied" },
+  asked_first: { label: tf("auto.db928628a30ccd18"), status: "require-approval" },
+  waiting: { label: tf("status.waiting"), status: "deferred" },
+  failed: { label: tf("text.Failed"), status: "failed" },
+  unknown: { label: tf("auto.c7175fa7a0db0d3c"), status: "unchecked" },
 };
 
 const OUTCOME_FILTERS: { value: string; label: string }[] = [
-  { value: ALL, label: "All outcomes" },
-  { value: "allowed", label: "Allowed" },
-  { value: "blocked", label: "Blocked" },
-  { value: "asked_first", label: "Asked first" },
-  { value: "waiting", label: "Waiting" },
-  { value: "failed", label: "Failed" },
+  { value: ALL, label: tf("auto.1d7f920d0db49837") },
+  { value: "allowed", label: tf("auto.1bb201d188352e9b") },
+  { value: "blocked", label: tf("status.blocked") },
+  { value: "asked_first", label: tf("auto.db928628a30ccd18") },
+  { value: "waiting", label: tf("status.waiting") },
+  { value: "failed", label: tf("text.Failed") },
 ];
 
 const WINDOW_FILTERS: { value: ToolAuditWindow; label: string }[] = [
-  { value: "all", label: "All time" },
-  { value: "1h", label: "Last 1 hour" },
-  { value: "24h", label: "Last 24 hours" },
-  { value: "7d", label: "Last 7 days" },
-  { value: "30d", label: "Last 30 days" },
+  { value: "all", label: tf("auto.9755c8d7d44a6258") },
+  { value: "1h", label: tf("auto.3e88e2410dc4c412") },
+  { value: "24h", label: tf("auto.5c37cf8f018b4ac5") },
+  { value: "7d", label: tf("auto.0603deca4fcb660f") },
+  { value: "30d", label: tf("auto.f8f03fb441b8b4ae") },
 ];
 
 function detailString(details: Record<string, unknown> | null, key: string): string | undefined {
@@ -255,12 +256,12 @@ function ActivityRow({
           <div className="flex flex-wrap gap-3 text-xs">
             {issueId ? (
               <Link to={`/issues/${issueId}`} className="text-primary hover:underline">
-                View task
+                {tf("auto.01444a2b442a7b78")}
               </Link>
             ) : null}
             {runId && agentId ? (
               <Link to={`/agents/${agentId}/runs/${runId}`} className="text-primary hover:underline">
-                View run
+                {tf("auto.aaf7fccc7d1315f2")}
               </Link>
             ) : null}
           </div>
@@ -276,28 +277,28 @@ function ActivityRow({
             </button>
             {detailsOpen ? (
               <div className="mt-2 space-y-1.5 text-xs">
-                {rawTool ? <DetailFact label="Action name" value={rawTool} mono /> : null}
-                <DetailFact label="Reason code" value={reasonCode} mono />
-                <DetailFact label="Actor type" value={event.actorType ?? "—"} />
-                {runId ? <DetailFact label="Run ID" value={runId} mono /> : null}
-                {transport ? <DetailFact label="Transport" value={transport} mono /> : null}
-                {requestMethod && endpoint ? <DetailFact label="HTTP request" value={`${requestMethod} ${endpoint}`} mono /> : null}
-                {mcpMethod ? <DetailFact label="MCP method" value={mcpMethod} mono /> : null}
-                {requestId ? <DetailFact label="Request ID" value={requestId} mono /> : null}
-                {request ? <DetailFact label="Dispatched" value={request.dispatched === true ? "Yes" : "No"} /> : null}
-                {httpStatus !== undefined ? <DetailFact label="HTTP status" value={String(httpStatus)} mono /> : null}
-                {contentType ? <DetailFact label="Content type" value={contentType} mono /> : null}
-                {responseBytes !== undefined ? <DetailFact label="Response size" value={`${responseBytes} bytes`} /> : null}
-                {upstreamRequestId ? <DetailFact label="Upstream ID" value={upstreamRequestId} mono /> : null}
+                {rawTool ? <DetailFact label={tf("auto.323a3fff01247561")} value={rawTool} mono /> : null}
+                <DetailFact label={tf("auto.9e13ec9ee6a95a38")} value={reasonCode} mono />
+                <DetailFact label={tf("auto.6d003d9d9a934965")} value={event.actorType ?? "—"} />
+                {runId ? <DetailFact label={tf("auto.26d3e7aaace43436")} value={runId} mono /> : null}
+                {transport ? <DetailFact label={tf("auto.aaead4abf5d0fd5e")} value={transport} mono /> : null}
+                {requestMethod && endpoint ? <DetailFact label={tf("auto.f1ee1152c8b29ea2")} value={`${requestMethod} ${endpoint}`} mono /> : null}
+                {mcpMethod ? <DetailFact label={tf("auto.e810a950faf752c6")} value={mcpMethod} mono /> : null}
+                {requestId ? <DetailFact label={tf("auto.d561f528baf777c7")} value={requestId} mono /> : null}
+                {request ? <DetailFact label={tf("auto.a43dccadeb619e3e")} value={request.dispatched === true ? "Yes" : "No"} /> : null}
+                {httpStatus !== undefined ? <DetailFact label={tf("auto.0f7cf91f242cdf7a")} value={String(httpStatus)} mono /> : null}
+                {contentType ? <DetailFact label={tf("auto.6f51cb0403204b19")} value={contentType} mono /> : null}
+                {responseBytes !== undefined ? <DetailFact label={tf("auto.3bbd79b42b54c2b1")} value={`${responseBytes} bytes`} /> : null}
+                {upstreamRequestId ? <DetailFact label={tf("auto.56ca20b2823d9585")} value={upstreamRequestId} mono /> : null}
                 {isRuntimeMcpDeliveryDiagnostic ? (
                   <>
-                    <DetailFact label="Delivered MCP servers" value="0" mono />
+                    <DetailFact label={tf("auto.e8f93a3ea5e8fb3c")} value="0" mono />
                     {permittedNotInstalledConnections.map((connection) => {
                       const connectionId = detailString(connection, "id");
                       const connectionName = detailString(connection, "name") ?? "Unnamed connection";
                       return connectionId ? (
                         <div key={connectionId} className="flex gap-2">
-                          <span className="shrink-0 text-muted-foreground">Not installed</span>
+                          <span className="shrink-0 text-muted-foreground">{tf("auto.d177cdc09a4ea3f3")}</span>
                           <Link to={`/apps/${connectionId}/permissions`} className="font-medium text-primary hover:underline">
                             {connectionName}
                           </Link>
@@ -308,7 +309,7 @@ function ActivityRow({
                 ) : null}
                 {argumentsText ? (
                   <div className="space-y-1">
-                    <span className="text-muted-foreground">Parameters (redacted)</span>
+                    <span className="text-muted-foreground">{tf("auto.7aa473afa7c5f455")}</span>
                     <pre className="whitespace-pre-wrap break-words rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground">
                       {argumentsText}
                     </pre>
@@ -396,17 +397,17 @@ export function AuditTab({ companyId }: { companyId: string }) {
   return (
     <div className="space-y-4">
       <ToolsPageHeader
-        title="Activity"
-        description="What your agents actually did with your apps, newest first. Each line is one decision — allowed, blocked, asked first, waiting, or failed."
+        title={tf("text.Activity")}
+        description={tf("auto.c7a12a9c26f81c5d")}
       />
 
       <div className="flex flex-wrap items-center gap-2">
         <Select value={app} onValueChange={setApp}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="App" />
+            <SelectValue placeholder={tf("auto.0d04bfeb7d64b71c")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL}>All apps</SelectItem>
+            <SelectItem value={ALL}>{tf("auto.01bed311e7d0c963")}</SelectItem>
             {(apps.data?.applications ?? []).map((a) => (
               <SelectItem key={a.id} value={a.id}>
                 {a.name}
@@ -445,14 +446,14 @@ export function AuditTab({ companyId }: { companyId: string }) {
           </SelectContent>
         </Select>
         <Input
-          placeholder="Search activity…"
+          placeholder={tf("auto.6f14857bfd04fabe")}
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           className="max-w-xs"
         />
         {hasActiveFilters ? (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Clear filters
+            {tf("text.Clear filters")}
           </Button>
         ) : null}
       </div>
@@ -467,13 +468,13 @@ export function AuditTab({ companyId }: { companyId: string }) {
             <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
               <ScrollText className="h-10 w-10 text-muted-foreground/40" />
               <div>
-                <p className="text-sm font-medium text-foreground">No activity matches these filters</p>
+                <p className="text-sm font-medium text-foreground">{tf("auto.2acc5c1033c90d21")}</p>
                 <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                  Try a wider time window or different filters.
+                  {tf("auto.4e97d386c47afe3a")}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={clearFilters}>
-                Clear filters
+                {tf("text.Clear filters")}
               </Button>
             </CardContent>
           </Card>
@@ -482,9 +483,9 @@ export function AuditTab({ companyId }: { companyId: string }) {
             <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
               <ScrollText className="h-10 w-10 text-muted-foreground/40" />
               <div>
-                <p className="text-sm font-medium text-foreground">Nothing here yet</p>
+                <p className="text-sm font-medium text-foreground">{tf("auto.49abaf804ab38c1d")}</p>
                 <p className="mt-1 max-w-md text-sm text-muted-foreground">
-                  As soon as your agents start using connected apps, what they do shows up here.
+                  {tf("auto.3d3eaa1988ecbaec")}
                 </p>
               </div>
             </CardContent>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { createContext, useContext, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, KeyRound, Loader2, Plus, X } from "lucide-react";
@@ -86,8 +87,8 @@ function statusTone(status: CompanySecret["status"]): string {
 export function SecretBindingPicker({
   value,
   onChange,
-  label = "Secret",
-  placeholder = "Select secret",
+  label = tf("auto.7e32a729b1226ed1"),
+  placeholder = tf("auto.72a2a90fd493dfb9"),
   allowVersionSelector = true,
   emptyHint = "No matching secrets. Create one to bind it here.",
   className,
@@ -148,7 +149,7 @@ export function SecretBindingPicker({
       setCreateError(null);
     },
     onError: (error) => {
-      setCreateError(error instanceof Error ? error.message : "Failed to create secret");
+      setCreateError(error instanceof Error ? error.message: tf("auto.c91d73b6f4ca6380"));
     },
   });
 
@@ -169,7 +170,7 @@ export function SecretBindingPicker({
               onClick={() => onChange(null)}
               disabled={disabled}
             >
-              <X className="h-3 w-3" /> Clear
+              <X className="h-3 w-3" /> {tf("text.Clear")}
             </button>
           ) : null}
         </div>
@@ -221,9 +222,9 @@ export function SecretBindingPicker({
               onChange({ ...value, version: next });
             }}
             disabled={disabled || !value || !selectedSecret}
-            aria-label="Version"
+            aria-label={tf("text.Version")}
           >
-            <option value={VERSION_LATEST}>latest</option>
+            <option value={VERSION_LATEST}>{tf("auto.5e1e2bcac305958b")}</option>
             {selectedSecret
               ? Array.from({ length: Math.max(0, selectedSecret.latestVersion) }, (_, index) => {
                   const version = selectedSecret.latestVersion - index;
@@ -243,7 +244,7 @@ export function SecretBindingPicker({
           size="sm"
           onClick={() => setCreateOpen(true)}
           disabled={disabled || !selectedCompanyId}
-          aria-label="Create secret"
+          aria-label={tf("auto.b72a982613b6b66e")}
         >
           <Plus className="h-3.5 w-3.5" />
         </Button>
@@ -276,7 +277,7 @@ export function SecretBindingPicker({
       ) : selectedMissing ? (
         <p className="text-(length:--text-micro) text-destructive flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />
-          The previously selected secret is no longer available. Pick another or remove the binding.
+          {tf("auto.80dbc032ef6381b5")}
         </p>
       ) : (filteredSecrets.length === 0 && !secretsQuery.isPending) ? (
         <p className="text-(length:--text-micro) text-muted-foreground">{emptyHint}</p>
@@ -285,46 +286,46 @@ export function SecretBindingPicker({
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Create new secret</DialogTitle>
+            <DialogTitle>{tf("auto.369eed0c494e6d01")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-xs font-medium text-foreground/80" htmlFor="secret-name">Name</label>
+              <label className="text-xs font-medium text-foreground/80" htmlFor="secret-name">{tf("text.Name")}</label>
               <Input
                 id="secret-name"
                 value={createName}
                 onChange={(event) => setCreateName(event.target.value)}
-                placeholder="OPENAI_API_KEY"
+                placeholder={tf("auto.1bd0074c9fd82ff8")}
                 autoFocus
               />
             </div>
             <div>
-              <label className="text-xs font-medium text-foreground/80" htmlFor="secret-value">Value</label>
+              <label className="text-xs font-medium text-foreground/80" htmlFor="secret-value">{tf("text.Value")}</label>
               <Textarea
                 id="secret-value"
                 value={createValue}
                 onChange={(event) => setCreateValue(event.target.value)}
                 rows={3}
-                placeholder="Paste the secret value"
+                placeholder={tf("auto.695e316ec6b59428")}
                 className="font-mono text-xs"
               />
               <p className="text-(length:--text-micro) text-muted-foreground mt-1">
-                The value is stored once and never re-displayed. Rotate to replace.
+                {tf("auto.70a9ef5b2ec59a6d")}
               </p>
             </div>
             <div>
-              <label className="text-xs font-medium text-foreground/80" htmlFor="secret-description">Description</label>
+              <label className="text-xs font-medium text-foreground/80" htmlFor="secret-description">{tf("text.Description")}</label>
               <Input
                 id="secret-description"
                 value={createDescription}
                 onChange={(event) => setCreateDescription(event.target.value)}
-                placeholder="Optional notes (no values)"
+                placeholder={tf("auto.6c3c8a00014730e4")}
               />
             </div>
             {createError ? <p className="text-xs text-destructive">{createError}</p> : null}
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>{tf("text.Cancel")}</Button>
             <Button
               type="button"
               onClick={() => createMutation.mutate()}

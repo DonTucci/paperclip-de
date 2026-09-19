@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -157,14 +158,14 @@ export function CompanySettings() {
   useEffect(() => {
     setBreadcrumbs([
       { label: selectedCompany?.name ?? "Company", href: "/dashboard" },
-      { label: "Settings" }
+      { label: tf("text.Settings") }
     ]);
   }, [setBreadcrumbs, selectedCompany?.name]);
 
   if (!selectedCompany) {
     return (
       <div className="text-sm text-muted-foreground">
-        No organization selected. Select an organization from the switcher above.
+        {tf("auto.9133af154f20a9d0")}
       </div>
     );
   }
@@ -180,16 +181,16 @@ export function CompanySettings() {
     <div className="max-w-6xl space-y-8">
       <div className="flex items-center gap-2">
         <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
-        <h1 className="text-lg font-semibold">General</h1>
+        <h1 className="text-lg font-semibold">{tf("text.General")}</h1>
       </div>
 
       {/* General */}
       <div className="max-w-2xl space-y-4">
         <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          General
+          {tf("text.General")}
         </div>
         <div className="space-y-3">
-          <Field label="Organization name" hint="The display name for your organization.">
+          <Field label={tf("auto.9a807d52ba21603e")} hint="The display name for your organization.">
             <input
               className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
               type="text"
@@ -204,14 +205,14 @@ export function CompanySettings() {
             )}
           </Field>
           <Field
-            label="Description"
+            label={tf("text.Description")}
             hint="Optional description shown in the organization profile."
           >
             <input
               className="w-full rounded-md border border-border bg-transparent px-2.5 py-1.5 text-sm outline-none"
               type="text"
               value={description}
-              placeholder="Optional organization description"
+              placeholder={tf("auto.4322c2356e421094")}
               onChange={(e) => setDescription(e.target.value)}
             />
           </Field>
@@ -221,7 +222,7 @@ export function CompanySettings() {
       {/* Appearance */}
       <div className="max-w-2xl space-y-4">
         <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Appearance
+          {tf("text.Appearance")}
         </div>
         <div className="space-y-3">
           <div className="flex items-start gap-4">
@@ -234,7 +235,7 @@ export function CompanySettings() {
             </div>
             <div className="flex-1 space-y-3">
               <Field
-                label="Logo"
+                label={tf("auto.d707dc2f1936efd8")}
                 hint="Upload a PNG, JPEG, WEBP, GIF, or SVG logo image."
               >
                 <div className="space-y-2">
@@ -260,8 +261,7 @@ export function CompanySettings() {
                     <span className="text-xs text-destructive">
                       {logoUploadError ??
                         (logoUploadMutation.error instanceof Error
-                          ? logoUploadMutation.error.message
-                          : "Logo upload failed")}
+                          ? logoUploadMutation.error.message: tf("auto.9faf7b9427524425"))}
                     </span>
                   )}
                   {clearLogoMutation.isError && (
@@ -270,7 +270,7 @@ export function CompanySettings() {
                     </span>
                   )}
                   {logoUploadMutation.isPending && (
-                    <span className="text-xs text-muted-foreground">Uploading logo...</span>
+                    <span className="text-xs text-muted-foreground">{tf("auto.def73c874daa508e")}</span>
                   )}
                 </div>
               </Field>
@@ -290,13 +290,12 @@ export function CompanySettings() {
             {generalMutation.isPending ? "Saving..." : "Save changes"}
           </Button>
           {generalMutation.isSuccess && (
-            <span className="text-xs text-muted-foreground">Saved</span>
+            <span className="text-xs text-muted-foreground">{tf("auto.b5c120b316c237a0")}</span>
           )}
           {generalMutation.isError && (
             <span className="text-xs text-destructive">
               {generalMutation.error instanceof Error
-                  ? generalMutation.error.message
-                  : "Failed to save"}
+                  ? generalMutation.error.message: tf("auto.2c07997249abaa76")}
             </span>
           )}
         </div>
@@ -305,11 +304,11 @@ export function CompanySettings() {
       {/* Hiring */}
       <div className="max-w-2xl space-y-4" data-testid="company-settings-team-section">
         <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Hiring
+          {tf("auto.4e414af41b7d4876")}
         </div>
         <div>
           <ToggleField
-            label="Require board approval for new hires"
+            label={tf("auto.411a6ac4e074946c")}
             hint="New agent hires stay pending until approved by board."
             checked={!!selectedCompany.requireBoardApprovalForNewAgents}
             onChange={(v) => settingsMutation.mutate(v)}
@@ -326,8 +325,7 @@ export function CompanySettings() {
         errorMessage={
           governanceMutation.isError
             ? governanceMutation.error instanceof Error
-              ? governanceMutation.error.message
-              : "Failed to save interaction governance"
+              ? governanceMutation.error.message: tf("auto.d33b037f371764a0")
             : null
         }
       />
@@ -337,7 +335,7 @@ export function CompanySettings() {
       {/* Danger Zone */}
       <div className="space-y-4">
         <div className="text-xs font-medium text-destructive uppercase tracking-wide">
-          Danger Zone
+          {tf("auto.3c1c01b405853556")}
         </div>
         <div className="space-y-3 bg-destructive/5 px-4 py-4">
           <p className="text-sm text-muted-foreground">
@@ -379,8 +377,7 @@ export function CompanySettings() {
             {archiveMutation.isError && (
               <span className="text-xs text-destructive">
                 {archiveMutation.error instanceof Error
-                  ? archiveMutation.error.message
-                  : "Failed to archive organization"}
+                  ? archiveMutation.error.message: tf("auto.45dfcd8f4d71ad0c")}
               </span>
             )}
           </div>

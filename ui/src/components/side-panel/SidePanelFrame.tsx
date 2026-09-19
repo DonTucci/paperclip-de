@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { CSSProperties, ReactNode } from "react";
 import { Maximize2, Minimize2, PanelRightClose, PanelRightOpen, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ export function SidePanelFrame({
   open = true,
   maximized = false,
   resizing = false,
-  label = "Side panel",
+  label = tf("auto.c28cdd98645b370f"),
   headerSize = "default",
   className,
   bodyClassName,
@@ -108,7 +109,7 @@ export function SidePanelToggleButton({
   shortcut?: string;
   className?: string;
 }) {
-  const label = "Toggle side panel";
+  const label = tf("auto.081f0fced829e89a");
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -154,8 +155,8 @@ export function SidePanelWindowControls({
         size="icon-sm"
         className="h-(--side-panel-tab-height) w-(--side-panel-tab-height) text-muted-foreground hover:text-foreground focus-visible:text-foreground"
         onClick={() => onMaximizedChange(!maximized)}
-        aria-label={maximized ? "Restore side panel" : "Maximize side panel"}
-        title={maximized ? "Restore side panel" : "Maximize side panel"}
+        aria-label={maximized ? tf("auto.7013aadda8d463bd") : tf("auto.2770d4aa0bee9490")}
+        title={maximized ? tf("auto.7013aadda8d463bd") : tf("auto.2770d4aa0bee9490")}
       >
         {maximized ? <Minimize2 aria-hidden /> : <Maximize2 aria-hidden />}
       </Button>
@@ -166,8 +167,8 @@ export function SidePanelWindowControls({
           size="icon-sm"
           className="h-(--side-panel-tab-height) w-(--side-panel-tab-height) text-muted-foreground hover:text-foreground focus-visible:text-foreground"
           onClick={onToggle}
-          aria-label="Close side panel"
-          title="Close side panel"
+          aria-label={tf("auto.9522182643507af1")}
+          title={tf("auto.9522182643507af1")}
         >
           <X aria-hidden />
         </Button>

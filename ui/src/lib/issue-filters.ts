@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ExternalObjectSummary, Issue } from "@paperclipai/shared";
 
 export type IssueFilterWorkspaceLookup = {
@@ -80,10 +81,10 @@ export const issueStatusOrder = ["in_progress", "todo", "backlog", "in_review", 
 export const issuePriorityOrder = ["critical", "high", "medium", "low"];
 
 export const issueQuickFilterPresets = [
-  { label: "All", statuses: [] as string[] },
-  { label: "Active", statuses: ["todo", "in_progress", "in_review", "blocked"] },
-  { label: "Backlog", statuses: ["backlog"] },
-  { label: "Done", statuses: ["done", "cancelled"] },
+  { label: tf("text.All"), statuses: [] as string[] },
+  { label: tf("text.Active"), statuses: ["todo", "in_progress", "in_review", "blocked"] },
+  { label: tf("status.backlog"), statuses: ["backlog"] },
+  { label: tf("text.Done"), statuses: ["done", "cancelled"] },
 ];
 
 export function issueFilterLabel(value: string): string {

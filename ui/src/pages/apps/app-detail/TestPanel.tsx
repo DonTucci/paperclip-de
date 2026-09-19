@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -146,22 +147,22 @@ export function ActionTestDialog({
         <DialogHeader>
           <DialogTitle>Test {title}</DialogTitle>
           <DialogDescription>
-            Run a real action with the same permissions and credentials an agent would use.
+            {tf("auto.c96dff7a78991f17")}
           </DialogDescription>
         </DialogHeader>
 
         {testAgentsQuery.isLoading ? (
           <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground" role="status">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading agents…
+            {tf("auto.ae0c1414f42139ce")}
           </div>
         ) : testAgentsQuery.isError ? (
           <TestLoadError
-            message="We couldn't load the agents available for testing."
+            message={tf("auto.30f10d0652771a18")}
             onRetry={() => { void testAgentsQuery.refetch(); }}
           />
         ) : agents.length === 0 ? (
-          <p className="py-6 text-sm text-muted-foreground">No agents are available to test as.</p>
+          <p className="py-6 text-sm text-muted-foreground">{tf("auto.3d77dc6dc0b902b2")}</p>
         ) : accessQuery.isError && !accessQuery.data ? (
           <TestLoadError
             message={`We couldn't load ${selectedAgentBase?.name ?? "this agent"}'s permissions.`}
@@ -170,12 +171,12 @@ export function ActionTestDialog({
         ) : !selectedAgent ? (
           <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground" role="status">
             <Loader2 className="h-4 w-4 animate-spin" />
-            Loading agent permissions…
+            {tf("auto.f8def289c7b05087")}
           </div>
         ) : (
           <div className="space-y-5">
             <div className="rounded-md border border-border bg-muted/30 p-4">
-              <p className="text-xs font-medium text-muted-foreground">Act as</p>
+              <p className="text-xs font-medium text-muted-foreground">{tf("auto.66ad5e25f51f864c")}</p>
               <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
                 <AgentPicker
                   agents={agents}
@@ -207,15 +208,15 @@ export function ActionTestDialog({
 
 const DECISION_META: Record<ToolConnectionTestDecision, DecisionMeta> = {
   allowed: {
-    label: "Allowed",
+    label: tf("auto.1bb201d188352e9b"),
     className: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
   },
   ask_first: {
-    label: "Ask first",
+    label: tf("auto.4a9e8cf39abb59f1"),
     className: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300",
   },
   off: {
-    label: "Off",
+    label: tf("auto.ca7981b46ecf2c17"),
     className: "border-border bg-muted text-muted-foreground",
   },
 };
@@ -337,7 +338,7 @@ export function TestPanel({
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading agents…
+          {tf("auto.ae0c1414f42139ce")}
         </div>
         <Skeleton className="h-20 w-full" />
         <Skeleton className="h-12 w-full" />
@@ -349,7 +350,7 @@ export function TestPanel({
   if (testAgentsQuery.isError) {
     return (
       <TestLoadError
-        message="We couldn't load the agents available for testing."
+        message={tf("auto.30f10d0652771a18")}
         onRetry={() => { void testAgentsQuery.refetch(); }}
       />
     );
@@ -358,11 +359,11 @@ export function TestPanel({
   if (agents.length === 0) {
     return (
       <div className="py-6 text-center">
-        <p className="text-sm font-medium text-foreground">No agents to test as</p>
+        <p className="text-sm font-medium text-foreground">{tf("auto.41e70431a67c82e4")}</p>
         <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
           Only agents you can assign tasks to can preview {appName}. Give an agent access in{" "}
           <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-            Permissions
+            {tf("text.Permissions")}
           </Link>{" "}
           to test it here.
         </p>
@@ -384,7 +385,7 @@ export function TestPanel({
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Loading agent permissions…
+          {tf("auto.f8def289c7b05087")}
         </div>
         <Skeleton className="h-20 w-full" />
         <Skeleton className="h-12 w-full" />
@@ -413,13 +414,13 @@ export function TestPanel({
       )}
 
       <section className="space-y-4 border-t border-border pt-8">
-        <h2 className="text-lg font-semibold text-foreground">Actions</h2>
+        <h2 className="text-lg font-semibold text-foreground">{tf("text.Actions")}</h2>
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-(--sz-12rem) flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              aria-label="Find an action"
-              placeholder="Find an action…"
+              aria-label={tf("auto.efd383494381e7de")}
+              placeholder={tf("auto.f0eba3ca1e970fff")}
               className="pl-9"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -479,12 +480,12 @@ export function TestPanel({
 function EmptyState({ connectionId, appName }: { connectionId: string; appName: string }) {
   return (
     <div className="py-8 text-center">
-      <p className="text-base font-bold text-foreground">Nothing to test yet</p>
+      <p className="text-base font-bold text-foreground">{tf("auto.e54d49d635832014")}</p>
       <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
         Once {appName} is connected, the actions it offers will show up here so you can try them out.
       </p>
       <Button asChild className="mt-4" variant="outline">
-        <Link to={appTabHref(connectionId, "permissions")}>Go to Permissions</Link>
+        <Link to={appTabHref(connectionId, "permissions")}>{tf("auto.f2e0eeb9fab2c179")}</Link>
       </Button>
     </div>
   );
@@ -495,7 +496,7 @@ function TestLoadError({ message, onRetry }: { message: string; onRetry: () => v
     <div className="py-8 text-center">
       <p className="text-sm font-medium text-foreground">{message}</p>
       <Button className="mt-3" size="sm" variant="outline" onClick={onRetry}>
-        Try again
+        {tf("text.Try again")}
       </Button>
     </div>
   );
@@ -521,14 +522,14 @@ function TestAsHeader({
   return (
     <section className="space-y-5">
       <div>
-        <h2 className="text-lg font-semibold text-foreground">Test an action</h2>
+        <h2 className="text-lg font-semibold text-foreground">{tf("auto.391c7ce705115c1e")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Run a real action as an agent.
+          {tf("auto.054d0a992f69f1a1")}
         </p>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-medium text-muted-foreground">Agent</p>
+          <p className="text-xs font-medium text-muted-foreground">{tf("text.Agent")}</p>
           <AgentPicker
             agents={agents}
             selectedAgent={selectedAgent}
@@ -579,7 +580,7 @@ function AgentPicker({
             "items-center gap-1.5 text-foreground outline-none hover:text-primary focus-visible:text-primary",
             inline ? "inline-flex font-semibold underline-offset-2 hover:underline" : "mt-0.5 flex text-lg font-bold",
           )}
-          aria-label="Choose which agent to test as"
+          aria-label={tf("auto.2072e751dcf212bc")}
         >
           {selectedAgent.name}
           <ChevronsUpDown className={cn("text-muted-foreground", inline ? "h-3.5 w-3.5" : "h-4 w-4")} />
@@ -590,8 +591,8 @@ function AgentPicker({
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              aria-label="Search agents"
-              placeholder="Search agents…"
+              aria-label={tf("auto.212fd04a1d202b4f")}
+              placeholder={tf("auto.e05cb78e973da372")}
               className="h-8 pl-8 text-sm"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -601,7 +602,7 @@ function AgentPicker({
         </div>
         <div className="max-h-60 overflow-y-auto p-1">
           {filtered.length === 0 ? (
-            <p className="px-3 py-4 text-center text-xs text-muted-foreground">No agents match.</p>
+            <p className="px-3 py-4 text-center text-xs text-muted-foreground">{tf("auto.8927413ab41d88ad")}</p>
           ) : (
             filtered.map((agent) => {
               const detail = agent.title?.trim() || agent.role;
@@ -635,23 +636,23 @@ function AgentPicker({
           )}
         </div>
         <div className="border-t border-border px-3 py-2 text-(length:--text-micro) text-muted-foreground">
-          <p>Only agents you can assign tasks to are listed.</p>
+          <p>{tf("auto.b4ee96c69eb6d35d")}</p>
           <p>Pick one to preview what they'd see in {appName}.</p>
         </div>
         <div className="border-t border-border p-3">
-          <p className="text-xs font-semibold text-foreground">What the badges mean</p>
+          <p className="text-xs font-semibold text-foreground">{tf("auto.acd5ccb3fcbbfda4")}</p>
           <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-            <li><span className="font-medium text-foreground">Allowed</span> — runs immediately when you press Run.</li>
-            <li><span className="font-medium text-foreground">Ask first</span> — Run is parked in Review for your OK.</li>
+            <li><span className="font-medium text-foreground">{tf("auto.1bb201d188352e9b")}</span> — runs immediately when you press Run.</li>
+            <li><span className="font-medium text-foreground">{tf("auto.4a9e8cf39abb59f1")}</span> — Run is parked in Review for your OK.</li>
             <li>
-              <span className="font-medium text-foreground">Off</span> — won't run. Change it in{" "}
+              <span className="font-medium text-foreground">{tf("auto.ca7981b46ecf2c17")}</span> — won't run. Change it in{" "}
               <Link className="text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-                Permissions
+                {tf("text.Permissions")}
               </Link>.
             </li>
           </ul>
           <p className="mt-2 text-(length:--text-micro) text-muted-foreground">
-            Badges reflect this agent's current settings, not yours. Swap agents to see how an action would behave for each.
+            {tf("auto.ff41d981dca5e17f")}
           </p>
         </div>
       </PopoverContent>
@@ -963,7 +964,7 @@ function ActionTester({
           advancedLabel="More options"
         />
       ) : (
-        <p className="text-xs text-muted-foreground">This action takes no inputs.</p>
+        <p className="text-xs text-muted-foreground">{tf("auto.53b634e4b73c10d4")}</p>
       )}
 
       <p className="text-xs text-muted-foreground">{GUT_CHECK[decision](appName, agent.name)}</p>
@@ -972,7 +973,7 @@ function ActionTester({
         <Button onClick={onRun} disabled={running} size="sm">
           {running ? (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Running…
+              <Loader2 className="h-3.5 w-3.5 animate-spin" /> {tf("auto.46c541363b0253b1")}
             </>
           ) : (
             <>
@@ -981,7 +982,7 @@ function ActionTester({
           )}
         </Button>
         <Button onClick={onReset} disabled={running} size="sm" variant="ghost">
-          Reset
+          {tf("text.Reset")}
         </Button>
       </div>
 
@@ -991,7 +992,7 @@ function ActionTester({
 
       {run.isError && !running && (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          Couldn't reach {agent.name}. {run.error instanceof Error ? run.error.message : "Please try again."}
+          Couldn't reach {agent.name}. {run.error instanceof Error ? run.error.message: tf("auto.eea4fb33efd38283")}
         </div>
       )}
 
@@ -1024,7 +1025,7 @@ function RunningCard({
     <div className="rounded-md border border-border bg-muted/30 p-4">
       <div className="flex items-center gap-2">
         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-        <span className="text-sm font-medium text-foreground">Running…</span>
+        <span className="text-sm font-medium text-foreground">{tf("auto.46c541363b0253b1")}</span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
         {verb} {appName} as {agentName}.
@@ -1032,7 +1033,7 @@ function RunningCard({
       <div className="mt-3 flex items-center justify-between">
         <span className="text-xs text-muted-foreground">Started {seconds(elapsedMs)} ago · Press cancel to stop</span>
         <Button onClick={onCancel} size="sm" variant="outline">
-          Cancel
+          {tf("text.Cancel")}
         </Button>
       </div>
     </div>
@@ -1162,7 +1163,7 @@ function AllowedResult({
 
       {!isEmptyResult(value) && (
         <div className="mt-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("text.Preview")}</p>
           <div className="mt-1.5">
             <PrettyPreview value={value} />
           </div>
@@ -1174,7 +1175,7 @@ function AllowedResult({
       <p className="mt-3 text-xs text-muted-foreground">
         This call is in the{" "}
         <Link className="text-primary hover:underline" to="/activity?mode=agents&action=tool_">
-          Audit log
+          {tf("auto.e4d36f9a4e22d3a2")}
         </Link>
         .
       </p>
@@ -1282,7 +1283,7 @@ function ErrorResult({
     <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-4">
       <div className="flex items-center gap-2">
         <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-        <span className="text-sm font-medium text-foreground">It didn't work.</span>
+        <span className="text-sm font-medium text-foreground">{tf("auto.24edd2c737d6785c")}</span>
       </div>
       <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
         <Clock className="h-3 w-3" />
@@ -1294,18 +1295,18 @@ function ErrorResult({
         {error.reasonCode && <p className="mt-0.5 text-xs text-muted-foreground">code: {error.reasonCode}</p>}
       </div>
       <div className="mt-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">What to try</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("auto.86fe6080ab0b93fa")}</p>
         <ul className="mt-1 list-disc space-y-0.5 pl-4 text-sm text-foreground">
           {hints.map((hint) => (
             <li key={hint}>{hint}</li>
           ))}
         </ul>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">Adjust the input above and try again.</p>
+      <p className="mt-3 text-xs text-muted-foreground">{tf("auto.ea1603a1404c1631")}</p>
       <p className="mt-1 text-xs text-muted-foreground">
         Also visible in the{" "}
         <Link className="text-primary hover:underline" to="/activity?mode=agents&action=tool_">
-          Audit log
+          {tf("auto.e4d36f9a4e22d3a2")}
         </Link>
         .
       </p>
@@ -1417,23 +1418,23 @@ function AskFirstResult({
     <div className="rounded-md border border-amber-500/40 bg-amber-500/5 p-4">
       <div className="flex items-center gap-2">
         <ShieldQuestion className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-        <span className="text-sm font-medium text-foreground">Sent for your OK.</span>
+        <span className="text-sm font-medium text-foreground">{tf("auto.0e6726130676e1d9")}</span>
       </div>
       <p className="mt-0.5 text-xs text-muted-foreground">{outcome.agentName} needs your approval before this runs.</p>
 
       <dl className="mt-3 space-y-1.5 text-sm">
         <div className="flex gap-3">
-          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Action</dt>
+          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("auto.64cff1319d2fd2cb")}</dt>
           <dd className="text-foreground">{entry.title ?? entry.toolName}</dd>
         </div>
         {where && (
           <div className="flex gap-3">
-            <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Where</dt>
+            <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("auto.1daaa38f33cd860e")}</dt>
             <dd className="break-words text-foreground">{where}</dd>
           </div>
         )}
         <div className="flex gap-3">
-          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</dt>
+          <dt className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("text.Status")}</dt>
           <dd className={cn("flex items-center gap-1.5 text-foreground", settled && "text-muted-foreground")}>
             {phase === "running" && <Loader2 className="h-3 w-3 animate-spin" />}
             {statusLabel}
@@ -1445,7 +1446,7 @@ function AskFirstResult({
         <p className="mt-3 text-sm text-foreground">
           Approve it in the{" "}
           <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "review")}>
-            Review tab
+            {tf("auto.d397f91a22dc48ea")}
           </Link>{" "}
           to finish the test. You can also cancel the request.
         </p>
@@ -1453,7 +1454,7 @@ function AskFirstResult({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button asChild size="sm" variant="outline">
-          <Link to={appTabHref(connectionId, "review")}>Open Review tab</Link>
+          <Link to={appTabHref(connectionId, "review")}>{tf("auto.711039fd7eab17e8")}</Link>
         </Button>
         {phase === "waiting" && actionRequestId && selectedCompanyId && (
           <Button size="sm" variant="ghost" onClick={() => cancel.mutate()} disabled={cancel.isPending}>
@@ -1509,29 +1510,29 @@ function OffExplanation({
           <Ban className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
           <div className="text-sm text-muted-foreground">
             <p className="font-medium text-foreground">{title} is off for {agent.name}.</p>
-            <p className="mt-0.5">It won't run here, and it won't run from a task either.</p>
+            <p className="mt-0.5">{tf("auto.9b8d2fd994bd5673")}</p>
             <p className="mt-2">
               Want to test it? Turn it on for {agent.name} in{" "}
               <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-                Permissions
+                {tf("text.Permissions")}
               </Link>{" "}
               — set it to Allowed or Ask first.
             </p>
           </div>
         </div>
         <Button asChild size="sm">
-          <Link to={permHref}>Open Permissions →</Link>
+          <Link to={permHref}>{tf("auto.1ac1cf8c7cd71aa6")}</Link>
         </Button>
         <p className="text-xs text-muted-foreground">No call will be made — this action is off for {agent.name}.</p>
       </div>
 
       <aside>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Why this is off</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tf("auto.d9e4665369cac9a2")}</p>
         <p className="mt-1.5 text-xs text-muted-foreground">{whyBody}</p>
         {auditHint && <p className="mt-1.5 text-(length:--text-micro) text-muted-foreground">{auditHint}</p>}
         {others.length > 0 && (
           <div className="mt-3">
-            <p className="text-(length:--text-micro) font-medium text-muted-foreground">Try as a different agent:</p>
+            <p className="text-(length:--text-micro) font-medium text-muted-foreground">{tf("auto.d143ee44c17b1d9a")}</p>
             <div className="mt-1 flex flex-wrap gap-1.5">
               {others.slice(0, 4).map((other) => (
                 <button

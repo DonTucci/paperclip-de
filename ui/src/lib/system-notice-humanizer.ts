@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { IssueCommentPresentation } from "@paperclipai/shared";
 import type { SystemNoticeTone } from "../components/SystemNotice";
 
@@ -58,19 +59,19 @@ export function humanizeSystemNotice(input: {
 
   if (code === "claude_auth_required") {
     return {
-      title: "Task paused — Claude needs re-authentication",
+      title: tf("auto.2db31a30d4a85dbd"),
       tone: presentationTone ?? "warning",
     };
   }
   if (code === "configuration_incomplete" || body.includes("secret/env bindings are missing")) {
     return {
-      title: "Task paused — a secret/config binding is missing",
+      title: tf("auto.6d0bd697c51f1687"),
       tone: presentationTone ?? "warning",
     };
   }
   if (code === "workspace_validation_failed" || body.includes("workspace failed validation")) {
     return {
-      title: "Task paused — workspace problem",
+      title: tf("auto.d227af6f136d4791"),
       tone: presentationTone ?? "warning",
     };
   }

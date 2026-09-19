@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { copyTextToClipboard } from "./clipboard";
@@ -89,7 +90,7 @@ export function useCopyToast() {
         return true;
       } catch {
         pushToast?.({
-          title: "Couldn’t copy to clipboard",
+          title: tf("auto.27990eb1bc893206"),
           body: "Select and copy the value manually.",
           tone: "error",
           dedupeKey: "copy-failed",

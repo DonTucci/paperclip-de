@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ActivityEvent } from "@paperclipai/shared";
 import { useProjectCreatedItems } from "@/hooks/useProjectCreatedItems";
 import { skillCreatedItems } from "@/components/task-chat/skill-created-items";
@@ -496,7 +497,7 @@ export function TaskChatThread(props: TaskChatThreadProps) {
     showComposer = true,
     composerPause,
     composerDisabledReason,
-    emptyMessage = "No messages yet.",
+    emptyMessage = tf("auto.f0d5968f615ed7ab"),
     companyId,
     linkedRuns,
     liveRuns,
@@ -1481,7 +1482,7 @@ export function TaskChatThread(props: TaskChatThreadProps) {
             id,
             item: {
               id, kind: "marker", variant: "interrupted", tone: "neutral",
-              label: "Waiting to resume",
+              label: tf("auto.16e29a3401c3516f"),
               detail: "The previous execution needs to be checked before work can continue. See the task’s execution hold for the next action. Individual checks remain in the run history.",
             },
           });
@@ -1757,7 +1758,7 @@ export function TaskChatThread(props: TaskChatThreadProps) {
             id,
             kind: "marker",
             variant: "turn_boundary",
-            label: "Run completed",
+            label: tf("auto.93429628fa8ddcb8"),
             detail: "The runner returned no user-facing response.",
           },
         });
@@ -2756,9 +2757,9 @@ export function TaskChatThread(props: TaskChatThreadProps) {
                   role="status"
                   className="absolute inset-x-0 top-0 z-20 mx-auto flex w-full max-w-(--tc-shell-max-w) items-center gap-2 border border-border bg-background px-4 py-2 text-sm text-muted-foreground"
                 >
-                  Some task history could not be loaded.
+                  {tf("auto.5ab49573544e53b2")}
                   <Button variant="ghost" size="sm" onClick={retryHistory}>
-                    Retry
+                    {tf("text.Retry")}
                   </Button>
                 </div>
               ) : null}
@@ -2767,7 +2768,7 @@ export function TaskChatThread(props: TaskChatThreadProps) {
                   className="absolute inset-0 z-10 overflow-hidden bg-background"
                   data-testid="task-chat-history-loading"
                   role="status"
-                  aria-label="Loading conversation"
+                  aria-label={tf("auto.9deef600048b62e9")}
                 >
                   <div className="mx-auto flex w-full max-w-(--tc-shell-max-w) flex-col gap-4 px-4 py-3">
                     {threadHeader}

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
@@ -394,7 +395,7 @@ export function IssueDocumentsSection({
       invalidateIssueDocuments();
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to delete document");
+      setError(err instanceof Error ? err.message: tf("auto.62de8fe94b0bf271"));
     },
   });
 
@@ -413,7 +414,7 @@ export function IssueDocumentsSection({
       invalidateIssueDocuments();
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to restore document revision");
+      setError(err instanceof Error ? err.message: tf("auto.1e5055596515e0b9"));
     },
   });
 
@@ -431,7 +432,7 @@ export function IssueDocumentsSection({
       invalidateIssueDocuments();
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to update document lock");
+      setError(err instanceof Error ? err.message: tf("auto.9ed8dbcf52210e61"));
     },
   });
 
@@ -639,7 +640,7 @@ export function IssueDocumentsSection({
           return false;
         }
       }
-      setError(err instanceof Error ? err.message : "Failed to save document");
+      setError(err instanceof Error ? err.message: tf("auto.210b653bb478a0cd"));
       return false;
     }
   }, [documentConflict, documentSubject, invalidateIssueDocuments, resetAutosaveState, runSave, sortedDocuments, syncDocumentCaches, upsertDocument]);
@@ -895,19 +896,19 @@ export function IssueDocumentsSection({
           {extraActions}
           <Button variant="outline" size="sm" onClick={beginNewDocument} className="shrink-0">
             <Plus className="mr-1.5 h-3.5 w-3.5" />
-            <span className="hidden sm:inline">New document</span>
-            <span className="sm:hidden">New</span>
+            <span className="hidden sm:inline">{tf("auto.1b26844054631e28")}</span>
+            <span className="sm:hidden">{tf("auto.18fdd549b2ed367a")}</span>
           </Button>
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-2 min-w-0">
-          <h3 className="w-full text-sm font-medium text-muted-foreground shrink-0 sm:w-auto">Documents</h3>
+          <h3 className="w-full text-sm font-medium text-muted-foreground shrink-0 sm:w-auto">{tf("text.Documents")}</h3>
           <div className="flex flex-wrap items-center gap-2 min-w-0 sm:ml-auto">
             {extraActions}
             <Button variant="outline" size="sm" onClick={beginNewDocument} className="shrink-0">
               <Plus className="mr-1.5 h-3.5 w-3.5" />
-              <span className="hidden sm:inline">New document</span>
-              <span className="sm:hidden">New</span>
+              <span className="hidden sm:inline">{tf("auto.1b26844054631e28")}</span>
+              <span className="sm:hidden">{tf("auto.18fdd549b2ed367a")}</span>
             </Button>
           </div>
         </div>
@@ -927,7 +928,7 @@ export function IssueDocumentsSection({
             onChange={(event) =>
               setDraft((current) => current ? { ...current, key: event.target.value.toLowerCase() } : current)
             }
-            placeholder="Document key"
+            placeholder={tf("auto.75622cdf9465d1a6")}
           />
           {newDocumentKeyError && (
             <p className="text-xs text-destructive">{newDocumentKeyError}</p>
@@ -938,7 +939,7 @@ export function IssueDocumentsSection({
               onChange={(event) =>
                 setDraft((current) => current ? { ...current, title: event.target.value } : current)
               }
-              placeholder="Optional title"
+              placeholder={tf("auto.67fc5f45e20b3338")}
             />
           )}
           <MarkdownEditor
@@ -946,7 +947,7 @@ export function IssueDocumentsSection({
             onChange={(body) =>
               setDraft((current) => current ? { ...current, body } : current)
             }
-            placeholder="Markdown body"
+            placeholder={tf("auto.4ddfc15ba3f746ed")}
             bordered={false}
             className="bg-transparent"
             contentClassName="min-h-(--sz-220px) text-sm leading-7"
@@ -957,7 +958,7 @@ export function IssueDocumentsSection({
           <div className="flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" onClick={cancelDraft}>
               <X className="mr-1.5 h-3.5 w-3.5" />
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               size="sm"
@@ -981,7 +982,7 @@ export function IssueDocumentsSection({
           <div className="mb-2 flex items-center gap-2">
             <FileText className="h-4 w-4 text-amber-600" />
             <Badge variant="outline" className="border-amber-500/30 font-mono text-(length:--text-nano) uppercase tracking-(--tracking-eyebrow) text-amber-700 dark:text-amber-300">
-              PLAN
+              {tf("auto.0ff15403106fefda")}
             </Badge>
           </div>
           <div className={documentBodyPaddingClassName}>
@@ -1067,7 +1068,7 @@ export function IssueDocumentsSection({
                         "text-muted-foreground transition-colors",
                         isLocked && "text-amber-700 hover:text-amber-800 dark:text-amber-300 dark:hover:text-amber-200",
                       )}
-                      title={isLocked ? "Unlock document" : "Lock document"}
+                      title={isLocked ? tf("auto.a1cf639c9e9d0706") : tf("auto.9950ef893ee82593")}
                       aria-label={isLocked ? `Unlock ${doc.key} document` : `Lock ${doc.key} document`}
                       onClick={() => toggleDocumentLock(doc, !isLocked)}
                       disabled={lockActionPending}
@@ -1075,7 +1076,7 @@ export function IssueDocumentsSection({
                       {isLocked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
                     </Button>
                     ) : isLocked ? (
-                      <span title="Locked document" aria-label="Locked document" className="inline-flex h-6 w-6 items-center justify-center text-amber-700 dark:text-amber-300">
+                      <span title={tf("auto.b09d58e20fc02ffe")} aria-label={tf("auto.b09d58e20fc02ffe")} className="inline-flex h-6 w-6 items-center justify-center text-amber-700 dark:text-amber-300">
                         <Lock className="h-3.5 w-3.5" />
                       </span>
                     ) : null}
@@ -1086,7 +1087,7 @@ export function IssueDocumentsSection({
                         "text-muted-foreground transition-colors",
                         copiedDocumentKey === doc.key && "text-foreground",
                       )}
-                      title={copiedDocumentKey === doc.key ? "Copied" : "Copy document"}
+                      title={copiedDocumentKey === doc.key ? tf("text.Copied") : tf("auto.c054131e44515b54")}
                       onClick={() => void copyDocumentBody(doc.key, displayedBody)}
                     >
                       {copiedDocumentKey === doc.key ? (
@@ -1101,7 +1102,7 @@ export function IssueDocumentsSection({
                           variant="ghost"
                           size="icon-xs"
                           className="text-muted-foreground"
-                          title="Document actions"
+                          title={tf("auto.97fa0725b718c1b9")}
                         >
                           <MoreHorizontal className="h-3.5 w-3.5" />
                         </Button>
@@ -1110,7 +1111,7 @@ export function IssueDocumentsSection({
                         {!isHistoricalPreview && !isLocked ? (
                           <DropdownMenuItem onClick={() => beginEdit(doc.key)}>
                             <FilePenLine className="h-3.5 w-3.5" />
-                            Edit document
+                            {tf("auto.630f2e78e1f229bd")}
                           </DropdownMenuItem>
                         ) : null}
                         {!isHistoricalPreview && !isLocked ? <DropdownMenuSeparator /> : null}
@@ -1118,12 +1119,12 @@ export function IssueDocumentsSection({
                           onClick={() => downloadDocumentFile(doc.key, displayedBody)}
                         >
                           <Download className="h-3.5 w-3.5" />
-                          Download document
+                          {tf("auto.9e250af974c824ee")}
                         </DropdownMenuItem>
                         {doc.latestRevisionNumber > 1 ? (
                           <DropdownMenuItem onClick={() => setDiffViewKey(doc.key)}>
                             <Diff className="h-3.5 w-3.5" />
-                            View diff
+                            {tf("auto.0e5d6873018e6c69")}
                           </DropdownMenuItem>
                         ) : null}
                         {canDeleteDocuments && !isLocked ? <DropdownMenuSeparator /> : null}
@@ -1133,7 +1134,7 @@ export function IssueDocumentsSection({
                             onClick={() => setConfirmDeleteKey(doc.key)}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                            Delete document
+                            {tf("auto.04f6d09aa840de5b")}
                           </DropdownMenuItem>
                         ) : null}
                       </DropdownMenuContent>
@@ -1168,7 +1169,7 @@ export function IssueDocumentsSection({
                             Viewing revision {selectedHistoricalRevision.revisionNumber}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            This is a historical preview. Restoring it creates a new latest revision and keeps history append-only.
+                            {tf("auto.8c15312663e5eae6")}
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -1177,7 +1178,7 @@ export function IssueDocumentsSection({
                             size="sm"
                             onClick={() => returnToLatestRevision(doc.key)}
                           >
-                            Return to latest
+                            {tf("auto.f6b3b853ed208532")}
                           </Button>
                           {!isLocked ? (
                             <Button
@@ -1201,9 +1202,9 @@ export function IssueDocumentsSection({
                     <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-3">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Out of date</p>
+                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">{tf("auto.c8f1506a7d60a32e")}</p>
                           <p className="text-xs text-muted-foreground">
-                            This document changed while you were editing. Your local draft is preserved and autosave is paused.
+                            {tf("auto.fcbbd08cf5e60bed")}
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -1225,14 +1226,14 @@ export function IssueDocumentsSection({
                             size="sm"
                             onClick={() => keepConflictedDraft(doc.key)}
                           >
-                            Keep my draft
+                            {tf("auto.cdb80bb94da38a42")}
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => reloadDocumentFromServer(doc.key)}
                           >
-                            Reload remote
+                            {tf("auto.499fed1b65ad02f1")}
                           </Button>
                           <Button
                             size="sm"
@@ -1265,7 +1266,7 @@ export function IssueDocumentsSection({
                         markDocumentDirty(doc.key);
                         setDraft((current) => current ? { ...current, title: event.target.value } : current);
                       }}
-                      placeholder="Optional title"
+                      placeholder={tf("auto.67fc5f45e20b3338")}
                     />
                   )}
                   <div
@@ -1288,7 +1289,7 @@ export function IssueDocumentsSection({
                               return current;
                             });
                           }}
-                          placeholder="Markdown body"
+                          placeholder={tf("auto.4ddfc15ba3f746ed")}
                           bordered={false}
                           className="bg-transparent"
                           contentClassName={documentBodyContentClassName}
@@ -1369,7 +1370,7 @@ export function IssueDocumentsSection({
               {confirmDeleteKey === doc.key && (
                 <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3">
                   <p className="text-sm text-destructive font-medium">
-                    Delete this document? This cannot be undone.
+                    {tf("auto.dcaf5e0d51997866")}
                   </p>
                   <div className="flex items-center gap-2 shrink-0">
                     <Button
@@ -1378,7 +1379,7 @@ export function IssueDocumentsSection({
                       onClick={() => setConfirmDeleteKey(null)}
                       disabled={deleteDocument.isPending}
                     >
-                      Cancel
+                      {tf("text.Cancel")}
                     </Button>
                     <Button
                       variant="destructive"

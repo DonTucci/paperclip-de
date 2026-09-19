@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,13 +8,13 @@ import { nextCronFires, parseCronExpression } from "../lib/cron-fires";
 export type SchedulePreset = "every_minute" | "every_hour" | "every_day" | "weekdays" | "weekly" | "monthly" | "custom";
 
 const PRESETS: { value: SchedulePreset; label: string }[] = [
-  { value: "every_minute", label: "Every minute" },
-  { value: "every_hour", label: "Every hour" },
-  { value: "every_day", label: "Every day" },
-  { value: "weekdays", label: "Weekdays" },
-  { value: "weekly", label: "Weekly" },
-  { value: "monthly", label: "Monthly" },
-  { value: "custom", label: "Custom (cron)" },
+  { value: "every_minute", label: tf("auto.3c14fb8a28813883") },
+  { value: "every_hour", label: tf("auto.a4bac4655d4593de") },
+  { value: "every_day", label: tf("auto.c4e42b974c335dc5") },
+  { value: "weekdays", label: tf("auto.6f4b602bb52984dc") },
+  { value: "weekly", label: tf("auto.2975132481a7a695") },
+  { value: "monthly", label: tf("auto.9b11f6b707d2a03e") },
+  { value: "custom", label: tf("auto.6dc53fd85ce22bf5") },
 ];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => ({
@@ -27,13 +28,13 @@ const MINUTES = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 const DAYS_OF_WEEK = [
-  { value: "1", label: "Mon" },
-  { value: "2", label: "Tue" },
-  { value: "3", label: "Wed" },
-  { value: "4", label: "Thu" },
-  { value: "5", label: "Fri" },
-  { value: "6", label: "Sat" },
-  { value: "0", label: "Sun" },
+  { value: "1", label: tf("auto.f40d7f51f69edfaf") },
+  { value: "2", label: tf("auto.d1eb39b09bf52b68") },
+  { value: "3", label: tf("auto.58339f45df960408") },
+  { value: "4", label: tf("auto.7da11212ed340ea7") },
+  { value: "5", label: tf("auto.66dab40cea1dea5c") },
+  { value: "6", label: tf("auto.fdeb71b569e0034d") },
+  { value: "0", label: tf("auto.db18f17fe5320076") },
 ];
 
 const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => ({
@@ -161,7 +162,7 @@ export function getScheduleCronValidation(cron: string): {
   if (!trimmed) {
     return {
       valid: false,
-      message: "Enter a 5-field cron expression.",
+      message: tf("auto.317636a735821037"),
       nextFires: [],
     };
   }
@@ -178,7 +179,7 @@ export function getScheduleCronValidation(cron: string): {
   if (!parseCronExpression(trimmed)) {
     return {
       valid: false,
-      message: "Cron fields must use valid numbers, ranges, lists, wildcards, or steps.",
+      message: tf("auto.a9b7c68b0a4610d0"),
       nextFires: [],
     };
   }
@@ -247,8 +248,8 @@ export function ScheduleEditor({
   return (
     <div className="space-y-3">
       <Select value={preset} onValueChange={(v) => handlePresetChange(v as SchedulePreset)}>
-        <SelectTrigger className="w-full" aria-label="Schedule frequency">
-          <SelectValue placeholder="Choose frequency..." />
+        <SelectTrigger className="w-full" aria-label={tf("auto.feed2d11fc52ba9a")}>
+          <SelectValue placeholder={tf("auto.554798442cd7ef04")} />
         </SelectTrigger>
         <SelectContent>
           {PRESETS.map((p) => (
@@ -277,12 +278,12 @@ export function ScheduleEditor({
               }
             }}
             placeholder="0 10 * * *"
-            aria-label="Cron expression"
+            aria-label={tf("auto.9e6e7de6b9d693c9")}
             aria-invalid={!customValidation.valid}
             className="font-mono text-sm"
           />
           <p className="text-xs text-muted-foreground">
-            Five fields: minute hour day-of-month month day-of-week
+            {tf("auto.7abb912add4d394a")}
           </p>
           <p
             className={customValidation.valid ? "text-xs text-muted-foreground" : "text-xs text-destructive"}
@@ -298,7 +299,7 @@ export function ScheduleEditor({
         <div className="flex flex-wrap items-center gap-2">
           {preset !== "every_minute" && preset !== "every_hour" && (
             <>
-              <span className="text-sm text-muted-foreground">at</span>
+              <span className="text-sm text-muted-foreground">{tf("auto.b1d6b91b67c2afa5")}</span>
               <Select
                 value={hour}
                 onValueChange={(h) => {
@@ -341,7 +342,7 @@ export function ScheduleEditor({
 
           {preset === "every_hour" && (
             <>
-              <span className="text-sm text-muted-foreground">at minute</span>
+              <span className="text-sm text-muted-foreground">{tf("auto.5f2ed72dfcbcf154")}</span>
               <Select
                 value={minute}
                 onValueChange={(m) => {
@@ -365,7 +366,7 @@ export function ScheduleEditor({
 
           {preset === "weekly" && (
             <>
-              <span className="text-sm text-muted-foreground">on</span>
+              <span className="text-sm text-muted-foreground">{tf("auto.b8d31e852725afb1")}</span>
               <div className="flex gap-1">
                 {DAYS_OF_WEEK.map((d) => (
                   <Button
@@ -389,7 +390,7 @@ export function ScheduleEditor({
 
           {preset === "monthly" && (
             <>
-              <span className="text-sm text-muted-foreground">on day</span>
+              <span className="text-sm text-muted-foreground">{tf("auto.ada1fca3e7ade2de")}</span>
               <Select
                 value={dayOfMonth}
                 onValueChange={(dom) => {

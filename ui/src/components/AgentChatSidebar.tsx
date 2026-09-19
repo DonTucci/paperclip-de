@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Star, SquarePen } from "lucide-react";
 import { SidebarNavItem } from "@/components/SidebarNavItem";
 import { AgentIcon } from "@/components/AgentIconPicker";
@@ -47,7 +48,7 @@ export function AgentChatSidebar({
             size="icon-xs"
             aria-label={`${pinned ? "Unstar" : "Star"} ${agent.name}`}
             aria-pressed={pinned}
-            title={pinned ? "Unstar agent" : "Star agent to pin"}
+            title={pinned ? tf("auto.87f2a385a20f0cda") : tf("auto.28d20be60a21a827")}
             onClick={(event) => {
               event.stopPropagation();
               onToggleStar(agent.id);
@@ -64,15 +65,15 @@ export function AgentChatSidebar({
     );
   };
   return (
-    <section aria-label="Chats" className="group/chats flex flex-col gap-0.5">
+    <section aria-label={tf("auto.ef5b4049bb367b05")} className="group/chats flex flex-col gap-0.5">
       <div className="relative flex min-h-9 items-center px-4 py-1.5">
-        <span className={cn("font-mono text-(length:--text-nano) font-medium uppercase tracking-widest text-muted-foreground/60", rail && "sr-only")}>Chats</span>
+        <span className={cn("font-mono text-(length:--text-nano) font-medium uppercase tracking-widest text-muted-foreground/60", rail && "sr-only")}>{tf("auto.ef5b4049bb367b05")}</span>
         <Button
           type="button"
           variant="ghost"
           size="icon-xs"
-          aria-label="Chat with an agent"
-          title="Chat with an agent"
+          aria-label={tf("auto.73adffe32a9a861c")}
+          title={tf("auto.73adffe32a9a861c")}
           onClick={onOpenChat}
           className="absolute right-2 top-(--pct-50) -translate-y-(--pct-50) text-muted-foreground opacity-0 group-hover/chats:opacity-100 focus-visible:opacity-100 pointer-coarse:opacity-100"
         >

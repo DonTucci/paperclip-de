@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -238,7 +239,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [agents]);
 
   useEffect(() => {
-    if (!embedded) setBreadcrumbs([{ label: "Org Chart" }]);
+    if (!embedded) setBreadcrumbs([{ label: tf("auto.aab3e6c8a0d87c7d") }]);
   }, [embedded, setBreadcrumbs]);
 
   // Layout computation
@@ -465,7 +466,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [pan, zoom]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Network} message="Select an organization to view the org chart." />;
+    return <EmptyState icon={Network} message={tf("auto.8d07c01265ef9637")} />;
   }
 
   if (providedOrgTree === undefined && isLoading) {
@@ -473,7 +474,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }
 
   if (orgTree && orgTree.length === 0) {
-    return <EmptyState icon={Network} message="No organizational hierarchy defined." />;
+    return <EmptyState icon={Network} message={tf("auto.7ac9886550455b61")} />;
   }
 
   return (
@@ -488,7 +489,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <Link to="/company/import">
             <Button variant="outline" size="sm">
               <Upload className="mr-1.5 h-3.5 w-3.5" />
-              Import organization
+              {tf("auto.837ee932677d818e")}
             </Button>
           </Link>
         ) : null}
@@ -496,7 +497,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <Link to="/company/export">
             <Button variant="outline" size="sm">
               <Download className="mr-1.5 h-3.5 w-3.5" />
-              Export organization
+              {tf("auto.38a8481ada8cca1b")}
             </Button>
           </Link>
         ) : null}
@@ -534,8 +535,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 });
               }
             }}
-            title="Zoom in"
-            aria-label="Zoom in"
+            title={tf("auto.0e47f09a748fa132")}
+            aria-label={tf("auto.0e47f09a748fa132")}
           >
             <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
@@ -550,16 +551,16 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 });
               }
             }}
-            title="Zoom out"
-            aria-label="Zoom out"
+            title={tf("auto.bc7b631a689b45ca")}
+            aria-label={tf("auto.bc7b631a689b45ca")}
           >
             <Minus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
           <button
             className="flex size-9 items-center justify-center rounded border border-border bg-background text-(length:--text-nano) transition-colors hover:bg-accent sm:size-7"
             onClick={fitToScreen}
-            title="Fit to screen"
-            aria-label="Fit chart to screen"
+            title={tf("auto.32bb0d298ca1545c")}
+            aria-label={tf("auto.3dc2e33313f5cf3c")}
           >
             <Maximize2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>

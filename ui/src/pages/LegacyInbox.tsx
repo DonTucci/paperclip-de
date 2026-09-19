@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -333,7 +334,7 @@ export function FailedRunInboxRow({
                   "inline-flex h-4 w-4 items-center justify-center rounded-full transition-colors",
                   "hover:bg-(--status-task-in_progress)/20",
                 )}
-                aria-label="Mark as read"
+                aria-label={tf("text.Mark as read")}
               >
                 <span className={cn(
                   "block h-2 w-2 rounded-full transition-opacity duration-300",
@@ -399,7 +400,7 @@ export function FailedRunInboxRow({
               type="button"
               onClick={onDismiss}
               className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover:opacity-100"
-              aria-label="Dismiss"
+              aria-label={tf("text.Dismiss")}
             >
               <X className="h-4 w-4" />
             </button>
@@ -423,7 +424,7 @@ export function FailedRunInboxRow({
             type="button"
             onClick={onDismiss}
             className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-            aria-label="Dismiss"
+            aria-label={tf("text.Dismiss")}
           >
             <X className="h-4 w-4" />
           </button>
@@ -482,7 +483,7 @@ function ApprovalInboxRow({
                   "inline-flex h-4 w-4 items-center justify-center rounded-full transition-colors",
                   "hover:bg-(--status-task-in_progress)/20",
                 )}
-                aria-label="Mark as read"
+                aria-label={tf("text.Mark as read")}
               >
                 <span className={cn(
                   "block h-2 w-2 rounded-full transition-opacity duration-300",
@@ -531,7 +532,7 @@ function ApprovalInboxRow({
                   onClick={onApprove}
                   disabled={isPending}
                 >
-                  Approve
+                  {tf("text.Approve")}
                 </Button>
                 <Button
                   variant="destructive"
@@ -540,7 +541,7 @@ function ApprovalInboxRow({
                   onClick={onReject}
                   disabled={isPending}
                 >
-                  Reject
+                  {tf("text.Reject")}
                 </Button>
               </>
             ) : null}
@@ -555,7 +556,7 @@ function ApprovalInboxRow({
             onClick={onApprove}
             disabled={isPending}
           >
-            Approve
+            {tf("text.Approve")}
           </Button>
           <Button
             variant="destructive"
@@ -564,7 +565,7 @@ function ApprovalInboxRow({
             onClick={onReject}
             disabled={isPending}
           >
-            Reject
+            {tf("text.Reject")}
           </Button>
         </div>
       ) : null}
@@ -615,7 +616,7 @@ function JoinRequestInboxRow({
                   "inline-flex h-4 w-4 items-center justify-center rounded-full transition-colors",
                   "hover:bg-(--status-task-in_progress)/20",
                 )}
-                aria-label="Mark as read"
+                aria-label={tf("text.Mark as read")}
               >
                 <span className={cn(
                   "block h-2 w-2 rounded-full transition-opacity duration-300",
@@ -654,7 +655,7 @@ function JoinRequestInboxRow({
             onClick={onApprove}
             disabled={isPending}
           >
-            Approve
+            {tf("text.Approve")}
           </Button>
           <Button
             variant="destructive"
@@ -663,7 +664,7 @@ function JoinRequestInboxRow({
             onClick={onReject}
             disabled={isPending}
           >
-            Reject
+            {tf("text.Reject")}
           </Button>
         </div>
       </div>
@@ -674,7 +675,7 @@ function JoinRequestInboxRow({
           onClick={onApprove}
           disabled={isPending}
         >
-          Approve
+          {tf("text.Approve")}
         </Button>
         <Button
           variant="destructive"
@@ -683,7 +684,7 @@ function JoinRequestInboxRow({
           onClick={onReject}
           disabled={isPending}
         >
-          Reject
+          {tf("text.Reject")}
         </Button>
       </div>
     </div>
@@ -773,7 +774,7 @@ export function Inbox() {
   });
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Inbox" }]);
+    setBreadcrumbs([{ label: tf("text.Inbox") }]);
   }, [setBreadcrumbs]);
 
   useEffect(() => {
@@ -1623,7 +1624,7 @@ export function Inbox() {
       navigate(`/approvals/${id}?resolved=approved`);
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to approve");
+      setActionError(err instanceof Error ? err.message: tf("auto.de0c2e40fd7a091d"));
     },
   });
 
@@ -1634,7 +1635,7 @@ export function Inbox() {
       queryClient.invalidateQueries({ queryKey: queryKeys.approvals.list(selectedCompanyId!) });
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to reject");
+      setActionError(err instanceof Error ? err.message: tf("auto.46960413b9a81e25"));
     },
   });
 
@@ -1649,7 +1650,7 @@ export function Inbox() {
       queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to approve join request");
+      setActionError(err instanceof Error ? err.message: tf("auto.3b65e5b7c998c9dc"));
     },
   });
 
@@ -1662,7 +1663,7 @@ export function Inbox() {
       queryClient.invalidateQueries({ queryKey: queryKeys.sidebarBadges(selectedCompanyId!) });
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to reject join request");
+      setActionError(err instanceof Error ? err.message: tf("auto.4d68f6e11d9ae57f"));
     },
   });
 
@@ -1689,8 +1690,8 @@ export function Inbox() {
     },
     onError: (error) => {
       pushToast({
-        title: "Run retry failed",
-        body: error instanceof Error ? error.message : "Unable to retry run",
+        title: tf("auto.243efbc1d68c5180"),
+        body: error instanceof Error ? error.message: tf("auto.537d0b3e65595899"),
         tone: "error",
       });
     },
@@ -1763,7 +1764,7 @@ export function Inbox() {
       return { companyId: selectedCompanyId, previousData };
     },
     onError: (err, id, context) => {
-      setActionError(err instanceof Error ? err.message : "Failed to archive task");
+      setActionError(err instanceof Error ? err.message: tf("auto.ab3328ec3513c7fb"));
       if (context?.companyId) clearLocalInboxArchive(context.companyId, id);
       setArchivingIssueIds((prev) => {
         const next = new Set(prev);
@@ -1804,7 +1805,7 @@ export function Inbox() {
       return { companyId: selectedCompanyId };
     },
     onError: (err, id, context) => {
-      setActionError(err instanceof Error ? err.message : "Failed to undo inbox archive");
+      setActionError(err instanceof Error ? err.message: tf("auto.f52fe16f6a79e73b"));
       if (context?.companyId) {
         beginLocalInboxArchive(context.companyId, id);
         boundLocalInboxArchive(context.companyId, id);
@@ -2210,7 +2211,7 @@ export function Inbox() {
   }, [selectedIndex]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={InboxIcon} message="Select a company to view inbox." />;
+    return <EmptyState icon={InboxIcon} message={tf("auto.593895d9d781983a")} />;
   }
 
   const hasRunFailures = failedRuns.length > 0;
@@ -2268,7 +2269,7 @@ export function Inbox() {
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search inbox…"
+            placeholder={tf("auto.d684b9b792bde6c0")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => {
@@ -2298,15 +2299,15 @@ export function Inbox() {
             items={[
               {
                 value: "mine",
-                label: "Mine",
+                label: tf("auto.f57afb7d275a26df"),
               },
               {
                 value: "recent",
-                label: "Recent",
+                label: tf("auto.690dbe9dc0993c42"),
               },
-              { value: "unread", label: "Unread" },
-              { value: "blocked", label: "Blocked" },
-              { value: "all", label: "All" },
+              { value: "unread", label: tf("auto.1b9f384c1436f607") },
+              { value: "blocked", label: tf("status.blocked") },
+              { value: "all", label: tf("text.All") },
             ]}
           />
         </Tabs>
@@ -2316,7 +2317,7 @@ export function Inbox() {
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search inbox…"
+              placeholder={tf("auto.d684b9b792bde6c0")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -2365,7 +2366,7 @@ export function Inbox() {
                     variant="outline"
                     size="icon"
                     className={cn("h-8 w-8 shrink-0", blockedGroupBy !== "none" && "bg-accent")}
-                    title="Group"
+                    title={tf("auto.34ca0e76608842ff")}
                   >
                     <Layers className="h-3.5 w-3.5" />
                   </Button>
@@ -2394,7 +2395,7 @@ export function Inbox() {
                 visibleColumnSet={visibleIssueColumnSet}
                 onToggleColumn={toggleIssueColumn}
                 onResetColumns={() => setIssueColumns(DEFAULT_INBOX_ISSUE_COLUMNS)}
-                title="Choose which inbox columns stay visible"
+                title={tf("auto.ad899478db8b91da")}
                 iconOnly
               />
               <Popover>
@@ -2404,7 +2405,7 @@ export function Inbox() {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 shrink-0"
-                    title="Sort"
+                    title={tf("auto.bec69036aa27e7fa")}
                   >
                     <ArrowUpDown className="h-3.5 w-3.5" />
                   </Button>
@@ -2437,7 +2438,7 @@ export function Inbox() {
                 size="icon"
                 className={cn("hidden h-8 w-8 shrink-0 sm:inline-flex", nestingEnabled && "bg-accent")}
                 onClick={toggleNesting}
-                title={nestingEnabled ? "Disable parent-child nesting" : "Enable parent-child nesting"}
+                title={nestingEnabled ? tf("auto.8c5a4b177b78f1f5") : tf("auto.18cf6dba7656852e")}
               >
                 <ListTree className="h-3.5 w-3.5" />
               </Button>
@@ -2464,7 +2465,7 @@ export function Inbox() {
                     variant="outline"
                     size="icon"
                     className={cn("h-8 w-8 shrink-0", groupBy !== "none" && "bg-accent")}
-                    title="Group"
+                    title={tf("auto.34ca0e76608842ff")}
                   >
                     <Layers className="h-3.5 w-3.5" />
                   </Button>
@@ -2499,7 +2500,7 @@ export function Inbox() {
                 visibleColumnSet={visibleIssueColumnSet}
                 onToggleColumn={toggleIssueColumn}
                 onResetColumns={() => setIssueColumns(DEFAULT_INBOX_ISSUE_COLUMNS)}
-                title="Choose which inbox columns stay visible"
+                title={tf("auto.ad899478db8b91da")}
                 iconOnly
               />
               {canMarkAllRead && (
@@ -2517,14 +2518,14 @@ export function Inbox() {
                   <Dialog open={showMarkAllReadConfirm} onOpenChange={setShowMarkAllReadConfirm}>
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
-                        <DialogTitle>Mark all as read?</DialogTitle>
+                        <DialogTitle>{tf("auto.0bf166e29608656d")}</DialogTitle>
                         <DialogDescription>
                           This will mark {unreadIssueIds.length} unread {unreadIssueIds.length === 1 ? "item" : "items"} as read.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setShowMarkAllReadConfirm(false)}>
-                          Cancel
+                          {tf("text.Cancel")}
                         </Button>
                         <Button
                           onClick={() => {
@@ -2532,7 +2533,7 @@ export function Inbox() {
                             markAllReadMutation.mutate(unreadIssueIds);
                           }}
                         >
-                          Mark all as read
+                          {tf("auto.d7592650e1c90a85")}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -2552,15 +2553,15 @@ export function Inbox() {
             onValueChange={(value) => updateAllCategoryFilter(value as InboxCategoryFilter)}
           >
             <SelectTrigger className="h-8 w-(--sz-170px) text-xs">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={tf("text.Category")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="everything">All categories</SelectItem>
-              <SelectItem value="issues_i_touched">My recent tasks</SelectItem>
-              <SelectItem value="join_requests">Join requests</SelectItem>
-              <SelectItem value="approvals">Approvals</SelectItem>
-              <SelectItem value="failed_runs">Failed runs</SelectItem>
-              <SelectItem value="alerts">Alerts</SelectItem>
+              <SelectItem value="everything">{tf("auto.9d5097a837102a17")}</SelectItem>
+              <SelectItem value="issues_i_touched">{tf("auto.0b598c2cf848fccd")}</SelectItem>
+              <SelectItem value="join_requests">{tf("auto.a1321fc27dc597a5")}</SelectItem>
+              <SelectItem value="approvals">{tf("text.Approvals")}</SelectItem>
+              <SelectItem value="failed_runs">{tf("auto.24afc952b6cc9475")}</SelectItem>
+              <SelectItem value="alerts">{tf("auto.f62e9267d196c761")}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -2570,12 +2571,12 @@ export function Inbox() {
               onValueChange={(value) => updateAllApprovalFilter(value as InboxApprovalFilter)}
             >
               <SelectTrigger className="h-8 w-(--sz-170px) text-xs">
-                <SelectValue placeholder="Approval status" />
+                <SelectValue placeholder={tf("auto.5a66175a2ba3931a")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All approval statuses</SelectItem>
-                <SelectItem value="actionable">Needs action</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="all">{tf("auto.eadb0e28eb271123")}</SelectItem>
+                <SelectItem value="actionable">{tf("auto.e382d466c25613b6")}</SelectItem>
+                <SelectItem value="resolved">{tf("auto.5be3c2c8354e1eb9")}</SelectItem>
               </SelectContent>
             </Select>
           )}
@@ -2887,7 +2888,7 @@ export function Inbox() {
                         <div key={`today-divider-${group.key}-${index}`} className="my-2 flex items-center gap-3 px-4">
                           <div className="flex-1 border-t border-zinc-600" />
                           <span className="shrink-0 text-(length:--text-micro) font-medium uppercase tracking-wider text-zinc-500">
-                            Earlier
+                            {tf("auto.e10ae99074011888")}
                           </span>
                         </div>,
                       );
@@ -3102,7 +3103,7 @@ export function Inbox() {
           {showSeparatorBefore("alerts") && <Separator />}
           <div>
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Alerts
+              {tf("auto.f62e9267d196c761")}
             </h3>
             <div className="divide-y divide-border border border-border">
               {showAggregateAgentError && (
@@ -3121,7 +3122,7 @@ export function Inbox() {
                     type="button"
                     onClick={() => dismissAlert("alert:agent-errors")}
                     className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover/alert:opacity-100"
-                    aria-label="Dismiss"
+                    aria-label={tf("text.Dismiss")}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -3144,7 +3145,7 @@ export function Inbox() {
                     type="button"
                     onClick={() => dismissAlert("alert:budget")}
                     className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground group-hover/alert:opacity-100"
-                    aria-label="Dismiss"
+                    aria-label={tf("text.Dismiss")}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>

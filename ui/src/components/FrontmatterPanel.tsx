@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useMemo, useState } from "react";
 import {
   analyzeFrontmatterBlock,
@@ -199,15 +200,15 @@ function collectValidation(form: FormModel, isSkillFile: boolean): ValidationIss
   const issues: ValidationIssue[] = [];
   const name = form.name.trim();
   const description = form.description.trim();
-  if (isSkillFile && !name) issues.push({ field: "name", message: "SKILL.md needs a name." });
+  if (isSkillFile && !name) issues.push({ field: "name", message: tf("auto.a7328230b21dff03") });
   if (name && !SLUG_RE.test(name)) {
-    issues.push({ field: "name", message: "Use lowercase letters, numbers and hyphens." });
+    issues.push({ field: "name", message: tf("auto.b42ce9e450a98d91") });
   }
   if (isSkillFile && !description) {
-    issues.push({ field: "description", message: "SKILL.md needs a description." });
+    issues.push({ field: "description", message: tf("auto.2b9040c7bf914473") });
   }
   if (form.allowedToolsPresent && form.allowedTools === null) {
-    issues.push({ field: "allowed-tools", message: "Expected a list — edit in YAML." });
+    issues.push({ field: "allowed-tools", message: tf("auto.9a18330db170f8af") });
   }
   return issues;
 }
@@ -339,12 +340,12 @@ export function FrontmatterPanel({
             aria-controls="frontmatter-panel-body"
           >
             {chevron}
-            <span className="text-sm font-medium">Frontmatter</span>
+            <span className="text-sm font-medium">{tf("auto.323d638f6497063a")}</span>
             {!open && present ? (
               <span className="truncate text-xs text-muted-foreground">{summary}</span>
             ) : null}
             {!open && !present ? (
-              <span className="text-xs text-muted-foreground">None</span>
+              <span className="text-xs text-muted-foreground">{tf("text.None")}</span>
             ) : null}
           </button>
 
@@ -356,7 +357,7 @@ export function FrontmatterPanel({
               <TabsList variant="line" className="h-7">
                 {canUseFields ? (
                   <TabsTrigger value="fields" className="px-2 py-0.5 text-xs">
-                    Fields
+                    {tf("auto.616f48c1db195b6f")}
                   </TabsTrigger>
                 ) : (
                   <Tooltip>
@@ -368,7 +369,7 @@ export function FrontmatterPanel({
                           aria-disabled="true"
                           className="px-2 py-0.5 text-xs opacity-50"
                         >
-                          Fields
+                          {tf("auto.616f48c1db195b6f")}
                         </TabsTrigger>
                       </span>
                     </TooltipTrigger>
@@ -380,14 +381,14 @@ export function FrontmatterPanel({
                   </Tooltip>
                 )}
                 <TabsTrigger value="yaml" className="px-2 py-0.5 text-xs">
-                  YAML
+                  {tf("auto.9b6e8abe425e34bb")}
                 </TabsTrigger>
               </TabsList>
             </Tabs>
           ) : !readOnly ? (
             <Button variant="ghost" size="sm" onClick={addFrontmatter} data-testid="add-frontmatter">
               <Plus className="mr-1 h-3.5 w-3.5" />
-              Add frontmatter
+              {tf("auto.d3629db00997afd9")}
             </Button>
           ) : null}
 
@@ -421,7 +422,7 @@ export function FrontmatterPanel({
             </div>
           ) : (
             <div className="px-3 pb-2 text-xs text-muted-foreground">
-              This file has no frontmatter.
+              {tf("auto.e9f9a8566309c8c8")}
             </div>
           )}
         </CollapsibleContent>
@@ -475,7 +476,7 @@ function FieldsForm({
       {form.hasName ? (
         <div>
           <Label htmlFor="fm-name" className="text-xs text-muted-foreground">
-            name
+            {tf("auto.82a3537ff0dbce7e")}
           </Label>
           <Input
             id="fm-name"
@@ -492,7 +493,7 @@ function FieldsForm({
       {form.hasDescription ? (
         <div>
           <Label htmlFor="fm-description" className="text-xs text-muted-foreground">
-            description
+            {tf("auto.c9046f7a37ad0ea7")}
           </Label>
           <Textarea
             id="fm-description"
@@ -508,7 +509,7 @@ function FieldsForm({
 
       {form.allowedToolsPresent ? (
         <div>
-          <Label className="text-xs text-muted-foreground">allowed-tools</Label>
+          <Label className="text-xs text-muted-foreground">{tf("auto.e3b05e680d8b7b11")}</Label>
           {form.allowedTools === null ? (
             <p className="mt-1 text-xs text-amber-500">
               {toolsWarning ?? "Expected a list — edit in YAML."}
@@ -517,7 +518,7 @@ function FieldsForm({
             <ChipInput
               values={form.allowedTools}
               readOnly={readOnly}
-              placeholder="Add a tool…"
+              placeholder={tf("auto.b048875c20cabf4e")}
               onChange={(next) => onCommit({ ...form, allowedTools: next })}
             />
           )}
@@ -526,9 +527,9 @@ function FieldsForm({
 
       {form.metadataPresent ? (
         <div>
-          <Label className="text-xs text-muted-foreground">metadata</Label>
+          <Label className="text-xs text-muted-foreground">{tf("auto.45447b7afbd5e544")}</Label>
           {form.metadataComplex !== null ? (
-            <p className="mt-1 text-xs text-muted-foreground">Complex value — edit in YAML.</p>
+            <p className="mt-1 text-xs text-muted-foreground">{tf("auto.122b742aabea5aa2")}</p>
           ) : (
             <MetadataRows
               rows={form.metaRows}
@@ -560,7 +561,7 @@ function FieldsForm({
         ) : (
           <div key={row.id}>
             <Label className="text-xs text-muted-foreground">{row.key}</Label>
-            <p className="mt-1 text-xs text-muted-foreground">Complex value — edit in YAML.</p>
+            <p className="mt-1 text-xs text-muted-foreground">{tf("auto.122b742aabea5aa2")}</p>
           </div>
         ),
       )}
@@ -600,7 +601,7 @@ function MetadataRows({
             aria-label={`Metadata key ${index + 1}`}
             value={row.key}
             readOnly={readOnly}
-            placeholder="key"
+            placeholder={tf("auto.2c70e12b7a0646f9")}
             onChange={(event) => update(index, { key: event.target.value })}
             className="h-8 flex-1 font-mono text-xs"
           />
@@ -608,7 +609,7 @@ function MetadataRows({
             aria-label={`Value for ${row.key || `field ${index + 1}`}`}
             value={row.text}
             readOnly={readOnly}
-            placeholder="value"
+            placeholder={tf("auto.cd42404d52ad55cc")}
             onChange={(event) => update(index, { text: event.target.value })}
             className="h-8 flex-1 text-xs"
           />
@@ -628,7 +629,7 @@ function MetadataRows({
       {!readOnly ? (
         <Button variant="ghost" size="sm" onClick={add} className="text-xs">
           <Plus className="mr-1 h-3.5 w-3.5" />
-          add field
+          {tf("auto.2af202ccb3444681")}
         </Button>
       ) : null}
     </div>
@@ -686,7 +687,7 @@ function ChipInput({
             }
           }}
           onBlur={commit}
-          aria-label="Add tool"
+          aria-label={tf("auto.3076805f860711e6")}
           className="min-w-24 flex-1 bg-transparent text-xs outline-none"
         />
       ) : null}
@@ -712,7 +713,7 @@ function YamlEditor({
       {!canReturnToFields && !parseError ? (
         <div className="mb-1.5 flex items-start gap-2 rounded-md bg-muted/40 px-2 py-1.5 text-xs text-muted-foreground">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          <span>Editing raw YAML to preserve formatting the form can't reconstruct.</span>
+          <span>{tf("auto.995aee50c2a8717c")}</span>
         </div>
       ) : null}
       <Textarea
@@ -722,10 +723,10 @@ function YamlEditor({
         rows={Math.min(12, Math.max(3, value.split("\n").length))}
         onChange={(event) => onChange(event.target.value)}
         className="font-mono text-xs"
-        aria-label="Frontmatter YAML"
+        aria-label={tf("auto.ed16c742ef423609")}
       />
       <p className="mt-1 text-xs text-muted-foreground">
-        Raw YAML is the source of truth in this mode.
+        {tf("auto.2b3b3fb24f887691")}
       </p>
     </div>
   );

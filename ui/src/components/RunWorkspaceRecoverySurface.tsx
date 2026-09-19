@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { HeartbeatRun } from "@paperclipai/shared";
@@ -103,12 +104,12 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
       pushToast(
         variables.mode === "quarantine_restore"
           ? {
-              title: "Workspace repaired",
+              title: tf("auto.22f46fd2c10aa2cb"),
               body: "Dirty changes were quarantined onto a rescue branch and the recorded branch restored; the task will resume.",
               tone: "success",
             }
           : {
-              title: "Workspace branch reconciled",
+              title: tf("auto.a01d3ef71b57c6fb"),
               body: "The recorded branch now matches the live branch; the task will resume.",
               tone: "success",
             },
@@ -116,8 +117,8 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
     },
     onError: (err) => {
       pushToast({
-        title: "Reconcile failed",
-        body: err instanceof Error ? err.message : "Unable to reconcile the workspace branch.",
+        title: tf("auto.45e781836d87377c"),
+        body: err instanceof Error ? err.message: tf("auto.f5dd81121d3443cb"),
         tone: "error",
       });
     },
@@ -158,7 +159,7 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
     onSuccess: (created) => {
       invalidate();
       pushToast({
-        title: "Isolated re-issue created",
+        title: tf("auto.6d11286299c74513"),
         body: created.identifier
           ? `${created.identifier} will run on a fresh isolated workspace.`
           : "A fresh isolated re-issue was created.",
@@ -170,8 +171,8 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
     },
     onError: (err) => {
       pushToast({
-        title: "Re-issue failed",
-        body: err instanceof Error ? err.message : "Unable to create an isolated re-issue.",
+        title: tf("auto.d2f4dc96997e51d4"),
+        body: err instanceof Error ? err.message: tf("auto.36df82b6e5ee2e34"),
         tone: "error",
       });
     },
@@ -194,8 +195,8 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
     },
     onError: (err) => {
       pushToast({
-        title: "Recovery resolution failed",
-        body: err instanceof Error ? err.message : "Unable to resolve recovery action",
+        title: tf("auto.f9244c725b820bdb"),
+        body: err instanceof Error ? err.message: tf("auto.98c80218bddf2c97"),
         tone: "error",
       });
     },
@@ -255,7 +256,7 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
   return (
     <div className="space-y-2" data-testid="run-workspace-recovery-surface">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-muted-foreground">Workspace recovery</span>
+        <span className="text-xs font-medium text-muted-foreground">{tf("auto.9869a22291109cd4")}</span>
         {issue?.identifier ? (
           <a
             href={`/issues/${issue.identifier}`}

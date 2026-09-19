@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useId } from "react";
 import { Loader2, Pause, Play } from "lucide-react";
 import { Link } from "@/lib/router";
@@ -51,11 +52,11 @@ export function TaskChatPausedTakeover({
       ) : null}
       <div className="flex flex-wrap items-center justify-end gap-3">
         {hasDraft ? (
-          <p className="mr-auto text-xs text-muted-foreground">Your draft is saved.</p>
+          <p className="mr-auto text-xs text-muted-foreground">{tf("auto.58c808d96ad9a87f")}</p>
         ) : null}
         {resumeHref ? (
           <Button asChild size="sm" className="bg-(--status-agent-paused) text-foreground hover:bg-(--status-agent-paused)/80 dark:text-background">
-            <Link to={resumeHref}><Play aria-hidden="true" />Resume subtree</Link>
+            <Link to={resumeHref}><Play aria-hidden="true" />{tf("auto.b38209885d3237c7")}</Link>
           </Button>
         ) : (
           <Button

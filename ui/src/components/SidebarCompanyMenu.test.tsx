@@ -389,7 +389,7 @@ describe("SidebarCompanyMenu", () => {
     await flushReact();
     await flushReact();
 
-    await openMenu("Open Acme Labs company switcher");
+    await openMenu("Open Acme Labs organization switcher");
 
     expect(document.body.textContent).toContain("Invite people to Acme Labs");
 
@@ -415,7 +415,7 @@ describe("SidebarCompanyMenu", () => {
     await flushReact();
     await flushReact();
 
-    await openMenu("Open Acme Labs company switcher");
+    await openMenu("Open Acme Labs organization switcher");
 
     expect(document.body.textContent).toContain("Organizations");
     expect(document.body.textContent).not.toContain("Invite people");

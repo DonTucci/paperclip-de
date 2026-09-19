@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { AlertTriangle, RotateCcw, TimerReset } from "lucide-react";
 import { healthApi, type DevServerHealthStatus } from "../api/health";
@@ -61,7 +62,7 @@ export function DevRestartBanner({ devServer }: { devServer?: DevServerHealthSta
       await healthApi.requestDevServerRestart();
     } catch (error) {
       setRestartPending(false);
-      window.alert(error instanceof Error ? error.message : "Failed to request restart");
+      window.alert(error instanceof Error ? error.message: tf("auto.807a9e71db1814fd"));
     }
   }
 
@@ -71,10 +72,10 @@ export function DevRestartBanner({ devServer }: { devServer?: DevServerHealthSta
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-(--tracking-caps)">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-            <span>Restart Required</span>
+            <span>{tf("auto.5e0716dcc27fa901")}</span>
             {devServer.autoRestartEnabled ? (
               <Badge variant="ghost" className="bg-amber-900/10 text-(length:--text-nano) tracking-(--tracking-eyebrow) dark:bg-amber-100/10">
-                Auto-Restart On
+                {tf("auto.0bf77a450a4627db")}
               </Badge>
             ) : null}
           </div>
@@ -107,12 +108,12 @@ export function DevRestartBanner({ devServer }: { devServer?: DevServerHealthSta
           ) : devServer.autoRestartEnabled ? (
             <div className="inline-flex items-center gap-2 rounded-full bg-amber-900/10 px-3 py-1.5 dark:bg-amber-100/10">
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Auto-restart will trigger when the instance is idle</span>
+              <span>{tf("auto.f49f9acf61f92a22")}</span>
             </div>
           ) : (
             <div className="inline-flex items-center gap-2 rounded-full bg-amber-900/10 px-3 py-1.5 dark:bg-amber-100/10">
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Restart <code>pnpm dev:once</code> after the active work is safe to interrupt</span>
+              <span>{tf("text.Restart")} <code>{tf("auto.4da66f2f6d6621db")}</code> after the active work is safe to interrupt</span>
             </div>
           )}
           <button

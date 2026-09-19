@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo } from "react";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import {
@@ -28,7 +29,7 @@ export function ReusableExecutionWorkspaceSelect<TWorkspace extends ReusableExec
   value,
   workspaces,
   onValueChange,
-  placeholder = "Choose an existing workspace",
+  placeholder = tf("auto.f8f73210599b2f45"),
   loading = false,
   error = false,
   disabled = false,
@@ -44,8 +45,8 @@ export function ReusableExecutionWorkspaceSelect<TWorkspace extends ReusableExec
       groups={groups}
       onValueChange={onValueChange}
       placeholder={placeholder}
-      searchPlaceholder="Search workspaces..."
-      emptyMessage={error ? "Workspaces failed to load." : "No matching workspaces."}
+      searchPlaceholder={tf("auto.5c192a3e6f23b125")}
+      emptyMessage={error ? tf("auto.d6a5fb0cd6f2c1f3") : tf("auto.76be0ffe594be86e")}
       loadingMessage="Loading workspaces..."
       loading={loading}
       disabled={disabled}

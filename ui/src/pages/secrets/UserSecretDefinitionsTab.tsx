@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SecretStatus, UserSecretDefinition } from "@paperclipai/shared";
@@ -130,7 +131,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
       setDialogOpen(false);
     },
     onError: (err) =>
-      setError(err instanceof ApiError || err instanceof Error ? err.message : "Failed to save"),
+      setError(err instanceof ApiError || err instanceof Error ? err.message: tf("auto.2c07997249abaa76")),
   });
 
   const remove = useMutation({
@@ -138,12 +139,12 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
       secretsApi.removeUserSecretDefinition(companyId, definition.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.secrets.userDefinitions(companyId) });
-      pushToast({ title: "Definition removed", tone: "info" });
+      pushToast({ title: tf("auto.b179e55e9c0cd35f"), tone: "info" });
       setDeleteTarget(null);
     },
     onError: (err) =>
       pushToast({
-        title: "Could not remove definition",
+        title: tf("auto.e6de8f56aa692a89"),
         body: err instanceof Error ? err.message : undefined,
         tone: "error",
       }),
@@ -164,7 +165,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
 
       <div className="flex items-center justify-end">
         <Button size="sm" onClick={openCreate}>
-          <Plus className="mr-1 h-3.5 w-3.5" /> New user secret
+          <Plus className="mr-1 h-3.5 w-3.5" /> {tf("auto.a67839ad4faf65ab")}
         </Button>
       </div>
 
@@ -174,14 +175,14 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
             <AlertCircle className="h-4 w-4" /> Failed to load definitions:{" "}
             {(definitionsQuery.error as Error).message}
             <Button variant="ghost" size="sm" onClick={() => definitionsQuery.refetch()}>
-              Retry
+              {tf("text.Retry")}
             </Button>
           </div>
         ) : definitions.length === 0 && !definitionsQuery.isPending ? (
           <EmptyState
             icon={UserRound}
-            message="No user secret definitions yet. Create one to require each member to supply their own credential."
-            action="New user secret"
+            message={tf("auto.ccda3b146359ffeb")}
+            action={tf("auto.a67839ad4faf65ab")}
             onAction={openCreate}
           />
         ) : (
@@ -238,13 +239,13 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
               <UserSecretChip />
             </DialogTitle>
             <DialogDescription>
-              Members supply their own value for this credential. No value is entered here.
+              {tf("auto.a42859e1a6317046")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground">Name</label>
+              <label className="text-xs font-medium text-foreground">{tf("text.Name")}</label>
               <Input
                 value={form.name}
                 onChange={(event) => {
@@ -255,19 +256,19 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
                     key: keyDirty ? current.key : keyFromName(name),
                   }));
                 }}
-                placeholder="Personal GitHub token"
+                placeholder={tf("auto.92e189a99f3ed8c3")}
                 autoFocus
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground">Key</label>
+              <label className="text-xs font-medium text-foreground">{tf("text.Key")}</label>
               <Input
                 value={form.key}
                 onChange={(event) => {
                   setKeyDirty(true);
                   setForm((current) => ({ ...current, key: event.target.value }));
                 }}
-                placeholder="PERSONAL_GH_TOKEN"
+                placeholder={tf("auto.f700329210660064")}
                 className="font-mono text-sm"
                 disabled={Boolean(editing)}
               />
@@ -276,31 +277,31 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
               </p>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground">Description</label>
+              <label className="text-xs font-medium text-foreground">{tf("text.Description")}</label>
               <Input
                 value={form.description}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, description: event.target.value }))
                 }
-                placeholder="What this credential is for"
+                placeholder={tf("auto.ecdde2fb6fedda1a")}
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-foreground">
-                Usage guidance <span className="text-muted-foreground">(optional)</span>
+                Usage guidance <span className="text-muted-foreground">{tf("auto.0059798b7f7023e4")}</span>
               </label>
               <Textarea
                 value={form.usageGuidance}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, usageGuidance: event.target.value }))
                 }
-                placeholder="Tell members how to create their token, required scopes, etc."
+                placeholder={tf("auto.2eecaea0c85e0847")}
                 className="min-h-(--sz-70px) text-sm"
               />
             </div>
             {editing ? (
               <div className="space-y-1">
-                <label className="text-xs font-medium text-foreground">Status</label>
+                <label className="text-xs font-medium text-foreground">{tf("text.Status")}</label>
                 <Select
                   value={form.status}
                   onValueChange={(status) =>
@@ -311,9 +312,9 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="disabled">Disabled</SelectItem>
-                    <SelectItem value="archived">Archived</SelectItem>
+                    <SelectItem value="active">{tf("text.Active")}</SelectItem>
+                    <SelectItem value="disabled">{tf("text.Disabled")}</SelectItem>
+                    <SelectItem value="archived">{tf("text.Archived")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -323,7 +324,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
 
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDialogOpen(false)} disabled={save.isPending}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button onClick={() => save.mutate()} disabled={!canSave || save.isPending}>
               {save.isPending ? "Saving…" : editing ? "Save changes" : "Create"}
@@ -336,7 +337,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
       <Dialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove user secret?</DialogTitle>
+            <DialogTitle>{tf("auto.c34b555e2b502363")}</DialogTitle>
             <DialogDescription>
               This removes the definition <span className="font-mono">{deleteTarget?.key}</span> for
               the whole company. Existing member values become unreferenced. This cannot be undone.
@@ -344,7 +345,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={remove.isPending}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               variant="destructive"

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { Link } from "@/lib/router";
 import { Bot, User, Cog, ChevronDown, ListFilter } from "lucide-react";
@@ -116,7 +117,7 @@ export function CaseActivityFeed({ events }: { events: CaseEvent[] }) {
       : `${active.size} filters`;
 
   if (events.length === 0) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">No activity yet.</p>;
+    return <p className="py-6 text-center text-sm text-muted-foreground">{tf("auto.a288d2d0a21eed3c")}</p>;
   }
 
   return (
@@ -134,9 +135,9 @@ export function CaseActivityFeed({ events }: { events: CaseEvent[] }) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Activity filter</DropdownMenuLabel>
+            <DropdownMenuLabel>{tf("auto.0472750d0c2345ae")}</DropdownMenuLabel>
             <DropdownMenuItem onSelect={() => setActive(new Set())}>
-              All activity
+              {tf("auto.29ebb2ef2da630f1")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {presentKinds.map((kind) => (
@@ -152,7 +153,7 @@ export function CaseActivityFeed({ events }: { events: CaseEvent[] }) {
         </DropdownMenu>
       </div>
       {filtered.length === 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">No events match this filter.</p>
+        <p className="py-6 text-center text-sm text-muted-foreground">{tf("auto.f5044d6659874027")}</p>
       ) : (
         <div className="divide-y divide-border">
           {filtered.map((event) => (

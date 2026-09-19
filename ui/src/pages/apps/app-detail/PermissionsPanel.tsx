@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Ban, Check, FlaskConical, Loader2, RefreshCw, Search, ShieldQuestion } from "lucide-react";
 import type { Agent, ToolCatalogEntry, ToolConnectionCapabilities } from "@paperclipai/shared";
@@ -122,8 +123,8 @@ function AgentAccessSection({
   return (
     <section className="space-y-4 border-t border-border pt-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-foreground">Which agents can use this connection?</h2>
-        {disabled ? <span className="text-xs text-muted-foreground">Saving…</span> : null}
+        <h2 className="text-sm font-semibold text-foreground">{tf("auto.a315e64c5835cd33")}</h2>
+        {disabled ? <span className="text-xs text-muted-foreground">{tf("auto.23e39291d6135814")}</span> : null}
       </div>
 
       {canManage ? (
@@ -143,7 +144,7 @@ function AgentAccessSection({
             options={[
               {
                 value: "specific",
-                title: "Just agents I pick",
+                title: tf("auto.d2b7ad835c7f34ea"),
                 description: install.onAll
                   ? "Unavailable while this connection is installed for every agent."
                   : "Available only to selected agents.",
@@ -151,8 +152,8 @@ function AgentAccessSection({
               },
               {
                 value: "all",
-                title: "Any agent",
-                description: "Available across your company.",
+                title: tf("auto.ee3e7690173b4911"),
+                description: tf("auto.0fecc5d5aabe0ef9"),
               },
             ]}
           />
@@ -165,7 +166,7 @@ function AgentAccessSection({
               triggerLabel={access.agentIds.size === 0
                 ? "Choose agents"
                 : `${access.agentIds.size} ${access.agentIds.size === 1 ? "agent" : "agents"} selected`}
-              emptyMessage="You cannot edit any agents yet."
+              emptyMessage={tf("auto.1fe14169977e0afd")}
               isAgentDisabled={(agent) => requiredAgentIds.has(agent.id)}
               getDescription={(agent) => requiredAgentIds.has(agent.id) ? "Required by this connection's install setting" : agent.title}
               onChange={(agentIds) => onSave({
@@ -176,9 +177,9 @@ function AgentAccessSection({
           ) : null}
         </div>
       ) : access.mode === "all" ? (
-        <p className="text-sm text-muted-foreground">Any agent can use this connection.</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.8f6ff97fb71ed9a8")}</p>
       ) : selectedAgents.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No agents can use this connection.</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.de5ab3d99cf0f480")}</p>
       ) : (
         <div className="space-y-0.5">
           {selectedAgents.map((agent) => (
@@ -246,10 +247,10 @@ function ActionsSection({
   return (
     <section className="space-y-6 border-t border-border pt-8">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-foreground">Actions</h2>
+        <h2 className="text-lg font-semibold text-foreground">{tf("text.Actions")}</h2>
         {canConfigure ? (
           <div className="flex items-center gap-2">
-            {disabled ? <span className="text-xs text-muted-foreground">Saving…</span> : null}
+            {disabled ? <span className="text-xs text-muted-foreground">{tf("auto.23e39291d6135814")}</span> : null}
             <Button
               variant="outline"
               size="sm"
@@ -286,8 +287,8 @@ function ActionsSection({
           <div className="relative min-w-(--sz-12rem) flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              aria-label="Find an action"
-              placeholder="Find an action…"
+              aria-label={tf("auto.efd383494381e7de")}
+              placeholder={tf("auto.f0eba3ca1e970fff")}
               className="pl-9"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -412,9 +413,9 @@ const PERMISSION_OPTIONS: Array<{
   description: string;
   icon: typeof Ban;
 }> = [
-  { value: "off", label: "Off", description: "Agents cannot run this action.", icon: Ban },
-  { value: "ask", label: "Ask first", description: "A human must approve each call.", icon: ShieldQuestion },
-  { value: "allowed", label: "Allowed", description: "Runs without approval.", icon: Check },
+  { value: "off", label: tf("auto.ca7981b46ecf2c17"), description: tf("auto.91ab626deacb2232"), icon: Ban },
+  { value: "ask", label: tf("auto.4a9e8cf39abb59f1"), description: tf("auto.d07c9e49240f2573"), icon: ShieldQuestion },
+  { value: "allowed", label: tf("auto.1bb201d188352e9b"), description: tf("auto.01d38af73b846e91"), icon: Check },
 ];
 
 function ActionRow({
@@ -506,7 +507,7 @@ function ActionRow({
           )}
           <Button type="button" size="sm" variant="outline" onClick={() => setTestOpen(true)}>
             <FlaskConical className="mr-1.5 h-3.5 w-3.5" />
-            Test
+            {tf("text.Test")}
           </Button>
         </div>
       </div>

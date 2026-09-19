@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 import { Lock, type LucideIcon } from "lucide-react";
 import { Link } from "@/lib/router";
@@ -120,7 +121,7 @@ export function AgentSkillRow({
   );
 
   const trailing = readOnly ? (
-    <Lock className="h-4 w-4 shrink-0 text-muted-foreground/60" aria-label="Read-only" />
+    <Lock className="h-4 w-4 shrink-0 text-muted-foreground/60" aria-label={tf("auto.72bb90897ab1eadc")} />
   ) : (
     (() => {
       const toggle = (

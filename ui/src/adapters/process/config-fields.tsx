@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { configFieldsForSection } from "../config-sections";
 import type { AdapterConfigFieldsProps } from "../types";
 import {
@@ -36,7 +37,7 @@ export function ProcessConfigFields({
 }: AdapterConfigFieldsProps) {
   return configFieldsForSection(section, (
     <>
-      <Field configSection="advanced" label="Command" hint={help.command}>
+      <Field configSection="advanced" label={tf("auto.713166971d730f81")} hint={help.command}>
         <DraftInput
           value={
             isCreate
@@ -50,10 +51,10 @@ export function ProcessConfigFields({
           }
           immediate
           className={inputClass}
-          placeholder="e.g. node, python"
+          placeholder={tf("auto.546f689829e8be55")}
         />
       </Field>
-      <Field configSection="advanced" label="Args (comma-separated)" hint={help.args}>
+      <Field configSection="advanced" label={tf("auto.2515de2e5e19a9db")} hint={help.args}>
         <DraftInput
           value={
             isCreate
@@ -71,7 +72,7 @@ export function ProcessConfigFields({
           }
           immediate
           className={inputClass}
-          placeholder="e.g. script.js, --flag"
+          placeholder={tf("auto.577a1413911d8482")}
         />
       </Field>
     </>

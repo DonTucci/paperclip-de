@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArchiveRestore, MoreHorizontal, Plus, ShieldCheck, Users } from "lucide-react";
@@ -83,55 +84,55 @@ export function ProfilesIndex({
     mutationFn: (profile: ToolProfileWithDetails) =>
       toolsApi.duplicateProfile(profile.id, { name: `${profile.name} (copy)` }),
     onSuccess: () => {
-      pushToast({ title: "Profile duplicated", body: "The copy is not assigned to anyone yet.", tone: "success" });
+      pushToast({ title: tf("auto.7a2bc19c5d6c1458"), body: "The copy is not assigned to anyone yet.", tone: "success" });
       invalidate();
     },
     onError: (error: unknown) =>
-      pushToast({ title: "Could not duplicate", body: errorBody(error), tone: "error" }),
+      pushToast({ title: tf("auto.552d5a1a94aca9e4"), body: errorBody(error), tone: "error" }),
   });
 
   const archive = useMutation({
     mutationFn: (profile: ToolProfileWithDetails) =>
       toolsApi.updateProfile(profile.id, { status: "archived" }),
     onSuccess: () => {
-      pushToast({ title: "Profile archived", tone: "success" });
+      pushToast({ title: tf("auto.114157ec2fe455f1"), tone: "success" });
       invalidate();
     },
-    onError: (error: unknown) => pushToast({ title: "Could not archive", body: errorBody(error), tone: "error" }),
+    onError: (error: unknown) => pushToast({ title: tf("auto.06029194134ebf8a"), body: errorBody(error), tone: "error" }),
   });
 
   const restore = useMutation({
     mutationFn: (profile: ToolProfileWithDetails) =>
       toolsApi.updateProfile(profile.id, { status: "active" }),
     onSuccess: () => {
-      pushToast({ title: "Profile restored", tone: "success" });
+      pushToast({ title: tf("auto.6e40ed960e4f3a77"), tone: "success" });
       invalidate();
     },
-    onError: (error: unknown) => pushToast({ title: "Could not restore", body: errorBody(error), tone: "error" }),
+    onError: (error: unknown) => pushToast({ title: tf("auto.fc2b762a8d768abc"), body: errorBody(error), tone: "error" }),
   });
 
   const remove = useMutation({
     mutationFn: (profile: ToolProfileWithDetails) => toolsApi.deleteProfile(profile.id),
     onSuccess: () => {
-      pushToast({ title: "Profile deleted", tone: "success" });
+      pushToast({ title: tf("auto.451546baf05026a9"), tone: "success" });
       invalidate();
     },
-    onError: (error: unknown) => pushToast({ title: "Could not delete", body: errorBody(error), tone: "error" }),
+    onError: (error: unknown) => pushToast({ title: tf("auto.00035f6765ba9a81"), body: errorBody(error), tone: "error" }),
   });
 
   const header = (
     <ToolsPageHeader
-      title="Access profiles"
-      description="Decide which tools your agents can use. Build a profile once, then assign it to the agents that need it."
+      title={tf("auto.2471292ff715cc6a")}
+      description={tf("auto.6d00444ece2406d0")}
       actions={
         <>
           <Button variant="outline" onClick={() => setResolverOpen(true)}>
             <ShieldCheck className="mr-1.5 h-4 w-4" />
-            Check an agent's access
+            {tf("auto.cfb8ca1e58be63cf")}
           </Button>
           <Button onClick={() => navigate(newProfileHref())}>
             <Plus className="mr-1.5 h-4 w-4" />
-            New profile
+            {tf("auto.fcf4f3f4d5f73ef8")}
           </Button>
         </>
       }
@@ -142,9 +143,9 @@ export function ProfilesIndex({
     <Sheet open={resolverOpen} onOpenChange={setResolverOpen}>
       <SheetContent className="w-full gap-0 p-0 sm:max-w-xl">
         <SheetHeader className="border-b border-border">
-          <SheetTitle>Check an agent's access</SheetTitle>
+          <SheetTitle>{tf("auto.cfb8ca1e58be63cf")}</SheetTitle>
           <SheetDescription>
-            See exactly which tools an agent can use right now, and which profile allows each one.
+            {tf("auto.014cb041e856081f")}
           </SheetDescription>
         </SheetHeader>
         <div className="flex min-h-0 flex-1 flex-col p-4">
@@ -158,7 +159,7 @@ export function ProfilesIndex({
     return (
       <div className="space-y-5">
         {header}
-        <LoadingState label="Loading profiles…" />
+        <LoadingState label={tf("auto.16b0bbfd1d1194f9")} />
       </div>
     );
   }
@@ -197,7 +198,7 @@ export function ProfilesIndex({
       {rows.length === 0 ? (
         statusFilter === "archived" ? (
           <div className="rounded-lg border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
-            No archived profiles.
+            {tf("auto.392d100c3db058ca")}
           </div>
         ) : (
           <EmptyTemplatePicker onPick={(key) => navigate(newProfileHref(key))} />
@@ -215,11 +216,11 @@ export function ProfilesIndex({
             </colgroup>
             <thead>
               <tr className="border-b border-border bg-muted/40 text-left text-xs font-medium text-muted-foreground">
-                <th className="px-3 py-2 font-medium">Profile</th>
-                <th className="px-3 py-2 font-medium">Allows</th>
-                <th className="px-3 py-2 font-medium">Assigned to</th>
-                <th className="px-3 py-2 font-medium">Status</th>
-                <th className="px-3 py-2 font-medium">Updated</th>
+                <th className="px-3 py-2 font-medium">{tf("text.Profile")}</th>
+                <th className="px-3 py-2 font-medium">{tf("auto.8b1d52d202522d89")}</th>
+                <th className="px-3 py-2 font-medium">{tf("auto.08ee4565a256df6e")}</th>
+                <th className="px-3 py-2 font-medium">{tf("text.Status")}</th>
+                <th className="px-3 py-2 font-medium">{tf("text.Updated")}</th>
                 <th className="w-10 px-3 py-2" />
               </tr>
             </thead>
@@ -257,7 +258,7 @@ export function ProfilesIndex({
                       {assigned.unassigned ? (
                         <span className="text-muted-foreground">
                           {assigned.text}
-                          <span className="ml-1 text-xs text-muted-foreground/70">— does not change access</span>
+                          <span className="ml-1 text-xs text-muted-foreground/70">{tf("auto.0952f00b04214440")}</span>
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 text-foreground">
@@ -277,7 +278,7 @@ export function ProfilesIndex({
                             onClick={open}
                             className="text-xs font-medium text-primary hover:underline"
                           >
-                            Resume
+                            {tf("text.Resume")}
                           </button>
                         ) : null}
                       </span>
@@ -343,26 +344,26 @@ function RowMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Profile actions"
+          aria-label={tf("auto.f29b9c8f1c7debdd")}
           className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity hover:bg-accent group-hover:opacity-100 data-[state=open]:opacity-100"
         >
           <MoreHorizontal className="h-4 w-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onSelect={onEdit}>Edit</DropdownMenuItem>
-        <DropdownMenuItem onSelect={onDuplicate}>Duplicate</DropdownMenuItem>
+        <DropdownMenuItem onSelect={onEdit}>{tf("text.Edit")}</DropdownMenuItem>
+        <DropdownMenuItem onSelect={onDuplicate}>{tf("auto.02cdaabfca805d6a")}</DropdownMenuItem>
         {onRestore ? (
           <DropdownMenuItem onSelect={onRestore}>
             <ArchiveRestore className="mr-1.5 h-4 w-4" />
-            Restore
+            {tf("text.Restore")}
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onSelect={onArchive}>Archive</DropdownMenuItem>
+          <DropdownMenuItem onSelect={onArchive}>{tf("text.Archive")}</DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={onDelete} className="text-destructive focus:text-destructive">
-          Delete
+          {tf("text.Delete")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -374,9 +375,9 @@ function EmptyTemplatePicker({ onPick }: { onPick: (key: TemplateKey) => void })
   return (
     <div className="rounded-lg border border-dashed border-border p-6">
       <div className="mb-4 max-w-2xl">
-        <h3 className="text-base font-semibold text-foreground">Create your first access profile</h3>
+        <h3 className="text-base font-semibold text-foreground">{tf("auto.1234b07d967c3ce3")}</h3>
         <p className="text-sm text-muted-foreground">
-          Pick a starting point. You can fine-tune exactly which tools it allows in the next step.
+          {tf("auto.e07fd8dcf09a15da")}
         </p>
       </div>
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

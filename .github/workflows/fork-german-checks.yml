@@ -1,0 +1,43 @@
+name: Deutscher Fork prüfen
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.repository != 'paperclipai/paperclip'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Deutsche Texte und Platzhalter prüfen
+        run: |
+          node scripts/refine-german-catalog.mjs --check
+          node scripts/verify-german-catalog.mjs
+          node --test scripts/verify-german-catalog.test.mjs
+          node scripts/audit-german-ui.mjs --check
+      - run: pnpm -r typecheck
+      - run: pnpm test:run
+      - run: pnpm build
+      - name: Textprüfung dokumentieren
+        if: always()
+        run: node scripts/audit-german-ui.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deutsche-oberfläche-prüfliste
+          path: tmp/german-ui-audit.json

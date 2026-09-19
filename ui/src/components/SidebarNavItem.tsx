@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { createContext, useContext, type ReactNode } from "react";
 import { NavLink } from "@/lib/router";
 import { SIDEBAR_SCROLL_RESET_STATE } from "../lib/navigation-scroll";
@@ -47,7 +48,7 @@ interface SidebarNavItemProps {
   badgeTone?: "default" | "danger" | "warning";
   /**
    * Accessible noun for the numeric badge when collapsed to the rail, where the
-   * count is rendered as a dot (e.g. `badgeLabel="unread"` → "Inbox, 28 unread").
+   * count is rendered as a dot (e.g. `badgeLabel={tf("nav.unread")}` → "Inbox, 28 unread").
    */
   badgeLabel?: string;
   textBadge?: string;

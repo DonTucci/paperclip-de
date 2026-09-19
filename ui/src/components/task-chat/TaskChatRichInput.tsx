@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Loader2 } from "lucide-react";
 import {
@@ -66,8 +67,7 @@ export function TaskChatRichInput({
     } catch (error) {
       setUploadError(
         error instanceof Error
-          ? error.message
-          : "The image could not be uploaded.",
+          ? error.message: tf("auto.323e3faa20c975ba"),
       );
       throw error;
     } finally {
@@ -134,7 +134,7 @@ export function TaskChatRichInput({
             )}
             Attach image
           </Button>
-          <span>or drop/paste an image into the note</span>
+          <span>{tf("auto.91c413d37849d50a")}</span>
         </div>
       ) : null}
       {uploadError ? (

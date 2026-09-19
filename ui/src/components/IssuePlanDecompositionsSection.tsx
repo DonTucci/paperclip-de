@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Agent, AcceptedPlanDecompositionSummary } from "@paperclipai/shared";
@@ -18,14 +19,14 @@ function StatusBadge({ status }: { status: AcceptedPlanDecompositionSummary["sta
     return (
       <span className="inline-flex items-center gap-1 rounded-sm border border-emerald-500/50 bg-emerald-500/10 px-2 py-0.5 text-(length:--text-micro) font-medium text-emerald-900 dark:text-emerald-100">
         <CheckCircle2 className="h-3 w-3" />
-        Completed
+        {tf("auto.22a970d2e5b1cc23")}
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-sm border border-amber-500/50 bg-amber-500/10 px-2 py-0.5 text-(length:--text-micro) font-medium text-amber-900 dark:text-amber-100">
       <Loader2 className="h-3 w-3 animate-spin" />
-      In flight
+      {tf("auto.b65abbf5920b271c")}
     </span>
   );
 }
@@ -46,7 +47,7 @@ export function IssuePlanDecompositionsSection({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-muted-foreground">Plan decomposition</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">{tf("auto.b574bd1cca199767")}</h3>
         <span className="text-(length:--text-micro) text-muted-foreground/80">
           {items.length === 1 ? "1 accepted plan revision" : `${items.length} accepted plan revisions`}
         </span>
@@ -101,10 +102,10 @@ export function IssuePlanDecompositionsSection({
                 {record.status === "completed" && requested > 0 ? (
                   <span
                     className="inline-flex items-center gap-1 rounded-sm border border-sky-500/40 bg-sky-500/10 px-1.5 py-0.5 text-(length:--text-nano) font-medium text-sky-900 dark:text-sky-100"
-                    title="Repeat attempts with this fingerprint reuse this record instead of creating new children"
+                    title={tf("auto.0c407f0aaf6203b2")}
                   >
                     <Repeat className="h-3 w-3" />
-                    Idempotent claim
+                    {tf("auto.33d4ffdad20c0b00")}
                   </span>
                 ) : null}
               </div>
@@ -124,7 +125,7 @@ export function IssuePlanDecompositionsSection({
                     to={`/issues/${issueIdentifier}#document-plan`}
                     className="underline-offset-2 hover:underline"
                   >
-                    Plan document
+                    {tf("auto.f0f6f3502007e534")}
                   </Link>
                 ) : null}
               </div>

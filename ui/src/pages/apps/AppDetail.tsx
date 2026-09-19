@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ManagedAiConnectionDetails } from "@/components/ai-connections/ManagedAiConnectionDetails";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { EmailConnectionAccess } from "@/components/EmailConnectionAccess";
@@ -220,7 +221,7 @@ export function AppDetail({ renderActions, onReconnect }: {
   useEffect(() => {
     if (!activeTab) return;
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
+      { label: tf("text.Connectors"), href: "/apps" },
       { label: appName, href: appTabHref(connectionId, "permissions") },
       { label: appTabLabel(activeTab) },
     ]);
@@ -271,8 +272,8 @@ export function AppDetail({ renderActions, onReconnect }: {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't save that",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.4ee3e155463fcb96"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
     onSettled: () => setPending(false),
@@ -290,8 +291,8 @@ export function AppDetail({ renderActions, onReconnect }: {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't rename the app",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.dba458bc04cbff33"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -307,16 +308,16 @@ export function AppDetail({ renderActions, onReconnect }: {
         navigateTopLevel(target.url);
       } catch (error) {
         pushToast({
-          title: "Couldn't start sign-in",
-          body: error instanceof Error ? error.message : "Please try again.",
+          title: tf("auto.3f9bac4a050951dc"),
+          body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
           tone: "error",
         });
       }
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't start sign-in",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.3f9bac4a050951dc"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -349,16 +350,16 @@ export function AppDetail({ renderActions, onReconnect }: {
         navigateTopLevel(target.url);
       } catch (error) {
         pushToast({
-          title: "Couldn't start sign-in",
-          body: error instanceof Error ? error.message : "Please try again.",
+          title: tf("auto.3f9bac4a050951dc"),
+          body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
           tone: "error",
         });
       }
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't start sign-in",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.3f9bac4a050951dc"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -375,7 +376,7 @@ export function AppDetail({ renderActions, onReconnect }: {
       invalidateGrants();
       setAudienceOpenGrantId(null);
       pushToast({
-        title: "Audience saved",
+        title: tf("auto.b7ee24e0a8a84f3b"),
         body: (grant.members?.length ?? 0) === 0
           ? "Every organization member can use this identity."
           : `${grant.members?.length} ${grant.members?.length === 1 ? "member" : "members"} can use this identity.`,
@@ -383,7 +384,7 @@ export function AppDetail({ renderActions, onReconnect }: {
       });
     },
     onError: (error) =>
-      setAudienceError(error instanceof Error ? error.message : "We couldn't save that audience."),
+      setAudienceError(error instanceof Error ? error.message: tf("auto.cc1aaa502da3db54")),
   });
 
   const refreshTools = useMutation({
@@ -404,8 +405,8 @@ export function AppDetail({ renderActions, onReconnect }: {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't refresh actions",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.17b3912d617e6305"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -416,14 +417,14 @@ export function AppDetail({ renderActions, onReconnect }: {
       queryClient.invalidateQueries({ queryKey: queryKeys.tools.connectionGrants(connectionId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.apps.attention(selectedCompanyId!) });
       pushToast({
-        title: "GitHub access refreshed",
+        title: tf("auto.477eae62754bc27f"),
         body: "Account, installation, and repository access are current.",
         tone: "success",
       });
     },
     onError: (error) => pushToast({
-      title: "Couldn't refresh GitHub access",
-      body: error instanceof Error ? error.message : "Please try again.",
+      title: tf("auto.f01f0fd36bf92267"),
+      body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
       tone: "error",
     }),
   });
@@ -463,7 +464,7 @@ export function AppDetail({ renderActions, onReconnect }: {
   }
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select an organization to manage apps.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.c62bf64e9f0c2f07")}</div>;
   }
   if (connectionQuery.isLoading) {
     return (
@@ -477,9 +478,9 @@ export function AppDetail({ renderActions, onReconnect }: {
   if (!connection) {
     return (
       <div className="max-w-3xl p-6">
-        <p className="text-sm text-muted-foreground">We couldn't find that app.</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.3dffbbcc9c521f53")}</p>
         <Button className="mt-4" variant="outline" onClick={() => navigate("/apps")}>
-          Back to connectors
+          {tf("auto.4bb96fc6ab818764")}
         </Button>
       </div>
     );
@@ -487,7 +488,7 @@ export function AppDetail({ renderActions, onReconnect }: {
 
   const aiGrantRevoked = connection.connectionPurpose === "ai"
     && grantRows.length > 0 && grantRows.every((grant) => grant.status === "revoked");
-  const status: StatusInfo = aiGrantRevoked ? { label: "Revoked", tone: "attention" } : statusFor(connection);
+  const status: StatusInfo = aiGrantRevoked ? { label: tf("auto.f6f738d043929f59"), tone: "attention" } : statusFor(connection);
   const needsReconnect = connection.requiresReauthorization
     ?? (status.tone === "attention" && connection.healthStatus !== "unknown");
   const quarantined = catalog.filter((e) => e.status === "quarantined");
@@ -530,7 +531,7 @@ export function AppDetail({ renderActions, onReconnect }: {
         <div role="status">
           <p>{connection.healthMessage || "GitHub access could not be checked. Try again."}</p>
           <Button variant="outline" disabled={refreshGitHubAccess.isPending} onClick={() => refreshGitHubAccess.mutate()}>
-            Retry access
+            {tf("auto.e5222230e095f673")}
           </Button>
         </div>
       )}
@@ -699,7 +700,7 @@ function AppDetailHeader({
               }}
             >
               <Input
-                aria-label="App name"
+                aria-label={tf("auto.e6ad399685374164")}
                 value={nameDraft}
                 onChange={(event) => onNameDraftChange(event.target.value)}
                 className="h-9 w-64 text-lg font-bold"
@@ -709,7 +710,7 @@ function AppDetailHeader({
                 {renamePending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}
               </Button>
               <Button type="button" size="sm" variant="ghost" onClick={onRenameCancel} disabled={renamePending}>
-                Cancel
+                {tf("text.Cancel")}
               </Button>
             </form>
           ) : (
@@ -719,7 +720,7 @@ function AppDetailHeader({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 text-muted-foreground"
-                aria-label="Rename app"
+                aria-label={tf("auto.5689214eba318e26")}
                 onClick={onRenameStart}
               >
                 <Pencil className="h-3.5 w-3.5" />
@@ -759,8 +760,8 @@ function ToolsLoading({ mcpActions = false }: { mcpActions?: boolean }) {
 function ToolsLoadError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="space-y-3 py-8">
-      <p className="text-sm text-destructive">Couldn’t load tools for this app.</p>
-      <Button size="sm" variant="outline" onClick={onRetry}>Try again</Button>
+      <p className="text-sm text-destructive">{tf("auto.6564a35d2b2d17ad")}</p>
+      <Button size="sm" variant="outline" onClick={onRetry}>{tf("text.Try again")}</Button>
     </div>
   );
 }
@@ -791,12 +792,12 @@ type StatusInfo = { label: string; tone: "connected" | "attention" | "paused" };
 
 function statusFor(connection: ToolConnection): StatusInfo {
   if (connection.enabled === false || connection.status === "disabled") {
-    return { label: "Paused", tone: "paused" };
+    return { label: tf("text.Paused"), tone: "paused" };
   }
   if (isAttentionHealthStatus(connection.healthStatus) || (connection.connectionPurpose === "ai" && (connection.healthStatus !== "ok" || aiSubscriptionNeedsIsolatedLogin(connection.config)))) {
-    return { label: "Needs attention", tone: "attention" };
+    return { label: tf("auto.c1ebc7817870e5be"), tone: "attention" };
   }
-  return { label: "Connected", tone: "connected" };
+  return { label: tf("auto.22965568d22a14ee"), tone: "connected" };
 }
 
 function StatusBadge({ status }: { status: StatusInfo }) {

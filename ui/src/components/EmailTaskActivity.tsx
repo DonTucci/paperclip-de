@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { EmailMessageCard } from "./EmailMessageCard";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -78,7 +79,7 @@ function EmailDelivery({
     <div className="space-y-2 text-xs text-muted-foreground">
       {p.request && !p.providerMessageId && (
         <article
-          aria-label="Email send intent"
+          aria-label={tf("auto.5cd558440d103fc4")}
           className="space-y-3 rounded-lg border border-border p-4"
         >
           <p className="font-semibold">{p.request.subject ?? "Email reply"}</p>
@@ -95,7 +96,7 @@ function EmailDelivery({
       {p.outcome === "uncertain" && (
         <details>
           <summary className="cursor-pointer">
-            Resolve delivery after checking AgentMail
+            {tf("auto.457318724b32f2ef")}
           </summary>
           <div className="space-y-2 py-2">
             <p>
@@ -103,10 +104,10 @@ function EmailDelivery({
               does not resend.
             </p>
             <Input
-              aria-label="Provider message ID"
+              aria-label={tf("auto.c250cfdf994a7023")}
               value={messageId}
               onChange={(e) => setMessageId(e.target.value)}
-              placeholder="Provider message ID"
+              placeholder={tf("auto.c250cfdf994a7023")}
             />
             <div className="flex gap-2">
               <Button
@@ -115,7 +116,7 @@ function EmailDelivery({
                 disabled={!messageId || resolve.isPending}
                 onClick={() => resolve.mutate("sent")}
               >
-                Confirm sent
+                {tf("auto.a1913b58f2df8ba5")}
               </Button>
               <Button
                 size="sm"
@@ -123,7 +124,7 @@ function EmailDelivery({
                 disabled={resolve.isPending}
                 onClick={() => resolve.mutate("failed")}
               >
-                Confirm not sent
+                {tf("auto.e948b4c3c1a39594")}
               </Button>
             </div>
             {resolve.error && (

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ManagedAiConnectionRow } from "@/components/ai-connections/ManagedAiConnectionDetails";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -108,6 +109,40 @@ type ConnectionRemovalTarget = {
   childConnectionCount: number;
 };
 
+const GERMAN_CONNECTOR_DESCRIPTIONS: Record<string, string> = {
+  github: "Code und Pull Requests lesen sowie Issues kommentieren.",
+  gmail: "Gmail-Nachrichten suchen und lesen sowie Entwürfe erstellen, ohne E-Mails zu versenden.",
+  "google-calendar": "Kalender lesen und Termine in Google Calendar verwalten.",
+  "google-chat": "Unterhaltungen in Google Chat suchen und lesen sowie Nachrichten senden.",
+  "google-docs": "Dokumente in Google Docs lesen und bearbeiten.",
+  "google-drive": "Dateien in Google Drive suchen, lesen, erstellen und kopieren.",
+  "google-people": "Kontakte und Verzeichnisprofile über Google People suchen.",
+  "google-sheets": "Tabellen in Google Sheets lesen und bearbeiten.",
+  "google-slides": "Präsentationen in Google Slides lesen und bearbeiten.",
+  "google-workspace-search": "Gmail, Drive, Calendar und Chat mit einer gemeinsamen Lesesuche durchsuchen.",
+  grok: "Grok-Konten mit deinen Agenten verbinden.",
+  linear: "Linear-Issues erstellen, bearbeiten und lesen.",
+  notion: "Seiten im Notion-Arbeitsbereich lesen und bearbeiten.",
+  openai: "OpenAI-Konten mit deinen Agenten verbinden.",
+  openrouter: "OpenRouter-Konten mit deinen Agenten verbinden.",
+  posthog: "Produktnutzung, Fehler, Funktionsschalter und Experimente mit PostHog untersuchen.",
+  railway: "Dienste und Protokolle prüfen, Anwendungen bereitstellen und Befehle in Railway-Containern ausführen.",
+  sentry: "Fehler, Veröffentlichungen und Probleme im Produktivbetrieb untersuchen.",
+  shopify: "Produkte und Richtlinien eines Shops suchen sowie Warenkörbe verwalten.",
+  slack: "Nachrichten in den Kanälen deines Teams senden und lesen.",
+  zapier: "Über dein Zapier-Konto auf Tausende Anwendungen zugreifen.",
+};
+
+function localizedConnectorDescription(slug: string, name: string, description: string): string {
+  if (!document.documentElement.lang.startsWith("de")) return description;
+  const curated = GERMAN_CONNECTOR_DESCRIPTIONS[slug];
+  if (curated) return curated;
+  if (/^Connect .+ provider-hosted MCP server\.$/.test(description)) {
+    return `${name} verbinden.`;
+  }
+  return description;
+}
+
 function chatProviderForSlug(slug: string): ChatProvider | null {
   const method = getAppStoreDefinition(slug)?.methods.find(
     (candidate) =>
@@ -164,21 +199,21 @@ function connectionState(connection: ToolConnection): ConnectionState {
   if (connection.status === "draft") {
     return {
       kind: "draft",
-      label: "Setup incomplete",
-      message: "Finish setup before agents can use this account.",
+      label: tf("auto.167fc0f362b761dd"),
+      message: tf("auto.631d427ee3ba61e3"),
     };
   }
   if (connection.enabled === false || connection.status === "disabled") {
     return {
       kind: "paused",
-      label: "Paused",
-      message: "Agents can’t use this account right now.",
+      label: tf("text.Paused"),
+      message: tf("auto.17c03df7452bb954"),
     };
   }
   if ((connection.connectionPurpose === "ai" && (connection.healthStatus !== "ok" || aiSubscriptionNeedsIsolatedLogin(connection.config))) || isToolConnectionAttentionHealth(connection.healthStatus)) {
     return {
       kind: "attention",
-      label: "Needs attention",
+      label: tf("auto.c1ebc7817870e5be"),
       message:
         connection.healthMessage ??
         connection.lastError ??
@@ -187,7 +222,7 @@ function connectionState(connection: ToolConnection): ConnectionState {
           : "Replace the credential to restore access."),
     };
   }
-  return { kind: "connected", label: "Connected", message: null };
+  return { kind: "connected", label: tf("auto.22965568d22a14ee"), message: null };
 }
 
 function connectionRank(connection: ToolConnection): number {
@@ -221,32 +256,32 @@ function connectorAction(
       )
     : null;
   if (row.connections.length > 0 || row.chatEndpoints.length > 0) {
-    if (chatHref) return { label: "Add connection", href: chatHref };
+    if (chatHref) return { label: tf("auto.685f88ae3db24ee1"), href: chatHref };
     if (row.entry && applicationId) {
       return {
-        label: "Add account",
+        label: tf("auto.ee7ee5830f091690"),
         href: additionalConnectionHref(row.entry, applicationId),
       };
     }
     return {
-      label: "Add account",
+      label: tf("auto.ee7ee5830f091690"),
       href: applicationId ? `/apps/app/${applicationId}/permissions` : null,
     };
   }
 
   if (row.entry?.availability?.available === false) {
     return {
-      label: "Unavailable",
+      label: tf("auto.ca184496974204a0"),
       href: null,
       title:
         row.entry.availability.reason ??
         "This connector is unavailable on this instance.",
     };
   }
-  if (chatHref) return { label: "Connect", href: chatHref };
-  if (row.entry) return { label: "Connect", href: connectHrefFor(row.entry) };
+  if (chatHref) return { label: tf("text.Connect"), href: chatHref };
+  if (row.entry) return { label: tf("text.Connect"), href: connectHrefFor(row.entry) };
   return {
-    label: "Connect",
+    label: tf("text.Connect"),
     href: applicationId ? `/apps/app/${applicationId}/permissions` : null,
   };
 }
@@ -282,7 +317,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
     useState<ConnectionRemovalTarget | null>(null);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Connectors" }]);
+    setBreadcrumbs([{ label: tf("text.Connectors") }]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs]);
 
@@ -329,7 +364,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
         queryKey: queryKeys.apps.attention(selectedCompanyId!),
       });
       pushToast({
-        title: "Connection removed",
+        title: tf("auto.2d806d0fa1a03949"),
         body:
           target.remainingConnectionCount > 0
             ? `${target.providerName} still has ${target.remainingConnectionCount} active ${target.remainingConnectionCount === 1 ? "connection" : "connections"} available to agents.`
@@ -340,8 +375,8 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't remove the connection",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.3999fa23e32b62c8"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -400,10 +435,13 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
         key: `gallery:${slug}`,
         slug,
         name: appDefinitionName(entry),
-        description:
+        description: localizedConnectorDescription(
+          slug,
+          appDefinitionName(entry),
           !chatConnectorsEnabled && chatProviderForSlug(slug)
             ? appCopyFor(slug).tagline
             : appDefinitionDescription(entry),
+        ),
         brandKey: slug,
         logoUrl: appDefinitionLogoUrl(entry),
         darkLogoUrl: appDefinitionDarkLogoUrl(entry),
@@ -414,35 +452,31 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
       });
     }
     const nativeChatProviders = [
-      { provider: "imessage-photon", name: "iMessage Photon", description: "Message agents and share photos from Apple Messages with a dedicated Photon number." },
+      { provider: "imessage-photon", name: "iMessage Photon", description: tf("auto.4d7f37676f4788e6") },
       {
         provider: "slack",
         name: "Slack",
-        description:
-          "Chat with agents from Slack channels and direct messages.",
+        description: tf("auto.0af5aaac259fc829"),
       },
       {
         provider: "github",
         name: "GitHub",
-        description:
-          "Chat with agents from issues, pull requests, and review threads.",
+        description: tf("auto.7ca7c7e60ad39e27"),
       },
       {
         provider: "discord",
         name: "Discord",
-        description:
-          "Chat with agents from Discord channels, threads, and direct messages.",
+        description: tf("auto.ceb5e587099ee0fc"),
       },
       {
         provider: "microsoft-teams",
         name: "Microsoft Teams",
-        description: "Chat with agents from Teams channels and conversations.",
+        description: tf("auto.5c50f9893170b03b"),
       },
       {
         provider: "telegram",
         name: "Telegram",
-        description:
-          "Chat with agents from Telegram direct messages, groups, and topics.",
+        description: tf("auto.a2dfd70fb625e2b6"),
       },
     ] as const;
     for (const item of chatConnectorsEnabled ? nativeChatProviders : []) {
@@ -604,7 +638,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
   if (!selectedCompanyId) {
     return (
       <div className="p-6 text-sm text-muted-foreground">
-        Select an organization to manage connectors.
+        {tf("auto.85993a68ec7d9a71")}
       </div>
     );
   }
@@ -630,8 +664,8 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search connectors…"
-            aria-label="Search connectors"
+            placeholder={tf("auto.fad7e42dfd243a0f")}
+            aria-label={tf("auto.706a6068c6a0dcbe")}
             className="pl-9"
           />
         </div>
@@ -658,13 +692,13 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
               if (chatConnectorsEnabled) void chatEndpointsQuery.refetch();
             }}
           >
-            Try again
+            {tf("text.Try again")}
           </Button>
         </div>
       ) : null}
 
       {loading ? (
-        <div className="space-y-3" aria-label="Loading connectors">
+        <div className="space-y-3" aria-label={tf("auto.2d1897ee96640b20")}>
           {Array.from({ length: 6 }).map((_, index) => (
             <Skeleton key={index} className="h-24 w-full rounded-xl" />
           ))}
@@ -675,7 +709,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
           No connectors match “{query.trim()}”.
         </p>
       ) : (
-        <div className="space-y-3" role="list" aria-label="Connector list">
+        <div className="space-y-3" role="list" aria-label={tf("auto.3bbef1f6f3df4100")}>
           {visibleRows.map((row) => (
             <ConnectorCard
               renderAccountDetails={renderAccountDetails}
@@ -717,7 +751,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={removeConnection.isPending}>
-              Cancel
+              {tf("text.Cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -943,7 +977,7 @@ function ConnectionAccountRow({
 
       <div className="flex flex-wrap items-center gap-2 sm:justify-end">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span>Connected by</span>
+          <span>{tf("auto.9952ce521b785711")}</span>
           <ConnectionOwnerIdentity owner={owner} />
         </div>
         {state.kind === "attention" || state.kind === "draft" ? (
@@ -975,12 +1009,12 @@ function ConnectionAccountRow({
             <DropdownMenuItem
               onSelect={() => onNavigate(`/apps/${connection.id}/permissions`)}
             >
-              Permissions
+              {tf("text.Permissions")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onSelect={onRemove}>
               <Trash2 />
-              Remove connection
+              {tf("auto.e9e9e26c6c2f8326")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -1047,10 +1081,10 @@ function CustomConnectorCard({
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="text-sm font-semibold text-foreground">
-            Connect your own tool
+            {tf("auto.89af50f90908406d")}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Add a custom MCP server or paste an existing configuration.
+            {tf("auto.b1e889797ceef5b5")}
           </p>
         </div>
         <Button
@@ -1061,7 +1095,7 @@ function CustomConnectorCard({
           aria-controls="custom-connector-options"
           onClick={() => setExpanded((open) => !open)}
         >
-          {expanded ? "Close" : "Connect"}
+          {expanded ? tf("text.Close") : tf("text.Connect")}
         </Button>
       </div>
 
@@ -1072,14 +1106,14 @@ function CustomConnectorCard({
         >
           <CustomConnectorOption
             icon={ServerCog}
-            title="Connect your own MCP server"
-            description="Enter the URL for a custom or self-hosted MCP server."
+            title={tf("auto.abb2409de6f9cc52")}
+            description={tf("auto.a5d7497c1aedafaf")}
             onClick={() => onNavigate("/apps/byo")}
           />
           <CustomConnectorOption
             icon={ClipboardPaste}
-            title="Paste a config"
-            description="Paste an existing setup snippet and connect it."
+            title={tf("auto.27261473ca2777b7")}
+            description={tf("auto.3c42052adf055e09")}
             onClick={() => onNavigate("/apps/advanced/paste-config")}
           />
         </div>

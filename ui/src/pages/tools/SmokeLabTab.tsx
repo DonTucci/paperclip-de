@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -53,10 +54,10 @@ function serviceTone(status: string): "success" | "warn" | "error" | "muted" {
 }
 
 function CellGlyph({ status }: { status: CellStatus }) {
-  if (status === "pass") return <Check className="mx-auto h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-label="pass" />;
-  if (status === "fail") return <X className="mx-auto h-4 w-4 text-destructive" aria-label="fail" />;
-  if (status === "skipped") return <Minus className="mx-auto h-4 w-4 text-amber-500" aria-label="skipped" />;
-  return <span className="mx-auto block h-1.5 w-1.5 rounded-full bg-muted-foreground/30" aria-label="not run" />;
+  if (status === "pass") return <Check className="mx-auto h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-label={tf("auto.d74ff0ee8da3b980")} />;
+  if (status === "fail") return <X className="mx-auto h-4 w-4 text-destructive" aria-label={tf("auto.51280dabfbc880cd")} />;
+  if (status === "skipped") return <Minus className="mx-auto h-4 w-4 text-amber-500" aria-label={tf("auto.389595a44dc9dce7")} />;
+  return <span className="mx-auto block h-1.5 w-1.5 rounded-full bg-muted-foreground/30" aria-label={tf("auto.b4a984371bc54d7a")} />;
 }
 
 const HEALTH_STYLES: Record<string, string> = {
@@ -109,19 +110,19 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
   const startMutation = useMutation({
     mutationFn: () => smokeLabApi.startServices(companyId),
     onSuccess: () => {
-      pushToast({ title: "Smoke services started", tone: "success" });
+      pushToast({ title: tf("auto.725d1544f5f08a98"), tone: "success" });
       refresh();
     },
-    onError: (e: Error) => pushToast({ title: "Couldn't start services", body: e.message, tone: "error" }),
+    onError: (e: Error) => pushToast({ title: tf("auto.b3bd9d2b5b20f6e9"), body: e.message, tone: "error" }),
   });
 
   const stopMutation = useMutation({
     mutationFn: () => smokeLabApi.stopServices(companyId),
     onSuccess: () => {
-      pushToast({ title: "Smoke services stopped", tone: "info" });
+      pushToast({ title: tf("auto.22c4412453a0384c"), tone: "info" });
       refresh();
     },
-    onError: (e: Error) => pushToast({ title: "Couldn't stop services", body: e.message, tone: "error" }),
+    onError: (e: Error) => pushToast({ title: tf("auto.42fc061cb203fe86"), body: e.message, tone: "error" }),
   });
 
   const installMutation = useMutation({
@@ -133,31 +134,31 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
       });
       refresh();
     },
-    onError: (e: Error) => pushToast({ title: "Couldn't install fixtures", body: e.message, tone: "error" }),
+    onError: (e: Error) => pushToast({ title: tf("auto.d2d1735e478c0b02"), body: e.message, tone: "error" }),
   });
 
   const resetMutation = useMutation({
     mutationFn: () => smokeLabApi.reset(companyId),
     onSuccess: () => {
-      pushToast({ title: "Smoke Lab reset", tone: "info" });
+      pushToast({ title: tf("auto.2c78b1f9c49ae7bc"), tone: "info" });
       setSelectedRunId(null);
       refresh();
     },
-    onError: (e: Error) => pushToast({ title: "Couldn't reset", body: e.message, tone: "error" }),
+    onError: (e: Error) => pushToast({ title: tf("auto.7a78fddef06eeb3d"), body: e.message, tone: "error" }),
   });
 
   const runSmokeMutation = useMutation({
     mutationFn: () => smokeLabApi.createRun(companyId, { trigger: "manual", summary: {} }),
     onSuccess: (r) => {
       pushToast({
-        title: "Smoke run started",
+        title: tf("auto.6fd2df1a97f6fa08"),
         body: "The browser runner records each step as it completes.",
         tone: "success",
       });
       setSelectedRunId(r.run.id);
       refresh();
     },
-    onError: (e: Error) => pushToast({ title: "Couldn't start a run", body: e.message, tone: "error" }),
+    onError: (e: Error) => pushToast({ title: tf("auto.8e76bd0a4e59dd5d"), body: e.message, tone: "error" }),
   });
 
   const anyMutating =
@@ -173,11 +174,11 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
       <div className="rounded-lg border border-border bg-card p-6">
         <div className="flex items-center gap-2 text-foreground">
           <FlaskConical className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-base font-semibold">Smoke Lab is turned off</h2>
+          <h2 className="text-base font-semibold">{tf("auto.a63d7e06c43f95c2")}</h2>
         </div>
         <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
           The Smoke Lab is an experimental developer surface for exercising the integration paths
-          against deterministic local fixtures. Turn on <code className="rounded bg-muted px-1 py-0.5 text-xs">Smoke Lab</code>{" "}
+          against deterministic local fixtures. Turn on <code className="rounded bg-muted px-1 py-0.5 text-xs">{tf("auto.876badbfdc245f31")}</code>{" "}
           under Settings → Experimental to enable it.
         </p>
       </div>
@@ -185,7 +186,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
   }
 
   if (!loaded) {
-    return <div className="p-6 text-sm text-muted-foreground">Loading Smoke Lab…</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.e0263a20ce4b35a2")}</div>;
   }
 
   const services = servicesQuery.data?.services ?? [];
@@ -197,15 +198,15 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
       <header>
         <div className="flex flex-wrap items-center gap-2">
           <FlaskConical className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-xl font-bold text-foreground">Smoke Lab</h1>
-          <Badge variant="outline">Experimental</Badge>
+          <h1 className="text-xl font-bold text-foreground">{tf("auto.876badbfdc245f31")}</h1>
+          <Badge variant="outline">{tf("auto.3dc9f569422dcfda")}</Badge>
           <a
             href="https://github.com/paperclipai/paperclip/blob/master/doc/connections/SMOKE-LAB-TUTORIAL.md"
             target="_blank"
             rel="noreferrer"
             className="ml-auto inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
-            <BookOpen className="h-4 w-4" /> Hands-on tutorial
+            <BookOpen className="h-4 w-4" /> {tf("auto.8d0f89b123bbd584")}
           </a>
         </div>
         <p className="mt-1.5 max-w-3xl text-sm text-muted-foreground">
@@ -219,7 +220,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
             rel="noreferrer"
             className="font-medium text-primary hover:underline"
           >
-            hands-on tutorial
+            {tf("auto.728428eb66fc286d")}
           </a>
           .
         </p>
@@ -230,7 +231,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <ServerCog className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Fixture services</h2>
+            <h2 className="text-sm font-semibold text-foreground">{tf("auto.e2b94ef58a85cf61")}</h2>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -238,7 +239,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
               onClick={() => startMutation.mutate()}
               disabled={anyMutating}
             >
-              <Power className="h-4 w-4" /> Start services
+              <Power className="h-4 w-4" /> {tf("auto.e325cb9431ba6e02")}
             </Button>
             <Button
               size="sm"
@@ -246,7 +247,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
               onClick={() => stopMutation.mutate()}
               disabled={anyMutating}
             >
-              Stop
+              {tf("text.Stop")}
             </Button>
             <Button
               size="sm"
@@ -254,7 +255,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
               onClick={() => installMutation.mutate()}
               disabled={anyMutating}
             >
-              Install fixture apps
+              {tf("auto.5aa55b8765b55424")}
             </Button>
             <Button
               size="sm"
@@ -262,7 +263,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
               onClick={() => resetMutation.mutate()}
               disabled={anyMutating}
             >
-              <RotateCcw className="h-4 w-4" /> Reset
+              <RotateCcw className="h-4 w-4" /> {tf("text.Reset")}
             </Button>
           </div>
         </div>
@@ -299,22 +300,22 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
               </div>
               <dl className="mt-3 space-y-1 text-xs">
                 <div className="flex items-baseline gap-2">
-                  <dt className="w-16 shrink-0 text-muted-foreground">URL</dt>
+                  <dt className="w-16 shrink-0 text-muted-foreground">{tf("auto.e7a241debad56609")}</dt>
                   <dd className="min-w-0 break-all font-mono text-foreground">
-                    {service.url ?? <span className="text-muted-foreground">not running</span>}
+                    {service.url ?? <span className="text-muted-foreground">{tf("auto.415ed7340303958f")}</span>}
                   </dd>
                 </div>
               </dl>
             </div>
           ))}
           {services.length === 0 && (
-            <p className="text-sm text-muted-foreground">No services reported. Start the fixture services above.</p>
+            <p className="text-sm text-muted-foreground">{tf("auto.ffd5cd699c1035e3")}</p>
           )}
         </div>
 
         {/* Demo credentials for the fake OAuth login */}
         <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3">
-          <p className="text-xs font-semibold text-foreground">Fake OAuth demo credentials</p>
+          <p className="text-xs font-semibold text-foreground">{tf("auto.724bbba6981f3922")}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Type these into the fake provider's real consent page during a P1 (OAuth) smoke. Fixed
             fixture values — safe to show.
@@ -329,19 +330,19 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
       {/* Results matrix */}
       <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold text-foreground">Integration matrix</h2>
+          <h2 className="text-sm font-semibold text-foreground">{tf("auto.d569a4241b363cf3")}</h2>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1"><Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> pass</span>
-            <span className="inline-flex items-center gap-1"><X className="h-3.5 w-3.5 text-destructive" /> fail</span>
-            <span className="inline-flex items-center gap-1"><Minus className="h-3.5 w-3.5 text-amber-500" /> skipped</span>
-            <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" /> not run</span>
+            <span className="inline-flex items-center gap-1"><Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> {tf("auto.d74ff0ee8da3b980")}</span>
+            <span className="inline-flex items-center gap-1"><X className="h-3.5 w-3.5 text-destructive" /> {tf("auto.51280dabfbc880cd")}</span>
+            <span className="inline-flex items-center gap-1"><Minus className="h-3.5 w-3.5 text-amber-500" /> {tf("auto.389595a44dc9dce7")}</span>
+            <span className="inline-flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" /> {tf("auto.b4a984371bc54d7a")}</span>
           </div>
         </div>
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr className="border-b border-border bg-muted/40">
-                <th className="sticky left-0 z-10 bg-muted/40 px-3 py-2 text-left font-semibold text-foreground">Path</th>
+                <th className="sticky left-0 z-10 bg-muted/40 px-3 py-2 text-left font-semibold text-foreground">{tf("text.Path")}</th>
                 {LIFECYCLE_STAGES.map((stage) => (
                   <th key={stage.key} className="px-2 py-2 text-center font-medium text-muted-foreground">
                     {stage.label}
@@ -374,7 +375,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
         </div>
         {steps.length === 0 && (
           <p className="text-xs text-muted-foreground">
-            No steps recorded for the selected run yet. Run a browser smoke to populate the matrix.
+            {tf("auto.94bd95c0b77942ec")}
           </p>
         )}
       </section>
@@ -383,7 +384,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
       <section className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-foreground">Runs</h2>
+            <h2 className="text-sm font-semibold text-foreground">{tf("text.Runs")}</h2>
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className={cn("h-2 w-2 rounded-full", HEALTH_STYLES[health])} />
               {health === "unknown" ? "no runs yet" : health}
@@ -403,7 +404,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
         <div className="grid gap-4 lg:grid-cols-(--gtc-64)">
           <div className="rounded-lg border border-border">
             {runs.length === 0 && (
-              <p className="p-4 text-sm text-muted-foreground">No runs recorded yet.</p>
+              <p className="p-4 text-sm text-muted-foreground">{tf("auto.c13e0702dbf00868")}</p>
             )}
             <ul className="divide-y divide-border">
               {runs.map((run: SmokeRun) => {
@@ -432,7 +433,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
 
           <div className="min-w-0 rounded-lg border border-border">
             {!activeRun && (
-              <p className="p-4 text-sm text-muted-foreground">Select a run to see its steps.</p>
+              <p className="p-4 text-sm text-muted-foreground">{tf("auto.dedf4f449a49832d")}</p>
             )}
             {activeRun && (
               <div className="flex flex-col">
@@ -443,7 +444,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
                   <StatusBadge status={activeRun.status} />
                 </div>
                 {steps.length === 0 ? (
-                  <p className="p-4 text-sm text-muted-foreground">No steps recorded for this run.</p>
+                  <p className="p-4 text-sm text-muted-foreground">{tf("auto.3bb9e2770612dda5")}</p>
                 ) : (
                   <ul className="divide-y divide-border">
                     {steps.map((step) => (
@@ -471,7 +472,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
                               rel="noreferrer"
                               className="mt-1 inline-block text-(length:--text-micro) font-medium text-primary hover:underline"
                             >
-                              View screenshot
+                              {tf("auto.acf862e2739fddb8")}
                             </a>
                           )}
                         </div>

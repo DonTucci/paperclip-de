@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Copy } from "lucide-react";
@@ -51,13 +52,13 @@ export function GatewayAdvancedPanel({
   const archiveMutation = useMutation({
     mutationFn: () => toolsApi.updateGateway(companyId, gateway.id, { status: "archived" }),
     onSuccess: async () => {
-      pushToast({ title: "Gateway archived", body: `${gateway.name} is no longer reachable.`, tone: "success" });
+      pushToast({ title: tf("auto.b6b73fd72ea20131"), body: `${gateway.name} is no longer reachable.`, tone: "success" });
       await queryClient.invalidateQueries({ queryKey: gatewaysQueryKey(companyId) });
       navigate("/apps/gateways");
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't archive the gateway",
+        title: tf("auto.ab9a7739f34eaec4"),
         body: error instanceof Error ? error.message : String(error),
         tone: "error",
       }),
@@ -66,21 +67,21 @@ export function GatewayAdvancedPanel({
   async function copy(value: string, label: string) {
     try {
       await copyTextToClipboard(value);
-      pushToast({ title: "Copied", body: label, tone: "success" });
+      pushToast({ title: tf("text.Copied"), body: label, tone: "success" });
     } catch {
-      pushToast({ title: "Copy failed", body: "Clipboard access is unavailable.", tone: "error" });
+      pushToast({ title: tf("auto.5b50e7a693fee952"), body: "Clipboard access is unavailable.", tone: "error" });
     }
   }
 
   return (
     <div className="space-y-5">
       <section className="space-y-2">
-        <h3 className="text-sm font-semibold text-foreground">Transport</h3>
+        <h3 className="text-sm font-semibold text-foreground">{tf("auto.aaead4abf5d0fd5e")}</h3>
         <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-          <Row label="Transport" value="streamable_http" />
-          <Row label="Authentication" value="bearer" />
-          <Row label="Protocol version" value="2025-03-26" />
-          <Row label="Public ID" value={gateway.gatewayPublicId} mono />
+          <Row label={tf("auto.aaead4abf5d0fd5e")} value="streamable_http" />
+          <Row label={tf("text.Authentication")} value="bearer" />
+          <Row label={tf("auto.cdd7356ea3acbf2f")} value="2025-03-26" />
+          <Row label={tf("auto.3705b64fd5cc026a")} value={gateway.gatewayPublicId} mono />
         </dl>
         <div className="flex items-center gap-2">
           <code className="min-w-0 flex-1 truncate rounded-md bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
@@ -88,17 +89,17 @@ export function GatewayAdvancedPanel({
           </code>
           <Button variant="outline" size="sm" onClick={() => void copy(endpoint, "Endpoint URL")}>
             <Copy className="mr-1 h-3.5 w-3.5" />
-            Copy
+            {tf("text.Copy")}
           </Button>
         </div>
       </section>
 
       <section className="space-y-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">Raw configuration</h3>
+          <h3 className="text-sm font-semibold text-foreground">{tf("auto.493d4f2717d68c39")}</h3>
           <Button variant="outline" size="sm" onClick={() => void copy(rawConfig, "Gateway config JSON")}>
             <Copy className="mr-1 h-3.5 w-3.5" />
-            Copy JSON
+            {tf("auto.7708c6e2ae9c0a35")}
           </Button>
         </div>
         <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 font-mono text-xs text-muted-foreground">
@@ -107,7 +108,7 @@ export function GatewayAdvancedPanel({
       </section>
 
       <section className="space-y-2 rounded-lg border border-destructive/40 p-4">
-        <h3 className="text-sm font-semibold text-destructive">Danger zone</h3>
+        <h3 className="text-sm font-semibold text-destructive">{tf("auto.fd8b8dae44216610")}</h3>
         <p className="text-sm text-muted-foreground">
           Archiving takes the gateway offline for every client. Existing tokens stop working. Type the
           gateway name to confirm.
@@ -118,7 +119,7 @@ export function GatewayAdvancedPanel({
               value={confirmName}
               onChange={(e) => setConfirmName(e.target.value)}
               placeholder={gateway.name}
-              aria-label="Type the gateway name to confirm archive"
+              aria-label={tf("auto.7add56c9ba3e3a93")}
             />
             <div className="flex gap-2">
               <Button
@@ -130,13 +131,13 @@ export function GatewayAdvancedPanel({
                 {archiveMutation.isPending ? "Archiving…" : "Archive gateway"}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => { setConfirming(false); setConfirmName(""); }}>
-                Cancel
+                {tf("text.Cancel")}
               </Button>
             </div>
           </div>
         ) : (
           <Button variant="outline" size="sm" className="text-destructive" onClick={() => setConfirming(true)}>
-            Archive gateway
+            {tf("auto.62da42a3ae2609cd")}
           </Button>
         )}
       </section>

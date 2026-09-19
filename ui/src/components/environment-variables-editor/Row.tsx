@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
@@ -214,11 +215,11 @@ export function EnvironmentVariableRow({
             showNameIssue && nameIssue?.level === "error" && "border-destructive focus-visible:ring-destructive/40",
             showNameIssue && nameIssue?.level === "warn" && "border-amber-500 focus-visible:ring-amber-500/40",
           )}
-          placeholder="KEY"
+          placeholder={tf("auto.5ca24005b740717b")}
           value={row.name}
           spellCheck={false}
           disabled={disabled}
-          aria-label="Variable name"
+          aria-label={tf("auto.0b64682bead3a63a")}
           aria-invalid={showNameIssue && nameIssue?.level === "error" ? true : undefined}
           aria-describedby={showNameIssue && nameIssue ? nameErrorId : undefined}
           onChange={(event) => onPatch({ name: event.target.value })}
@@ -262,7 +263,7 @@ export function EnvironmentVariableRow({
                     <DropdownMenuTrigger asChild disabled={disabled}>
                       <button
                         type="button"
-                        aria-label="Value source"
+                        aria-label={tf("auto.980b10e3e81d06b1")}
                         className="flex shrink-0 items-center gap-0.5 border-r border-border px-2 text-muted-foreground hover:bg-accent/50 disabled:pointer-events-none"
                       >
                         {row.source === "text" ? (
@@ -280,17 +281,17 @@ export function EnvironmentVariableRow({
                 </Tooltip>
                 <DropdownMenuContent align="start" className="w-56">
                   <DropdownMenuItem className="flex-col items-start gap-0.5" onSelect={() => switchSource("text")}>
-                    <span className="text-sm">Text value</span>
-                    <span className="text-(length:--text-micro) text-muted-foreground">Store the value inline as plain text.</span>
+                    <span className="text-sm">{tf("auto.93dd746bd58485c6")}</span>
+                    <span className="text-(length:--text-micro) text-muted-foreground">{tf("auto.18de4f220fe1e871")}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex-col items-start gap-0.5" onSelect={() => switchSource("secret")}>
-                    <span className="text-sm">Organization secret</span>
-                    <span className="text-(length:--text-micro) text-muted-foreground">Resolve a stored organization secret at run start.</span>
+                    <span className="text-sm">{tf("auto.7b4e3d0ed470b51e")}</span>
+                    <span className="text-(length:--text-micro) text-muted-foreground">{tf("auto.deff85d81a207b2f")}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex-col items-start gap-0.5" onSelect={() => switchSource("user_secret")}>
-                    <span className="text-sm">User secret</span>
+                    <span className="text-sm">{tf("auto.62c03b86e0b7355f")}</span>
                     <span className="text-(length:--text-micro) text-muted-foreground">
-                      Resolve the responsible user&apos;s own value at run start.
+                      {tf("auto.b75f2e64d6682083")}
                     </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -301,12 +302,12 @@ export function EnvironmentVariableRow({
                   <input
                     ref={valueInputRef}
                     className={valueTextInputClass}
-                    placeholder="value"
+                    placeholder={tf("auto.cd42404d52ad55cc")}
                     value={row.textValue}
                     type={sensitive ? "password" : "text"}
                     spellCheck={false}
                     disabled={disabled}
-                    aria-label="Variable value"
+                    aria-label={tf("auto.f94d74f144948b42")}
                     onChange={(event) => onPatch({ textValue: event.target.value })}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" && isLast) {
@@ -322,17 +323,17 @@ export function EnvironmentVariableRow({
                         onClick={openStoreAsSecret}
                         disabled={disabled}
                         className="flex items-center gap-1 px-2 text-(length:--text-micro) text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
-                        title="This value looks sensitive — store it as a secret"
+                        title={tf("auto.1414c5718afeb987")}
                       >
                         <ShieldAlert className="size-3.5" />
-                        <span className="hidden @[30rem]/env:inline">Store as secret</span>
+                        <span className="hidden @[30rem]/env:inline">{tf("auto.2ffb23b2802199e5")}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => onPatch({ sensitiveDismissed: true })}
                         disabled={disabled}
-                        aria-label="Dismiss sensitive-value suggestion"
-                        title="Dismiss — keep this value as plain text"
+                        aria-label={tf("auto.25c10e5dddcc02aa")}
+                        title={tf("auto.8dfc9fc81e82a41a")}
                         className="flex items-center px-1.5 text-amber-700/60 hover:bg-amber-500/10 hover:text-amber-700 dark:text-amber-400/60 dark:hover:text-amber-400"
                       >
                         <X className="size-3" />
@@ -367,7 +368,7 @@ export function EnvironmentVariableRow({
                             event.stopPropagation();
                             setVersionOpen((prev) => !prev);
                           }}
-                          aria-label="Version"
+                          aria-label={tf("text.Version")}
                           className={cn(
                             "absolute right-8 top-1/2 z-10 -translate-y-1/2 rounded px-1.5 py-0.5 text-(length:--text-nano) font-medium",
                             versionPinned
@@ -378,7 +379,7 @@ export function EnvironmentVariableRow({
                           {versionTagLabel}
                         </button>
                       </PopoverAnchor>
-                      <PopoverContent align="end" className="w-44 p-1" role="radiogroup" aria-label="Secret version">
+                      <PopoverContent align="end" className="w-44 p-1" role="radiogroup" aria-label={tf("auto.46f110b486c57831")}>
                         <button
                           type="button"
                           role="radio"
@@ -392,7 +393,7 @@ export function EnvironmentVariableRow({
                             row.version === "latest" && "font-medium",
                           )}
                         >
-                          latest <span className="text-(length:--text-micro) text-muted-foreground">(recommended)</span>
+                          {tf("auto.5e1e2bcac305958b")} <span className="text-(length:--text-micro) text-muted-foreground">{tf("auto.1185133b5b8946c2")}</span>
                         </button>
                         {Array.from({ length: versions }, (_, idx) => versions - idx)
                           .filter((v) => v > 0)
@@ -422,7 +423,7 @@ export function EnvironmentVariableRow({
                 <div className="grid min-w-0 flex-1 grid-cols-(--gtc-13)">
                   {userSecretsEnabled ? (
                     <select
-                      aria-label="User secret"
+                      aria-label={tf("auto.62c03b86e0b7355f")}
                       value={row.userSecretKey}
                       disabled={disabled}
                       onChange={(event) => {
@@ -435,7 +436,7 @@ export function EnvironmentVariableRow({
                       }}
                       className="min-w-0 bg-transparent px-2 py-1.5 text-sm font-mono outline-none disabled:pointer-events-none"
                     >
-                      <option value="">Select user secret...</option>
+                      <option value="">{tf("auto.25697923cce1994b")}</option>
                       {row.userSecretKey && !userSecretDefinitions?.some((definition) => definition.key === row.userSecretKey) ? (
                         <option value={row.userSecretKey}>Unknown ({row.userSecretKey})</option>
                       ) : null}
@@ -449,23 +450,23 @@ export function EnvironmentVariableRow({
                   ) : (
                     <input
                       className={valueTextInputClass}
-                      placeholder="user-secret key"
+                      placeholder={tf("auto.eee73c3361847112")}
                       value={row.userSecretKey}
                       spellCheck={false}
                       disabled={disabled}
-                      aria-label="User secret key"
+                      aria-label={tf("auto.2f31631316ca04af")}
                       onChange={(event) => onPatch({ userSecretKey: event.target.value })}
                     />
                   )}
                   <select
-                    aria-label="Requirement"
+                    aria-label={tf("auto.f5f5690b0ecc41d3")}
                     value={row.required ? "required" : "optional"}
                     disabled={disabled}
                     onChange={(event) => onPatch({ required: event.target.value === "required" })}
                     className="border-l border-border bg-transparent px-2 py-1.5 text-xs font-medium text-muted-foreground outline-none disabled:pointer-events-none"
                   >
-                    <option value="required">Required</option>
-                    <option value="optional">Optional</option>
+                    <option value="required">{tf("text.Required")}</option>
+                    <option value="optional">{tf("text.Optional")}</option>
                   </select>
                 </div>
               )}
@@ -542,7 +543,7 @@ export function EnvironmentVariableRow({
                 setUndoPrev(null);
               }}
             >
-              Undo
+              {tf("auto.a8283ade31856f71")}
             </button>
           </p>
         ) : null}
@@ -567,7 +568,7 @@ export function EnvironmentVariableRow({
             <DropdownMenuTrigger asChild disabled={disabled}>
               <button
                 type="button"
-                aria-label="More actions"
+                aria-label={tf("text.More actions")}
                 className="rounded p-1 text-muted-foreground opacity-100 hover:bg-accent hover:text-foreground @[40rem]/env:opacity-0 @[40rem]/env:group-hover/row:opacity-100 @[40rem]/env:group-focus-within/row:opacity-100"
               >
                 <MoreHorizontal className="size-4" />
@@ -586,7 +587,7 @@ export function EnvironmentVariableRow({
                   window.setTimeout(openStoreAsSecret, 0);
                 }}
               >
-                Store as secret…
+                {tf("auto.06c8495c8dea5924")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

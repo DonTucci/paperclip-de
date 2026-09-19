@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 export interface AssigneeSelection {
   assigneeAgentId: string | null;
   assigneeUserId: string | null;
@@ -66,7 +67,7 @@ export function currentUserAssigneeOption(currentUserId: string | null | undefin
   if (!currentUserId) return [];
   return [{
     id: assigneeValueFromSelection({ assigneeUserId: currentUserId }),
-    label: "Me",
+    label: tf("auto.d30af076b0dc85cc"),
     searchText: currentUserId === "local-board" ? "me board human local-board" : `me human ${currentUserId}`,
   }];
 }

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -201,7 +202,7 @@ export function EmailEndpointSetup() {
           ? "Email tasks stay inside the configured project or root task boundary. Output is quarantined for trusted review."
           : "Email can contain malicious instructions. We recommend Low-trust review to limit the agent’s access to Paperclip work."}
       </p>
-      <p className="text-xs text-muted-foreground">Low-trust execution also requires isolated workspaces and an active sandbox environment in the agent’s runtime settings.</p>
+      <p className="text-xs text-muted-foreground">{tf("auto.98a1efa6872edfd1")}</p>
       <Button
         size="sm"
         variant="outline"
@@ -236,7 +237,7 @@ export function EmailEndpointSetup() {
         </Button>
       </header>
       {step !== 6 && (
-        <nav aria-label="Setup progress">
+        <nav aria-label={tf("auto.e9b4495ace726330")}>
           <ol className="flex gap-4">
             {labels.map((label, i) => (
               <li
@@ -286,16 +287,16 @@ export function EmailEndpointSetup() {
         >
           <section className="space-y-4 rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold">
-              Add your AgentMail API key
+              {tf("auto.86ad576ff6c71ef5")}
             </h2>
-            <Label htmlFor="email-api-key">API key</Label>
+            <Label htmlFor="email-api-key">{tf("text.API key")}</Label>
             <Input
               id="email-api-key"
               type="password"
               autoComplete="off"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Paste your AgentMail API key"
+              placeholder={tf("auto.8ec42b9366a2c70d")}
             />
             <a
               href="https://console.agentmail.to"
@@ -303,12 +304,12 @@ export function EmailEndpointSetup() {
               rel="noreferrer"
               className="text-sm underline"
             >
-              Get a key in AgentMail ↗
+              {tf("auto.67dbac0bda5a3dfa")}
             </a>
           </section>
           <div className="flex justify-between">
             <Button type="button" variant="ghost" onClick={() => setStep(0)}>
-              Back
+              {tf("text.Back")}
             </Button>
             <Button disabled={!apiKey.trim() || connect.isPending}>
               {connect.isPending ? "Connecting…" : "Connect AgentMail"}
@@ -318,9 +319,9 @@ export function EmailEndpointSetup() {
       )}
       {step === 2 && (
         <section className="space-y-5 rounded-xl border border-border p-6">
-          <h2 className="text-lg font-semibold">AgentMail is connected</h2>
+          <h2 className="text-lg font-semibold">{tf("auto.914dbf14eaa95331")}</h2>
           <p className="text-sm text-muted-foreground">
-            Next, give an agent an email address from Permissions.
+            {tf("auto.5b6ba47997b644b1")}
           </p>
           <div className="flex justify-end">
             <Button
@@ -335,17 +336,17 @@ export function EmailEndpointSetup() {
         <>
           <section className="space-y-4 rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold">
-              Who should handle this inbox?
+              {tf("auto.acf4abf7085c865e")}
             </h2>
             <p className="text-sm text-muted-foreground">
-              Incoming email will create tasks assigned to this agent.
+              {tf("auto.3d66e86dea9fb87f")}
             </p>
-            <Label>Agent</Label>
+            <Label>{tf("text.Agent")}</Label>
             <SearchableSelect
               value={agentId}
-              placeholder="Choose an agent"
-              searchPlaceholder="Search all agents…"
-              emptyMessage="No agents found."
+              placeholder={tf("auto.b6890bc23a9c54fa")}
+              searchPlaceholder={tf("auto.559bc132bc98a560")}
+              emptyMessage={tf("auto.61666542b1caa1e2")}
               groups={[
                 {
                   id: "agents",
@@ -405,15 +406,15 @@ export function EmailEndpointSetup() {
               options={[
                 {
                   value: "new",
-                  title: "Create a new address",
+                  title: tf("auto.71311ae115d03a1e"),
                   disabled: scopedKey,
                 },
-                { value: "existing", title: "Use an existing inbox" },
+                { value: "existing", title: tf("auto.797916bdfe1e206e") },
               ]}
             />
             {addressMode === "new" ? (
               <div className="space-y-2">
-                <Label htmlFor="email-name">Email address</Label>
+                <Label htmlFor="email-name">{tf("auto.f2488fd4ef4adbc6")}</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     id="email-name"
@@ -427,14 +428,14 @@ export function EmailEndpointSetup() {
               </div>
             ) : (
               <div className="space-y-2">
-                <Label htmlFor="email-existing">Available inbox</Label>
+                <Label htmlFor="email-existing">{tf("auto.dcc0073651035d8b")}</Label>
                 <select
                   id="email-existing"
                   className={selectClass}
                   value={inboxId}
                   onChange={(e) => setInboxId(e.target.value)}
                 >
-                  <option value="">Choose an inbox</option>
+                  <option value="">{tf("auto.9678be097742633b")}</option>
                   {inspected.data?.inboxes.map((i) => (
                     <option
                       key={i.inbox_id}
@@ -455,12 +456,12 @@ export function EmailEndpointSetup() {
             )}
             <details className="border-t border-border pt-4">
               <summary className="cursor-pointer text-sm text-muted-foreground">
-                Advanced options
+                {tf("auto.9443ff69463ef46b")}
               </summary>
               <div className="space-y-4 pt-4">
                 {addressMode === "new" && (
                   <>
-                    <Label htmlFor="email-domain">Domain</Label>
+                    <Label htmlFor="email-domain">{tf("auto.79fa33618d8eaa1f")}</Label>
                     <select
                       id="email-domain"
                       value={domain}
@@ -480,11 +481,11 @@ export function EmailEndpointSetup() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      Set up a custom domain in AgentMail ↗
+                      {tf("auto.8871324517473ffb")}
                     </a>
                   </>
                 )}
-                <Label htmlFor="email-mode">Receiving</Label>
+                <Label htmlFor="email-mode">{tf("auto.fa8162869da5b5da")}</Label>
                 <select
                   id="email-mode"
                   value={mode}
@@ -492,10 +493,10 @@ export function EmailEndpointSetup() {
                   className={selectClass}
                 >
                   <option value="websocket">
-                    Live connection — works locally
+                    {tf("auto.cd01b44beeb17f62")}
                   </option>
                   <option value="webhook">
-                    Webhook — requires public HTTPS
+                    {tf("auto.472bcc588db981cc")}
                   </option>
                 </select>
               </div>
@@ -510,7 +511,7 @@ export function EmailEndpointSetup() {
           {trustNotice}
           <section className="space-y-4 rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold">
-              Ready to start receiving email?
+              {tf("auto.9aafcef703acf8e9")}
             </h2>
             <p className="text-lg font-semibold">{address}</p>
             <p className="text-sm">
@@ -533,7 +534,7 @@ export function EmailEndpointSetup() {
           <p className="text-lg font-semibold">{setup.data?.address}</p>
           <EmailSafetyNotice />
           <Button onClick={() => navigate(`/apps/${connectionId}/permissions`)}>
-            Back to permissions
+            {tf("auto.979ceb0cca42ddf2")}
           </Button>
         </section>
       )}
@@ -548,7 +549,7 @@ export function EmailEndpointSetup() {
             }
           >
             <ArrowLeft className="size-4" />
-            Back
+            {tf("text.Back")}
           </Button>
           <Button
             disabled={
@@ -616,7 +617,7 @@ export function EmailEndpointSetup() {
           )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setTrustOpen(false)}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               disabled={
@@ -628,7 +629,7 @@ export function EmailEndpointSetup() {
               }
               onClick={() => trust.mutate()}
             >
-              Save trust settings
+              {tf("auto.bf63250b446ce5b9")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -669,10 +670,10 @@ export function EmailConnectionInboxes({
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border p-6">
         <div className="space-y-1">
           <h2 className="text-lg font-semibold">
-            Give an agent an email address
+            {tf("auto.1597b60b580d91d8")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Each email conversation becomes a task.
+            {tf("auto.5a59f8ed7d0ab443")}
           </p>
         </div>
         {canConfigure && (
@@ -680,7 +681,7 @@ export function EmailConnectionInboxes({
             <Link
               to={`/apps/chat/connect?provider=agentmail&connectionId=${connectionId}`}
             >
-              Give an agent an email address
+              {tf("auto.1597b60b580d91d8")}
             </Link>
           </Button>
         )}
@@ -755,7 +756,7 @@ export function EmailEndpointSettings({
     },
   });
   if (removed)
-    return <p>Inbox disconnected. Email history remains in its tasks.</p>;
+    return <p>{tf("auto.f8ffe56dc75e85f8")}</p>;
   if (!inbox)
     return (
       <p role={query.error ? "alert" : undefined}>
@@ -796,12 +797,12 @@ export function EmailEndpointSettings({
           disabled={control.isPending}
           onClick={() => control.mutate("remove")}
         >
-          Disconnect inbox
+          {tf("auto.ad8f627077a04212")}
         </Button>
       </div>
       <div className="space-y-2">
         <Label htmlFor="email-reconnect-key">
-          Reconnect this inbox with a new API key
+          {tf("auto.0345924ae988d532")}
         </Label>
         <Input
           id="email-reconnect-key"
@@ -810,7 +811,7 @@ export function EmailEndpointSettings({
           value={replacementKey}
           onChange={(e) => setReplacementKey(e.target.value)}
         />
-        <Label htmlFor="email-reconnect-mode">Receiving mode</Label>
+        <Label htmlFor="email-reconnect-mode">{tf("auto.73551da4af800060")}</Label>
         <select
           id="email-reconnect-mode"
           className={selectClass}
@@ -819,15 +820,15 @@ export function EmailEndpointSettings({
             setReceiveMode(e.target.value as "websocket" | "webhook")
           }
         >
-          <option value="websocket">Live connection</option>
-          <option value="webhook">Webhook</option>
+          <option value="websocket">{tf("auto.2f4eeda9ca9a0c0d")}</option>
+          <option value="webhook">{tf("auto.4814f62c108d82de")}</option>
         </select>
         <Button
           variant="outline"
           disabled={!replacementKey || reconnect.isPending}
           onClick={() => reconnect.mutate()}
         >
-          Reconnect inbox
+          {tf("auto.fc11261ab7dad828")}
         </Button>
       </div>
       {reconnect.error && (

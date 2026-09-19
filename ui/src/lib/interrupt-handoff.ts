@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { parseAgentMentionHref } from "@paperclipai/shared";
 
 /**
@@ -71,7 +72,7 @@ export function resolveRunStatusPresentation(
 ): RunStatusPresentation {
   if (status === "cancelled" && opts.operatorInterrupted) {
     return {
-      label: "interrupted",
+      label: tf("auto.d512d96ea31ab0b9"),
       className: "text-amber-700 dark:text-amber-300",
       srHint: "interrupted by board comment",
     };

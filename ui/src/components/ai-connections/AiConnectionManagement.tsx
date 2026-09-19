@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Button } from "@/components/ui/button";
 
 export function AiConnectionLegacyNotice({
@@ -10,7 +11,7 @@ export function AiConnectionLegacyNotice({
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
       <h3 className="text-sm font-semibold">
-        Existing authentication — not managed by Connections
+        {tf("auto.c836e59bd188e034")}
       </h3>
       <p className="text-sm text-muted-foreground">
         This agent keeps its current authentication until you choose and test a
@@ -19,7 +20,7 @@ export function AiConnectionLegacyNotice({
       </p>
       {!readOnly && (
         <Button variant="outline" className="self-start" onClick={onAdopt}>
-          Choose a managed connection
+          {tf("auto.7efd0256f59b484a")}
         </Button>
       )}
     </div>

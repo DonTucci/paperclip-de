@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@/lib/router";
 import type { Issue, ExecutionWorkspace } from "@paperclipai/shared";
@@ -27,9 +28,9 @@ import { Badge } from "@/components/ui/badge";
 /* -------------------------------------------------------------------------- */
 
 const EXECUTION_WORKSPACE_OPTIONS = [
-  { value: "shared_workspace", label: "Project default" },
-  { value: "isolated_workspace", label: "New isolated workspace" },
-  { value: "reuse_existing", label: "Reuse existing workspace" },
+  { value: "shared_workspace", label: tf("auto.e8cb80e5c5cb7d7a") },
+  { value: "isolated_workspace", label: tf("auto.0c67029f9e1abe73") },
+  { value: "reuse_existing", label: tf("auto.c84ba2b63629f77d") },
 ] as const;
 
 /* -------------------------------------------------------------------------- */
@@ -71,7 +72,7 @@ function CopyableInline({ value, label, mono }: { value: string; label?: string;
         type="button"
         className="shrink-0 p-0.5 rounded hover:bg-accent/50 transition-colors text-muted-foreground hover:text-foreground opacity-0 group-hover/copy:opacity-100 focus:opacity-100"
         onClick={handleCopy}
-        title={copied ? "Copied!" : "Copy"}
+        title={copied ? tf("auto.ea61bc15688d1e48") : tf("text.Copy")}
         aria-label={copied ? "Copied to clipboard" : `Copy ${label ?? "value"}`}
       >
         {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
@@ -355,7 +356,7 @@ export function IssueWorkspaceCard({
                 className="h-6 px-2 text-xs text-muted-foreground"
                 onClick={handleCancel}
               >
-                <X className="h-3 w-3 mr-1" />Cancel
+                <X className="h-3 w-3 mr-1" />{tf("text.Cancel")}
               </Button>
               <Button
                 size="sm"
@@ -363,7 +364,7 @@ export function IssueWorkspaceCard({
                 onClick={handleSave}
                 disabled={!canSaveWorkspaceConfig}
               >
-                Save
+                {tf("text.Save")}
               </Button>
             </>
           ) : (
@@ -373,7 +374,7 @@ export function IssueWorkspaceCard({
               className="h-6 px-2 text-xs text-muted-foreground"
               onClick={() => setEditing(true)}
             >
-              <Pencil className="h-3 w-3 mr-1" />Edit
+              <Pencil className="h-3 w-3 mr-1" />{tf("text.Edit")}
             </Button>
           )}
         </div>
@@ -396,7 +397,7 @@ export function IssueWorkspaceCard({
           )}
           {workspace?.repoUrl && (
             <div className="flex items-center gap-1.5 text-muted-foreground">
-              <span className="text-(length:--text-micro)">Repo:</span>
+              <span className="text-(length:--text-micro)">{tf("auto.8d01a908bca02414")}</span>
               <CopyableInline value={workspace.repoUrl} mono />
             </div>
           )}
@@ -440,7 +441,7 @@ export function IssueWorkspaceCard({
                 to={currentWorkspaceLink}
                 className="text-(length:--text-micro) text-muted-foreground hover:text-foreground hover:underline"
               >
-                View workspace details →
+                {tf("auto.2e9561430d517b1d")}
               </Link>
             </div>
           )}
@@ -514,7 +515,7 @@ export function IssueWorkspaceCard({
             className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
           >
             <FolderSearch className="h-3.5 w-3.5 shrink-0" />
-            Browse files…
+            {tf("auto.62f9b06784b65938")}
           </button>
           <button
             type="button"
@@ -522,7 +523,7 @@ export function IssueWorkspaceCard({
             className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
           >
             <FileSearch className="h-3.5 w-3.5 shrink-0" />
-            Open file by path…
+            {tf("auto.1f9a7fd51ed0083a")}
           </button>
         </div>
       )}

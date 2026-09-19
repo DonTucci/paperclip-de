@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -74,7 +75,7 @@ function ProposalRow({
               {proposal.target ? (
                 <AgentRefChip agent={proposal.target} className="font-medium" />
               ) : (
-                <span className="text-muted-foreground">agent</span>
+                <span className="text-muted-foreground">{tf("auto.d4f0bc5a29de06b5")}</span>
               )}
               <DeliveryBadge configPath={proposal.configPath} />
               <code className="font-mono text-xs">{envKey || proposal.configPath}</code>
@@ -167,7 +168,7 @@ export function ProposalsTab({
   if (proposalsQuery.isError) {
     return (
       <div className="flex items-center gap-2 py-4 text-sm text-destructive">
-        <AlertCircle className="size-4" /> Couldn’t load proposals. Try again.
+        <AlertCircle className="size-4" /> {tf("auto.7c9b863bdefb2cec")}
       </div>
     );
   }
@@ -175,7 +176,7 @@ export function ProposalsTab({
   if (proposalsQuery.isPending) {
     return (
       <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> Loading proposals…
+        <Loader2 className="size-4 animate-spin" /> {tf("auto.5b6b1d4355c10da5")}
       </div>
     );
   }
@@ -184,8 +185,8 @@ export function ProposalsTab({
     return (
       <EmptyState
         icon={Inbox}
-        title="No pending proposals"
-        message="When an agent proposes a secret or an access binding, it shows up here for review."
+        title={tf("auto.1722fa3087d995f7")}
+        message={tf("auto.b7a0085401481343")}
       />
     );
   }

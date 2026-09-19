@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -59,16 +60,16 @@ function workProductStatusBadge(status: string): { label: string; cssVar: string
   switch (status) {
     case "active":
     case "draft":
-      return { label: "In progress", cssVar: "--status-task-in_progress" };
+      return { label: tf("status.in_progress"), cssVar: "--status-task-in_progress" };
     case "ready_for_review":
-      return { label: "For review", cssVar: "--status-task-in_review" };
+      return { label: tf("auto.1afa6050587eb7a5"), cssVar: "--status-task-in_review" };
     case "approved":
     case "merged":
-      return { label: "Done", cssVar: "--status-task-done" };
+      return { label: tf("text.Done"), cssVar: "--status-task-done" };
     case "changes_requested":
-      return { label: "Changes requested", cssVar: "--status-task-todo" };
+      return { label: tf("auto.10a92a8ad3ee5891"), cssVar: "--status-task-todo" };
     case "failed":
-      return { label: "Failed", cssVar: "--status-task-blocked" };
+      return { label: tf("text.Failed"), cssVar: "--status-task-blocked" };
     default:
       return null;
   }
@@ -149,7 +150,7 @@ function MarkdownWorkProductRow({
   if (tooLarge) {
     expandedBody = (
       <p className="text-sm text-muted-foreground">
-        This Markdown file is too large to preview. Use Raw or Download instead.
+        {tf("auto.c4195ee524aeaae8")}
       </p>
     );
   } else if (reviewDoc) {
@@ -169,7 +170,7 @@ function MarkdownWorkProductRow({
         <MarkdownBody>{reviewDoc.body}</MarkdownBody>
       </IssueDocumentAnnotations>
     ) : (
-      <p className="text-sm text-muted-foreground">Document is empty.</p>
+      <p className="text-sm text-muted-foreground">{tf("auto.149458228eeb7e85")}</p>
     );
   } else if (ensure.isError) {
     expandedBody = (
@@ -188,13 +189,13 @@ function MarkdownWorkProductRow({
               ensure.mutate();
             }}
           >
-            Retry
+            {tf("text.Retry")}
           </button>
         ) : null}
       </div>
     );
   } else {
-    expandedBody = <p className="text-sm text-muted-foreground">Preparing preview…</p>;
+    expandedBody = <p className="text-sm text-muted-foreground">{tf("auto.11e66e1bb9b76293")}</p>;
   }
 
   return (
@@ -236,7 +237,7 @@ function MarkdownWorkProductRow({
           target="_blank"
           rel="noreferrer"
           aria-label={`Open raw ${workProduct.title}`}
-          title="Open raw"
+          title={tf("auto.7f57bf8c34f6dda4")}
           className="shrink-0 px-1.5 py-1.5 text-muted-foreground hover:text-foreground"
         >
           <ExternalLink className="h-3 w-3" />
@@ -244,7 +245,7 @@ function MarkdownWorkProductRow({
         <a
           href={metadata.downloadPath}
           aria-label={`Download ${workProduct.title}`}
-          title="Download"
+          title={tf("text.Download")}
           className="shrink-0 py-1.5 pr-2 pl-0.5 text-muted-foreground hover:text-foreground"
         >
           <Download className="h-3 w-3" />
@@ -338,7 +339,7 @@ function DocumentRow({
               <MarkdownBody>{doc.body}</MarkdownBody>
             </IssueDocumentAnnotations>
           ) : (
-            <p className="text-sm text-muted-foreground">Document is empty.</p>
+            <p className="text-sm text-muted-foreground">{tf("auto.149458228eeb7e85")}</p>
           )}
         </div>
       ) : null}
@@ -432,7 +433,7 @@ export function IssuePropertiesArtifactsTab({ issue, documentDeepLink, onOpenDoc
   if (workProductRows.length === 0 && documentRows.length === 0 && fileRows.length === 0) {
     return (
       <div className="px-1 py-6 text-sm text-muted-foreground">
-        No artifacts yet. Work products, documents, and agent-produced files will appear here.
+        {tf("auto.b032412c097b00bd")}
       </div>
     );
   }

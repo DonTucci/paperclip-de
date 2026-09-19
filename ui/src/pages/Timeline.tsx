@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Work Timeline page (PAP-12424 / Phase C of PAP-12405).
  *
@@ -249,22 +250,22 @@ function TimelineLegend() {
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border px-3.5 py-2 text-xs text-muted-foreground">
       <span className="flex items-center gap-1.5">
         <span className="h-2.5 w-4 rounded-sm" style={{ backgroundColor: TIMELINE_COLORS.delegated }} />
-        Delegated
+        {tf("auto.dd341e5d100e662a")}
       </span>
       <span className="flex items-center gap-1.5">
         <span className="h-2.5 w-4 rounded-sm" style={{ backgroundColor: TIMELINE_COLORS.automation }} />
-        Automation
+        {tf("auto.d909750b1bbb71a3")}
       </span>
       <span className="flex items-center gap-1.5">
         <span
           className="h-2.5 w-4 rounded-sm border border-dashed bg-transparent"
           style={{ borderColor: TIMELINE_COLORS.cancelled }}
         />
-        Cancelled
+        {tf("status.cancelled")}
       </span>
       <span className="flex items-center gap-1.5">
         <span className="h-3.5 w-0.5" style={{ backgroundColor: TIMELINE_COLORS.now }} />
-        Now
+        {tf("auto.fe18013d93d22f4f")}
       </span>
     </div>
   );
@@ -276,11 +277,11 @@ function TimelineSummaryStats({
   summary: ReturnType<typeof timelineSummary>;
 }) {
   const stats: { label: string; value: string; icon: LucideIcon }[] = [
-    { label: "Runs", value: formatInteger(summary.runs), icon: GanttChartSquare },
-    { label: "Agents", value: formatInteger(summary.agents), icon: Bot },
-    { label: "Run time", value: formatDuration(0, summary.activeMs), icon: Clock3 },
+    { label: tf("text.Runs"), value: formatInteger(summary.runs), icon: GanttChartSquare },
+    { label: tf("text.Agents"), value: formatInteger(summary.agents), icon: Bot },
+    { label: tf("auto.40349abbfc605159"), value: formatDuration(0, summary.activeMs), icon: Clock3 },
     {
-      label: "Tokens used",
+      label: tf("auto.d2252f5a23d70f43"),
       value: summary.totalTokens > 0 ? formatCompactInteger(summary.totalTokens) : "Not tracked",
       icon: Coins,
     },
@@ -362,7 +363,7 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
     return (
       <>
         {!embedded && <RequestCollapsedSidebar />}
-        <EmptyState icon={GanttChartSquare} message="Select an organization to view its work timeline." />
+        <EmptyState icon={GanttChartSquare} message={tf("auto.fc69c7186616082e")} />
       </>
     );
   }
@@ -397,7 +398,7 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
 
   const rangeControls = (
     <label className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted-foreground">
-      Range
+      {tf("auto.5de74a81b192304c")}
       <Segmented
         value={rangePreset}
         onChange={(preset) => {
@@ -406,9 +407,9 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
           setDateRange(presetRange(preset));
         }}
         options={[
-          { value: "today", label: "Today" },
-          { value: "7d", label: "7 days" },
-          { value: "30d", label: "30 days" },
+          { value: "today", label: tf("auto.2b065c7c9ce466e5") },
+          { value: "7d", label: tf("auto.7f920bb639c93075") },
+          { value: "30d", label: tf("auto.ffd7280513ce285e") },
         ]}
       />
       <Input
@@ -419,9 +420,9 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
           setDateRange((prev) => ({ ...prev, fromDate: event.target.value }));
         }}
         className="h-8 w-(--sz-150px) text-xs"
-        aria-label="Timeline start date"
+        aria-label={tf("auto.881e6415c6458c0a")}
       />
-      <span>to</span>
+      <span>{tf("auto.663ea1bfffe5038f")}</span>
       <Input
         type="date"
         value={dateRange.toDate}
@@ -430,7 +431,7 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
           setDateRange((prev) => ({ ...prev, toDate: event.target.value }));
         }}
         className="h-8 w-(--sz-150px) text-xs"
-        aria-label="Timeline end date"
+        aria-label={tf("auto.0f612621007ec6cd")}
       />
     </label>
   );
@@ -438,14 +439,14 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
   const toolbar = (
     <div className="flex flex-wrap items-start gap-3">
       {summary && <TimelineSummaryStats summary={summary} />}
-      <div className="ml-auto flex items-center gap-1 pt-3" aria-label="Timeline zoom controls">
+      <div className="ml-auto flex items-center gap-1 pt-3" aria-label={tf("auto.4c7cc9e98c01f78b")}>
         <Button
           type="button"
           variant="outline"
           size="icon-xs"
           onClick={() => adjustZoom(0.8)}
-          aria-label="Zoom out"
-          title="Zoom out"
+          aria-label={tf("auto.bc7b631a689b45ca")}
+          title={tf("auto.bc7b631a689b45ca")}
         >
           <Minus className="h-3 w-3" />
         </Button>
@@ -454,8 +455,8 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
           variant="outline"
           size="icon-xs"
           onClick={() => adjustZoom(1.25)}
-          aria-label="Zoom in"
-          title="Zoom in"
+          aria-label={tf("auto.0e47f09a748fa132")}
+          title={tf("auto.0e47f09a748fa132")}
         >
           <Plus className="h-3 w-3" />
         </Button>
@@ -464,8 +465,8 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
           variant="outline"
           size="icon-xs"
           onClick={resetZoom}
-          aria-label="Reset zoom"
-          title="Reset zoom"
+          aria-label={tf("auto.91a661b24f1bc2bf")}
+          title={tf("auto.91a661b24f1bc2bf")}
         >
           <RotateCcw className="h-3 w-3" />
         </Button>
@@ -496,7 +497,7 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
       {error && (
         <EmptyState
           icon={GanttChartSquare}
-          message="Couldn't load the timeline. The aggregation endpoint may be unavailable."
+          message={tf("auto.fa69220aaf9db6d6")}
         />
       )}
 
@@ -505,7 +506,7 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
           <div className="space-y-3">
             <EmptyState
               icon={GanttChartSquare}
-              message={scopedProjectId ? "No project activity in this window." : "No activity in this window."}
+              message={scopedProjectId ? tf("auto.536e6b637ecb24a4") : tf("auto.885e0c5769e98ba8")}
             />
             <div className="flex flex-wrap items-center justify-end gap-3">
               {rangeControls}

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { GitFork, Loader2, Users } from "lucide-react";
@@ -111,7 +112,7 @@ export function ForkSkillDialog({
       const switched = result.reassignments.length;
       toast?.pushToast({
         tone: "success",
-        title: "Editing a copy",
+        title: tf("auto.a1502ebf5fe25dd9"),
         body:
           switched > 0
             ? `Created a copy of ${skill.name} and switched ${switched} ${switched === 1 ? "agent" : "agents"} to it.`
@@ -123,8 +124,8 @@ export function ForkSkillDialog({
     onError: (error) => {
       toast?.pushToast({
         tone: "error",
-        title: "Couldn't create a copy",
-        body: error instanceof Error ? error.message : "The fork request failed.",
+        title: tf("auto.310170f98646aaa3"),
+        body: error instanceof Error ? error.message: tf("auto.aba25c0914266a3b"),
       });
     },
   });
@@ -158,7 +159,7 @@ export function ForkSkillDialog({
 
         {reusableFork ? (
           <div className="rounded-md border border-primary/40 bg-primary/5 p-3 text-sm">
-            <p className="font-medium text-foreground">You already have a copy</p>
+            <p className="font-medium text-foreground">{tf("auto.b196859524376577")}</p>
             <p className="mt-0.5 text-muted-foreground">
               An unedited copy of this skill already exists. Open it instead of
               making another.
@@ -170,7 +171,7 @@ export function ForkSkillDialog({
               onClick={openExisting}
               disabled={busy}
             >
-              Open your existing copy
+              {tf("auto.b6026ce978b50e20")}
             </Button>
           </div>
         ) : null}
@@ -202,7 +203,7 @@ export function ForkSkillDialog({
               <label className="mt-3 flex items-start justify-between gap-3">
                 <span className="text-sm">
                   <span className="font-medium text-foreground">
-                    Switch these agents to the copy
+                    {tf("auto.d734b5ee6319f29f")}
                   </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground">
                     {reassign
@@ -214,7 +215,7 @@ export function ForkSkillDialog({
                   checked={reassign}
                   onCheckedChange={setReassign}
                   disabled={busy}
-                  aria-label="Switch these agents to the copy"
+                  aria-label={tf("auto.d734b5ee6319f29f")}
                 />
               </label>
             </>
@@ -233,7 +234,7 @@ export function ForkSkillDialog({
             onClick={() => onOpenChange(false)}
             disabled={busy}
           >
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button
             type="button"

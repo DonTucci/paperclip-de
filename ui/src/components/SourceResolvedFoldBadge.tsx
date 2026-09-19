@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,7 +11,7 @@ export interface SourceResolvedFoldBadgeProps {
 
 export function SourceResolvedFoldBadge({
   className,
-  title = "System folded this run as a source-resolved false positive.",
+  title = tf("auto.1643b5e23da480a8"),
   showIcon = true,
 }: SourceResolvedFoldBadgeProps) {
   return (
@@ -22,7 +23,7 @@ export function SourceResolvedFoldBadge({
         className,
       )}
       title={title}
-      aria-label="Source-resolved watchdog fold"
+      aria-label={tf("auto.b1780fd40397a243")}
     >
       {showIcon ? <Sparkles className="h-3 w-3 text-emerald-700 dark:text-emerald-300" aria-hidden /> : null}
       Source-resolved

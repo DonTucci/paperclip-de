@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type SyntheticEvent, useEffect, useRef, useState } from "react";
 import { Download, ExternalLink, Paperclip, Play } from "lucide-react";
 import type { CompanyArtifact } from "@/api/artifacts";
@@ -35,7 +36,7 @@ function PlaceholderPreview({ label }: { label?: string }) {
 function ImagePreview({ artifact }: { artifact: CompanyArtifact }) {
   const [errored, setErrored] = useState(false);
   if (errored || !artifact.contentPath) {
-    return <PlaceholderPreview label="Image" />;
+    return <PlaceholderPreview label={tf("auto.1aa4cb0bcca76e92")} />;
   }
   return (
     <PreviewFrame>
@@ -134,7 +135,7 @@ function VideoPreview({ artifact }: { artifact: CompanyArtifact }) {
 function TextPreview({ artifact }: { artifact: CompanyArtifact }) {
   const preview = artifact.previewText?.trim();
   if (!preview) {
-    return <PlaceholderPreview label={artifact.source === "document" ? "Document" : "Text"} />;
+    return <PlaceholderPreview label={artifact.source === "document" ? tf("text.Document") : tf("auto.71988c4d8e0803ba")} />;
   }
   return (
     <PreviewFrame className="bg-card">
@@ -158,7 +159,7 @@ export function ArtifactPreview({ artifact }: { artifact: CompanyArtifact }) {
     case "document":
       return <TextPreview artifact={artifact} />;
     case "file":
-      return <PlaceholderPreview label="File" />;
+      return <PlaceholderPreview label={tf("text.File")} />;
     case "empty":
     default:
       return <PlaceholderPreview />;
@@ -212,12 +213,12 @@ export function ArtifactCard({ artifact }: ArtifactCardProps) {
           </h3>
           <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
             {artifact.openPath ? (
-              <SecondaryAction href={artifact.openPath} title="Open file in new tab">
+              <SecondaryAction href={artifact.openPath} title={tf("auto.f31b6190b24b5351")}>
                 <ExternalLink className="h-3.5 w-3.5" />
               </SecondaryAction>
             ) : null}
             {artifact.downloadPath ? (
-              <SecondaryAction href={artifact.downloadPath} download title="Download file">
+              <SecondaryAction href={artifact.downloadPath} download title={tf("auto.9de4149fb9716cfc")}>
                 <Download className="h-3.5 w-3.5" />
               </SecondaryAction>
             ) : null}

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { ChevronLeft, ChevronRight, Download, X } from "lucide-react";
@@ -104,7 +105,7 @@ export function ImageGalleryModal({
                 href={attachmentDownloadPath(current)}
                 download={filename}
                 className="text-white/50 hover:text-white transition-colors"
-                title="Download"
+                title={tf("text.Download")}
                 aria-label={`Download ${filename}`}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -114,7 +115,7 @@ export function ImageGalleryModal({
                 type="button"
                 onClick={() => onOpenChange(false)}
                 className="text-white/50 hover:text-white transition-colors"
-                title="Close"
+                title={tf("text.Close")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -130,7 +131,7 @@ export function ImageGalleryModal({
                   type="button"
                   onClick={goPrev}
                   className="rounded-full bg-white/10 p-3 text-white/60 hover:text-white hover:bg-white/20 transition-colors"
-                  title="Previous"
+                  title={tf("text.Previous")}
                 >
                   <ChevronLeft className="h-7 w-7" />
                 </button>
@@ -165,7 +166,7 @@ export function ImageGalleryModal({
                   type="button"
                   onClick={goNext}
                   className="rounded-full bg-white/10 p-3 text-white/60 hover:text-white hover:bg-white/20 transition-colors"
-                  title="Next"
+                  title={tf("text.Next")}
                 >
                   <ChevronRight className="h-7 w-7" />
                 </button>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState, type ReactNode } from "react";
 import type {
   FeedbackDataSharingPreference,
@@ -145,8 +146,8 @@ export function AgentBubbleActionRow({
             variant="ghost"
             size="icon-xs"
             className="text-muted-foreground hover:text-foreground"
-            title="More actions"
-            aria-label="More actions"
+            title={tf("text.More actions")}
+            aria-label={tf("text.More actions")}
           >
             <MoreHorizontal className="h-3.5 w-3.5" />
           </Button>
@@ -158,7 +159,7 @@ export function AgentBubbleActionRow({
             }}
           >
             <Copy className="mr-2 h-3.5 w-3.5" />
-            Copy message
+            {tf("auto.457efe538b254dfb")}
           </DropdownMenuItem>
           {menuItems}
         </DropdownMenuContent>
@@ -262,8 +263,8 @@ export function IssueChatFeedbackButtons({
             ? "text-green-600 dark:text-green-400"
             : "text-muted-foreground hover:bg-accent hover:text-foreground",
         )}
-        title="Helpful"
-        aria-label="Helpful"
+        title={tf("auto.63c432db3ebb9aec")}
+        aria-label={tf("auto.63c432db3ebb9aec")}
         onClick={handleThumbsUp}
       >
         <ThumbsUp className="h-3.5 w-3.5" />
@@ -279,19 +280,19 @@ export function IssueChatFeedbackButtons({
                 ? "text-amber-600 dark:text-amber-400"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
-            title="Needs work"
-            aria-label="Needs work"
+            title={tf("auto.738a3278e945747c")}
+            aria-label={tf("auto.738a3278e945747c")}
             onClick={handleThumbsDown}
           >
             <ThumbsDown className="h-3.5 w-3.5" />
           </button>
         </PopoverTrigger>
         <PopoverContent side="top" align="start" className="w-80 p-3">
-          <div className="mb-2 text-sm font-medium">What could have been better?</div>
+          <div className="mb-2 text-sm font-medium">{tf("auto.829e701d9a216100")}</div>
           <Textarea
             value={downvoteReason}
             onChange={(event) => setDownvoteReason(event.target.value)}
-            placeholder="Add a short note"
+            placeholder={tf("auto.1adb884ad7345cf3")}
             className="min-h-20 resize-y bg-background text-sm"
             disabled={isSaving}
           />
@@ -306,7 +307,7 @@ export function IssueChatFeedbackButtons({
                 setDownvoteReason("");
               }}
             >
-              Dismiss
+              {tf("text.Dismiss")}
             </Button>
             <Button
               type="button"
@@ -331,21 +332,21 @@ export function IssueChatFeedbackButtons({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Save your feedback sharing preference</DialogTitle>
+            <DialogTitle>{tf("auto.1c562b5e2b712a50")}</DialogTitle>
             <DialogDescription>
               Choose whether voted AI outputs can be shared with Paperclip Labs. This
               answer becomes the default for future thumbs up and thumbs down votes.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 text-sm text-muted-foreground">
-            <p>This vote is always saved locally.</p>
+            <p>{tf("auto.a7cd6ce4e69c38e2")}</p>
             <p>
-              Choose <span className="font-medium text-foreground">Always allow</span> to share
+              {tf("auto.c7f937836f5d82d5")} <span className="font-medium text-foreground">{tf("auto.977618bd8bc7eef4")}</span> to share
               this vote and future voted AI outputs. Choose{" "}
-              <span className="font-medium text-foreground">Don't allow</span> to keep this vote
+              <span className="font-medium text-foreground">{tf("auto.9803bdd2047b1343")}</span> to keep this vote
               and future votes local.
             </p>
-            <p>You can change this later in Settings &gt; General.</p>
+            <p>{tf("auto.46238be658a5b085")}</p>
             {termsUrl ? (
               <a
                 href={termsUrl}
@@ -353,7 +354,7 @@ export function IssueChatFeedbackButtons({
                 rel="noreferrer"
                 className="inline-flex text-sm text-foreground underline underline-offset-4"
               >
-                Read our terms of service
+                {tf("auto.50aceeb579a2002a")}
               </a>
             ) : null}
           </div>

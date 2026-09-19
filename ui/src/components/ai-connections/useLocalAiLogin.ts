@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState } from "react";
 import type { AiConnectionLoginIntent, LocalAiLoginAttempt, LocalAiLoginStatus } from "@paperclipai/shared";
 import { aiConnectionsApi } from "@/api/ai-connections";
@@ -59,7 +60,7 @@ export function useLocalAiLogin(companyId: string | null, intent: AiConnectionLo
         // visit; awaiting terminal login never requires repeated Connect clicks.
         if (next.status === "sign_in_required") timer = setTimeout(() => void check(), 5000);
       } catch (cause) {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Could not check local sign-in.");
+        if (!cancelled) setError(cause instanceof Error ? cause.message: tf("auto.0ce5fa5f3f76d2f2"));
       } finally { checking = false; }
     }
     const onFocus = () => { if (!document.hidden) void check(); };

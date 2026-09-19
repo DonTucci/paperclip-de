@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { defaultStatusCardRefreshPolicy } from "@paperclipai/shared";
@@ -67,25 +68,25 @@ export function CreateStatusCardDialog({
       ]);
       close();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Could not create the card."),
+    onError: (err) => setError(err instanceof Error ? err.message: tf("auto.e0dabbd51c3fc527")),
   });
 
   return (
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>New card</DialogTitle>
+          <DialogTitle>{tf("auto.8d3efc397417cfd0")}</DialogTitle>
           <DialogDescription>
             One message sets up the whole card: say what you want to watch and what each update
             should tell you. The agent builds the query from it and writes every update against it.
           </DialogDescription>
         </DialogHeader>
 
-        {error ? <InlineBanner tone="danger" title="Create failed">{error}</InlineBanner> : null}
+        {error ? <InlineBanner tone="danger" title={tf("auto.3e05ffcf023b367b")}>{error}</InlineBanner> : null}
 
         <div className="space-y-3">
           <label htmlFor="status-card-prompt" className="block pb-1 text-sm font-semibold">
-            What do you want to keep an eye on?
+            {tf("auto.2abdde3da6ca1ec2")}
           </label>
           <Textarea
             id="status-card-prompt"
@@ -93,11 +94,11 @@ export function CreateStatusCardDialog({
             onChange={(event) => setPrompt(event.target.value)}
             rows={5}
             autoFocus
-            placeholder="Keep an eye on the ID and Cloud projects. Tell me whether the service is live, and if not, the exact three actions needed to get it to production."
+            placeholder={tf("auto.1cadc7b8c3faed11")}
             className="text-sm"
           />
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">Examples</span>
+            <span className="text-xs font-medium text-muted-foreground">{tf("auto.e68ee04dff59551b")}</span>
             {EXAMPLES.map((example) => (
               <button
                 key={example}
@@ -112,17 +113,17 @@ export function CreateStatusCardDialog({
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-semibold">Agent</label>
+          <label className="block text-sm font-semibold">{tf("text.Agent")}</label>
           <SummarizerAgentSelect companyId={companyId} value={agentId} onChange={setAgentId} enabled={open} />
           <p className="text-xs text-muted-foreground">
-            Runs this card's setup and updates. Leave on the default unless another agent should own it.
+            {tf("auto.d23a2d8b4bcd94e9")}
           </p>
         </div>
 
         <DialogFooter>
           <div className="flex gap-2">
             <Button variant="outline" onClick={close} disabled={createMutation.isPending}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               onClick={() => createMutation.mutate()}

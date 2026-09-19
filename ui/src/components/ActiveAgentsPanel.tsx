@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { memo, useMemo } from "react";
 import { Link } from "@/lib/router";
 import { useQueries, useQuery } from "@tanstack/react-query";
@@ -48,13 +49,13 @@ interface ActiveAgentsPanelProps {
 
 export function ActiveAgentsPanel({
   companyId,
-  title = "Agents",
+  title = tf("text.Agents"),
   minRunCount = MIN_DASHBOARD_RUNS,
   fetchLimit,
   cardLimit = DASHBOARD_RUN_CARD_LIMIT,
   gridClassName,
   cardClassName,
-  emptyMessage = "No recent agent runs.",
+  emptyMessage = tf("auto.45e7a9c5ea14d96d"),
   queryScope = "dashboard",
   showMoreLink = true,
   showTranscripts = false,

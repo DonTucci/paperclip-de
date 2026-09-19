@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useEffect,
   useId,
@@ -80,27 +81,27 @@ export function describeUnavailable(reason: string): { title: string; body: stri
   if (lower.includes("remote")) {
     return {
       icon: <Cloud aria-hidden="true" className="h-5 w-5 text-muted-foreground" />,
-      title: "Remote workspace preview not supported",
+      title: tf("auto.118565fc423845cf"),
       body: "This workspace is hosted remotely and is not available for inline preview yet.",
     };
   }
   if (lower.includes("no_workspace") || lower.includes("no_local")) {
     return {
       icon: <FolderOpen aria-hidden="true" className="h-5 w-5 text-muted-foreground" />,
-      title: "No workspace yet",
+      title: tf("auto.133e716aadbe8631"),
       body: "This issue does not have a workspace to browse. Files appear here once a run creates one.",
     };
   }
   if (lower.includes("archiv") || lower.includes("cleaned") || lower.includes("unavailable")) {
     return {
       icon: <FolderOpen aria-hidden="true" className="h-5 w-5 text-muted-foreground" />,
-      title: "Workspace is no longer available",
+      title: tf("auto.cb2826c669f7ae88"),
       body: "The isolated worktree for this issue has been cleaned up, so files cannot be previewed.",
     };
   }
   return {
     icon: <AlertTriangle aria-hidden="true" className="h-5 w-5 text-amber-500" />,
-    title: "Workspace unavailable",
+    title: tf("auto.f29d3f31dc6e215a"),
     body: "These workspace files can't be browsed right now.",
   };
 }
@@ -141,7 +142,7 @@ function WorkspaceFileBreadcrumbs({
   if (!rootLabel && segments.length === 0) return null;
 
   return (
-    <nav aria-label="Current folder" className="min-w-0 overflow-hidden text-(length:--text-micro) text-muted-foreground">
+    <nav aria-label={tf("auto.1a5db52359a6d813")} className="min-w-0 overflow-hidden text-(length:--text-micro) text-muted-foreground">
       <ol className="flex min-w-0 items-center gap-1 overflow-hidden">
         {rootLabel ? (
           <li className="min-w-0 shrink">
@@ -417,7 +418,7 @@ function WorkspaceFileTree({
                   style={{ paddingLeft: `${1 + (node.depth + 1) * 0.875}rem` }}
                 >
                   <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />
-                  <span>Loading folder…</span>
+                  <span>{tf("auto.4cf8a251abedc073")}</span>
                 </div>
               ) : null}
               {truncated ? (
@@ -428,7 +429,7 @@ function WorkspaceFileTree({
                   style={{ paddingLeft: `${1 + (node.depth + 1) * 0.875}rem` }}
                 >
                   <span className="h-3.5 w-3.5 shrink-0" />
-                  <span>Load more from this folder</span>
+                  <span>{tf("auto.e37b9f58929096a0")}</span>
                 </button>
               ) : null}
             </>
@@ -453,7 +454,7 @@ function WorkspaceFileTree({
   }
 
   return (
-    <div role="tree" id={listboxId} aria-label="Workspace files" className="space-y-0.5 py-1">
+    <div role="tree" id={listboxId} aria-label={tf("auto.bb2e2d0fd34f9c6d")} className="space-y-0.5 py-1">
       {nodes.map(renderNode)}
     </div>
   );
@@ -987,7 +988,7 @@ export function WorkspaceFileBrowser({
     body = (
       <StateMessage
         icon={<FolderOpen aria-hidden="true" className="h-5 w-5 text-muted-foreground" />}
-        title="No organization selected"
+        title={tf("auto.278cd1778d29b11d")}
         body="Choose an organization before browsing another project workspace."
       />
     );
@@ -995,7 +996,7 @@ export function WorkspaceFileBrowser({
     body = (
       <StateMessage
         icon={<Loader2 aria-hidden="true" className="h-5 w-5 animate-spin text-muted-foreground" />}
-        title="Loading project workspaces"
+        title={tf("auto.93bac55507e05a90")}
         body="Registered workspaces will appear here."
       />
     );
@@ -1003,7 +1004,7 @@ export function WorkspaceFileBrowser({
     body = (
       <StateMessage
         icon={<FolderOpen aria-hidden="true" className="h-5 w-5 text-muted-foreground" />}
-        title="No project workspaces"
+        title={tf("auto.7aa49b4707c69e9b")}
         body="No same-organization project has a registered workspace to browse."
       />
     );
@@ -1032,7 +1033,7 @@ export function WorkspaceFileBrowser({
     body = (
       <StateMessage
         icon={<AlertTriangle aria-hidden="true" className="h-5 w-5 text-amber-500" />}
-        title={changedFilesTemporarilyUnavailable ? "Changed files temporarily unavailable" : "Couldn't load files"}
+        title={changedFilesTemporarilyUnavailable ? tf("auto.30007ebbcc19bce4") : tf("auto.8a2c692760451ecf")}
         body={
           changedFilesTemporarilyUnavailable
             ? "Paperclip is limiting workspace scans to keep the server responsive. Try again in a moment."
@@ -1048,7 +1049,7 @@ export function WorkspaceFileBrowser({
             disabled={!queriesEnabled}
             onClick={() => void listQuery.refetch()}
           >
-            <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> Retry
+            <RefreshCcw aria-hidden="true" className="mr-1 h-3 w-3" /> {tf("text.Retry")}
           </Button>
         ) : null}
       />
@@ -1100,8 +1101,8 @@ export function WorkspaceFileBrowser({
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             onKeyDown={handleSearchKeyDown}
-            placeholder="Search files by name or path…"
-            aria-label="Search workspace files"
+            placeholder={tf("auto.e4afb9af199e331d")}
+            aria-label={tf("auto.81293eedc55283a8")}
             role="combobox"
             aria-expanded={items.length > 0}
             aria-controls={items.length > 0 ? listboxId : undefined}
@@ -1118,8 +1119,8 @@ export function WorkspaceFileBrowser({
           size="icon-sm"
           onClick={() => void listQuery.refetch()}
           disabled={!queriesEnabled || listQuery.isFetching}
-          aria-label="Refresh workspace files"
-          title="Refresh workspace files"
+          aria-label={tf("auto.fe4d202224b5da8f")}
+          title={tf("auto.fe4d202224b5da8f")}
           className="h-8 w-8 shrink-0"
         >
           <RefreshCcw aria-hidden="true" className={cn("h-3.5 w-3.5", listQuery.isFetching && "animate-spin")} />
@@ -1146,7 +1147,7 @@ export function WorkspaceFileBrowser({
               onClick={() => loadMoreFolder(currentFolderKey)}
               className="rounded px-1 py-0.5 text-left hover:bg-accent hover:text-foreground"
             >
-              Load more from this folder
+              {tf("auto.e37b9f58929096a0")}
             </button>
           ) : (
             <>Showing first {items.length} — refine the search to narrow.</>

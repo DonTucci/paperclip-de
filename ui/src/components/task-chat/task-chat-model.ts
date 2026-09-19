@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Normalized presentation model for the chat-style task thread (the default
  * task view; the classic legacy view sits behind enableClassicTaskInterface).

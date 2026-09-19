@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Check, ExternalLink, Loader2, RefreshCw } from "lucide-react";
@@ -104,7 +105,7 @@ export function ServicesPanel({
     onError: (error, row) =>
       pushToast({
         title: `Couldn't connect ${row.name}`,
-        body: error instanceof Error ? error.message : "Please try again.",
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
     onSettled: () => setBusySlug(null),
@@ -118,7 +119,7 @@ export function ServicesPanel({
     onError: (error, row) =>
       pushToast({
         title: `Couldn't check ${row.name}`,
-        body: error instanceof Error ? error.message : "Please try again.",
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
     onSettled: () => setBusySlug(null),
@@ -140,7 +141,7 @@ export function ServicesPanel({
     onError: (error, row) =>
       pushToast({
         title: `Couldn't disconnect ${row.name}`,
-        body: error instanceof Error ? error.message : "Please try again.",
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
     onSettled: () => setBusySlug(null),
@@ -150,7 +151,7 @@ export function ServicesPanel({
     return (
       <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground" role="status">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Loading services from Composio, this may take a moment.
+        {tf("auto.056cf044a7530dd3")}
       </div>
     );
   }
@@ -193,7 +194,7 @@ export function ServicesPanel({
 function ServicesIntro({ appName, connectedCount }: { appName: string; connectedCount: number }) {
   return (
     <div className="max-w-2xl space-y-1">
-      <h2 className="text-lg font-semibold">Services</h2>
+      <h2 className="text-lg font-semibold">{tf("auto.604dce445e326d95")}</h2>
       <p className="text-sm leading-6 text-muted-foreground">
         {appName} brokers these services. Connect one and it becomes its own app in Paperclip, which
         you then give to agents on its Permissions tab.
@@ -213,7 +214,7 @@ function ServicesIntro({ appName, connectedCount }: { appName: string; connected
 function ServicesEmptyState() {
   return (
     <div className="rounded-xl border border-border bg-card p-6">
-      <p className="text-sm font-medium">No services available yet</p>
+      <p className="text-sm font-medium">{tf("auto.1806b25e9349f1ce")}</p>
       <p className="mt-1 max-w-xl text-sm text-muted-foreground">
         This Composio project has no toolkits Paperclip can offer. Add a toolkit and an auth
         configuration in Composio, then check back.
@@ -228,7 +229,7 @@ function ServicesLoadError({ message, onRetry }: { message: string | null; onRet
       <p className="text-sm text-destructive">
         {message ?? "Couldn’t load services from Composio."}
       </p>
-      <Button size="sm" variant="outline" onClick={onRetry}>Try again</Button>
+      <Button size="sm" variant="outline" onClick={onRetry}>{tf("text.Try again")}</Button>
     </div>
   );
 }
@@ -292,7 +293,7 @@ export function ServiceRow({
       <div className="flex shrink-0 items-center gap-2">
         {row.state === "connected" && row.childConnectionId && (
           <Button asChild size="sm" variant="ghost">
-            <Link to={appTabHref(row.childConnectionId, "permissions")}>Manage</Link>
+            <Link to={appTabHref(row.childConnectionId, "permissions")}>{tf("auto.5a23444828db654a")}</Link>
           </Button>
         )}
         {row.state === "pending" && (
@@ -312,7 +313,7 @@ export function ServiceRow({
           <Button size="sm" disabled={busy} onClick={() => onConnect(row)}>
             {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : (
               <>
-                Connect
+                {tf("text.Connect")}
                 <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
               </>
             )}
@@ -323,12 +324,12 @@ export function ServiceRow({
               {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Reconnect"}
             </Button>
             <Button size="sm" variant="ghost" disabled={busy} onClick={() => onDisconnect(row)}>
-              Disconnect
+              {tf("text.Disconnect")}
             </Button>
           </>
         ) : row.state === "connected" ? (
           <Button size="sm" variant="ghost" disabled={busy} onClick={() => onDisconnect(row)}>
-            Disconnect
+            {tf("text.Disconnect")}
           </Button>
         ) : null}
       </div>
@@ -418,7 +419,7 @@ function DisconnectDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending} autoFocus>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending} autoFocus>{tf("text.Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
             onClick={(event) => {

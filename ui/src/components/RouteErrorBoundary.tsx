@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { useLocation, useNavigate } from "@/lib/router";
 import { Button } from "@/components/ui/button";
@@ -41,9 +42,9 @@ class RouteErrorBoundaryInner extends Component<RouteErrorBoundaryInnerProps, Ro
     return (
       <div className="mx-auto max-w-2xl space-y-4 px-4 py-10">
         <div>
-          <h1 className="text-lg font-semibold">This page hit an error</h1>
+          <h1 className="text-lg font-semibold">{tf("auto.58443b4f44733d36")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Something went wrong while rendering this page. You can go back and try again, or reload.
+            {tf("auto.46d793bc79aa7c85")}
           </p>
         </div>
         <pre className="overflow-auto rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive whitespace-pre-wrap">
@@ -51,10 +52,10 @@ class RouteErrorBoundaryInner extends Component<RouteErrorBoundaryInnerProps, Ro
         </pre>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={this.props.onReset}>
-            Go back
+            {tf("auto.6aadac2f2b7a6b8e")}
           </Button>
           <Button size="sm" onClick={() => window.location.reload()}>
-            Reload page
+            {tf("auto.437d0d63bfbd9732")}
           </Button>
         </div>
       </div>

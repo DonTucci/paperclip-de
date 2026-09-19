@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { memo, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -71,10 +72,10 @@ function tomorrowMorningIso(): string {
 
 /** Snooze presets, resolved to a future ISO timestamp at click time. */
 const SNOOZE_PRESETS: ReadonlyArray<{ label: string; resolve: () => string }> = [
-  { label: "1 hour", resolve: () => new Date(Date.now() + HOUR_MS).toISOString() },
-  { label: "4 hours", resolve: () => new Date(Date.now() + 4 * HOUR_MS).toISOString() },
-  { label: "Tomorrow morning", resolve: tomorrowMorningIso },
-  { label: "Next week", resolve: () => new Date(Date.now() + 7 * DAY_MS).toISOString() },
+  { label: tf("auto.f8b8883f0c9d8d82"), resolve: () => new Date(Date.now() + HOUR_MS).toISOString() },
+  { label: tf("auto.e5bc99278849514d"), resolve: () => new Date(Date.now() + 4 * HOUR_MS).toISOString() },
+  { label: tf("auto.ea64c9f1aa4e0c25"), resolve: tomorrowMorningIso },
+  { label: tf("auto.21fbde19cfb095cd"), resolve: () => new Date(Date.now() + 7 * DAY_MS).toISOString() },
 ];
 
 interface AttentionQueueRowProps {
@@ -179,7 +180,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
     <button
       type="button"
       className="inline-flex shrink-0 items-center gap-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground focus-visible:ring-ring focus-visible:ring-(length:--rad-3) focus-visible:outline-none"
-      aria-label={expanded ? "Collapse decision" : "Expand decision"}
+      aria-label={expanded ? tf("auto.efeaeedadc710e4c") : tf("auto.81b1c87f8419cd7f")}
       aria-expanded={expanded}
       onClick={activate}
     >
@@ -215,7 +216,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
           {showOpen && (
             <Button asChild variant="default" size="xs" className={ACTION_BTN}>
               <Link to={href!}>
-                Open
+                {tf("text.Open")}
                 <ExternalLink className="h-3 w-3" />
               </Link>
             </Button>
@@ -224,7 +225,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
           {showRestore && (
             <Button type="button" variant="outline" size="xs" className={ACTION_BTN} onClick={() => onRestore(item)}>
               <RotateCcw className="h-3 w-3" />
-              Restore
+              {tf("text.Restore")}
             </Button>
           )}
         </div>
@@ -307,7 +308,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
                   variant="ghost"
                   size="icon-xs"
                   className="text-muted-foreground"
-                  aria-label="Row actions"
+                  aria-label={tf("auto.67a1892f792aa89b")}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -316,13 +317,13 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
                 {onSnooze && <SnoozeSubmenu onSnooze={(iso) => onSnooze(item, iso)} />}
                 <DropdownMenuItem onClick={() => onDismiss(item)}>
                   <X className="h-4 w-4" />
-                  Dismiss
+                  {tf("text.Dismiss")}
                 </DropdownMenuItem>
                 {href && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to={href}>Open source</Link>
+                      <Link to={href}>{tf("auto.67a0d2e0dab41fca")}</Link>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -534,7 +535,7 @@ function CompactDecisionActions({
   if (actions.length === 0) return null;
 
   return (
-    <div className="flex w-full flex-wrap items-center gap-2 @xl:w-auto @xl:justify-end @xl:gap-1" aria-label="Decision actions">
+    <div className="flex w-full flex-wrap items-center gap-2 @xl:w-auto @xl:justify-end @xl:gap-1" aria-label={tf("auto.645f42496f3ce374")}>
       {actions.map(({ action, id, label, description }) => (
         <Button
           key={id}
@@ -658,7 +659,7 @@ function ExpandedImages({ images, issueHref }: { images: AttentionDetailImage[];
         >
           <span className="text-base font-semibold">{extra} more</span>
           <span className="mt-0.5 inline-flex items-center gap-1 text-(length:--text-nano)">
-            View issue
+            {tf("auto.870173579cf57514")}
             <ExternalLink className="h-3 w-3" />
           </span>
         </Link>
@@ -684,7 +685,7 @@ function SnoozeSubmenu({ onSnooze }: { onSnooze: (snoozedUntil: string) => void 
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
         <AlarmClock className="h-4 w-4" />
-        Snooze
+        {tf("auto.52102940fe58e07e")}
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent>
         {SNOOZE_PRESETS.map((preset) => (
@@ -701,7 +702,7 @@ function SnoozeSubmenu({ onSnooze }: { onSnooze: (snoozedUntil: string) => void 
           onClick={(e) => e.stopPropagation()}
         >
           <span className="text-(length:--text-nano) font-medium uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-            Custom
+            {tf("auto.494ca78f7374e46f")}
           </span>
           <input
             type="datetime-local"
@@ -710,7 +711,7 @@ function SnoozeSubmenu({ onSnooze }: { onSnooze: (snoozedUntil: string) => void 
             className="w-full rounded-sm border border-border bg-background px-2 py-1 text-xs"
           />
           <Button type="button" size="xs" disabled={!customValue} onClick={applyCustom}>
-            Snooze until…
+            {tf("auto.2462850b55d58675")}
           </Button>
         </div>
       </DropdownMenuSubContent>
@@ -777,7 +778,7 @@ function InlineResolver({
   if (item.sourceKind === "issue_thread_interaction") {
     const issueId = (item.subject.metadata?.issueId as string | undefined) ?? item.relatedIssue?.id;
     if (!issueId) {
-      return <p className="text-xs text-muted-foreground">Missing issue reference for this decision.</p>;
+      return <p className="text-xs text-muted-foreground">{tf("auto.1f2b96d39308b9b3")}</p>;
     }
     return (
       <>
@@ -856,7 +857,7 @@ function ApprovalResolver({ item, companyId, toggle }: { item: AttentionItem; co
       <Textarea
         value={note}
         onChange={(e) => setNote(e.target.value)}
-        placeholder="Optional decision note…"
+        placeholder={tf("auto.17872ddbd6e98572")}
         className="min-h-16 text-sm"
       />
       <ResolverFooter toggle={toggle}>

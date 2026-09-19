@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Copy, Fingerprint, KeyRound, Link2, ShieldAlert, Variable, ServerCog } from "lucide-react";
@@ -76,8 +77,8 @@ export function FingerprintChip({
       type="button"
       onClick={() => {
         copyTextToClipboard(full)
-          .then(() => pushToast({ title: "Fingerprint copied", tone: "success" }))
-          .catch(() => pushToast({ title: "Couldn’t copy fingerprint", tone: "error" }));
+          .then(() => pushToast({ title: tf("auto.8c837ec1bc2f0dae"), tone: "success" }))
+          .catch(() => pushToast({ title: tf("auto.bed9690f69f66290"), tone: "error" }));
       }}
       title={`Copy full digest — ${full}`}
       className={cn(
@@ -108,7 +109,7 @@ export function ProposalJustification({
 }) {
   return (
     <div className={cn("space-y-0.5", className)}>
-      <p className="text-(length:--text-micro) text-muted-foreground">Reason given by the agent</p>
+      <p className="text-(length:--text-micro) text-muted-foreground">{tf("auto.39273c7e097b1c09")}</p>
       <p className="whitespace-pre-wrap break-words text-xs text-foreground/80">
         “{justification}”
       </p>
@@ -164,7 +165,7 @@ export function ProposedBadge({ className }: { className?: string }) {
         className,
       )}
     >
-      <ShieldAlert className="size-3" /> Proposed
+      <ShieldAlert className="size-3" /> {tf("auto.9b0c660bb1152a72")}
     </Badge>
   );
 }
@@ -280,7 +281,7 @@ export function useProposalReview(
       secretsApi.rejectProposal(companyId!, proposal.id, { reason: reason.trim() }),
     onSuccess: (result) => {
       pushToast({
-        title: "Proposal rejected",
+        title: tf("auto.ad35cb885cad67f2"),
         body: result.kind === "secret" ? (result.proposedName ?? undefined) : undefined,
         tone: "info",
       });
@@ -409,7 +410,7 @@ function ApproveDialog({
             {/* Provenance recap — keeps the social-engineering surface visible. */}
             <div className="space-y-1.5 rounded-md border border-border bg-muted/30 p-2.5 text-xs">
               <div className="flex items-center gap-1.5 text-muted-foreground">
-                <span>Proposed by</span>
+                <span>{tf("auto.3b48f0b6ae209df2")}</span>
                 <AgentRefChip agent={draft.proposal.proposedBy} className="font-medium text-foreground" />
               </div>
               <ProposalJustification justification={draft.proposal.justification} />
@@ -419,7 +420,7 @@ function ApproveDialog({
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label htmlFor="approve-folder">Folder</Label>
+                    <Label htmlFor="approve-folder">{tf("auto.74ccd43303847f26")}</Label>
                     <Input
                       id="approve-folder"
                       value={draft.folder}
@@ -429,12 +430,12 @@ function ApproveDialog({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="approve-name">Name</Label>
+                    <Label htmlFor="approve-name">{tf("text.Name")}</Label>
                     <Input
                       id="approve-name"
                       value={draft.leaf}
                       onChange={(event) => onChange({ ...draft, leaf: event.target.value })}
-                      placeholder="client-secret"
+                      placeholder={tf("auto.fdce8e4a65b70d18")}
                       autoFocus
                       aria-invalid={!draft.leaf.trim()}
                       className="font-mono text-xs"
@@ -446,23 +447,23 @@ function ApproveDialog({
                   {previewName ? (
                     <SecretPathName name={previewName} className="font-mono" />
                   ) : (
-                    <span className="italic">enter a name</span>
+                    <span className="italic">{tf("auto.46b4826df4e3bbb0")}</span>
                   )}
                 </p>
 
                 <div className="space-y-1">
-                  <Label htmlFor="approve-description">Description</Label>
+                  <Label htmlFor="approve-description">{tf("text.Description")}</Label>
                   <Input
                     id="approve-description"
                     value={draft.description}
                     onChange={(event) => onChange({ ...draft, description: event.target.value })}
-                    placeholder="Optional"
+                    placeholder={tf("text.Optional")}
                   />
                 </div>
 
                 {localConfigs.length > 0 ? (
                   <div className="space-y-1">
-                    <Label htmlFor="approve-provider-config">Provider vault</Label>
+                    <Label htmlFor="approve-provider-config">{tf("auto.8bb8c5d18a315972")}</Label>
                     <select
                       id="approve-provider-config"
                       value={draft.providerConfigId}
@@ -471,7 +472,7 @@ function ApproveDialog({
                       }
                       className="h-9 w-full rounded-md border border-input bg-transparent px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
                     >
-                      <option value="">Deployment default</option>
+                      <option value="">{tf("auto.d9bdc394a15e55e1")}</option>
                       {localConfigs.map((config) => (
                         <option key={config.id} value={config.id}>
                           {config.displayName}
@@ -500,7 +501,7 @@ function ApproveDialog({
 
             <DialogFooter>
               <Button variant="ghost" onClick={onCancel} disabled={pending}>
-                Cancel
+                {tf("text.Cancel")}
               </Button>
               <Button onClick={onConfirm} disabled={pending || !canConfirm}>
                 {pending
@@ -533,7 +534,7 @@ function BindingApproveBody({
     <div className="space-y-3 text-sm">
       <div className="space-y-2 rounded-md border border-border p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-muted-foreground">Target agent</span>
+          <span className="text-xs text-muted-foreground">{tf("auto.d539091489783f89")}</span>
           {proposal.target ? (
             <AgentRefChip agent={proposal.target} className="text-sm font-medium" />
           ) : (
@@ -541,14 +542,14 @@ function BindingApproveBody({
           )}
         </div>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-muted-foreground">Delivered as</span>
+          <span className="text-xs text-muted-foreground">{tf("auto.7ee7eb4eb457c735")}</span>
           <span className="flex items-center gap-1.5">
             <DeliveryBadge configPath={proposal.configPath} />
             <code className="font-mono text-xs">{envKey || proposal.configPath}</code>
           </span>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs text-muted-foreground">Secret</span>
+          <span className="text-xs text-muted-foreground">{tf("auto.7e32a729b1226ed1")}</span>
           <span className="flex items-center gap-1.5">
             <KeyRound className="size-3.5 text-muted-foreground" />
             <span className="font-medium">{secret.name}</span>
@@ -564,7 +565,7 @@ function BindingApproveBody({
             checked={draft.cascade}
             onCheckedChange={(checked) => onChange({ ...draft, cascade: checked === true })}
             className="mt-0.5"
-            aria-label="Also approve the proposed secret"
+            aria-label={tf("auto.1ef5afe2320abaaa")}
           />
           <span className="text-foreground/90">
             Also approve the proposed secret{" "}
@@ -605,7 +606,7 @@ function RejectDialog({
         {proposal ? (
           <>
             <DialogHeader>
-              <DialogTitle>Reject proposal</DialogTitle>
+              <DialogTitle>{tf("auto.8c3acdbb3b99d6f9")}</DialogTitle>
               <DialogDescription>
                 The reason is sent back to{" "}
                 <AgentRefChip agent={proposal.proposedBy} className="text-foreground" />. Dependent
@@ -613,14 +614,14 @@ function RejectDialog({
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-1">
-              <Label htmlFor="reject-reason">Reason</Label>
+              <Label htmlFor="reject-reason">{tf("text.Reason")}</Label>
               <Textarea
                 id="reject-reason"
                 value={reason}
                 onChange={(event) => onReasonChange(event.target.value)}
                 rows={3}
                 autoFocus
-                placeholder="Why is this being rejected?"
+                placeholder={tf("auto.1fa2a42938c56711")}
               />
             </div>
             {error ? (
@@ -630,7 +631,7 @@ function RejectDialog({
             ) : null}
             <DialogFooter>
               <Button variant="ghost" onClick={onCancel} disabled={pending}>
-                Cancel
+                {tf("text.Cancel")}
               </Button>
               <Button variant="destructive" onClick={onConfirm} disabled={pending || !canConfirm}>
                 {pending ? "Rejecting…" : "Reject"}
@@ -669,7 +670,7 @@ export function ProposalActions({
       disabled={disabled || blocked}
       onClick={() => onApprove(proposal)}
     >
-      Approve
+      {tf("text.Approve")}
     </Button>
   );
   return (
@@ -695,7 +696,7 @@ export function ProposalActions({
         disabled={disabled}
         onClick={() => onReject(proposal)}
       >
-        Reject
+        {tf("text.Reject")}
       </Button>
     </div>
   );

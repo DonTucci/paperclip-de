@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useCallback,
   useEffect,
@@ -249,14 +250,14 @@ export function SkillFolderRail({
   return (
     <div className="relative hidden h-full shrink-0 md:flex" style={{ width: `${width}px` }}>
       <nav
-        aria-label="Skill folders"
+        aria-label={tf("auto.87294e029ecb2260")}
         className="flex min-w-0 flex-1 flex-col overflow-y-auto border-r border-border pr-3"
       >
       <div className="mb-2 flex items-center justify-between gap-2 pt-0.5">
         <div className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
-          Folders
+          {tf("auto.c4d6bb200f4c058a")}
         </div>
-        <Button variant="ghost" size="icon-sm" title="New folder" onClick={() => onCreateFolder(null)}>
+        <Button variant="ghost" size="icon-sm" title={tf("auto.cf28f49ec597a6ed")} onClick={() => onCreateFolder(null)}>
           <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
@@ -271,7 +272,7 @@ export function SkillFolderRail({
         <div className="space-y-0.5">
           <VirtualRow
             active={selection === "all"}
-            label="All skills"
+            label={tf("auto.78abcbbfb830971c")}
             count={allCount}
             icon={<Layers className="h-3.5 w-3.5" />}
             onSelect={() => onSelect("all")}
@@ -302,7 +303,7 @@ export function SkillFolderRail({
           ) : onEnsureMyFolder ? (
             <VirtualRow
               active={false}
-              label="My Skills"
+              label={tf("auto.ea424d66243dffe9")}
               count={0}
               icon={<User className="h-3.5 w-3.5" />}
               muted
@@ -311,7 +312,7 @@ export function SkillFolderRail({
           ) : null}
 
           {/* Company — plain top-level company folders */}
-          <RailHeading label="Organization" onCreate={() => onCreateFolder(null)} />
+          <RailHeading label={tf("text.Organization")} onCreate={() => onCreateFolder(null)} />
           {model.company.length > 0 ? (
             model.company.map((node) => (
               <TreeBranch
@@ -335,7 +336,7 @@ export function SkillFolderRail({
               />
             ))
           ) : (
-            <div className="px-2 py-1 text-xs text-muted-foreground">No organization folders yet.</div>
+            <div className="px-2 py-1 text-xs text-muted-foreground">{tf("auto.2f476526a23441a5")}</div>
           )}
 
           {/* Projects — auto-managed, read-only structure */}
@@ -363,7 +364,7 @@ export function SkillFolderRail({
           ) : (
             <VirtualRow
               active={false}
-              label="Projects"
+              label={tf("text.Projects")}
               count={0}
               icon={<Boxes className="h-3.5 w-3.5" />}
               muted
@@ -397,11 +398,11 @@ export function SkillFolderRail({
           ) : null}
 
           <div className="px-2 pb-1 pt-3 text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
-            System
+            {tf("text.System")}
           </div>
           <VirtualRow
             active={selection === "unfiled"}
-            label="Unfiled"
+            label={tf("auto.d64dc9ae400c2871")}
             count={unfiledCount}
             icon={<FolderSwatch color={null} />}
             onSelect={() => onSelect("unfiled")}
@@ -414,7 +415,7 @@ export function SkillFolderRail({
         <div className="mt-4 border-t border-border pt-3">
           <div className="mb-1.5 flex items-center gap-1.5 px-2 text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
             <Hash className="h-3 w-3" />
-            Tags
+            {tf("text.Tags")}
           </div>
           <div className="flex flex-wrap gap-1.5 px-1">
             {activeTag ? (
@@ -446,7 +447,7 @@ export function SkillFolderRail({
       </nav>
       <div
         role="separator"
-        aria-label="Resize skill folders"
+        aria-label={tf("auto.d8cb8ea6c818044e")}
         aria-orientation="vertical"
         aria-valuemin={MIN_FOLDER_RAIL_WIDTH}
         aria-valuemax={MAX_FOLDER_RAIL_WIDTH}
@@ -582,7 +583,7 @@ function TreeBranch({
       >
         <button
           type="button"
-          aria-label={isOpen ? "Collapse folder" : "Expand folder"}
+          aria-label={isOpen ? tf("auto.de183e2e0cd2c3a9") : tf("auto.a5e635fd384f3fd0")}
           className={cn(
             "flex h-6 w-4 items-center justify-center text-muted-foreground",
             children.length === 0 && "invisible",
@@ -640,13 +641,13 @@ function TreeBranch({
               {canNest ? (
                 <DropdownMenuItem onSelect={() => onCreateFolder(folder.id)}>
                   <FolderPlus className="h-3.5 w-3.5" />
-                  New subfolder
+                  {tf("auto.1f054525307b8b57")}
                 </DropdownMenuItem>
               ) : null}
               {editable ? (
                 <>
-                  <DropdownMenuItem onSelect={() => onStartRename(folder)}>Rename</DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => onEditFolder(folder)}>Edit color</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => onStartRename(folder)}>{tf("auto.3064d79a295cefe4")}</DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => onEditFolder(folder)}>{tf("auto.0ef08627434532c9")}</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => onMoveFolder(folder, isInMySkills ? "company" : "my")}>
                     <MoveRight className="h-3.5 w-3.5" />
                     Move to {isInMySkills ? "Organization" : "My Skills"}
@@ -654,7 +655,7 @@ function TreeBranch({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onSelect={() => onDeleteFolder(folder)}>
                     <Trash2 className="h-3.5 w-3.5" />
-                    Delete
+                    {tf("text.Delete")}
                   </DropdownMenuItem>
                 </>
               ) : null}
@@ -712,7 +713,7 @@ export function FolderBreadcrumb({
     : folderBreadcrumbTrail(model, selection);
 
   return (
-    <nav aria-label="Folder path" className="flex flex-wrap items-center gap-1 text-sm">
+    <nav aria-label={tf("auto.98bca2fab915abe0")} className="flex flex-wrap items-center gap-1 text-sm">
       <button
         type="button"
         onClick={() => onSelect("all")}
@@ -722,12 +723,12 @@ export function FolderBreadcrumb({
         )}
       >
         <Home className="h-3.5 w-3.5" />
-        All skills
+        {tf("auto.78abcbbfb830971c")}
       </button>
       {selection === "unfiled" ? (
         <>
           <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
-          <span className="rounded px-1.5 py-0.5 font-medium text-foreground">Unfiled</span>
+          <span className="rounded px-1.5 py-0.5 font-medium text-foreground">{tf("auto.d64dc9ae400c2871")}</span>
         </>
       ) : null}
       {trail.map((folder, index) => {
@@ -779,7 +780,7 @@ export function FolderTiles({
   return (
     <div className="mb-4">
       <div className="mb-2 text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
-        Folders
+        {tf("auto.c4d6bb200f4c058a")}
       </div>
       <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(11rem,1fr))]">
         {children.map((node) => (
@@ -904,13 +905,13 @@ export function MoveToFolderDialog({
             <FolderSwatch color={folder.color} />
           )}
           <span className="min-w-0 flex-1 truncate">{reservedRootLabel(folder)}</span>
-          {isCurrent ? <span className="text-xs text-muted-foreground">current</span> : null}
-          {bundled ? <span className="text-xs text-muted-foreground">read-only</span> : null}
+          {isCurrent ? <span className="text-xs text-muted-foreground">{tf("auto.97b0560280ed60a5")}</span> : null}
+          {bundled ? <span className="text-xs text-muted-foreground">{tf("auto.4fed3970dcc0d31d")}</span> : null}
           {isChosen ? <Check className="h-3.5 w-3.5" /> : null}
           {nestable ? (
             <button
               type="button"
-              title="New folder inside…"
+              title={tf("auto.3409c55afd702c69")}
               className="opacity-0 transition-opacity group-hover:opacity-100"
               onClick={(event) => {
                 event.stopPropagation();
@@ -950,7 +951,7 @@ export function MoveToFolderDialog({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search folders"
+            placeholder={tf("auto.b2132d5f1a39c610")}
             className="h-8 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
@@ -964,8 +965,8 @@ export function MoveToFolderDialog({
             onClick={() => setTarget(null)}
           >
             <FolderSwatch color={null} />
-            <span className="min-w-0 flex-1 truncate">Unfiled</span>
-            {currentFolderId == null ? <span className="text-xs text-muted-foreground">current</span> : null}
+            <span className="min-w-0 flex-1 truncate">{tf("auto.d64dc9ae400c2871")}</span>
+            {currentFolderId == null ? <span className="text-xs text-muted-foreground">{tf("auto.97b0560280ed60a5")}</span> : null}
             {chosen === null ? <Check className="h-3.5 w-3.5" /> : null}
           </div>
           {model.roots.map((node) => renderNode(node, 0))}
@@ -989,7 +990,7 @@ export function MoveToFolderDialog({
                 className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent/40 hover:text-foreground"
               >
                 <Plus className="h-3.5 w-3.5" />
-                New top-level folder…
+                {tf("auto.93d8f8e980e06cf1")}
               </button>
             )}
           </div>
@@ -1001,13 +1002,13 @@ export function MoveToFolderDialog({
               Moving to <span className="font-mono text-foreground">{previewPath}</span>
             </span>
           ) : (
-            <span>Pick a destination folder.</span>
+            <span>{tf("auto.1b4df9890211d2c4")}</span>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={pending}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button
             disabled={pending || chosen === undefined || chosen === currentFolderId}
@@ -1047,7 +1048,7 @@ function InlineNewFolder({
       <Input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Folder name"
+        placeholder={tf("auto.14d34edf50ef6c87")}
         autoFocus
         className="h-7 flex-1 text-sm"
         onKeyDown={(event) => {
@@ -1056,10 +1057,10 @@ function InlineNewFolder({
         }}
       />
       <Button size="sm" variant="ghost" onClick={onCancel} disabled={pending}>
-        Cancel
+        {tf("text.Cancel")}
       </Button>
       <Button size="sm" onClick={onSubmit} disabled={pending || !value.trim()}>
-        Add
+        {tf("text.Add")}
       </Button>
     </div>
   );

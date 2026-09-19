@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { auditSectionHref, type AuditSection } from "./audit/audit-navigation";
 
 export type AgentDetailView =
@@ -20,28 +21,28 @@ export const AGENT_DETAIL_NAVIGATION: ReadonlyArray<{
   items: ReadonlyArray<{ value: AgentLocalDetailView; label: string }>;
 }> = [
   {
-    label: "Agent",
+    label: tf("text.Agent"),
     items: [
-      { value: "overview", label: "Overview" },
-      { value: "instructions", label: "Instructions" },
-      { value: "skills", label: "Skills" },
+      { value: "overview", label: tf("text.Overview") },
+      { value: "instructions", label: tf("text.Instructions") },
+      { value: "skills", label: tf("text.Skills") },
     ],
   },
   {
-    label: "Runtime",
+    label: tf("auto.1093115897879aa3"),
     items: [
-      { value: "runtime", label: "Harness / Runtime" },
-      { value: "secrets", label: "Secrets" },
-      { value: "tools", label: "Tools" },
-      { value: "channels", label: "Channels" },
+      { value: "runtime", label: tf("auto.6711e546a022dbe7") },
+      { value: "secrets", label: tf("text.Secrets") },
+      { value: "tools", label: tf("text.Tools") },
+      { value: "channels", label: tf("auto.4c8906cf76f5740a") },
     ],
   },
   {
-    label: "Governance",
+    label: tf("auto.86f8a694159b712f"),
     items: [
-      { value: "permissions", label: "Permissions / Trust" },
-      { value: "api-keys", label: "API Keys" },
-      { value: "revisions", label: "Revisions" },
+      { value: "permissions", label: tf("auto.183c6ae80610fdda") },
+      { value: "api-keys", label: tf("auto.c08f17eb9e11a353") },
+      { value: "revisions", label: tf("auto.da80b1d5740caaef") },
     ],
   },
 ] as const;

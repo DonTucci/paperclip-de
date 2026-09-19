@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -75,17 +76,16 @@ function AuthAttempt({
       {state.phase === "connected" ? (
         <>
           <p role="status" className="text-sm">
-            Connected. This account is saved in Connections and can be reused.
+            {tf("auto.95a419a808a60634")}
           </p>
-          <Button onClick={onDone}>Use connection</Button>
+          <Button onClick={onDone}>{tf("auto.bcb76497501bff25")}</Button>
         </>
       ) : (
         <>
           {unsupported ? (
             <p role="status" className="text-sm text-muted-foreground">
               {state.phase === "unsupported"
-                ? state.message
-                : "This provider does not offer a subscription connection."}
+                ? state.message: tf("auto.0c38d4709916e986")}
             </p>
           ) : (
             <>
@@ -96,7 +96,7 @@ function AuthAttempt({
               )}
               {state.phase === "cancelled" && (
                 <p role="status" className="text-sm text-muted-foreground">
-                  Sign-in cancelled. No connection was created.
+                  {tf("auto.66a4f12626a72463")}
                 </p>
               )}
               {method === "api_key" ? (
@@ -105,7 +105,7 @@ function AuthAttempt({
                   value={value}
                   onChange={setValue}
                   onSubmit={submit}
-                  placeholder="Enter API key here"
+                  placeholder={tf("auto.c80c3ac9799dc19b")}
                   disabled={busy}
                   autoFocus
                 />
@@ -156,7 +156,7 @@ function AuthAttempt({
                 onCancel();
               }}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             {!unsupported &&
               (method === "api_key" ? (
@@ -166,11 +166,11 @@ function AuthAttempt({
               ) : state.phase === "waiting" ? (
                 provider === "anthropic" ? (
                   <Button disabled={!value.trim()} onClick={submit}>
-                    Submit code
+                    {tf("auto.833a3a4cefd5e9f4")}
                   </Button>
                 ) : (
                   <span role="status" className="text-sm text-muted-foreground">
-                    Waiting for sign-in…
+                    {tf("auto.20ff194db3253bd1")}
                   </span>
                 )
               ) : (

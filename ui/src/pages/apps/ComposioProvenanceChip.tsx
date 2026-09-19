@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Blocks } from "lucide-react";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
@@ -36,7 +37,7 @@ export function ConnectionProvenanceChip({
         title={connectorUid ? `Credentials managed by Vercel Connect (${connectorUid})` : "Credentials managed by Vercel Connect"}
       >
         <Blocks className="h-3 w-3" />
-        via Vercel Connect
+        {tf("auto.d34e03fbdfb4a5d5")}
       </span>
     );
   }
@@ -47,7 +48,7 @@ export function ConnectionProvenanceChip({
   const label = (
     <>
       <Blocks className="h-3 w-3" />
-      via Composio
+      {tf("auto.2318d037535f6a7e")}
     </>
   );
 

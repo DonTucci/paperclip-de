@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserPlus2 } from "lucide-react";
@@ -22,8 +23,8 @@ export function JoinRequestQueue() {
   useEffect(() => {
     setBreadcrumbs([
       { label: selectedCompany?.name ?? "Organization", href: "/dashboard" },
-      { label: "Inbox", href: "/inbox" },
-      { label: "Join Requests" },
+      { label: tf("text.Inbox"), href: "/inbox" },
+      { label: tf("auto.26fe033758d63747") },
     ]);
   }, [selectedCompany?.name, setBreadcrumbs]);
 
@@ -44,7 +45,7 @@ export function JoinRequestQueue() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.access.joinRequests(selectedCompanyId!, `${status}:${requestType}`) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.access.companyMembers(selectedCompanyId!) });
       await queryClient.invalidateQueries({ queryKey: queryKeys.access.companyUserDirectory(selectedCompanyId!) });
-      pushToast({ title: "Join request approved", tone: "success" });
+      pushToast({ title: tf("auto.d1a4dcc6d8643181"), tone: "success" });
     },
   });
 
@@ -52,16 +53,16 @@ export function JoinRequestQueue() {
     mutationFn: (requestId: string) => accessApi.rejectJoinRequest(selectedCompanyId!, requestId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.access.joinRequests(selectedCompanyId!, `${status}:${requestType}`) });
-      pushToast({ title: "Join request rejected", tone: "success" });
+      pushToast({ title: tf("auto.c8110f2795ab6182"), tone: "success" });
     },
   });
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select an organization to review join requests.</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.2317c6a6bf957d19")}</div>;
   }
 
   if (requestsQuery.isLoading) {
-    return <div className="text-sm text-muted-foreground">Loading join requests…</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.6aaf5068256131bb")}</div>;
   }
 
   if (requestsQuery.error) {
@@ -69,8 +70,7 @@ export function JoinRequestQueue() {
       requestsQuery.error instanceof ApiError && requestsQuery.error.status === 403
         ? "You do not have permission to review join requests for this organization."
         : requestsQuery.error instanceof Error
-          ? requestsQuery.error.message
-          : "Failed to load join requests.";
+          ? requestsQuery.error.message: tf("auto.de1cbe58e21d7c45");
     return <div className="text-sm text-destructive">{message}</div>;
   }
 
@@ -79,16 +79,16 @@ export function JoinRequestQueue() {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <UserPlus2 className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-lg font-semibold">Join Request Queue</h1>
+          <h1 className="text-lg font-semibold">{tf("auto.a51c104b51cc3123")}</h1>
         </div>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Review human and agent join requests outside the mixed inbox feed. This queue uses the same approval mutations as the inline inbox cards.
+          {tf("auto.a25f80123d884e59")}
         </p>
       </div>
 
       <Card className="flex-row flex-wrap gap-3 p-4">
         <label className="space-y-2 text-sm">
-          <span className="font-medium">Status</span>
+          <span className="font-medium">{tf("text.Status")}</span>
           <select
             className="rounded-md border border-border bg-background px-3 py-2"
             value={status}
@@ -96,13 +96,13 @@ export function JoinRequestQueue() {
               setStatus(event.target.value as "pending_approval" | "approved" | "rejected")
             }
           >
-            <option value="pending_approval">Pending approval</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
+            <option value="pending_approval">{tf("status.pending_approval")}</option>
+            <option value="approved">{tf("text.Approved")}</option>
+            <option value="rejected">{tf("text.Rejected")}</option>
           </select>
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-medium">Request type</span>
+          <span className="font-medium">{tf("auto.6db8df2da928ebd3")}</span>
           <select
             className="rounded-md border border-border bg-background px-3 py-2"
             value={requestType}
@@ -110,9 +110,9 @@ export function JoinRequestQueue() {
               setRequestType(event.target.value as "all" | "human" | "agent")
             }
           >
-            <option value="all">All</option>
-            <option value="human">Human</option>
-            <option value="agent">Agent</option>
+            <option value="all">{tf("text.All")}</option>
+            <option value="human">{tf("auto.9ffa865f2bc6e850")}</option>
+            <option value="agent">{tf("text.Agent")}</option>
           </select>
         </label>
       </Card>
@@ -120,7 +120,7 @@ export function JoinRequestQueue() {
       <div className="space-y-4">
         {(requestsQuery.data ?? []).length === 0 ? (
           <div className="rounded-xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
-            No join requests match the current filters.
+            {tf("auto.bf9e13fbd9e55b1e")}
           </div>
         ) : (
           requestsQuery.data!.map((request) => (
@@ -155,13 +155,13 @@ export function JoinRequestQueue() {
                       onClick={() => rejectMutation.mutate(request.id)}
                       disabled={rejectMutation.isPending}
                     >
-                      Reject
+                      {tf("text.Reject")}
                     </Button>
                     <Button
                       onClick={() => approveMutation.mutate(request.id)}
                       disabled={approveMutation.isPending}
                     >
-                      Approve
+                      {tf("text.Approve")}
                     </Button>
                   </div>
                 ) : null}
@@ -169,7 +169,7 @@ export function JoinRequestQueue() {
 
               <div className="mt-4 grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
                 <div className="rounded-lg border border-border bg-background px-3 py-2">
-                  <div className="text-xs font-medium uppercase tracking-wide">Invite context</div>
+                  <div className="text-xs font-medium uppercase tracking-wide">{tf("auto.b13541ba608ff338")}</div>
                   <div className="mt-2">
                     {request.invite
                       ? `${request.invite.allowedJoinTypes} join invite${request.invite.humanRole ? ` • default role ${request.invite.humanRole}` : ""}`
@@ -180,7 +180,7 @@ export function JoinRequestQueue() {
                   ) : null}
                 </div>
                 <div className="rounded-lg border border-border bg-background px-3 py-2">
-                  <div className="text-xs font-medium uppercase tracking-wide">Request details</div>
+                  <div className="text-xs font-medium uppercase tracking-wide">{tf("auto.b6e3369e005b7240")}</div>
                   <div className="mt-2">Submitted {new Date(request.createdAt).toLocaleString()}</div>
                   <div>Source IP {request.requestIp}</div>
                   {request.requestType === "agent" && request.capabilities ? <div>{request.capabilities}</div> : null}

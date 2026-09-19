@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { FilterX, RotateCcw } from "lucide-react";
 import type { CompanySearchZeroResults } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ export function ZeroResultsRecovery({
     >
       <FilterX className="h-10 w-10 text-muted-foreground" aria-hidden />
       <div className="space-y-1">
-        <div className="text-base font-semibold">No results with these filters</div>
+        <div className="text-base font-semibold">{tf("auto.9005fe703af09b17")}</div>
         <p className="text-sm text-muted-foreground">
           {unfilteredTotal === 1 ? "1 result matches" : `${unfilteredTotal} results match`}
           {query ? <> &ldquo;{query}&rdquo;</> : null}, but your{" "}
@@ -49,7 +50,7 @@ export function ZeroResultsRecovery({
       {suggestions.length > 0 ? (
         <div className="flex w-full flex-col gap-1.5">
           <div className="text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-            Loosen a filter
+            {tf("auto.bbc8b39a722afa47")}
           </div>
           {suggestions.map((suggestion) => (
             <button
@@ -74,7 +75,7 @@ export function ZeroResultsRecovery({
 
       <Button onClick={onClearAll} variant="default" size="sm">
         <RotateCcw className="mr-1.5 h-4 w-4" />
-        Clear all filters
+        {tf("auto.de22447d91bbb54e")}
       </Button>
     </div>
   );

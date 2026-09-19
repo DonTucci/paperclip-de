@@ -1,0 +1,109 @@
+name: Originalversion prüfen
+
+on:
+  schedule:
+    - cron: '23 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fork-upstream-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.repository != 'paperclipai/paperclip'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      FORK_REPOSITORY: ${{ github.repository }}
+      BASE_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Stabiles Release zusammenführen und Prüfung starten
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=$(gh api repos/paperclipai/paperclip/releases/latest --jq '.tag_name')
+          git check-ref-format "refs/tags/$tag"
+          git remote add upstream https://github.com/paperclipai/paperclip.git
+          git fetch upstream "refs/tags/$tag"
+          release_commit=$(git rev-parse 'FETCH_HEAD^{commit}')
+          if git merge-base --is-ancestor "$release_commit" HEAD; then
+            echo "Release $tag ist bereits enthalten." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          branch="updates/upstream-${release_commit:0:12}"
+          existing=$(gh pr list --repo "$FORK_REPOSITORY" --head "$branch" --base "$BASE_BRANCH" --state all --json number,state --jq '.[0] // empty')
+          if [ -n "$existing" ]; then
+            echo "Für $tag existiert bereits ein Pull Request: $existing" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$(gh pr list --repo "$FORK_REPOSITORY" --head "$branch" --base "$BASE_BRANCH" --state open --json number --jq 'length')" != '0' ]; then
+              gh workflow run fork-german-checks.yml --repo "$FORK_REPOSITORY" --ref "$branch"
+            fi
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code origin "refs/heads/$branch" > /dev/null; then
+            git fetch origin "refs/heads/$branch"
+            git switch -c "$branch" FETCH_HEAD
+          else
+            git switch -c "$branch"
+            if ! git merge --no-ff "$release_commit" -m "Originalversion $tag übernehmen"; then
+              echo "### Merge-Konflikt bei $tag" >> "$GITHUB_STEP_SUMMARY"
+              git diff --name-only --diff-filter=U >> "$GITHUB_STEP_SUMMARY"
+              git merge --abort
+              exit 1
+            fi
+          fi
+          git push origin "HEAD:refs/heads/$branch"
+          cat > "$RUNNER_TEMP/update-pr.md" <<'BODY'
+          ## Thinking Path
+          > Paperclip verwaltet Agentenarbeit. Dieser Fork ergänzt eine deutsche Oberfläche. Ein stabiles Originalrelease muss mit den deutschen Anpassungen zusammengeführt und vor der Nutzung geprüft werden.
+
+          ## Linked Issues or Issue Description
+          **Problem**
+          Das Originalprojekt hat ein neueres stabiles Release.
+
+          **Proposed Solution**
+          Die Änderungen werden mit dem gepflegten Fork zusammengeführt.
+
+          **Expected Benefit**
+          Die deutsche Version erhält die Verbesserungen des Originals.
+
+          ## What Changed
+          - Ein stabiles Originalrelease wurde durch einen Git-Merge übernommen.
+
+          ## Verification
+          - Der Workflow «Deutscher Fork prüfen» wird ausdrücklich auf diesem Branch gestartet.
+          - Ergebnisse der Prüfungen und die Prüfliste neuer Texte vor dem Merge kontrollieren.
+          - Betroffene Ansichten manuell prüfen und fehlende Übersetzungen ergänzen.
+
+          ## Risks
+          - Neue Texte können noch Englisch sein.
+          - Originaländerungen können Verhalten, Datenmodell und Abhängigkeiten ändern.
+
+          ## Model Used
+          Kein KI-Modell beim Update-Lauf; automatisierter Git-Merge.
+
+          ## Checklist
+          - [x] Originalrelease durch Merge übernommen
+          - [ ] Typprüfung, Tests und Build erfolgreich
+          - [ ] Neue und geänderte Texte geprüft
+          - [ ] Betroffene Ansichten visuell geprüft
+          - [ ] Migrationen und Bereitstellung geprüft
+          BODY
+          gh pr create --repo "$FORK_REPOSITORY" --base "$BASE_BRANCH" --head "$branch" --draft --title "Originalversion $tag übernehmen" --body-file "$RUNNER_TEMP/update-pr.md"
+          # GITHUB_TOKEN löst keinen normalen pull_request-Folgelauf aus.
+          gh workflow run fork-german-checks.yml --repo "$FORK_REPOSITORY" --ref "$branch"
+          echo "Update-Entwurf für $tag erstellt; Prüfworkflow gestartet." >> "$GITHUB_STEP_SUMMARY"

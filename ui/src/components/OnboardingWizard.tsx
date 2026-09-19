@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { healthApi } from "@/api/health";
 import { LocalProviderLoginInstructions } from "./AdapterLoginChrome";
 import { useLocalAiLogin } from "./ai-connections/useLocalAiLogin";
@@ -1346,9 +1347,9 @@ function OnboardingWizardInner({
     connectProgress
       ? { label: adapterEnvLoading ? "Testing…" : connectProgress, icon: "spinner", disabled: true }
       : connectPhase === "waiting"
-      ? { label: "Waiting for code", icon: "spinner", disabled: true }
+      ? { label: tf("auto.f22b705c3b7ce68f"), icon: "spinner", disabled: true }
       : connectPhase === "connecting"
-        ? { label: "Connecting", icon: "spinner", disabled: true }
+        ? { label: tf("auto.d403c686f6a10480"), icon: "spinner", disabled: true }
         : connectPhase === "ready"
           ? connectStepNeedsLogin
             ? {
@@ -1357,14 +1358,14 @@ function OnboardingWizardInner({
                 disabled: !connectAuthUrl,
               }
             : {
-                label: "Connect",
+                label: tf("text.Connect"),
                 icon: "arrow",
                 disabled:
                   !connectStepReady || (credentialMode === "api" && !apiKey.trim() && !selectedApiKey),
               }
           : // Nothing is chosen on arrival, and the row is what chooses. Until
             // it has been answered the button has nothing to do.
-            { label: "Next", icon: "arrow", disabled: true };
+            { label: tf("text.Next"), icon: "arrow", disabled: true };
 
   /**
    * Back, on the connect step, unwinds the sign-in before it leaves the step.
@@ -1740,7 +1741,7 @@ function OnboardingWizardInner({
       // dashboard) so they land on the conversation the agent will start in.
       navigate(prefix ? `/${prefix}/issues/${issueRef}` : `/issues/${issueRef}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to launch first task");
+      setError(err instanceof Error ? err.message: tf("auto.38057469b0d5892c"));
     } finally {
       setLoading(false);
     }
@@ -1937,7 +1938,7 @@ function OnboardingWizardInner({
     } catch (err) {
       if (!isCurrent()) return null;
       setAdapterEnvError(
-        err instanceof Error ? err.message : "Adapter environment test failed"
+        err instanceof Error ? err.message: tf("auto.7effce27ad293483")
       );
       return null;
     } finally {
@@ -1979,7 +1980,7 @@ function OnboardingWizardInner({
       setSelectedCompanyId(company.id);
       setStep(3);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create organization");
+      setError(err instanceof Error ? err.message: tf("auto.f2204373452ba70e"));
     } finally {
       creatingCompanyRef.current = false;
       setLoading(false);
@@ -2024,8 +2025,7 @@ function OnboardingWizardInner({
         if (adapterModelsError) {
           setError(
             adapterModelsError instanceof Error
-              ? adapterModelsError.message
-              : "Failed to load OpenCode models."
+              ? adapterModelsError.message: tf("auto.c2dab824502ad48d")
           );
           return;
         }
@@ -2206,7 +2206,7 @@ function OnboardingWizardInner({
       setStep(5);
     } catch (err) {
       if (!isCurrent()) return;
-      setError(err instanceof Error ? err.message : "Failed to create agent");
+      setError(err instanceof Error ? err.message: tf("auto.71b8459f6e0b7cc1"));
     } finally {
       if (hiringAgentRef.current === attempt) hiringAgentRef.current = null;
       if (isCurrent()) setLoading(false);
@@ -2261,8 +2261,7 @@ function OnboardingWizardInner({
     } catch (err) {
       setError(
         err instanceof Error
-          ? err.message
-          : "Failed to unset ANTHROPIC_API_KEY and retry."
+          ? err.message: tf("auto.10e549fb84eaddd4")
       );
     } finally {
       setUnsetAnthropicLoading(false);
@@ -2536,7 +2535,7 @@ function OnboardingWizardInner({
                 <div className="mx-auto w-full space-y-9">
                   <OnboardingHeading
                     center
-                    title="What is the name of your organization?"
+                    title={tf("auto.315be75f1b324889")}
                     lede="Welcome to Paperclip — let's set up your organization."
                   />
                   {/* The field takes the agent step's measure rather than the
@@ -2552,11 +2551,11 @@ function OnboardingWizardInner({
                           : "text-muted-foreground group-focus-within:text-foreground"
                       )}
                     >
-                      Name
+                      {tf("text.Name")}
                     </label>
                     <input
                       className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50"
-                      placeholder="e.g. Northwind Labs"
+                      placeholder={tf("auto.b7c20a47425e7366")}
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       onKeyDown={(e) => {
@@ -2580,7 +2579,7 @@ function OnboardingWizardInner({
               {step === 3 && (
                 <div className="mx-auto flex w-full flex-col gap-9">
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="onboarding-agent-name">Agent name</Label>
+                    <Label htmlFor="onboarding-agent-name">{tf("auto.1cfb21871a035769")}</Label>
                     {/*
                       Filled, not outlined, and the column's full width — the
                       same field the naming step before the hand-off draws.
@@ -2593,7 +2592,7 @@ function OnboardingWizardInner({
                     <Input
                       id="onboarding-agent-name"
                       className="h-(--sz-44px) rounded-lg border-transparent bg-muted shadow-none dark:bg-muted"
-                      placeholder="e.g. Chief of staff"
+                      placeholder={tf("auto.8e339ee765a8d7be")}
                       value={agentName}
                       onChange={(e) => setAgentName(e.target.value)}
                       onKeyDown={(e) => {
@@ -2621,7 +2620,7 @@ function OnboardingWizardInner({
                         Picking one starts the sign-in now. The row is the
                         question, and answering it is what opens the card. */}
                     <ModelSourceTiles
-                      label="Model source"
+                      label={tf("auto.9fb88c74db9bfbbb")}
                       sources={recommendedAdapters.map((opt) => ({
                         id: opt.type,
                         label: CONNECT_SOURCE_NAMES[opt.type] ?? opt.label,
@@ -2672,7 +2671,7 @@ function OnboardingWizardInner({
                       <div className="-ml-3 mt-1">
                         <CredentialModeLink mode={credentialMode} onChange={setCredentialMode} />
                         {savedKeys.options.length > 0 && <p className="px-3 text-sm text-muted-foreground">{savedKeys.options.length} saved API {savedKeys.options.length === 1 ? "key available" : "keys available"}.</p>}
-                        {credentialMode === "subscription" && authSignalStatus === "present" && <p className="px-3 text-sm text-muted-foreground">An existing provider connection is available.</p>}
+                        {credentialMode === "subscription" && authSignalStatus === "present" && <p className="px-3 text-sm text-muted-foreground">{tf("auto.e34ff189bffb6e8f")}</p>}
                       </div>
                     </motion.div>
                   </div>
@@ -2729,8 +2728,8 @@ function OnboardingWizardInner({
                           setApiKey("");
                         }} />
                         {!selectedApiKey && <OnboardingCardField
-                          label="API key"
-                          placeholder="Enter API key here"
+                          label={tf("text.API key")}
+                          placeholder={tf("auto.c80c3ac9799dc19b")}
                           masked
                           // The card is the answer to the tile just pressed, so
                           // the field is unambiguously the next thing. Carried
@@ -2841,7 +2840,7 @@ function OnboardingWizardInner({
                     ) : hasSavedSubscription || localLogin.status === "ready" ? null : connectStepHasNoSandbox ? (
                       canUseLocalLogin && managedProvider ? (
                         <LocalProviderLoginInstructions adapterType={adapterType} login={{ ...localLogin, retry: () => { autoConnectStartedRef.current = false; setError(null); localLogin.retry(); } }} />
-                      ) : <p className="text-xs text-muted-foreground">This environment does not support browser sign-in. Choose another sign-in environment or connect with an API key.</p>
+                      ) : <p className="text-xs text-muted-foreground">{tf("auto.bbff3a38768e7c6f")}</p>
                     ) : null}
                   </motion.div>
 
@@ -2886,7 +2885,7 @@ function OnboardingWizardInner({
                             style={{ "--sc": "var(--status-task-done)" } as CSSProperties}
                           >
                             <Check className="size-3.5 shrink-0" />
-                            <span className="font-medium">Passed</span>
+                            <span className="font-medium">{tf("auto.436fe71bb9561f05")}</span>
                           </div>
                           {/* Show the checks on a pass too, so the target and the
                               auth signals stay visible before the hire. */}
@@ -2900,7 +2899,7 @@ function OnboardingWizardInner({
                         <div className="rounded-md border border-amber-300/60 bg-amber-50/40 px-2.5 py-2 space-y-2">
                           <p className="text-(length:--text-micro) text-amber-900/90 leading-relaxed">
                             Claude failed while{" "}
-                            <span className="font-mono">ANTHROPIC_API_KEY</span>{" "}
+                            <span className="font-mono">{tf("auto.8f2c257fa4427f3f")}</span>{" "}
                             is set. You can clear it in this adapter config
                             and retry the probe.
                           </p>
@@ -2922,7 +2921,7 @@ function OnboardingWizardInner({
 
                       {adapterEnvResult && adapterEnvResult.status === "fail" && (
                         <div className="rounded-md border border-border/70 bg-muted/20 px-2.5 py-2 text-(length:--text-micro) space-y-1.5">
-                          <p className="font-medium">Manual debug</p>
+                          <p className="font-medium">{tf("auto.b21b558929c99267")}</p>
                           <p className="text-muted-foreground font-mono break-all">
                             {adapterType === "cursor"
                               ? `${effectiveAdapterCommand} -p --mode ask --output-format json \"Respond with hello.\"`
@@ -2938,7 +2937,7 @@ function OnboardingWizardInner({
                           </p>
                           <p className="text-muted-foreground">
                             Prompt:{" "}
-                            <span className="font-mono">Respond with hello.</span>
+                            <span className="font-mono">{tf("auto.1ed91d47f9607337")}</span>
                           </p>
                           {adapterType === "cursor" ||
                           adapterType === "codex_local" ||
@@ -2973,7 +2972,7 @@ function OnboardingWizardInner({
                           ) : (
                             <p className="text-muted-foreground">
                               If login is required, run{" "}
-                              <span className="font-mono">claude login</span>{" "}
+                              <span className="font-mono">{tf("auto.1d839ac9acf2102b")}</span>{" "}
                               and retry.
                             </p>
                           )}
@@ -3043,8 +3042,7 @@ function OnboardingWizardInner({
                       : step === 5
                         ? "Get started"
                         : step === 4
-                          ? connectCta.label
-                          : "Next"
+                          ? connectCta.label: tf("text.Next")
                   }
                   primaryIcon={step === 4 ? connectCta.icon : undefined}
                   loadingLabel={

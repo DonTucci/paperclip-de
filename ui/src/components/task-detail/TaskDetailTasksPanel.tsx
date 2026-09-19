@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 import type { Issue, Project } from "@paperclipai/shared";
 import { ArrowUpRight, ChevronRight } from "lucide-react";
@@ -60,7 +61,7 @@ export function TaskDetailTasksPanel({ subtasks, createdTasks, projects, isLoadi
     groups.set(key, group);
   }
   return (
-    <section className="flex flex-col gap-6" aria-label="Related tasks">
+    <section className="flex flex-col gap-6" aria-label={tf("auto.c5ded36c752cc931")}>
       {sortedSubtasks.length > 0 && (
         <TaskGroup name="Subtasks">
           <TaskDetailSubtasksPanel items={sortedSubtasks} issueLinkState={issueLinkState} />
@@ -71,15 +72,15 @@ export function TaskDetailTasksPanel({ subtasks, createdTasks, projects, isLoadi
           <TaskDetailTaskList items={group.tasks} ariaLabel={`${group.name} tasks`} issueLinkState={issueLinkState} />
         </TaskGroup>
       ))}
-      {isLoading && <p role="status" className="text-sm text-muted-foreground">Loading tasks…</p>}
+      {isLoading && <p role="status" className="text-sm text-muted-foreground">{tf("auto.9ae9f7d835d95a2c")}</p>}
       {hasError && (
         <div role="alert" className="flex items-center gap-2 text-sm text-destructive">
-          <span>Could not load all tasks.</span>
-          {onRetry && <Button variant="ghost" size="sm" onClick={onRetry}>Retry</Button>}
+          <span>{tf("auto.58dfc6761b3b56d4")}</span>
+          {onRetry && <Button variant="ghost" size="sm" onClick={onRetry}>{tf("text.Retry")}</Button>}
         </div>
       )}
       {!isLoading && !hasError && subtasks.length === 0 && createdTasks.length === 0 && (
-        <p className="py-6 text-center text-sm text-muted-foreground">No tasks yet.</p>
+        <p className="py-6 text-center text-sm text-muted-foreground">{tf("auto.5a889457d27958e3")}</p>
       )}
     </section>
   );

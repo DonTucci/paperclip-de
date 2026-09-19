@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Download, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,13 +73,13 @@ export function OutputPrimaryCard({ item, creatorName, onMediaClick }: OutputPri
           <p className="break-words text-sm font-semibold text-foreground">{filename}</p>
           {item.degraded ? (
             <p className="mt-0.5 text-(length:--text-micro) text-destructive">
-              Output metadata is unavailable — this file can’t be played or downloaded here.
+              {tf("auto.68902975c9588252")}
             </p>
           ) : (
             <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-(length:--text-micro) text-muted-foreground">
               {item.isPrimary && (
                 <Badge variant="secondary" className="px-1.5 py-0 text-(length:--text-nano)">
-                  Primary
+                  {tf("auto.efe10c80ec8a9f38")}
                 </Badge>
               )}
               {meta && <span>{meta.contentType}</span>}
@@ -102,21 +103,21 @@ export function OutputPrimaryCard({ item, creatorName, onMediaClick }: OutputPri
                 onClick={() => onMediaClick(item)}
               >
                 <Maximize2 className="h-4 w-4" />
-                Browse
+                {tf("auto.3227aa9666253f7a")}
               </Button>
             ) : null}
             {!isMedia || !onMediaClick || isVideo ? (
               <Button asChild variant="outline" size="sm" className="max-md:flex-1">
                 <a href={meta.openPath} target="_blank" rel="noreferrer">
                   <ExternalLink className="h-4 w-4" />
-                  Open
+                  {tf("text.Open")}
                 </a>
               </Button>
             ) : null}
             <Button asChild size="sm" className="max-md:flex-1">
               <a href={meta.downloadPath} aria-label={`Download ${filename}`}>
                 <Download className="h-4 w-4" />
-                Download
+                {tf("text.Download")}
               </a>
             </Button>
           </div>

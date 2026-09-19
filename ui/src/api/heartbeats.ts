@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { IssueRecoveryAction } from "@paperclipai/shared";
 import type {
   HeartbeatRun,

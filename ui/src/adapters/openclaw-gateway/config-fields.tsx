@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { configFieldsForSection } from "../config-sections";
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
@@ -144,7 +145,7 @@ export function OpenClawGatewayConfigFields({
 
   return configFieldsForSection(section, (
     <>
-      <Field label="Gateway URL" hint={help.webhookUrl}>
+      <Field label={tf("auto.3d06950825de7452")} hint={help.webhookUrl}>
         <DraftInput
           value={
             isCreate
@@ -172,7 +173,7 @@ export function OpenClawGatewayConfigFields({
 
       {/* Auth and Identity - available in both create and edit modes */}
       <SecretField
-        label="Gateway auth token"
+        label={tf("auto.a31b5be38953f120")}
         value={
           isCreate
             ? values!.authToken ?? ""
@@ -183,10 +184,10 @@ export function OpenClawGatewayConfigFields({
             ? set!({ authToken: v })
             : commitGatewayToken(v)
         }
-        placeholder="OpenClaw gateway token"
+        placeholder={tf("auto.dbcf48feb1f1057e")}
       />
 
-      <Field label="Agent ID">
+      <Field label={tf("auto.510bce732db77286")}>
         <DraftInput
           value={
             isCreate
@@ -200,11 +201,11 @@ export function OpenClawGatewayConfigFields({
           }
           immediate
           className={inputClass}
-          placeholder="agent-123"
+          placeholder={tf("auto.0e9a8c1ba450d66e")}
         />
       </Field>
 
-      <Field label="Session strategy">
+      <Field label={tf("auto.1747233af5908171")}>
         <select
           value={
             isCreate
@@ -218,14 +219,14 @@ export function OpenClawGatewayConfigFields({
           }
           className={inputClass}
         >
-          <option value="fixed">Fixed</option>
-          <option value="issue">Per issue</option>
-          <option value="run">Per run</option>
+          <option value="fixed">{tf("auto.1246fc93bca00b90")}</option>
+          <option value="issue">{tf("auto.a1ce76ec4524c2c3")}</option>
+          <option value="run">{tf("auto.97bc74ee5caf4a25")}</option>
         </select>
       </Field>
 
       {(isCreate ? values!.sessionKeyStrategy ?? "fixed" : sessionStrategy) === "fixed" && (
-        <Field label="Session key">
+        <Field label={tf("auto.2319ec27475054a2")}>
           <DraftInput
             value={
               isCreate
@@ -239,13 +240,13 @@ export function OpenClawGatewayConfigFields({
             }
             immediate
             className={inputClass}
-            placeholder="paperclip"
+            placeholder={tf("auto.670d47ccb9a6cdef")}
           />
         </Field>
       )}
 
       <SecretField
-        label="Password (alternative auth)"
+        label={tf("auto.a0623db13679ee2a")}
         value={
           isCreate
             ? values!.password ?? ""
@@ -256,10 +257,10 @@ export function OpenClawGatewayConfigFields({
             ? set!({ password: v })
             : mark("adapterConfig", "password", v || undefined)
         }
-        placeholder="Gateway shared password"
+        placeholder={tf("auto.6a063dc23bfc8757")}
       />
 
-      <Field label="Role">
+      <Field label={tf("text.Role")}>
         <DraftInput
           value={
             isCreate
@@ -273,11 +274,11 @@ export function OpenClawGatewayConfigFields({
           }
           immediate
           className={inputClass}
-          placeholder="operator"
+          placeholder={tf("auto.06e55b633481f7bb")}
         />
       </Field>
 
-      <Field label="Scopes (comma-separated)">
+      <Field label={tf("auto.79d74bdb4faffb62")}>
         <DraftInput
           value={
             isCreate
@@ -309,7 +310,7 @@ export function OpenClawGatewayConfigFields({
         mark={mark}
       />
 
-      <Field label="Paperclip API URL override">
+      <Field label={tf("auto.5462f7699e2ebea1")}>
         <DraftInput
           value={
             isCreate
@@ -327,7 +328,7 @@ export function OpenClawGatewayConfigFields({
         />
       </Field>
 
-      <Field configSection="runPolicy" label="Timeout (seconds)">
+      <Field configSection="runPolicy" label={tf("auto.1f966032d11151c8")}>
         <DraftInput
           value={
             isCreate
@@ -349,7 +350,7 @@ export function OpenClawGatewayConfigFields({
         />
       </Field>
 
-      <Field label="Headers JSON">
+      <Field label={tf("auto.2899a831dbe0b032")}>
         <HeadersJsonTextarea
           isCreate={isCreate}
           createDraft={isCreate ? values!.headersJson ?? "" : ""}
@@ -375,18 +376,18 @@ export function OpenClawGatewayConfigFields({
       </Field>
 
       {!isCreate && (
-        <Field label="Claimed API key path">
+        <Field label={tf("auto.be223b29f7982acb")}>
           <DraftInput
             value={eff("adapterConfig", "claimedApiKeyPath", String(config.claimedApiKeyPath ?? ""))}
             onCommit={(v) => mark("adapterConfig", "claimedApiKeyPath", v || undefined)}
             immediate
             className={inputClass}
-            placeholder="~/.openclaw/workspace/paperclip-claimed-api-key.json"
+            placeholder={tf("auto.9776c09e32d4e88b")}
           />
         </Field>
       )}
 
-      <Field configSection="runPolicy" label="Wait timeout (ms)">
+      <Field configSection="runPolicy" label={tf("auto.9e6598176b0ed394")}>
         <DraftInput
           value={
             isCreate
@@ -410,7 +411,7 @@ export function OpenClawGatewayConfigFields({
         />
       </Field>
 
-      <Field label="Disable device auth">
+      <Field label={tf("auto.9ce197720896bf45")}>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -425,11 +426,11 @@ export function OpenClawGatewayConfigFields({
                 : mark("adapterConfig", "disableDeviceAuth", e.target.checked || undefined)
             }
           />
-          Skip device key authentication
+          {tf("auto.4ca952152e396180")}
         </label>
       </Field>
 
-      <Field label="Auto-pair on first connect">
+      <Field label={tf("auto.7d491d768fa4dc81")}>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -444,11 +445,11 @@ export function OpenClawGatewayConfigFields({
                 : mark("adapterConfig", "autoPairOnFirstConnect", e.target.checked)
             }
           />
-          Automatically approve device pairing
+          {tf("auto.55fd685aca22626f")}
         </label>
       </Field>
 
-      <Field label="Device auth">
+      <Field label={tf("auto.6fc25a19873431c0")}>
         <div className="text-xs text-muted-foreground leading-relaxed">
           When enabled, Paperclip persists a device key during onboarding so pairing approvals
           remain stable across runs.

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { KeyRound, Save } from "lucide-react";
 import type { CompanySecret, RoutineEnvConfig } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
@@ -52,8 +53,8 @@ export function StageSecretsPanel({
     return (
       <EmptyState
         icon={KeyRound}
-        message="Secrets are available only to step automation. Pick an agent to run this step, then add the secrets it needs."
-        action="Set up automation"
+        message={tf("auto.e45aba825411765f")}
+        action={tf("auto.3ebbfd8b5afb79e9")}
         onAction={onSetupAutomation}
       />
     );
@@ -72,13 +73,13 @@ export function StageSecretsPanel({
         <p>
           These env vars are injected when{" "}
           <span className="font-medium text-foreground">{displayName}</span> runs this step. They override
-          matching project and agent env on collisions. <span className="font-mono">PAPERCLIP_*</span> names
+          matching project and agent env on collisions. <span className="font-mono">{tf("auto.40dac43c34166443")}</span> names
           are reserved.
         </p>
       </div>
 
       {secretsLoading ? (
-        <p className="text-sm text-muted-foreground">Loading secrets…</p>
+        <p className="text-sm text-muted-foreground">{tf("auto.3775fb66c3558ca1")}</p>
       ) : (
         <EnvironmentVariablesEditor
           value={value}
@@ -93,7 +94,7 @@ export function StageSecretsPanel({
           <Save className="h-4 w-4 mr-1.5" />
           {saving ? "Saving…" : "Save secrets"}
         </Button>
-        {dirty && !saving ? <span className="text-xs text-muted-foreground">Unsaved changes</span> : null}
+        {dirty && !saving ? <span className="text-xs text-muted-foreground">{tf("auto.a710c2b90913b537")}</span> : null}
       </div>
     </div>
   );

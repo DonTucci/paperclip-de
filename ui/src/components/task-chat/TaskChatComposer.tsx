@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   useEffect,
   useRef,
@@ -703,7 +704,7 @@ export function TaskChatComposer({
             ? {
                 ...item,
                 status: "error",
-                error: err instanceof Error ? err.message : "Upload failed",
+                error: err instanceof Error ? err.message: tf("auto.6efc5d27f30b20c1"),
               }
             : item,
         ),
@@ -758,7 +759,7 @@ export function TaskChatComposer({
             ? {
                 ...item,
                 status: "error",
-                error: err instanceof Error ? err.message : "Upload failed",
+                error: err instanceof Error ? err.message: tf("auto.6efc5d27f30b20c1"),
               }
             : item,
         ),
@@ -912,8 +913,7 @@ export function TaskChatComposer({
       } catch (error) {
         setActionError(
           error instanceof Error
-            ? error.message
-            : "The goal action could not be applied.",
+            ? error.message: tf("auto.156163bee8871c67"),
         );
       }
       return;
@@ -1101,8 +1101,7 @@ export function TaskChatComposer({
       setTakeoverBusy(false);
       setTakeoverError(
         cause instanceof Error
-          ? cause.message
-          : "This request could not be skipped.",
+          ? cause.message: tf("auto.663913f609288f35"),
       );
     });
   }
@@ -1167,10 +1166,10 @@ export function TaskChatComposer({
             size="sm"
             onClick={reviewUncertainSubmission}
           >
-            Review conversation
+            {tf("auto.f2f5723a2045cdf5")}
           </Button>
           {reviewError ? (
-            <p>Couldn’t refresh the conversation. Try reviewing it again.</p>
+            <p>{tf("auto.57d51bf884c7c022")}</p>
           ) : null}
           {uncertainSubmission.reviewed ? (
             <>
@@ -1184,7 +1183,7 @@ export function TaskChatComposer({
                 size="sm"
                 onClick={discardUncertainDraft}
               >
-                Discard draft and start new
+                {tf("auto.c6c7026bc387c407")}
               </Button>
             </>
           ) : null}
@@ -1304,7 +1303,7 @@ export function TaskChatComposer({
           {pause && conversationMode ? (
             <div className="space-y-2">
               <TaskChatPausedTakeover {...pause} hasDraft={Boolean(body.trim() || attachments.length)} />
-              <p className="text-xs text-muted-foreground">Send /new to start a fresh session and resume this conversation.</p>
+              <p className="text-xs text-muted-foreground">{tf("auto.bed063a11d2dc7ac")}</p>
             </div>
           ) : null}
           <div data-testid="task-chat-composer-input">
@@ -1321,7 +1320,7 @@ export function TaskChatComposer({
               mentions={mentions}
               actionCommands={conversationMode ? [{
                 id: "action:new", kind: "action", command: "new", name: "New session",
-                description: "Start fresh context here, preserving conversation history.", aliases: ["new"],
+                description: tf("auto.130c3e630a6e78d7"), aliases: ["new"],
                 disabled,
               }] : [goalCommandOption]}
               onSubmit={() => void submit()}
@@ -1426,8 +1425,8 @@ export function TaskChatComposer({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={disabled}
-                  title="Attach file"
-                  aria-label="Attach file"
+                  title={tf("auto.87fbe4fb79b1d700")}
+                  aria-label={tf("auto.87fbe4fb79b1d700")}
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
                   data-testid="task-chat-composer-attach"
                 >
@@ -1511,10 +1510,10 @@ export function TaskChatComposer({
               <InlineEntitySelector
                 value={assigneeValue}
                 options={reassignOptions ?? []}
-                placeholder="Assignee"
+                placeholder={tf("text.Assignee")}
                 noneLabel="No assignee"
-                searchPlaceholder="Search assignees…"
-                emptyMessage="No matches."
+                searchPlaceholder={tf("auto.12019555b7b48d70")}
+                emptyMessage={tf("auto.d6572bd2e77380ce")}
                 onChange={updatePendingAssignee}
                 disabled={disabled}
                 triggerTestId="task-chat-composer-assignee"
@@ -1561,7 +1560,7 @@ export function TaskChatComposer({
                 disabled={submitting}
                 className="h-8 shrink-0 rounded-md px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
               >
-                Cancel
+                {tf("text.Cancel")}
               </button>
             ) : null}
 

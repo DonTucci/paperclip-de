@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buildFilterChips, type FilterChipLookups, type SearchFilters } from "@/lib/search-filters";
@@ -36,7 +37,7 @@ export function SearchFilterChips({
         className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
         onClick={onClearAll}
       >
-        Clear all
+        {tf("auto.29a390f9237e3c84")}
       </button>
     </div>
   );

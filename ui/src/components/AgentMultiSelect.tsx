@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState, type ComponentProps, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import { AgentIcon } from "@/components/AgentIconPicker";
@@ -19,8 +20,8 @@ export function AgentSelect({
   agents,
   value,
   onChange,
-  placeholder = "Select agent…",
-  emptyMessage = "No agents yet.",
+  placeholder = tf("auto.fc1204ee98dd3240"),
+  emptyMessage = tf("auto.8a33b2e7d85a08f8"),
   disabled = false,
   triggerClassName,
   id,
@@ -74,7 +75,7 @@ export function AgentSelect({
           <Input
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter agents"
+            placeholder={tf("auto.2b2a8e180c4201f3")}
             className="h-8"
             autoFocus
           />
@@ -102,7 +103,7 @@ export function AgentSelect({
               </button>
             ))}
             {filteredAgents.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground">No matches.</div>
+              <div className="px-3 py-4 text-sm text-muted-foreground">{tf("auto.d6572bd2e77380ce")}</div>
             ) : null}
           </div>
         )}
@@ -130,7 +131,7 @@ export function AgentMultiSelect({
   triggerClassName,
   contentAlign = "start",
   headerContent,
-  emptyMessage = "No agents yet.",
+  emptyMessage = tf("auto.8a33b2e7d85a08f8"),
   showSelectionPreview = true,
   onOpenChange,
 }: {
@@ -224,7 +225,7 @@ export function AgentMultiSelect({
           <Input
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            placeholder="Filter agents"
+            placeholder={tf("auto.2b2a8e180c4201f3")}
             className="h-8"
             autoFocus
           />
@@ -273,7 +274,7 @@ export function AgentMultiSelect({
               );
             })}
             {filteredAgents.length === 0 ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground">No matches.</div>
+              <div className="px-3 py-4 text-sm text-muted-foreground">{tf("auto.d6572bd2e77380ce")}</div>
             ) : null}
           </div>
         )}
@@ -284,7 +285,7 @@ export function AgentMultiSelect({
             <div className="flex items-center gap-2">
               {staged ? (
                 <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)} disabled={pending}>
-                  Cancel
+                  {tf("text.Cancel")}
                 </Button>
               ) : null}
               <Button

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   ExecutionWorkspace,
   ExecutionWorkspaceSummary,

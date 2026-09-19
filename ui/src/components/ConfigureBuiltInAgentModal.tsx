@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -143,7 +144,7 @@ export function ConfigureBuiltInAgentModal({
       onOpenChange(false);
     },
     onError: (err) => {
-      setError(err instanceof ApiError ? err.message : "Failed to configure the built-in agent.");
+      setError(err instanceof ApiError ? err.message: tf("auto.bfb415817168341e"));
     },
   });
 
@@ -158,11 +159,11 @@ export function ConfigureBuiltInAgentModal({
         <div className="space-y-4">
           <InlineBanner tone="info" compact>
             Creates <strong>{definition.displayName}</strong> in your roster, badged{" "}
-            <strong>Built-in</strong>. Organizations that require hire approval will queue this for the
+            <strong>{tf("auto.1f43948106d1d47f")}</strong>. Organizations that require hire approval will queue this for the
             board.
           </InlineBanner>
 
-          <Field label="Adapter type">
+          <Field label={tf("auto.03298f6641cee814")}>
             <AdapterTypeDropdown
               value={adapterType}
               onChange={(next) => {
@@ -201,7 +202,7 @@ export function ConfigureBuiltInAgentModal({
             </InlineBanner>
           )}
 
-          <Field label="Monthly budget (optional)" hint="Leave blank for no cap.">
+          <Field label={tf("auto.4e4490135805f013")} hint="Leave blank for no cap.">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">$</span>
               <Input
@@ -214,7 +215,7 @@ export function ConfigureBuiltInAgentModal({
                 onChange={(event) => setBudgetDollars(event.target.value)}
                 className="w-32"
               />
-              <span className="text-sm text-muted-foreground">/ month</span>
+              <span className="text-sm text-muted-foreground">{tf("auto.57cbd84fd6e0495f")}</span>
             </div>
           </Field>
 
@@ -231,7 +232,7 @@ export function ConfigureBuiltInAgentModal({
             onClick={() => onOpenChange(false)}
             disabled={provision.isPending}
           >
-            Not now
+            {tf("auto.a0e63d7c7125d29a")}
           </Button>
           <Button
             onClick={() => {

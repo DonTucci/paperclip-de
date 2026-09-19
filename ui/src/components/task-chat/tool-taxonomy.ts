@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Provider-neutral tool vocabulary shared by live status, transcript rows,
  * and canonical provider activity. Exact semantic tools get purpose-specific

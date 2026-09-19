@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, Plug, Plus, Search, X } from "lucide-react";
 import { Link } from "@/lib/router";
@@ -74,7 +75,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
       .filter((entry) => entry.tools.length > 0);
   }, [appGroups, search, capabilityFilter]);
 
-  if (catalogLoading) return <LoadingState label="Loading tools…" />;
+  if (catalogLoading) return <LoadingState label={tf("auto.ff20973001c13ece")} />;
 
   // Cold state A (AP17): nothing connected at all.
   if (appGroups.length === 0) {
@@ -82,14 +83,14 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
       <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border py-12 text-center">
         <Plug className="h-6 w-6 text-muted-foreground" />
         <div>
-          <p className="text-sm font-medium text-foreground">App connections are coming soon</p>
+          <p className="text-sm font-medium text-foreground">{tf("auto.0b9d3ae749adf634")}</p>
           <p className="mx-auto max-w-sm text-sm text-muted-foreground">
             Profiles will be available once app connections are ready. Browse the planned integrations in the
             meantime.
           </p>
         </div>
         <Button asChild variant="outline">
-          <Link to="/apps">Browse app connections</Link>
+          <Link to="/apps">{tf("auto.a60b4f5ff6abf381")}</Link>
         </Button>
       </div>
     );
@@ -103,7 +104,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search tools…"
+            placeholder={tf("auto.e4245bd3a7c406b2")}
             className="pl-8"
           />
         </div>
@@ -138,7 +139,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
             }}
             className="text-sm font-medium text-primary hover:underline"
           >
-            Clear search
+            {tf("auto.3b7ea51793e9d906")}
           </button>
         </div>
       ) : (
@@ -258,19 +259,19 @@ function NewToolsRadio({
   const options: Array<{ value: NewToolsAction; label: string; hint: string; recommended?: boolean }> = [
     {
       value: "deny",
-      label: "Stay blocked until someone allows them",
+      label: tf("auto.dbc2aaef3f3456b3"),
       hint: "New tools an app adds later won't be usable until you review them.",
       recommended: true,
     },
     {
       value: "allow",
-      label: "Allowed automatically",
+      label: tf("auto.7fed1ac8c9e94fae"),
       hint: "Any tool an app adds later becomes usable right away.",
     },
   ];
   return (
     <fieldset className="space-y-2 rounded-lg border border-border p-4">
-      <legend className="px-1 text-sm font-medium text-foreground">New tools that appear later</legend>
+      <legend className="px-1 text-sm font-medium text-foreground">{tf("auto.ffe663688191163e")}</legend>
       <div className="space-y-2">
         {options.map((opt) => (
           <label key={opt.value} className="flex cursor-pointer items-start gap-2.5">
@@ -286,10 +287,10 @@ function NewToolsRadio({
                 {opt.label}
                 {opt.recommended ? (
                   <Badge variant="outline" className="text-(length:--text-nano)">
-                    Recommended
+                    {tf("auto.d70604e843046137")}
                   </Badge>
                 ) : (
-                  <span className="text-xs font-normal text-amber-600">(risky)</span>
+                  <span className="text-xs font-normal text-amber-600">{tf("auto.9f4875c487ebcf62")}</span>
                 )}
               </span>
               <span className="text-xs text-muted-foreground">{opt.hint}</span>
@@ -302,9 +303,9 @@ function NewToolsRadio({
 }
 
 const RULE_KIND_OPTIONS: Array<{ value: AdvancedRuleKind; label: string }> = [
-  { value: "tool_name", label: "Tool name pattern" },
-  { value: "risk_level", label: "Risk level" },
-  { value: "catalog_entry", label: "By tool ID" },
+  { value: "tool_name", label: tf("auto.df0ac12b59cca44e") },
+  { value: "risk_level", label: tf("auto.d4419ea33b84fa50") },
+  { value: "catalog_entry", label: tf("auto.9c7511c18d99a3bc") },
 ];
 
 function createAdvancedRuleId() {
@@ -349,7 +350,7 @@ function AdvancedRules({
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="rounded-lg border border-border">
       <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-left">
-        <span className="text-sm font-medium text-foreground">Advanced rules</span>
+        <span className="text-sm font-medium text-foreground">{tf("auto.8f58d324c8c86ae8")}</span>
         <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
       </CollapsibleTrigger>
       <CollapsibleContent className="space-y-3 border-t border-border px-4 py-3">
@@ -368,7 +369,7 @@ function AdvancedRules({
                 <span className="text-foreground">{ruleSummary(rule)}</span>
                 <button
                   type="button"
-                  aria-label="Remove rule"
+                  aria-label={tf("auto.3fab7379af907d88")}
                   onClick={() => onChange(rules.filter((r) => r.id !== rule.id))}
                   className="text-muted-foreground hover:text-destructive"
                 >
@@ -385,8 +386,8 @@ function AdvancedRules({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="include">Allow</SelectItem>
-              <SelectItem value="exclude">Block</SelectItem>
+              <SelectItem value="include">{tf("auto.e213c161d5cefa52")}</SelectItem>
+              <SelectItem value="exclude">{tf("auto.211d0bb8cf4f5b52")}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={kind} onValueChange={(v) => setKind(v as AdvancedRuleKind)}>
@@ -407,22 +408,22 @@ function AdvancedRules({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="read">Read-only</SelectItem>
-                <SelectItem value="write">Makes changes</SelectItem>
-                <SelectItem value="destructive">Destructive</SelectItem>
+                <SelectItem value="read">{tf("auto.72bb90897ab1eadc")}</SelectItem>
+                <SelectItem value="write">{tf("auto.f85b6093348f6dca")}</SelectItem>
+                <SelectItem value="destructive">{tf("auto.c3e58a73609d1094")}</SelectItem>
               </SelectContent>
             </Select>
           ) : (
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder={kind === "tool_name" ? "e.g. gmail.send*" : "tool ID"}
+              placeholder={kind === "tool_name" ? tf("auto.497b3e836ebc3da8") : tf("auto.5e1e780f9aa72d38")}
               className="w-44"
             />
           )}
           <Button type="button" variant="outline" size="sm" onClick={addRule}>
             <Plus className="mr-1 h-3.5 w-3.5" />
-            Add rule
+            {tf("auto.a27cff51a2e03e61")}
           </Button>
         </div>
       </CollapsibleContent>

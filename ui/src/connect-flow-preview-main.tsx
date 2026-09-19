@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { MotionConfig, motion } from "motion/react";
@@ -72,10 +73,10 @@ function OpenAiBlossom({ className }: { className?: string }) {
 const MODEL_SOURCES: ModelSource[] = [
   {
     id: "claude_local",
-    label: "Claude",
+    label: tf("auto.0615570f9ea13694"),
     icon: <img src="/brands/claude-color.svg" alt="" className="size-full" />,
   },
-  { id: "codex_local", label: "OpenAI", icon: <OpenAiBlossom className="size-full" /> },
+  { id: "codex_local", label: tf("auto.8b7d1a3187ab355d"), icon: <OpenAiBlossom className="size-full" /> },
 ];
 
 /**
@@ -277,18 +278,18 @@ function ConnectFlowPreview({
     phase === "unwindCard"
       ? { label: signInLabel, icon: "none" as const, disabled: true }
       : done
-      ? { label: "Start over", icon: "arrow" as const, disabled: false }
+      ? { label: tf("auto.5eed7e9fc8f3cd68"), icon: "arrow" as const, disabled: false }
       : phase === "ready" && apiMode
         ? // A key is typed here rather than fetched elsewhere, so the button is
           // the submit and stays dead until there is something to submit.
-          { label: "Connect", icon: "arrow" as const, disabled: !apiKey.trim() }
+          { label: tf("text.Connect"), icon: "arrow" as const, disabled: !apiKey.trim() }
         : phase === "ready"
         ? { label: signInLabel, icon: "none" as const, disabled: false }
         : phase === "waiting"
-          ? { label: "Waiting for code", icon: "spinner" as const, disabled: true }
+          ? { label: tf("auto.f22b705c3b7ce68f"), icon: "spinner" as const, disabled: true }
           : phase === "connecting"
-            ? { label: "Connecting", icon: "spinner" as const, disabled: true }
-            : { label: "Next", icon: "arrow" as const, disabled: true };
+            ? { label: tf("auto.d403c686f6a10480"), icon: "spinner" as const, disabled: true }
+            : { label: tf("text.Next"), icon: "arrow" as const, disabled: true };
 
   return (
     <MotionConfig reducedMotion="user">
@@ -308,7 +309,7 @@ function ConnectFlowPreview({
         <div className="pt-6">
           <OnboardingHeading
             center
-            title={done ? "Connected" : "Connect a model"}
+            title={done ? tf("auto.22965568d22a14ee") : tf("auto.87bdaaf8ac10de0f")}
             lede={
               done
                 ? "The step advances straight to Review — there is no success screen."
@@ -321,7 +322,7 @@ function ConnectFlowPreview({
           <>
             <div className="space-y-2 pt-12">
               <ModelSourceTiles
-                label="Model source"
+                label={tf("auto.9fb88c74db9bfbbb")}
                 sources={MODEL_SOURCES}
                 mode={mode}
                 selectedId={selectedId}
@@ -420,8 +421,8 @@ function ConnectFlowPreview({
                     {/* The one place the three paths differ. */}
                     {apiMode ? (
                       <OnboardingCardField
-                        label="API key"
-                        placeholder="Enter API key here"
+                        label={tf("text.API key")}
+                        placeholder={tf("auto.c80c3ac9799dc19b")}
                         masked
                         value={apiKey}
                         onChange={setApiKey}

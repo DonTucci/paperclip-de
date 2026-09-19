@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Check, ChevronRight } from "lucide-react";
@@ -140,18 +141,18 @@ export function AgentBasicsDialog({
       >
         <div
           className="flex items-center gap-2 px-6 py-5 text-xs text-muted-foreground"
-          aria-label="New agent progress"
+          aria-label={tf("auto.260193aa8a064dab")}
         >
           <span
             className={cn(step === "name" && "font-medium text-foreground")}
           >
-            1. Name
+            {tf("auto.6dce9cbb76b5bf6c")}
           </span>
           <ChevronRight className="size-3" />
           <span
             className={cn(step === "adapter" && "font-medium text-foreground")}
           >
-            2. Adapter
+            {tf("auto.f692efe7c246d24c")}
           </span>
         </div>
         <form
@@ -183,13 +184,13 @@ export function AgentBasicsDialog({
             {step === "name" ? (
               <div className="space-y-2">
                 <label htmlFor={id} className="text-sm font-medium">
-                  Agent name
+                  {tf("auto.1cfb21871a035769")}
                 </label>
                 <Input
                   id={id}
                   autoFocus
                   maxLength={100}
-                  placeholder="e.g. Darnold"
+                  placeholder={tf("auto.4c64e4feedf5facc")}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   className="h-12 text-base"
@@ -201,16 +202,16 @@ export function AgentBasicsDialog({
                     className="px-0 text-muted-foreground"
                     onClick={onInvite}
                   >
-                    Invite an external agent
+                    {tf("auto.0c21d4548b1504b5")}
                   </Button>
                 )}
               </div>
             ) : (
               <fieldset className="space-y-4">
-                <legend className="sr-only">Adapter</legend>
+                <legend className="sr-only">{tf("text.Adapter")}</legend>
                 {isPending && (
                   <p role="status" className="text-sm text-muted-foreground">
-                    Loading adapters…
+                    {tf("auto.89e30959db8cec48")}
                   </p>
                 )}
                 {error && (
@@ -256,7 +257,7 @@ export function AgentBasicsDialog({
                 </div>
                 {validAdapter && adapterType === "paperclip_runner" && (
                   <label className="flex flex-col gap-2 text-sm font-medium">
-                    Runner
+                    {tf("auto.2184a4e3f4ce0f21")}
                     <select
                       className="rounded-md border border-border bg-background px-3 py-2"
                       value={runnerProvider}
@@ -264,9 +265,9 @@ export function AgentBasicsDialog({
                         setRunnerProvider(event.target.value)
                       }
                     >
-                      <option value="codex">Codex (app server)</option>
-                      <option value="claude">Claude (ACPX)</option>
-                      <option value="opencode">OpenCode</option>
+                      <option value="codex">{tf("auto.d64fe2f5ed158c94")}</option>
+                      <option value="claude">{tf("auto.60a5ff3212877efd")}</option>
+                      <option value="opencode">{tf("auto.3af0e55ccc96d87c")}</option>
                     </select>
                   </label>
                 )}
@@ -284,7 +285,7 @@ export function AgentBasicsDialog({
               ) : (
                 <>
                   <ArrowLeft className="size-4" />
-                  Back
+                  {tf("text.Back")}
                 </>
               )}
             </Button>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -39,58 +40,57 @@ import type { EnvBinding, RoutineDetail as RoutineDetailType } from "@paperclipa
 const concurrencyPolicyOptions = [
   {
     value: "coalesce_if_active",
-    title: "Coalesce if active",
-    description: "Keep one follow-up run queued while an active run is still working.",
+    title: tf("auto.ee3319ab1628d0c6"),
+    description: tf("auto.f81f576dbdbb1235"),
   },
   {
     value: "always_enqueue",
-    title: "Always enqueue",
-    description: "Queue every trigger occurrence, even if several runs stack up.",
+    title: tf("auto.14769882600a7ef2"),
+    description: tf("auto.1d8944578a61f1d6"),
   },
   {
     value: "skip_if_active",
-    title: "Skip if active",
-    description: "Drop overlapping trigger occurrences while the routine is already active.",
+    title: tf("auto.128f844b123f2a29"),
+    description: tf("auto.ca3216548bcc2420"),
   },
 ];
 
 const catchUpPolicyOptions = [
   {
     value: "skip_missed",
-    title: "Skip missed",
-    description: "Ignore schedule windows that were missed while paused.",
+    title: tf("auto.23ab424e7bc844bb"),
+    description: tf("auto.403c69b07373abc7"),
   },
   {
     value: "enqueue_missed_with_cap",
-    title: "Enqueue missed with cap",
-    description: "Catch up missed schedule windows after recovery; sub-hourly schedules are combined into one catch-up run, slower schedules replay each missed window up to a cap.",
+    title: tf("auto.97c8825e971347d2"),
+    description: tf("auto.5137b63345e0bb4f"),
   },
 ];
 
 const activityGatePolicyOptions = [
   {
     value: "always",
-    title: "Run on every scheduled tick",
-    description: "Fire on the schedule no matter what — the default behavior.",
+    title: tf("auto.6fa83c63bb710032"),
+    description: tf("auto.4412186d92b8e1cc"),
   },
   {
     value: "require_external_activity",
-    title: "Skip when there's been no activity since the last run",
-    description:
-      "On a scheduled tick, only run if something happened since the last run that finished. Lets a watcher-style routine stay asleep while the system is settled instead of burning tokens.",
+    title: tf("auto.e3bb529a226a107d"),
+    description: tf("auto.ca39b27cb8ce7d09"),
   },
 ];
 
 const activityGateScopeOptions = [
   {
     value: "company",
-    title: "Organization-wide",
-    description: "Any activity across the organization counts as a reason to run.",
+    title: tf("auto.4b115f61b9918e76"),
+    description: tf("auto.a601b680dc4dc9ba"),
   },
   {
     value: "project",
-    title: "This project",
-    description: "Only activity in the routine's project counts as a reason to run.",
+    title: tf("auto.d0f62545074d3f6b"),
+    description: tf("auto.bd02213257510e18"),
   },
 ];
 
@@ -151,16 +151,16 @@ export function OverviewSection({
       {/* Assignment row */}
       <div className="overflow-x-auto overscroll-x-contain">
         <div className="inline-flex min-w-full flex-wrap items-center gap-2 text-sm text-muted-foreground sm:min-w-max sm:flex-nowrap">
-          <span>For</span>
+          <span>{tf("auto.ca15ebc05a3c5c13")}</span>
           <InlineEntitySelector
             ref={assigneeSelectorRef}
             value={editDraft.assigneeAgentId}
             options={assigneeOptions}
             recentOptionIds={recentAssigneeIds}
-            placeholder="Responsible"
+            placeholder={tf("auto.bc110a6d0722098a")}
             noneLabel="No responsible"
-            searchPlaceholder="Search responsible..."
-            emptyMessage="No responsible found."
+            searchPlaceholder={tf("auto.9cb8d79fc8b40d38")}
+            emptyMessage={tf("auto.045a8ffe4067d6d2")}
             onChange={(assigneeAgentId) =>
               setEditDraft((current) => ({ ...current, assigneeAgentId }))
             }
@@ -182,7 +182,7 @@ export function OverviewSection({
                   <span className="truncate">{option.label}</span>
                 )
               ) : (
-                <span className="text-muted-foreground">Responsible</span>
+                <span className="text-muted-foreground">{tf("auto.bc110a6d0722098a")}</span>
               )
             }
             renderOption={(option) => {
@@ -198,16 +198,16 @@ export function OverviewSection({
               );
             }}
           />
-          <span>in</span>
+          <span>{tf("auto.582967534d0f909d")}</span>
           <InlineEntitySelector
             ref={projectSelectorRef}
             value={editDraft.projectId}
             options={projectOptions}
             recentOptionIds={recentProjectIds}
-            placeholder="Project"
+            placeholder={tf("text.Project")}
             noneLabel="No project"
-            searchPlaceholder="Search projects..."
-            emptyMessage="No projects found."
+            searchPlaceholder={tf("auto.c59dd5a3c5a25588")}
+            emptyMessage={tf("auto.26e92309ba5b0ca9")}
             onChange={(projectId) => setEditDraft((current) => ({ ...current, projectId }))}
             onConfirm={() => descriptionEditorRef.current?.focus()}
             renderTriggerValue={(option) =>
@@ -220,7 +220,7 @@ export function OverviewSection({
                   <span className="truncate">{option.label}</span>
                 </>
               ) : (
-                <span className="text-muted-foreground">Project</span>
+                <span className="text-muted-foreground">{tf("text.Project")}</span>
               )
             }
             renderOption={(option) => {
@@ -277,7 +277,7 @@ export function OverviewSection({
               ref={descriptionEditorRef}
               value={editDraft.description}
               onChange={(description) => setEditDraft((current) => ({ ...current, description }))}
-              placeholder="Add instructions..."
+              placeholder={tf("auto.d49e19c5685d2f96")}
               bordered={false}
               contentClassName="min-h-(--sz-120px) text-sm leading-7"
               mentions={mentionOptions}
@@ -293,7 +293,7 @@ export function OverviewSection({
             ref={descriptionEditorRef}
             value={editDraft.description}
             onChange={(description) => setEditDraft((current) => ({ ...current, description }))}
-            placeholder="Add instructions..."
+            placeholder={tf("auto.d49e19c5685d2f96")}
             bordered={false}
             contentClassName="min-h-(--sz-120px) text-sm leading-7"
             mentions={mentionOptions}
@@ -321,7 +321,7 @@ export function OverviewSection({
       <div className="grid gap-3 sm:grid-cols-2">
         <SummaryCard
           icon={Clock3}
-          label="Triggers"
+          label={tf("text.Triggers")}
           value={activeTriggers === 0 ? "None" : `${activeTriggers} active`}
           hint={nextFire ? `Next fire ${nextFire}` : "No schedule"}
           to={() => navigateToSection("triggers")}
@@ -329,7 +329,7 @@ export function OverviewSection({
         />
         <SummaryCard
           icon={Play}
-          label="Last run"
+          label={tf("auto.512a48218ba21791")}
           value={lastRun ? lastRun.status.replaceAll("_", " ") : "No runs"}
           hint={lastRun ? timeAgo(lastRun.triggeredAt) : "Trigger a run"}
           to={() => navigateToSection("runs")}
@@ -340,10 +340,10 @@ export function OverviewSection({
       {/* Recent activity */}
       <div className="space-y-2">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Recent activity
+          {tf("auto.6cb44b56336af70b")}
         </p>
         {recentActivity.length === 0 ? (
-          <p className="text-xs text-muted-foreground">No activity yet.</p>
+          <p className="text-xs text-muted-foreground">{tf("auto.a288d2d0a21eed3c")}</p>
         ) : (
           <div className="divide-y divide-border/60">
             {recentActivity.map((event) => (
@@ -440,12 +440,12 @@ export function TriggersSection() {
           {addOpen ? (
             <>
               <X className="mr-1.5 h-3.5 w-3.5" />
-              Cancel
+              {tf("text.Cancel")}
             </>
           ) : (
             <>
               <Plus className="mr-1.5 h-3.5 w-3.5" />
-              New trigger
+              {tf("auto.a38f4ea67a30a344")}
             </>
           )}
         </Button>
@@ -454,10 +454,10 @@ export function TriggersSection() {
       {/* Add trigger form — expand-on-click drawer */}
       {addOpen ? (
       <div className="space-y-3 rounded-lg border border-border p-4">
-        <p className="text-sm font-medium">Add trigger</p>
+        <p className="text-sm font-medium">{tf("auto.58fd308928ddaee3")}</p>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-1.5">
-            <Label className="text-xs">Kind</Label>
+            <Label className="text-xs">{tf("auto.f5387f9bb6ed7031")}</Label>
             <Select
               value={newTrigger.kind}
               onValueChange={(kind) => setNewTrigger((current) => ({ ...current, kind }))}
@@ -477,7 +477,7 @@ export function TriggersSection() {
           </div>
           {newTrigger.kind === "schedule" && (
             <div className="space-y-1.5 md:col-span-2">
-              <Label className="text-xs">Schedule</Label>
+              <Label className="text-xs">{tf("text.Schedule")}</Label>
               <ScheduleEditor
                 value={newTrigger.cronExpression}
                 onChange={(cronExpression) =>
@@ -490,7 +490,7 @@ export function TriggersSection() {
           {newTrigger.kind === "webhook" && (
             <>
               <div className="space-y-1.5">
-                <Label className="text-xs">Signing mode</Label>
+                <Label className="text-xs">{tf("auto.0ba52a4363cea122")}</Label>
                 <Select
                   value={newTrigger.signingMode}
                   onValueChange={(signingMode) =>
@@ -514,7 +514,7 @@ export function TriggersSection() {
               </div>
               {!SIGNING_MODES_WITHOUT_REPLAY_WINDOW.has(newTrigger.signingMode) && (
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Replay window (seconds)</Label>
+                  <Label className="text-xs">{tf("auto.88c7ec0cb4218eda")}</Label>
                   <Input
                     value={newTrigger.replayWindowSec}
                     onChange={(event) =>
@@ -528,7 +528,7 @@ export function TriggersSection() {
         </div>
         <div className="flex items-center justify-end gap-2">
           <Button size="sm" variant="ghost" onClick={() => setAddOpen(false)}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button
             size="sm"
@@ -552,8 +552,8 @@ export function TriggersSection() {
       {routine.triggers.length === 0 ? (
         <EmptyState
           icon={Clock3}
-          message="No triggers yet."
-          action="Add a schedule"
+          message={tf("auto.4d6663215ba49a07")}
+          action={tf("auto.3d19f1acee38d489")}
           onAction={() => setAddOpen(true)}
         />
       ) : (
@@ -588,7 +588,7 @@ export function VariablesSection() {
         </span>
         <Button variant="secondary" size="sm" onClick={() => navigateToSection("overview")}>
           <Edit3 className="mr-1.5 h-3.5 w-3.5" />
-          Edit instructions
+          {tf("auto.23e275114309dfff")}
         </Button>
       </div>
 
@@ -602,8 +602,8 @@ export function VariablesSection() {
       ) : (
         <EmptyState
           icon={Braces}
-          message="No variables yet. Add a {{placeholder}} in the title or instructions to create one."
-          action="Edit instructions"
+          message={tf("auto.56192d62567ca91f")}
+          action={tf("auto.23e275114309dfff")}
           onAction={() => navigateToSection("overview")}
         />
       )}
@@ -634,7 +634,7 @@ export function SecretsSection() {
     <div className="space-y-4">
       <div className="rounded-md border border-border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
         Routine secrets apply to every task this routine creates. They override matching keys in
-        project and agent env. <span className="font-mono">PAPERCLIP_*</span> names are reserved.
+        project and agent env. <span className="font-mono">{tf("auto.40dac43c34166443")}</span> names are reserved.
       </div>
 
       {secretMessage ? (
@@ -642,7 +642,7 @@ export function SecretsSection() {
           <div>
             <p className="font-medium">{secretMessage.title}</p>
             <p className="text-xs text-muted-foreground">
-              Save this now. Paperclip will not show the secret value again.
+              {tf("auto.70e9778951e47592")}
             </p>
           </div>
           <div className="space-y-3">
@@ -651,13 +651,13 @@ export function SecretsSection() {
                 <div className="flex items-center gap-2">
                   <Input value={entry.webhookUrl} readOnly className="flex-1" />
                   <Button variant="outline" size="sm" onClick={() => copySecretValue("Webhook URL", entry.webhookUrl)}>
-                    URL
+                    {tf("auto.e7a241debad56609")}
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
                   <Input value={entry.webhookSecret} readOnly className="flex-1" />
                   <Button variant="outline" size="sm" onClick={() => copySecretValue("Webhook secret", entry.webhookSecret)}>
-                    Secret
+                    {tf("auto.7e32a729b1226ed1")}
                   </Button>
                 </div>
               </div>
@@ -692,7 +692,7 @@ export function DeliverySection() {
     <div className="space-y-6">
       <div className="space-y-3">
         <p className="text-xs font-medium uppercase tracking-(--tracking-caps) text-muted-foreground">
-          Concurrency
+          {tf("auto.8708492f3ef5c138")}
         </p>
         <RadioCardGroup
           ariaLabel="Concurrency policy"
@@ -705,7 +705,7 @@ export function DeliverySection() {
       </div>
       <div className="space-y-3">
         <p className="text-xs font-medium uppercase tracking-(--tracking-caps) text-muted-foreground">
-          Catch-up
+          {tf("auto.1c2d0f8e6b923cd0")}
         </p>
         <RadioCardGroup
           ariaLabel="Catch-up policy"
@@ -718,7 +718,7 @@ export function DeliverySection() {
       </div>
       <div className="space-y-3">
         <p className="text-xs font-medium uppercase tracking-(--tracking-caps) text-muted-foreground">
-          Advanced run policy
+          {tf("auto.02eb5cf767493595")}
         </p>
         <RadioCardGroup
           ariaLabel="Advanced run policy"
@@ -736,7 +736,7 @@ export function DeliverySection() {
           </p>
         ) : gateEnabled ? (
           <div className="space-y-2 rounded-lg border border-border p-3">
-            <Label className="text-xs font-medium">Activity scope</Label>
+            <Label className="text-xs font-medium">{tf("auto.98a37b44fa795fa6")}</Label>
             <RadioCardGroup
               ariaLabel="Activity gate scope"
               value={editDraft.activityGateScope}
@@ -796,7 +796,7 @@ function NextFiresPreview({
   return (
     <div className="space-y-3">
       <p className="text-xs font-medium uppercase tracking-(--tracking-caps) text-muted-foreground">
-        Next 5 fires
+        {tf("auto.10b02c89b237563a")}
       </p>
       {preview ? (
         <>

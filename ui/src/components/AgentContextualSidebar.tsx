@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
@@ -42,10 +43,10 @@ const localIcons = {
 } satisfies Record<AgentLocalDetailView, typeof Sparkles>;
 
 const auditItems = [
-  { section: "activity", label: "Activity", icon: Activity },
-  { section: "runs", label: "Runs", icon: PlayCircle },
-  { section: "costs", label: "Costs", icon: ReceiptText },
-  { section: "budgets", label: "Budgets", icon: BadgeDollarSign },
+  { section: "activity", label: tf("text.Activity"), icon: Activity },
+  { section: "runs", label: tf("text.Runs"), icon: PlayCircle },
+  { section: "costs", label: tf("text.Costs"), icon: ReceiptText },
+  { section: "budgets", label: tf("auto.a1a06e046b0b9ad3"), icon: BadgeDollarSign },
 ] as const;
 
 export function AgentContextualSidebar({
@@ -118,7 +119,7 @@ export function AgentContextualSidebar({
             data-slot="contextual-sidebar-section-label"
             className={contextualSidebarStyles.sectionLabel}
           >
-            Audit
+            {tf("text.Audit")}
           </p>
           <div data-slot="contextual-sidebar-group" className={contextualSidebarStyles.group}>
             {resolvedId ? auditItems.map((item) => (
@@ -129,7 +130,7 @@ export function AgentContextualSidebar({
                 icon={item.icon}
               />
             )) : (
-              <p className="px-2 py-1.5 text-xs text-muted-foreground">Loading audit links…</p>
+              <p className="px-2 py-1.5 text-xs text-muted-foreground">{tf("auto.041de4208fb94dda")}</p>
             )}
           </div>
         </div>

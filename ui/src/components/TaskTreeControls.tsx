@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { PauseCircle, PlayCircle, Repeat, XCircle } from "lucide-react";
@@ -58,13 +59,13 @@ export function TaskTreeControlMenuItems({
           onClick={onCancel}
         >
           <XCircle className="h-3 w-3" />
-          Cancel subtree...
+          {tf("auto.fccd5115640dc89c")}
         </button>
       ) : null}
       {canRestore ? (
         <button disabled={pending} className={itemClass} onClick={onRestore}>
           <Repeat className="h-3 w-3" />
-          Restore subtree...
+          {tf("auto.b42c304472894f02")}
         </button>
       ) : null}
     </>
@@ -143,7 +144,7 @@ export function TaskTreeControlDialog({
               disabled={pending}
               onClick={onRetry}
             >
-              Retry preview
+              {tf("auto.ceba352728693758")}
             </Button>
           </div>
         ) : null}

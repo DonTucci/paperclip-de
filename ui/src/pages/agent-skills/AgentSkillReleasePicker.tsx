@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { CompanySkillVersion } from "@paperclipai/shared";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -82,7 +83,7 @@ export function AgentSkillReleasePicker({
       <SelectTrigger
         size="sm"
         className="w-full max-w-(--sz-16rem) sm:w-(--sz-16rem)"
-        aria-label="Skill release"
+        aria-label={tf("auto.461c13432a504314")}
       >
         <SelectValue placeholder={DEFAULT_LABEL}>{triggerLabel}</SelectValue>
       </SelectTrigger>
@@ -93,7 +94,7 @@ export function AgentSkillReleasePicker({
             <span className="flex items-center gap-2">
               <span className="truncate">{releaseOptionLabel(release)}</span>
               <Badge variant="secondary" className="shrink-0 text-(length:--text-nano)">
-                Beta
+                {tf("auto.703390318bd55aef")}
               </Badge>
             </span>
           </SelectItem>

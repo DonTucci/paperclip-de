@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { Apple, Monitor, Terminal } from "lucide-react";
 import {
@@ -12,9 +13,9 @@ import { cn } from "@/lib/utils";
 type Platform = "mac" | "windows" | "linux";
 
 const platforms: { id: Platform; label: string; icon: typeof Apple }[] = [
-  { id: "mac", label: "macOS", icon: Apple },
-  { id: "windows", label: "Windows", icon: Monitor },
-  { id: "linux", label: "Linux", icon: Terminal },
+  { id: "mac", label: tf("auto.aed6b7aa2a0511a9"), icon: Apple },
+  { id: "windows", label: tf("auto.d598026a9cbc6050"), icon: Monitor },
+  { id: "linux", label: tf("auto.4828e60247c1636f"), icon: Terminal },
 ];
 
 const instructions: Record<Platform, { steps: string[]; tip?: string }> = {
@@ -69,11 +70,11 @@ export function PathInstructionsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-base">How to get a full path</DialogTitle>
+          <DialogTitle className="text-base">{tf("auto.dc9f3a6626d2ece4")}</DialogTitle>
           <DialogDescription>
             Paste the absolute path (e.g.{" "}
             <code className="text-xs bg-muted px-1 py-0.5 rounded">/Users/you/project</code>
-            ) into the input field.
+            {tf("auto.fe953a5f572c437c")}
           </DialogDescription>
         </DialogHeader>
 
@@ -135,7 +136,7 @@ export function ChoosePathButton({ className }: { className?: string }) {
         )}
         onClick={() => setOpen(true)}
       >
-        Choose
+        {tf("auto.c7f937836f5d82d5")}
       </button>
       <PathInstructionsModal open={open} onOpenChange={setOpen} />
     </>

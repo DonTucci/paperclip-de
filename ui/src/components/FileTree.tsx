@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { KeyboardEvent, ReactNode } from "react";
 import { useMemo, useRef, useState } from "react";
 import { cn } from "../lib/utils";
@@ -218,12 +219,12 @@ export function parseFrontmatter(content: string): { data: FrontmatterData; body
 
 export const FRONTMATTER_FIELD_LABELS: Record<string, string> = {
   name: "Name",
-  title: "Title",
+  title: tf("text.Title"),
   kind: "Kind",
   reportsTo: "Reports to",
   skills: "Skills",
   status: "Status",
-  description: "Description",
+  description: tf("text.Description"),
   priority: "Priority",
   assignee: "Responsible",
   project: "Project",
@@ -364,13 +365,13 @@ export function FileTree({
                 statusBadge.error ?? statusBadgeDefault,
               )}
             >
-              error
+              {tf("auto.ca00fccfb408989e")}
             </Badge>
             <span className="min-w-0 text-destructive">{error.message}</span>
           </div>
           {error.retry && (
             <Button type="button" size="xs" variant="outline" onClick={error.retry}>
-              Retry
+              {tf("text.Retry")}
             </Button>
           )}
         </div>

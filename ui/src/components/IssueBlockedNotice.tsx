@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   IssueBlockerAttention,
   IssueRecoveryAction,
@@ -108,7 +109,7 @@ function SuccessfulRunRetryNowControl({
           {retryNow.isPending ? (
             <span className="inline-flex items-center gap-1.5">
               <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              Retrying...
+              {tf("auto.84a657bcf3d968b4")}
             </span>
           ) : success ? (
             <span className="inline-flex items-center gap-1.5">
@@ -118,7 +119,7 @@ function SuccessfulRunRetryNowControl({
           ) : (
             <span className="inline-flex items-center gap-1.5">
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-              Retry now
+              {tf("auto.5148c3e20576923b")}
             </span>
           )}
         </Button>
@@ -166,7 +167,7 @@ function WaitingChipLink({
       </span>
       {running ? (
         <span className="ml-0.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-(length:--text-nano) font-medium uppercase tracking-wide text-blue-700 dark:bg-blue-400/20 dark:text-blue-200">
-          running
+          {tf("auto.c071cf5f5ed6f884")}
         </span>
       ) : null}
     </IssueLinkQuicklook>
@@ -289,7 +290,7 @@ function WaitingOnLiveWorkNotice({
         </span>
         <div className="min-w-0 flex-1 space-y-2">
           <div className="space-y-1">
-            <p className="font-medium leading-5">Waiting on live work</p>
+            <p className="font-medium leading-5">{tf("auto.54a2de10c50a1e92")}</p>
             <p className="leading-5">
               Queued behind {total} {queuedNoun} being worked in order. This task
               resumes automatically when the chain is done. Comments still notify the
@@ -304,7 +305,7 @@ function WaitingOnLiveWorkNotice({
             </div>
             <div
               role="progressbar"
-              aria-label="Blocker chain progress"
+              aria-label={tf("auto.e381a27e6c071622")}
               aria-valuemin={0}
               aria-valuenow={doneCount}
               aria-valuemax={total}
@@ -355,7 +356,7 @@ function WaitingOnLiveWorkNotice({
               </div>
               <div className="min-w-0 pb-0.5">
                 <span className="inline-block rounded-md border border-dashed border-blue-300/70 px-2 py-1 text-xs text-blue-800 dark:border-blue-500/40 dark:text-blue-200">
-                  This task — resumes automatically when the chain is done
+                  {tf("auto.30e6fd94f5e0f3e2")}
                 </span>
               </div>
             </div>
@@ -367,7 +368,7 @@ function WaitingOnLiveWorkNotice({
               className="space-y-1 pt-0.5"
             >
               <div className="text-xs font-medium text-blue-800 dark:text-blue-200">
-                Now running
+                {tf("auto.44cdf35701cdac02")}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 {nowRunning.map((blocker) => (
@@ -384,7 +385,7 @@ function WaitingOnLiveWorkNotice({
             >
               <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-800 dark:text-amber-200">
                 <Flag className="h-3 w-3" aria-hidden />
-                Blocked by parked work
+                {tf("auto.8b239473a30cf86f")}
               </span>
               {parkedBlockers.map((blocker) => renderParkedChip(blocker))}
             </div>
@@ -607,16 +608,16 @@ export function IssueBlockedNotice({
         <div className="min-w-0 space-y-1.5">
           {showSuccessfulRunHandoff ? (
             <>
-              <p className="font-medium leading-5">This task still needs a next step.</p>
+              <p className="font-medium leading-5">{tf("auto.1ada26e38e3346fb")}</p>
               <p className="leading-5">
                 A run finished successfully, but the task is still open. Paperclip needs someone to choose
                 what happens next.
               </p>
               <ul className="list-disc space-y-1 pl-5 text-xs leading-5 text-amber-900 dark:text-amber-100">
-                <li>Mark it done or cancelled.</li>
-                <li>Send it for review or ask for input.</li>
-                <li>Record what is blocking it and who owns that blocker.</li>
-                <li>Delegate follow-up work or queue a continuation.</li>
+                <li>{tf("auto.5cbd64668dd7813e")}</li>
+                <li>{tf("auto.fa883fca0815f5db")}</li>
+                <li>{tf("auto.6b236d4dc709ad66")}</li>
+                <li>{tf("auto.19ff3fa43da042e3")}</li>
               </ul>
               <div className="flex flex-wrap gap-1.5 text-xs">
                 {successfulRunHandoff.sourceRunId && successfulRunHandoff.assigneeAgentId ? (
@@ -688,14 +689,14 @@ export function IssueBlockedNotice({
               {showStalledRow ? (
                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                   <span className="text-xs font-medium text-amber-800 dark:text-amber-200">
-                    Stalled in review
+                    {tf("auto.0fc03143b2897da2")}
                   </span>
                   {stalledLeafBlockers.map(renderBlockerChip)}
                 </div>
               ) : terminalBlockers.length > 0 ? (
                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                   <span className="text-xs font-medium text-amber-800 dark:text-amber-200">
-                    Ultimately waiting on
+                    {tf("auto.ae937d0626706577")}
                   </span>
                   {terminalBlockers.map(renderBlockerChip)}
                 </div>
@@ -707,7 +708,7 @@ export function IssueBlockedNotice({
                 >
                   <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-800 dark:text-amber-200">
                     <Flag className="h-3 w-3" aria-hidden />
-                    Blocked by parked work
+                    {tf("auto.8b239473a30cf86f")}
                   </span>
                   {parkedBlockers.map(renderBlockerChip)}
                 </div>

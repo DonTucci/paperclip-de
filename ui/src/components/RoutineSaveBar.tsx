@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,7 @@ export function RoutineSaveBar({
         {saveConflict ? (
           <div className="flex items-center gap-2 text-sm text-amber-800 dark:text-amber-200">
             <AlertTriangle className="h-4 w-4" />
-            <span>Routine changed elsewhere. Reload to merge.</span>
+            <span>{tf("auto.3148fbdb84a4b028")}</span>
           </div>
         ) : (
           <Popover>
@@ -98,7 +99,7 @@ export function RoutineSaveBar({
             </PopoverTrigger>
             <PopoverContent align="start" className="w-64">
               <p className="mb-2 text-xs font-medium text-muted-foreground">
-                Pending changes
+                {tf("auto.54ae644fbb47b1f0")}
               </p>
               <ul className="space-y-1 text-sm">
                 {dirtyFields.map((field) => (
@@ -116,7 +117,7 @@ export function RoutineSaveBar({
           {saveConflict ? (
             <>
               <Button variant="outline" size="sm" onClick={onReload}>
-                Reload latest
+                {tf("auto.cb5bbbf3fd17d086")}
               </Button>
               <TooltipProvider>
                 <Tooltip>
@@ -132,7 +133,7 @@ export function RoutineSaveBar({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    Replaces the newer revision with your local edits.
+                    {tf("auto.fec05c5b616364ae")}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -145,7 +146,7 @@ export function RoutineSaveBar({
                 disabled={isSaving || disabled}
                 onClick={() => setConfirmDiscardOpen(true)}
               >
-                Discard
+                {tf("auto.eb1a70e39274bb76")}
               </Button>
               <Button
                 size="sm"
@@ -166,7 +167,7 @@ export function RoutineSaveBar({
       <Dialog open={confirmDiscardOpen} onOpenChange={setConfirmDiscardOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Discard changes?</DialogTitle>
+            <DialogTitle>{tf("auto.85bcf41666a53691")}</DialogTitle>
             <DialogDescription>
               This will revert {dirtyCount} unsaved{" "}
               {dirtyCount === 1 ? "change" : "changes"} in this section.
@@ -174,7 +175,7 @@ export function RoutineSaveBar({
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" size="sm" onClick={() => setConfirmDiscardOpen(false)}>
-              Keep editing
+              {tf("auto.e76fd2add01005ae")}
             </Button>
             <Button
               variant="destructive"
@@ -184,7 +185,7 @@ export function RoutineSaveBar({
                 setConfirmDiscardOpen(false);
               }}
             >
-              Discard changes
+              {tf("auto.f9bfa3dc7c8fcdea")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -197,7 +198,7 @@ export function RoutineSaveBar({
 export function RoutineReadOnlyStrip() {
   return (
     <div className="-mx-8 mt-6 border-t border-border bg-muted/20 px-8 py-3 text-xs text-muted-foreground">
-      Read-only — you don't own this routine.
+      {tf("auto.ed056afbccefe760")}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { brandChipBadge, type BrandChipColor } from "@/lib/status-colors";
@@ -33,40 +34,40 @@ interface VariantSpec {
 }
 
 const VARIANTS: Record<ResourceStatusVariant, VariantSpec> = {
-  ready: { color: "green", glyph: "●", label: "Ready", title: "Materialized and matches the shipped default" },
-  needs_setup: { color: "amber", glyph: "⚠", label: "Needs setup", title: "Present but not usable yet" },
-  missing: { color: "amber", glyph: "⚠", label: "Missing", title: "Expected resource absent; reconcile will recreate it" },
-  error: { color: "red", glyph: "✕", label: "Error", title: "Failed to load or reconcile" },
+  ready: { color: "green", glyph: "●", label: tf("auto.5fa7aac5375c5815"), title: tf("auto.4dd6c838decdfcb4") },
+  needs_setup: { color: "amber", glyph: "⚠", label: tf("auto.b6df2441064f1416"), title: tf("auto.968a205913144398") },
+  missing: { color: "amber", glyph: "⚠", label: tf("auto.6be36ca49ee85210"), title: tf("auto.f4936f59ff7986ab") },
+  error: { color: "red", glyph: "✕", label: tf("text.Error"), title: tf("auto.4e42ee640e89878f") },
   update_available: {
     color: "blue",
     glyph: "↑",
-    label: "Update available",
-    title: "Unedited — a newer shipped default can be applied",
+    label: tf("auto.ff8b555d818f0b25"),
+    title: tf("auto.71a19f555fc9aa0b"),
   },
   drifted: {
     color: "gray",
     glyph: "✎",
-    label: "Drifted",
-    title: "You've edited this; your changes are kept, not overwritten",
+    label: tf("auto.bb85e2687d4222fb"),
+    title: tf("auto.993846ba180493ed"),
   },
   schedule_off: {
     color: "gray",
     glyph: "◌",
-    label: "Schedule off",
-    title: "No background work runs until you enable it — costs zero tokens",
+    label: tf("auto.e96f8077b459c809"),
+    title: tf("auto.ef9bdba77102a11f"),
   },
-  schedule_on: { color: "green", glyph: "●", label: "Weekly", title: "Runs on the weekly schedule" },
+  schedule_on: { color: "green", glyph: "●", label: tf("auto.2975132481a7a695"), title: tf("auto.47fd02dd7f2aa529") },
   pending_approval: {
     color: "amber",
     glyph: "⚠",
-    label: "Pending approval",
-    title: "Waiting on board hire approval before it can run",
+    label: tf("status.pending_approval"),
+    title: tf("auto.96a74263220d3ec0"),
   },
   proposal_pending: {
     color: "blue",
     glyph: "↑",
-    label: "Proposal pending",
-    title: "A proposed update is waiting for your review",
+    label: tf("auto.f8a713a24dfda798"),
+    title: tf("auto.ae9d508636c9ad06"),
   },
 };
 

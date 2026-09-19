@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
@@ -20,7 +21,7 @@ import { SetMyUserSecretDialog } from "./SetMyUserSecretDialog";
 export function MissingUserSecretsBanner({
   companyId,
   definitionKeys,
-  title = "Set your user secrets",
+  title = tf("auto.9f5349de86173eb8"),
   secretsPath,
   className,
 }: {
@@ -76,7 +77,7 @@ export function MissingUserSecretsBanner({
                   <code className="text-(length:--text-micro) text-muted-foreground">{entry.definition.key}</code>
                 </span>
                 <Button size="sm" onClick={() => setDialogFor(entry)}>
-                  Set value
+                  {tf("auto.58bf3410b028e71c")}
                 </Button>
               </li>
             ))}
@@ -86,7 +87,7 @@ export function MissingUserSecretsBanner({
               to={secretsPath}
               className="mt-2 inline-block text-(length:--text-micro) font-medium underline underline-offset-2"
             >
-              Manage all my secrets
+              {tf("auto.632626ac59f1902f")}
             </Link>
           ) : null}
         </div>

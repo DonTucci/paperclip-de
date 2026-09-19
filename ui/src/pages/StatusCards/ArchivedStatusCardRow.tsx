@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
@@ -45,7 +46,7 @@ export function ArchivedStatusCardRow({
           stale and never auto-runs. */}
       <div className="flex shrink-0 gap-2">
         <Button size="sm" onClick={onView}>
-          View
+          {tf("text.View")}
         </Button>
         <Button variant="outline" size="sm" onClick={onRestore} disabled={restorePending}>
           {restorePending ? <Loader2 className="animate-spin" /> : null}

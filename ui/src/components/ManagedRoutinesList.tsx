@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Button } from "@/components/ui/button";
 import {
   RoutineListRow,
@@ -83,7 +84,7 @@ export function ManagedRoutinesList({
   agents = [],
   projects = [],
   pluginDisplayName = null,
-  emptyMessage = "No managed routines.",
+  emptyMessage = tf("auto.0a429d06766f011c"),
   runningRoutineKey = null,
   statusMutationRoutineKey = null,
   reconcilingRoutineKey = null,

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
@@ -172,7 +173,7 @@ function SelectOption({
           <span>{label}</span>
           {recommended ? (
             <span className="rounded-sm bg-background/70 px-1.5 py-0.5 text-(length:--text-micro) font-medium text-muted-foreground">
-              Recommended
+              {tf("auto.d70604e843046137")}
             </span>
           ) : null}
         </span>
@@ -313,7 +314,7 @@ export function QuestionForm({
   if (!question)
     return (
       <p className="text-sm text-muted-foreground">
-        No answerable questions were provided.
+        {tf("auto.f088561afe97f5dc")}
       </p>
     );
   const answer = answers[question.id] ?? {};
@@ -402,8 +403,7 @@ export function QuestionForm({
       setError({
         message:
           cause instanceof Error
-            ? cause.message
-            : "The answers could not be submitted.",
+            ? cause.message: tf("auto.81389e37c98e5cb7"),
       });
     } finally {
       setWorking(null);
@@ -421,8 +421,7 @@ export function QuestionForm({
       setError({
         message:
           cause instanceof Error
-            ? cause.message
-            : "The questions could not be cancelled.",
+            ? cause.message: tf("auto.fc11c2188528d293"),
       });
     } finally {
       setWorking(null);
@@ -451,13 +450,13 @@ export function QuestionForm({
     questionSet.questions.length > 1 ? (
       <nav
         className="flex shrink-0 items-center gap-1"
-        aria-label="Question pagination"
+        aria-label={tf("auto.032747727a6c9f98")}
       >
         <Button
           type="button"
           size="icon-xs"
           variant="ghost"
-          aria-label="Previous question"
+          aria-label={tf("auto.d237e091b80cd2f0")}
           disabled={disabled || working != null || page === 0}
           onClick={() => setPage((current) => current - 1)}
         >
@@ -470,7 +469,7 @@ export function QuestionForm({
           type="button"
           size="icon-xs"
           variant="ghost"
-          aria-label="Next question"
+          aria-label={tf("auto.f7a9d7437e964638")}
           // The arrows browse; they do not validate. A send that finds an
           // earlier answer missing returns to that question (see submit).
           disabled={disabled || working != null || isLastPage}
@@ -521,7 +520,7 @@ export function QuestionForm({
       ) : null}
       {question.answerMode === "text" ? (
         <div className="mb-2 flex items-center gap-3 text-xs text-muted-foreground">
-          {question.answerMode === "text" ? <span>Write an answer</span> : null}
+          {question.answerMode === "text" ? <span>{tf("auto.dd394ad8bf24c881")}</span> : null}
         </div>
       ) : null}
       {pagination ? (
@@ -563,7 +562,7 @@ export function QuestionForm({
             value={answer.text ?? ""}
             disabled={disabled || working != null}
             onChange={(value) => updateAnswer({ text: value })}
-            placeholder="Write your answer"
+            placeholder={tf("auto.a2639bd01faffe13")}
             imageUploadHandler={imageUploadHandler}
             mentions={mentions}
             autoFocus
@@ -594,7 +593,7 @@ export function QuestionForm({
                     [question.id]: event.target.value,
                   }))
                 }
-                placeholder="Filter choices"
+                placeholder={tf("auto.386caed3a289cd7b")}
                 aria-label={`Filter choices for ${question.prompt}`}
                 className="pl-8"
               />
@@ -617,7 +616,7 @@ export function QuestionForm({
             <div className="space-y-1.5">
               <SelectOption
                 id={`${id}-${question.id}-custom`}
-                label={question.customAnswer?.label ?? "Other"}
+                label={question.customAnswer?.label ?? tf("auto.f97e9da0e3b879f0")}
                 selected={isCustomActive}
                 multiple={multiple}
                 disabled={disabled || working != null}
@@ -683,7 +682,7 @@ export function QuestionForm({
             disabled={busy}
             onClick={skipQuestion}
           >
-            Skip
+            {tf("auto.28d03596d24eeb4e")}
           </Button>
         ) : null}
         <Button

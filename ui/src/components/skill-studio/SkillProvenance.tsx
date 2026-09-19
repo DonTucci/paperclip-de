@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import { FolderGit2, GitFork } from "lucide-react";
 import type { CompanySkillDetail } from "@paperclipai/shared";
@@ -77,7 +78,7 @@ export function ProjectScanNotice({
           className="h-auto p-0 text-xs"
           onClick={onEditACopy}
         >
-          Edit a copy instead
+          {tf("auto.533010cfd540001f")}
         </Button>
       </div>
     </div>

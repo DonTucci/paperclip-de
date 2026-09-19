@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ShortcutEntry {
@@ -15,48 +16,48 @@ interface ShortcutSection {
 
 const sections: ShortcutSection[] = [
   {
-    title: "Inbox",
+    title: tf("text.Inbox"),
     shortcuts: [
-      { keys: ["j"], label: "Move down" },
-      { keys: ["↓"], label: "Move down" },
-      { keys: ["k"], label: "Move up" },
-      { keys: ["↑"], label: "Move up" },
-      { keys: ["←"], label: "Collapse selected group" },
-      { keys: ["→"], label: "Expand selected group" },
-      { keys: ["Enter"], label: "Open selected item" },
-      { keys: ["a"], label: "Archive item" },
-      { keys: ["y"], label: "Archive item" },
-      { keys: ["r"], label: "Mark as read" },
-      { keys: ["U"], label: "Mark as unread" },
+      { keys: ["j"], label: tf("auto.40bb50da160cdc21") },
+      { keys: ["↓"], label: tf("auto.40bb50da160cdc21") },
+      { keys: ["k"], label: tf("auto.c66feb5eb8f217c7") },
+      { keys: ["↑"], label: tf("auto.c66feb5eb8f217c7") },
+      { keys: ["←"], label: tf("auto.933a60afce8a6b41") },
+      { keys: ["→"], label: tf("auto.6ecae6bf37bf0525") },
+      { keys: ["Enter"], label: tf("auto.948dbc15b31394c9") },
+      { keys: ["a"], label: tf("auto.0fd57cea79115d49") },
+      { keys: ["y"], label: tf("auto.0fd57cea79115d49") },
+      { keys: ["r"], label: tf("text.Mark as read") },
+      { keys: ["U"], label: tf("auto.2c19d584bf8ad518") },
     ],
   },
   {
-    title: "Task detail",
+    title: tf("auto.be4654d6726af242"),
     shortcuts: [
-      { keys: ["y"], label: "Quick-archive back to inbox" },
-      { keys: ["g", "i"], label: "Go to inbox" },
-      { keys: ["g", "c"], label: "Focus comment composer" },
+      { keys: ["y"], label: tf("auto.630428a4c87f5f6b") },
+      { keys: ["g", "i"], label: tf("auto.cde5bedaa1cc432c") },
+      { keys: ["g", "c"], label: tf("auto.a0f6da743c071031") },
     ],
   },
   {
-    title: "Decisions",
+    title: tf("text.Decisions"),
     shortcuts: [
-      { keys: ["j"], label: "Move down" },
-      { keys: ["↓"], label: "Move down" },
-      { keys: ["k"], label: "Move up" },
-      { keys: ["↑"], label: "Move up" },
-      { keys: ["Enter"], label: "Open or close selected decision" },
-      { keys: ["x"], label: "Dismiss selected decision" },
+      { keys: ["j"], label: tf("auto.40bb50da160cdc21") },
+      { keys: ["↓"], label: tf("auto.40bb50da160cdc21") },
+      { keys: ["k"], label: tf("auto.c66feb5eb8f217c7") },
+      { keys: ["↑"], label: tf("auto.c66feb5eb8f217c7") },
+      { keys: ["Enter"], label: tf("auto.54d2aedada1f0c4c") },
+      { keys: ["x"], label: tf("auto.371158fa81c25127") },
     ],
   },
   {
-    title: "Global",
+    title: tf("auto.a258b30f88c30650"),
     shortcuts: [
-      { keys: ["/"], label: "Search current page or quick search" },
-      { keys: ["c"], label: "New task" },
-      { keys: ["["], label: "Toggle sidebar" },
-      { keys: ["]"], label: "Toggle panel" },
-      { keys: ["?"], label: "Show keyboard shortcuts" },
+      { keys: ["/"], label: tf("auto.4dac6ee7d1ea34bb") },
+      { keys: ["c"], label: tf("text.New task") },
+      { keys: ["["], label: tf("auto.041aefc44394f530") },
+      { keys: ["]"], label: tf("auto.ed98852805c90543") },
+      { keys: ["?"], label: tf("auto.3d0ced5dc621bc9e") },
     ],
   },
 ];
@@ -105,7 +106,7 @@ export function KeyboardShortcutsCheatsheetContent() {
       </div>
       <div className="border-t border-border px-5 py-3">
         <p className="text-xs text-muted-foreground">
-          Press <KeyCap>Esc</KeyCap> to close &middot; Shortcuts are disabled in text fields
+          Press <KeyCap>{tf("auto.52f878edb34fa14f")}</KeyCap> to close &middot; Shortcuts are disabled in text fields
         </p>
       </div>
     </>
@@ -123,7 +124,7 @@ export function KeyboardShortcutsCheatsheet({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden" showCloseButton={false}>
         <DialogHeader className="px-5 pt-5 pb-3">
-          <DialogTitle className="text-base">Keyboard shortcuts</DialogTitle>
+          <DialogTitle className="text-base">{tf("auto.e9bef0b0f3c25e6e")}</DialogTitle>
         </DialogHeader>
         <KeyboardShortcutsCheatsheetContent />
       </DialogContent>

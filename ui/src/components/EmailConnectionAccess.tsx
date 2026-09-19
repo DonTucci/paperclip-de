@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Agent } from "@paperclipai/shared";
 import { toolsApi } from "@/api/tools";
@@ -34,11 +35,11 @@ export function EmailConnectionAccess({
     },
   });
   if (grants.isLoading || installs.isLoading)
-    return <p className="text-sm text-muted-foreground">Loading access…</p>;
+    return <p className="text-sm text-muted-foreground">{tf("auto.a55b4d69fcfdff44")}</p>;
   if (grants.error || installs.error)
     return (
       <p role="alert" className="text-sm text-destructive">
-        Connection access could not be loaded.
+        {tf("auto.95339012793d2430")}
       </p>
     );
   const active = grants.data?.grants.filter((g) => g.status === "active") ?? [];
@@ -63,13 +64,13 @@ export function EmailConnectionAccess({
     <div className="space-y-8">
       <section className="space-y-3">
         <h2 className="text-sm font-semibold">
-          Which humans can use this credential?
+          {tf("auto.df3c5fa3fb9fdb31")}
         </h2>
         <p className="text-sm">{humanLabel}</p>
       </section>
       <section className="space-y-4">
         <h2 className="text-sm font-semibold">
-          Which agents can use this connection?
+          {tf("auto.a315e64c5835cd33")}
         </h2>
         <RadioCardGroup
           ariaLabel="Which agents can use this connection"
@@ -77,8 +78,8 @@ export function EmailConnectionAccess({
           disabled={disabled}
           className="sm:grid-cols-2"
           options={[
-            { value: "selected", title: "Just agents I pick" },
-            { value: "all", title: "Any agent" },
+            { value: "selected", title: tf("auto.d2b7ad835c7f34ea") },
+            { value: "all", title: tf("auto.ee3e7690173b4911") },
           ]}
           onValueChange={(value) =>
             save.mutate(
@@ -107,7 +108,7 @@ export function EmailConnectionAccess({
           />
         )}
         <p className="text-xs text-muted-foreground">
-          Removing an assigned agent stops receiving and sending from its inbox.
+          {tf("auto.e816d5d69a2438db")}
         </p>
         {save.error && (
           <p role="alert" className="text-sm text-destructive">

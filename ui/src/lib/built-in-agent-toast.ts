@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ToastInput } from "@/context/ToastContext";
 
 export interface BuiltInAgentPausedToastOptions {
@@ -23,6 +24,6 @@ export function buildBuiltInAgentPausedToast(options: BuiltInAgentPausedToastOpt
     title: `${options.displayName} is paused`,
     body: `Resume the agent to generate this ${noun}.`,
     tone: "warn",
-    action: { label: "View agent", href: options.agentHref },
+    action: { label: tf("auto.7ce7832e35e85d35"), href: options.agentHref },
   };
 }

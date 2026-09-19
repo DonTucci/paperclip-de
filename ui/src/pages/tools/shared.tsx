@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 import type {
   ToolRiskLevel,
@@ -12,7 +13,7 @@ import { ApiError } from "@/api/client";
 
 /** Risk classification badge for a catalog tool. */
 export function RiskBadge({ risk }: { risk: ToolRiskLevel | null | undefined }) {
-  if (!risk) return <Badge variant="outline">unknown</Badge>;
+  if (!risk) return <Badge variant="outline">{tf("auto.b23a6a8439c0dde5")}</Badge>;
   const variant =
     risk === "high" || risk === "critical"
       ? "destructive"
@@ -34,9 +35,9 @@ export function CapabilityBadges({
 }) {
   return (
     <span className="inline-flex flex-wrap gap-1">
-      {isReadOnly ? <Badge variant="outline">read-only</Badge> : null}
-      {isWrite ? <Badge variant="secondary">write</Badge> : null}
-      {isDestructive ? <Badge variant="destructive">destructive</Badge> : null}
+      {isReadOnly ? <Badge variant="outline">{tf("auto.4fed3970dcc0d31d")}</Badge> : null}
+      {isWrite ? <Badge variant="secondary">{tf("auto.10fd874b68dad080")}</Badge> : null}
+      {isDestructive ? <Badge variant="destructive">{tf("auto.1b933329d22a42d5")}</Badge> : null}
     </span>
   );
 }
@@ -83,25 +84,25 @@ function decisionToStatusKey(decision: string): { key: string; label: string } {
   switch (decision) {
     case "allow":
     case "allowed":
-      return { key: "allowed", label: "allowed" };
+      return { key: "allowed", label: tf("auto.eabc01f12ec3e7cb") };
     case "deny":
     case "denied":
-      return { key: "denied", label: "denied" };
+      return { key: "denied", label: tf("auto.62d6c2330036f64b") };
     case "block":
-      return { key: "block", label: "block" };
+      return { key: "block", label: tf("auto.496aca80e4d8f29f") };
     case "require_approval":
     case "requires_approval":
-      return { key: "require-approval", label: "require approval" };
+      return { key: "require-approval", label: tf("auto.ba46f298f18b1d3a") };
     case "redact":
     case "redacted":
-      return { key: "redacted", label: "redacted" };
+      return { key: "redacted", label: tf("auto.b68919aff001d836") };
     case "rate_limited":
-      return { key: "rate-limit", label: "rate limited" };
+      return { key: "rate-limit", label: tf("auto.d292012eb3769a2f") };
     case "defer":
     case "deferred":
-      return { key: "deferred", label: "deferred" };
+      return { key: "deferred", label: tf("auto.a706016085b2165e") };
     case "hidden":
-      return { key: "hidden", label: "hidden" };
+      return { key: "hidden", label: tf("auto.e564b4081d7a9ea4") };
     default:
       return { key: decision, label: decision };
   }
@@ -116,7 +117,7 @@ export function DecisionBadge({ decision }: { decision: ToolPolicyDecision | str
 
 /** Compact relative time, falling back to absolute. */
 export function RelativeTime({ value }: { value: Date | string | null | undefined }) {
-  if (!value) return <span className="text-muted-foreground">never</span>;
+  if (!value) return <span className="text-muted-foreground">{tf("auto.6497e4b3d7bed169")}</span>;
   const date = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return <span className="text-muted-foreground">—</span>;
   const diffMs = Date.now() - date.getTime();
@@ -157,7 +158,7 @@ export function ToolsPageHeader({
   );
 }
 
-export function LoadingState({ label = "Loading…" }: { label?: string }) {
+export function LoadingState({ label = tf("auto.ba3bbbe10d8bef66") }: { label?: string }) {
   return (
     <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
       <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
@@ -171,17 +172,17 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
   let message: string;
   if (error instanceof ApiError) {
     if (error.status === 403) {
-      message = "You do not have permission to view this. Tools & Access requires board/admin access.";
+      message = tf("auto.172085a4f12fb320");
     } else if (error.status === 404 || /route not found/i.test(error.message)) {
       // Snapshot-skew window: the route exists in this build but not on the live server snapshot yet.
-      message = "Tools & Access isn't available on this server yet — try refreshing after the next deployment.";
+      message = tf("auto.ae09e4f7ca270168");
     } else {
       message = error.message;
     }
   } else if (error instanceof Error) {
     message = error.message;
   } else {
-    message = "Something went wrong.";
+    message = tf("auto.0c953ab32c603ec4");
   }
   return (
     <Card className="border-destructive/40">
@@ -189,7 +190,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
         <div className="flex items-start gap-2 text-sm text-destructive">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
-            <p className="font-medium">Could not load this view</p>
+            <p className="font-medium">{tf("auto.fa92f9261c042b39")}</p>
             <p className="text-destructive/80">{message}</p>
           </div>
         </div>
@@ -199,7 +200,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
             onClick={onRetry}
             className="self-start rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent"
           >
-            Retry
+            {tf("text.Retry")}
           </button>
         ) : null}
       </CardContent>

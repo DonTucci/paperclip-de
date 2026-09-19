@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { EmailEndpointSettings } from "./EmailEndpointSetup";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -233,7 +234,7 @@ export function ChatEndpointDetail() {
   useEffect(() => {
     if (!endpoint || !activeTab) return;
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
+      { label: tf("text.Connectors"), href: "/apps" },
       {
         label: `${endpoint.assignedAgentName} · ${providerNames[endpoint.provider]}`,
         href: `/apps/chat/${endpoint.id}/settings`,
@@ -253,17 +254,17 @@ export function ChatEndpointDetail() {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Loading connection…
+        {tf("auto.ca5b56e4cc0be238")}
       </div>
     );
   if (endpointQuery.isError || !endpoint)
     return (
       <div className="space-y-3">
         <p className="text-sm text-destructive">
-          This chat connection could not be loaded.
+          {tf("auto.89a518fffbb43acf")}
         </p>
         <Button variant="outline" onClick={() => endpointQuery.refetch()}>
-          Try again
+          {tf("text.Try again")}
         </Button>
       </div>
     );
@@ -285,10 +286,10 @@ export function ChatEndpointDetail() {
           {endpoint.provider === "imessage-photon" && endpoint.botExternalId && endpoint.photonAllocation !== "shared" && (
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
               <span>{endpoint.botExternalId}</span>
-              <Button variant="ghost" size="sm" aria-label="Copy dedicated number" onClick={async () => {
+              <Button variant="ghost" size="sm" aria-label={tf("auto.0a559caf8e5ef72f")} onClick={async () => {
                 try { await copyTextToClipboard(endpoint.botExternalId!); setCopyStatus("Number copied"); }
                 catch { setCopyStatus("Could not copy the number. Select and copy it manually."); }
-              }}><Copy className="size-4" />Copy number</Button>
+              }}><Copy className="size-4" />{tf("auto.f35c40de44350294")}</Button>
               <span role="status" className="text-muted-foreground">{copyStatus}</span>
             </div>
           )}
@@ -303,7 +304,7 @@ export function ChatEndpointDetail() {
                 )
               }
             >
-              Continue setup
+              {tf("auto.c5702c19da53e523")}
             </Button>
           ) : null}
           <StatusBadge status={endpoint.status} />
@@ -364,8 +365,8 @@ function Settings({
       ),
     onError: (error) =>
       pushToast({
-        title: "Couldn't update destination",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.f23b38cd6e08b4ad"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -378,8 +379,8 @@ function Settings({
       ),
     onError: (error) =>
       pushToast({
-        title: "Couldn't update settings",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.522457dbff20340c"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -395,7 +396,7 @@ function Settings({
       {endpoint.provider === "imessage-photon" && <p className="text-sm text-muted-foreground">{endpoint.photonAllocation === "shared" ? "Shared Photon project · direct messages only. Enroll senders in Photon and link their Messages identities in Access. Groups cannot be enabled." : "Enable each group individually. Agent replies are visible to everyone in that group; only authorized senders can start work."}</p>}
       {endpoint.provider === "slack" && endpoint.setup?.command && (
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Slack command</h2>
+          <h2 className="text-lg font-semibold">{tf("auto.33642541cdb0f950")}</h2>
           <div className="rounded-lg border border-border p-3 text-sm">
             <code>{endpoint.setup.command}</code>
             <p className="mt-2 text-muted-foreground">
@@ -411,7 +412,7 @@ function Settings({
       )}
       {endpoint.provider === "telegram" && (
         <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Telegram group command</h2>
+          <h2 className="text-lg font-semibold">{tf("auto.a2c515a4d168f843")}</h2>
           <div className="rounded-lg border border-border p-3 text-sm">
             <code>
               /task@
@@ -427,19 +428,19 @@ function Settings({
         </div>
       )}
       <div>
-        <h2 className="text-lg font-semibold">Where this agent can work</h2>
+        <h2 className="text-lg font-semibold">{tf("auto.b3257820dbf0e6d4")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Provider membership makes a destination available. Paperclip responds
           only where you enable it.
         </p>
       </div>
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold">Destinations</h3>
+        <h3 className="text-sm font-semibold">{tf("auto.72eb63f032e47e34")}</h3>
         {resourcesQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading destinations…</p>
+          <p className="text-sm text-muted-foreground">{tf("auto.b78eda5f3fc75eba")}</p>
         ) : destinationResources.length === 0 ? (
           <p className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-            No provider destinations have been discovered yet.
+            {tf("auto.44663dffe95570ba")}
           </p>
         ) : (
           <div className="divide-y divide-border border-y border-border">
@@ -475,9 +476,9 @@ function Settings({
       </div>
       {endpoint.provider !== "github" && (
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold">Private conversations</h3>
+          <h3 className="text-sm font-semibold">{tf("auto.65f20ef7ee9a6ecb")}</h3>
           <SettingToggle
-            label="Allow direct messages"
+            label={tf("auto.e2f7f14dd8ad3c02")}
             detail={
               endpoint.provider === "discord"
                 ? "People must also enable Direct Messages in their shared Discord server’s Privacy Settings."
@@ -491,7 +492,7 @@ function Settings({
           />
           {endpoint.provider === "microsoft-teams" && (
             <SettingToggle
-              label="Allow group chats"
+              label={tf("auto.5fabb08f65b4672e")}
               detail="The bot may participate in group chats where it is installed."
               checked={endpoint.allowGroupChats ?? false}
               pending={updateEndpoint.isPending}
@@ -566,15 +567,15 @@ function Access({
         new URL(confirmationUrl, window.location.origin).toString(),
       );
       pushToast({
-        title: "Private identity-link URL created",
+        title: tf("auto.ec92b406a21c55c1"),
         body: "Send it only to the person whose provider identity is shown.",
         tone: "success",
       });
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't create identity link",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.619b3ffebb378443"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -590,14 +591,14 @@ function Access({
   return (
     <section className="max-w-3xl space-y-7">
       <div>
-        <h2 className="text-lg font-semibold">External identity access</h2>
+        <h2 className="text-lg font-semibold">{tf("auto.742bdfc379f824a6")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Linked identities act as their current Paperclip user. Unlinked
           people, when allowed, receive a fixed restricted profile.
         </p>
       </div>
       <SettingToggle
-        label="Allow unlinked people"
+        label={tf("auto.b61e32fc710b1caa")}
         detail="They are restricted guests. Their tasks run only with an isolated workspace and sandbox environment; otherwise Paperclip safely refuses the request. They cannot approve, hire, spend, manage access, or reassign agents."
         checked={allowUnlinked}
         pending={updatePolicy.isPending}
@@ -605,7 +606,7 @@ function Access({
       />
       {confirmationUrl && (
         <div className="space-y-2 border-y border-border py-3">
-          <p className="text-sm font-medium">Private confirmation link</p>
+          <p className="text-sm font-medium">{tf("auto.a3503780b09e5d3f")}</p>
           <p className="break-all text-xs text-muted-foreground">
             {confirmationUrl}
           </p>
@@ -616,12 +617,12 @@ function Access({
               void copyTextToClipboard(confirmationUrl).then(
                 () =>
                   pushToast({
-                    title: "Confirmation link copied",
+                    title: tf("auto.715f611146702382"),
                     tone: "success",
                   }),
                 () =>
                   pushToast({
-                    title: "Couldn't copy the link",
+                    title: tf("auto.6bad7bdb27b753ae"),
                     body: "Select and copy it manually.",
                     tone: "error",
                   }),
@@ -629,15 +630,15 @@ function Access({
             }}
           >
             <Copy />
-            Copy link
+            {tf("text.Copy link")}
           </Button>
         </div>
       )}
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold">Identity links</h3>
+        <h3 className="text-sm font-semibold">{tf("auto.d0150db97db5e9e0")}</h3>
         {links.length === 0 ? (
           <p className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-            External people appear here after they message the agent.
+            {tf("auto.9c47110375675ebc")}
           </p>
         ) : (
           <div className="divide-y divide-border border-y border-border">
@@ -662,7 +663,7 @@ function Access({
                     onClick={() => revoke.mutate(link.principalId)}
                   >
                     <Unlink />
-                    Revoke
+                    {tf("auto.87e6d00bbf53ec5a")}
                   </Button>
                 ) : (
                   <Button
@@ -671,7 +672,7 @@ function Access({
                     disabled={createIntent.isPending}
                     onClick={() => createIntent.mutate(link.principalId)}
                   >
-                    Create private link
+                    {tf("auto.d972bf7850a78a32")}
                   </Button>
                 )}
               </div>
@@ -699,7 +700,7 @@ function Conversations({
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold">Conversations</h2>
+        <h2 className="text-lg font-semibold">{tf("auto.1d432f58690c2b4a")}</h2>
       </div>
       {rows.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
@@ -735,7 +736,7 @@ function Conversations({
                 )}
                 {row.issueId && (
                   <Button asChild size="sm" variant="outline">
-                    <Link to={`/issues/${row.issueId}`}>Open task</Link>
+                    <Link to={`/issues/${row.issueId}`}>{tf("auto.6b5c9394cb7f900b")}</Link>
                   </Button>
                 )}
               </div>
@@ -782,8 +783,8 @@ function Activity({
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't replay activity",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.e3eb4a3341173aac"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -841,8 +842,8 @@ function Activity({
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't resolve activity",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.fce6f023ce3f346c"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -868,8 +869,8 @@ function Activity({
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't update connection",
-        body: error instanceof Error ? error.message : "Try again.",
+        title: tf("auto.a99084d879ff9cd3"),
+        body: error instanceof Error ? error.message: tf("auto.a0c2cc1374d94994"),
         tone: "error",
       }),
   });
@@ -886,7 +887,7 @@ function Activity({
     : [];
   return (
     <section className="space-y-5">
-      <h2 className="text-lg font-semibold">Connection activity</h2>
+      <h2 className="text-lg font-semibold">{tf("auto.52520f2f36e9e339")}</h2>
       {(health.message || health.error) && (
         <div
           className={`flex items-start gap-2 rounded-lg border p-3 text-sm ${status === "attention" || status === "revoked" ? "border-destructive/40 bg-destructive/5 text-destructive" : "border-border bg-muted/30 text-foreground"}`}
@@ -898,7 +899,7 @@ function Activity({
             {health.message && <p>{health.message}</p>}
             {health.previousHealth && (
               <p className="mt-1 text-xs opacity-80">
-                <span className="font-medium">Last reported health:</span>{" "}
+                <span className="font-medium">{tf("auto.1b2bf64e746ed501")}</span>{" "}
                 {health.previousHealth}
               </p>
             )}
@@ -915,7 +916,7 @@ function Activity({
         <div
           className={`rounded-lg border p-3 text-sm ${endpoint.setup?.callbacksNeedUpdate ? "border-destructive/40 bg-destructive/5" : "border-border bg-muted/30"}`}
         >
-          <p className="font-medium">Slack callback health</p>
+          <p className="font-medium">{tf("auto.035e2b309da2f233")}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             {endpoint.setup?.callbacksNeedUpdate
               ? "Slack callback URLs need an update. Save the current App Manifest, then exercise Events, Interactivity, and the registered command again."
@@ -1012,7 +1013,7 @@ function Activity({
               onClick={() => setRemoveOpen(true)}
             >
               <Trash2 />
-              Remove connection
+              {tf("auto.e9e9e26c6c2f8326")}
             </Button>
           </div>
           {status !== "draft" && status !== "verifying" && (
@@ -1024,26 +1025,26 @@ function Activity({
       )}
       <div className="space-y-2">
         <h3 className="text-sm font-semibold">
-          Delivery and publication history
+          {tf("auto.34c447befe185683")}
         </h3>
         <div className="divide-y divide-border border-y border-border">
           {query.isLoading && (
             <div className="flex items-center gap-2 py-5 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Loading activity…
+              {tf("auto.a389c395010ec404")}
             </div>
           )}
           {query.isError && (
             <div className="flex flex-wrap items-center justify-between gap-3 py-4">
               <p className="text-sm text-destructive" role="alert">
-                Connection activity could not be loaded.
+                {tf("auto.65047eb0ce811ca6")}
               </p>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => query.refetch()}
               >
-                Try again
+                {tf("text.Try again")}
               </Button>
             </div>
           )}
@@ -1106,14 +1107,14 @@ function Activity({
                     variant="outline"
                     onClick={() => setResolutionItem(item)}
                   >
-                    Resolve
+                    {tf("auto.c8f193b315c86f3a")}
                   </Button>
                 )}
               </div>
             ))}
           {!query.isLoading && !query.isError && rows.length === 0 && (
             <p className="py-5 text-sm text-muted-foreground">
-              No connection activity yet.
+              {tf("auto.3ba50fcde806959d")}
             </p>
           )}
         </div>
@@ -1143,7 +1144,7 @@ function Activity({
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:flex-wrap">
             <AlertDialogCancel disabled={resolveActivity.isPending}>
-              Keep unresolved
+              {tf("auto.0de1079d12fd052c")}
             </AlertDialogCancel>
             {resolutionItem &&
               activityResolutionActions(resolutionItem).includes("cancel") && (
@@ -1203,7 +1204,7 @@ function Activity({
                     }
                   }}
                 >
-                  Mark delivered
+                  {tf("auto.3a47653eb7247f46")}
                 </AlertDialogAction>
               )}
           </AlertDialogFooter>
@@ -1212,7 +1213,7 @@ function Activity({
       <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove this connection?</AlertDialogTitle>
+            <AlertDialogTitle>{tf("auto.e91e08c0b06c53cf")}</AlertDialogTitle>
             <AlertDialogDescription>
               {endpoint.assignedAgentName} will stop receiving new work from
               {` ${providerNames[endpoint.provider]}`}. Existing Paperclip tasks
@@ -1221,7 +1222,7 @@ function Activity({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{tf("text.Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={lifecycle.isPending}

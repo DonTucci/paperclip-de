@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import type { Agent } from "@paperclipai/shared";
 import {
@@ -51,7 +52,7 @@ export function ReportsToPicker({
           {unknownManager ? (
             <>
               <User className="h-3 w-3 shrink-0 text-muted-foreground" />
-              <span className="min-w-0 truncate text-muted-foreground">Unknown manager (stale ID)</span>
+              <span className="min-w-0 truncate text-muted-foreground">{tf("auto.7c4ea0f2a6f44356")}</span>
             </>
           ) : current ? (
             <>
@@ -87,7 +88,7 @@ export function ReportsToPicker({
             setOpen(false);
           }}
         >
-          No manager
+          {tf("auto.6a4ee4d7c34ebada")}
         </button>
         {terminatedManager && (
           <div className="flex min-w-0 items-center gap-2 overflow-hidden px-2 py-1.5 text-xs text-muted-foreground border-b border-border mb-0.5">
@@ -99,7 +100,7 @@ export function ReportsToPicker({
         )}
         {unknownManager && (
           <div className="px-2 py-1.5 text-xs text-muted-foreground border-b border-border mb-0.5">
-            Saved manager is missing from this organization. Choose a new manager or clear.
+            {tf("auto.20e0650734bc70cb")}
           </div>
         )}
         {rows.map((a) => (

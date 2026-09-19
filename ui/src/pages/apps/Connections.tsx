@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppWindow, Cloud, Loader2, ShieldAlert, ShieldCheck, ShieldQuestion, Trash2 } from "lucide-react";
@@ -57,7 +58,7 @@ const BROWSE_HREF = "/apps";
 type StatusFilter = "all" | "attention";
 
 type AppStatus = {
-  label: "Healthy" | "Needs attention" | "Paused" | "Not connected";
+  label: string;
   tone: "connected" | "attention" | "paused" | "not_connected";
 };
 
@@ -82,19 +83,19 @@ type AppRow = {
  */
 function statusFor(application: ToolApplication, connections: ToolConnection[]): AppStatus {
   if (connections.length === 0) {
-    return { label: "Not connected", tone: "not_connected" };
+    return { label: tf("auto.0303e18246708180"), tone: "not_connected" };
   }
   if (
     application.status === "disabled" ||
     application.status === "archived" ||
     connections.every((connection) => connection.enabled === false || connection.status === "disabled")
   ) {
-    return { label: "Paused", tone: "paused" };
+    return { label: tf("text.Paused"), tone: "paused" };
   }
   if (connections.some((connection) => isAttentionHealthStatus(connection.healthStatus))) {
-    return { label: "Needs attention", tone: "attention" };
+    return { label: tf("auto.c1ebc7817870e5be"), tone: "attention" };
   }
-  return { label: "Healthy", tone: "connected" };
+  return { label: tf("auto.7f1e323b6272c620"), tone: "connected" };
 }
 
 /** The single health-derived predicate that drives highlight, pill, banner, filter (F6). */
@@ -126,8 +127,8 @@ export function Connections() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
-      { label: "Connections" },
+      { label: tf("text.Connectors"), href: "/apps" },
+      { label: tf("text.Connections") },
     ]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs]);
@@ -167,8 +168,8 @@ export function Connections() {
       if (status.verificationUrl) window.location.assign(status.verificationUrl);
     },
     onError: (error) => pushToast({
-      title: "Couldn’t reach Paperclip Cloud",
-      body: error instanceof Error ? error.message : "Try again in a moment.",
+      title: tf("auto.79f035657540a3a5"),
+      body: error instanceof Error ? error.message: tf("auto.29cc3339fce99f05"),
       tone: "error",
     }),
   });
@@ -188,7 +189,7 @@ export function Connections() {
       queryClient.invalidateQueries({ queryKey: queryKeys.tools.applications(selectedCompanyId!) });
       queryClient.invalidateQueries({ queryKey: queryKeys.apps.attention(selectedCompanyId!) });
       pushToast({
-        title: "Connection deleted",
+        title: tf("auto.d0294a63a52c330e"),
         body: target.remainingConnectionCount > 0
           ? `${target.appName} still has ${target.remainingConnectionCount} active ${target.remainingConnectionCount === 1 ? "connection" : "connections"} available to agents.`
           : `${target.appName} is no longer available to agents and its credentials are deleted. Connecting it again needs a new sign-in or key.`,
@@ -198,8 +199,8 @@ export function Connections() {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't delete the connection",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.1ef396039a6f63d7"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -305,7 +306,7 @@ export function Connections() {
   const visibleRows = filter === "attention" ? rowsNeedingAttention : rows;
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select an organization to manage apps.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.c62bf64e9f0c2f07")}</div>;
   }
 
   const loading = applicationsQuery.isLoading || connectionsQuery.isLoading || galleryQuery.isLoading;
@@ -335,9 +336,9 @@ export function Connections() {
         <div className="space-y-5">
           <header className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">Connections</h1>
+              <h1 className="text-2xl font-bold tracking-tight">{tf("text.Connections")}</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                The tools you’ve connected, and whether they’re working.
+                {tf("auto.86c96136650cf311")}
               </p>
             </div>
             <Button onClick={() => navigate(BROWSE_HREF)}>Connect an app</Button>
@@ -369,10 +370,10 @@ export function Connections() {
                   {reviewCount} {reviewCount === 1 ? "action is" : "actions are"} waiting for your OK
                 </div>
                 <div className="truncate text-xs text-amber-700 dark:text-amber-300">
-                  Your agents paused to check with you before making a change.
+                  {tf("auto.c81a8bf451c4e8f9")}
                 </div>
               </div>
-              <span className="shrink-0 text-xs font-semibold text-amber-800 dark:text-amber-200">Review →</span>
+              <span className="shrink-0 text-xs font-semibold text-amber-800 dark:text-amber-200">{tf("auto.ab7681eab1638a81")}</span>
             </button>
           )}
 
@@ -391,7 +392,7 @@ export function Connections() {
                   {floatSummary(rowsNeedingAttention)}
                 </div>
               </div>
-              <span className="shrink-0 text-xs font-semibold text-red-800 dark:text-red-200">Fix →</span>
+              <span className="shrink-0 text-xs font-semibold text-red-800 dark:text-red-200">{tf("auto.9049952f0b0af5f1")}</span>
             </button>
           )}
 
@@ -399,12 +400,12 @@ export function Connections() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/40 text-left text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-                  <th className="px-4 py-2.5">Connection</th>
-                  <th className="px-4 py-2.5">Type</th>
-                  <th className="px-4 py-2.5">Connected by</th>
-                  <th className="px-4 py-2.5">Status</th>
-                  <th className="px-4 py-2.5">Actions</th>
-                  <th className="px-4 py-2.5">Last used</th>
+                  <th className="px-4 py-2.5">{tf("auto.639a40e82b9a96f0")}</th>
+                  <th className="px-4 py-2.5">{tf("text.Type")}</th>
+                  <th className="px-4 py-2.5">{tf("auto.9952ce521b785711")}</th>
+                  <th className="px-4 py-2.5">{tf("text.Status")}</th>
+                  <th className="px-4 py-2.5">{tf("text.Actions")}</th>
+                  <th className="px-4 py-2.5">{tf("auto.830ec7f812f9d862")}</th>
                   <th className="px-4 py-2.5" />
                 </tr>
               </thead>
@@ -531,7 +532,7 @@ export function Connections() {
 
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs text-muted-foreground">
-              Apps you connect become available to every agent unless you change “Who can use it”.
+              {tf("auto.b1c276b4f721040b")}
             </p>
           </div>
         </div>
@@ -557,7 +558,7 @@ export function Connections() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteConnection.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleteConnection.isPending}>{tf("text.Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={!connectionToDelete || deleteConnection.isPending}
@@ -592,7 +593,7 @@ function CloudConnectorEnrollmentBanner({
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
         <ShieldCheck className="h-5 w-5 text-primary" />
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold text-foreground">Paperclip-managed sign-in is ready</div>
+          <div className="text-sm font-semibold text-foreground">{tf("auto.267735c56afaf14d")}</div>
           <div className="truncate text-xs text-muted-foreground">
             Provider authorization uses {status.brokerBaseUrl}; credentials stay in this instance.
           </div>
@@ -604,7 +605,7 @@ function CloudConnectorEnrollmentBanner({
     return (
       <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
         <Cloud className="h-5 w-5 text-muted-foreground" />
-        <div className="text-sm text-muted-foreground">Paperclip Cloud enrollment status is unavailable.</div>
+        <div className="text-sm text-muted-foreground">{tf("auto.92a8b2077bb666e0")}</div>
       </div>
     );
   }
@@ -616,7 +617,7 @@ function CloudConnectorEnrollmentBanner({
           {status?.status === "pending" ? "Finish Paperclip Cloud enrollment" : "Enable Paperclip-managed sign-in"}
         </div>
         <div className="text-xs text-muted-foreground">
-          Confirm this server’s exact address before Cloud can return encrypted Google credentials to it.
+          {tf("auto.895b87768fb3b3d8")}
         </div>
       </div>
       <Button variant="outline" size="sm" disabled={busy} onClick={onEnable}>
@@ -678,9 +679,9 @@ function EmptyConnections({ onBrowse }: { onBrowse: () => void }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight">Connections</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{tf("text.Connections")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          The tools you’ve connected, and whether they’re working.
+          {tf("auto.86c96136650cf311")}
         </p>
       </header>
 
@@ -688,13 +689,13 @@ function EmptyConnections({ onBrowse }: { onBrowse: () => void }) {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
           <AppWindow className="h-6 w-6 text-muted-foreground" />
         </div>
-        <p className="mt-4 text-sm font-medium text-foreground">No connections yet.</p>
+        <p className="mt-4 text-sm font-medium text-foreground">{tf("auto.643013cde6f1dbcd")}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add one from <span className="font-medium text-foreground">Apps</span> to give your agents
+          Add one from <span className="font-medium text-foreground">{tf("auto.89dd748442c19485")}</span> to give your agents
           the tools they need.
         </p>
         <Button className="mt-6" onClick={onBrowse}>
-          Browse apps
+          {tf("auto.cc28cdd0d000cd4a")}
         </Button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 // token-extraction: allowlisted — intentional one-off decoration (DECISION-SHEET.md B1
 // user ruling). The bg-[...gradient...] / shadow-[...] literals in this demo/UX-lab page
 // are deliberate one-off decoration, reverted from --gradient-extract-*/--shadow-extract-*
@@ -23,23 +24,23 @@ const surfaceOptions: Array<{
 }> = [
   {
     id: "detail",
-    label: "Run Detail",
+    label: tf("auto.95ccb018c85dce04"),
     eyebrow: "Full transcript",
-    description: "The long-form run page with the `Nice | Raw` toggle and the most inspectable transcript view.",
+    description: tf("auto.4c316230aca7ce43"),
     icon: MonitorCog,
   },
   {
     id: "live",
-    label: "Issue Widget",
+    label: tf("auto.977a3384be4b5e91"),
     eyebrow: "Live stream",
-    description: "The issue-detail live run widget, optimized for following an active run without leaving the task page.",
+    description: tf("auto.13d3e8d1d635d972"),
     icon: RadioTower,
   },
   {
     id: "dashboard",
-    label: "Dashboard Card",
+    label: tf("auto.686783b6ae6de581"),
     eyebrow: "Dense card",
-    description: "The active-agents dashboard card, tuned for compact scanning while keeping the same transcript language.",
+    description: tf("auto.59aca2a9db49a3d1"),
     icon: PanelsTopLeft,
   },
 ];
@@ -68,7 +69,7 @@ function RunDetailPreview({
       <div className="border-b border-border/60 bg-background/90 px-5 py-4">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="uppercase tracking-(--tracking-caps) text-(length:--text-nano)">
-            Run Detail
+            {tf("auto.95ccb018c85dce04")}
           </Badge>
           <StatusBadge status={streaming ? "running" : "succeeded"} />
           <span className="text-xs text-muted-foreground">
@@ -104,10 +105,10 @@ function LiveWidgetPreview({
     <div className="overflow-hidden rounded-xl border border-cyan-500/25 bg-background/85 shadow-[0_20px_50px_rgba(6,182,212,0.10)]">
       <div className="border-b border-border/60 bg-cyan-500/[0.05] px-5 py-4">
         <div className="text-xs font-semibold uppercase tracking-(--tracking-caps) text-cyan-700 dark:text-cyan-300">
-          Live Runs
+          {tf("auto.cf23290bfc629e1a")}
         </div>
         <div className="mt-1 text-xs text-muted-foreground">
-          Compact live transcript stream for the issue detail page.
+          {tf("auto.0e8e7080554af3fd")}
         </div>
       </div>
       <div className="px-5 py-4">
@@ -123,7 +124,7 @@ function LiveWidgetPreview({
             </div>
           </div>
           <Badge variant="outline" className="border-border/70 bg-background/70 px-2.5 py-1 text-(length:--text-micro) text-muted-foreground">
-            Open run
+            {tf("auto.95fe7393c85ec788")}
             <ExternalLink className="h-3 w-3" />
           </Badge>
         </div>
@@ -210,11 +211,11 @@ export function RunTranscriptUxLab() {
             <div className="mb-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/[0.08] px-3 py-1 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-caps) text-cyan-700 dark:text-cyan-300">
                 <FlaskConical className="h-3.5 w-3.5" />
-                UX Lab
+                {tf("auto.ff3eaed8aa19a88e")}
               </div>
-              <h1 className="mt-4 text-2xl font-semibold tracking-tight">Run Transcript Fixtures</h1>
+              <h1 className="mt-4 text-2xl font-semibold tracking-tight">{tf("auto.867588bfb42e9ec8")}</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Built from a real Paperclip development run, then sanitized so no secrets, local paths, or environment details survive into the fixture.
+                {tf("auto.a53c06078ecd1398")}
               </p>
             </div>
 
@@ -277,7 +278,7 @@ export function RunTranscriptUxLab() {
 
             <div className="mb-5 flex flex-wrap items-center gap-2">
               <span className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-caps) text-muted-foreground">
-                Controls
+                {tf("auto.799c269135742a36")}
               </span>
               <div className="inline-flex rounded-full border border-border/70 bg-background/80 p-1">
                 {(["nice", "raw"] as const).map((mode) => (

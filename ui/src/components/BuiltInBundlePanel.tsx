@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 
 import { Link } from "@/lib/router";
@@ -126,7 +127,7 @@ function ResourceActionButton({
           <AlertDialogDescription>{copy.body}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{tf("text.Cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>{copy.confirmLabel}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -162,7 +163,7 @@ function ConfirmActionButton({
           <AlertDialogDescription>{body}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{tf("text.Cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>{confirmLabel}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -302,7 +303,7 @@ export function BuiltInBundlePanel({
         actions={
           <>
             <Button asChild variant="link" size="sm">
-              <Link to={viewHref}>View</Link>
+              <Link to={viewHref}>{tf("text.View")}</Link>
             </Button>
             <ResourceActionButton
               resource={resource}
@@ -317,18 +318,18 @@ export function BuiltInBundlePanel({
   };
 
   return (
-    <section className={cn("space-y-2", className)} aria-label="Bundle status">
-      <h3 className="text-sm font-medium">Bundle status</h3>
+    <section className={cn("space-y-2", className)} aria-label={tf("auto.7d35c70373addf7e")}>
+      <h3 className="text-sm font-medium">{tf("auto.7d35c70373addf7e")}</h3>
 
       <div className="divide-y rounded-lg border px-4">
         {/* Adapter — no resource entry; readiness is the agent lifecycle. */}
         <BundleRow
-          label="Adapter"
+          label={tf("text.Adapter")}
           chips={<ResourceStatusChip variant={adapterChip} />}
           detail={adapterDetail}
           actions={
             <Button variant="outline" size="sm" onClick={onConfigure}>
-              Configure
+              {tf("text.Configure")}
             </Button>
           }
         />
@@ -353,7 +354,7 @@ export function BuiltInBundlePanel({
 
         {/* Routine — zero-token-by-default; the weekly schedule ships off. */}
         <BundleRow
-          label="Routine"
+          label={tf("text.Routine")}
           secondary={bundle.routine.title}
           chips={
             <>
@@ -376,7 +377,7 @@ export function BuiltInBundlePanel({
               <>
                 {onRunRoutine && (
                   <ConfirmActionButton
-                    title="Run Reflection Coach once?"
+                    title={tf("auto.4cb5c954c165c52c")}
                     body="Paperclip will create one routine task now. This does not enable the weekly schedule or turn on background work."
                     triggerLabel="Run once"
                     confirmLabel="Run once"
@@ -387,7 +388,7 @@ export function BuiltInBundlePanel({
                 {scheduleEnabled
                   ? onDisableSchedule && (
                     <ConfirmActionButton
-                      title="Disable the weekly schedule?"
+                      title={tf("auto.dc2e4df7a45fa887")}
                       body="Paperclip will stop future scheduled Reflection Coach runs. Manual Run once remains available."
                       triggerLabel="Disable schedule"
                       confirmLabel="Disable schedule"
@@ -397,7 +398,7 @@ export function BuiltInBundlePanel({
                   )
                   : onEnableSchedule && (
                     <ConfirmActionButton
-                      title="Enable the weekly schedule?"
+                      title={tf("auto.639afd2782aec3c4")}
                       body="Paperclip will allow Reflection Coach to create routine tasks on the weekly schedule. It can spend tokens when those tasks run."
                       triggerLabel="Enable weekly"
                       confirmLabel="Enable weekly"
@@ -408,7 +409,7 @@ export function BuiltInBundlePanel({
                 {driftVariant(routine) && (
                   <ResourceActionButton
                     resource={routine}
-                    label="routine"
+                    label={tf("auto.fde55b36ec36cbcd")}
                     onConfirm={() => onResetResource("routine")}
                     pending={resettingResource === "routine"}
                   />
@@ -419,12 +420,12 @@ export function BuiltInBundlePanel({
         />
         {proposalHref && (
           <BundleRow
-            label="Proposal"
+            label={tf("auto.5d42766c7ecac46c")}
             chips={<ResourceStatusChip variant="proposal_pending" />}
             detail="A proposed Reflection Coach update is waiting for review."
             actions={
               <Button asChild variant="link" size="sm">
-                <Link to={proposalHref}>Review proposal</Link>
+                <Link to={proposalHref}>{tf("auto.fc3188f440463920")}</Link>
               </Button>
             }
           />

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Agent } from "@paperclipai/shared";
 import { AlertTriangle, ArrowUpRight, Bot, Check, CheckCircle2, ChevronDown, ChevronRight, CircleDashed, Clock, ExternalLink, FileText, GitBranch, ImagePlus, KeyRound, Loader2, MessageSquareQuote, MinusCircle, ShieldAlert, ThumbsUp, TriangleAlert, Wrench, X, XCircle } from "lucide-react";
@@ -283,14 +284,14 @@ function planStatusClasses(
         return {
           shell: "border-2 border-amber-500/70 bg-transparent",
           badge: "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:bg-amber-500/15 dark:text-amber-100",
-          label: "Approved — agent resume failed",
+          label: tf("auto.03dbaee78a06fbac"),
           Icon: AlertTriangle,
         };
       }
       return {
         shell: "border-2 border-green-500/80 bg-transparent",
         badge: "border-green-500/60 bg-green-500/10 text-green-900 dark:bg-green-500/15 dark:text-green-100",
-        label: "Approved",
+        label: tf("text.Approved"),
         Icon: CheckCircle2,
       };
     case "rejected":
@@ -306,14 +307,14 @@ function planStatusClasses(
       return {
         shell: "border-2 border-amber-500/70 bg-transparent",
         badge: "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:bg-amber-500/15 dark:text-amber-100",
-        label: "Expired",
+        label: tf("auto.424a2551d356754c"),
         Icon: AlertTriangle,
       };
     default:
       return {
         shell: "border-2 border-violet-500/80 bg-transparent",
         badge: "border-violet-500/60 bg-violet-500/10 text-violet-900 dark:bg-violet-500/15 dark:text-violet-100",
-        label: "In review",
+        label: tf("status.in_review"),
         Icon: FileText,
       };
   }
@@ -474,7 +475,7 @@ function toolActionStatusClasses(state: ToolActionCardState): {
       return {
         shell: "border-2 border-amber-500/70 bg-transparent",
         badge: "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:bg-amber-500/15 dark:text-amber-100",
-        label: "Running…",
+        label: tf("auto.46c541363b0253b1"),
         Icon: Loader2,
         spin: true,
       };
@@ -482,31 +483,31 @@ function toolActionStatusClasses(state: ToolActionCardState): {
       return {
         shell: "border-2 border-green-500/80 bg-transparent",
         badge: "border-green-500/60 bg-green-500/10 text-green-900 dark:bg-green-500/15 dark:text-green-100",
-        label: "Executed",
+        label: tf("auto.3aa8b683ebf3703c"),
         Icon: CheckCircle2,
       };
     case "failed":
       return {
         shell: "border-2 border-amber-500/70 bg-transparent",
         badge: "border-amber-500/60 bg-amber-500/10 text-amber-900 dark:bg-amber-500/15 dark:text-amber-100",
-        label: "Failed",
+        label: tf("text.Failed"),
         Icon: XCircle,
       };
     case "declined":
       return {
         shell: "border-2 border-red-500/80 bg-transparent",
         badge: "border-red-500/60 bg-red-500/10 text-red-900 dark:bg-red-500/15 dark:text-red-100",
-        label: "Declined",
+        label: tf("auto.dce083a2c47ffdc4"),
         Icon: XCircle,
         dimmed: true,
       };
     case "cancelled":
-      return { shell: "border-2 border-border bg-transparent", badge: "border-border bg-muted text-muted-foreground", label: "Cancelled", Icon: XCircle, dimmed: true };
+      return { shell: "border-2 border-border bg-transparent", badge: "border-border bg-muted text-muted-foreground", label: tf("status.cancelled"), Icon: XCircle, dimmed: true };
     case "expired":
       return {
         shell: "border-2 border-border bg-transparent",
         badge: "border-border bg-muted/60 text-muted-foreground",
-        label: "Expired",
+        label: tf("auto.424a2551d356754c"),
         Icon: Clock,
         dimmed: true,
       };
@@ -514,7 +515,7 @@ function toolActionStatusClasses(state: ToolActionCardState): {
       return {
         shell: "border-2 border-violet-500/80 bg-transparent",
         badge: "border-violet-500/60 bg-violet-500/10 text-violet-900 dark:bg-violet-500/15 dark:text-violet-100",
-        label: "Awaiting approval",
+        label: tf("auto.ae25c9b1d366d159"),
         Icon: ShieldAlert,
       };
   }
@@ -632,7 +633,7 @@ function TaskTreeNode({
                 </div>
                 {depth > 0 ? (
                   <div className="mt-0.5 text-(length:--text-nano) font-medium uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-                    Child task
+                    {tf("auto.4e6d7bdb7ee5f2eb")}
                   </div>
                 ) : null}
                 {node.task.description ? (
@@ -654,7 +655,7 @@ function TaskTreeNode({
             </Link>
           ) : isSkipped ? (
             <span className="inline-flex shrink-0 items-center rounded-sm border border-amber-500/60 bg-amber-500/10 px-2.5 py-1 text-(length:--text-micro) font-medium text-amber-900 dark:text-amber-100">
-              Skipped
+              {tf("auto.12698ce1ea5cd4ab")}
             </span>
           ) : null}
         </div>
@@ -662,16 +663,16 @@ function TaskTreeNode({
         {hasMetadata ? (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {hasExplicitAssignee ? (
-              <TaskField label="Responsible" value={assigneeLabel} />
+              <TaskField label={tf("auto.bc110a6d0722098a")} value={assigneeLabel} />
             ) : null}
             {node.task.billingCode ? (
-              <TaskField label="Billing" value={node.task.billingCode} />
+              <TaskField label={tf("auto.3ac8bbca9a74cfbd")} value={node.task.billingCode} />
             ) : null}
             {node.task.projectId ? (
-              <TaskField label="Project" value={node.task.projectId} tone="subtle" />
+              <TaskField label={tf("text.Project")} value={node.task.projectId} tone="subtle" />
             ) : null}
             {labels.map((label) => (
-              <TaskField key={label} label="Label" value={label} tone="subtle" />
+              <TaskField key={label} label={tf("auto.0e66373f45dcf3dd")} value={label} tone="subtle" />
             ))}
           </div>
         ) : null}
@@ -840,7 +841,7 @@ function SuggestTasksCard({
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span>{totalTasks === 1 ? "1 draft issue" : `${totalTasks} draft issues`}</span>
         {interaction.payload.defaultParentId ? (
-          <TaskField label="Default parent" value={interaction.payload.defaultParentId} tone="subtle" />
+          <TaskField label={tf("auto.ac981ebffeaa6b4d")} value={interaction.payload.defaultParentId} tone="subtle" />
         ) : null}
       </div>
 
@@ -864,7 +865,7 @@ function SuggestTasksCard({
       {interaction.status === "accepted" ? (
         <div className="rounded-sm border border-emerald-500/60 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-900 dark:text-emerald-100">
           <div className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-emerald-700">
-            Resolution summary
+            {tf("auto.5ac338f055a7abe5")}
           </div>
           <p className="mt-1 leading-6">
             {skippedCount > 0
@@ -877,7 +878,7 @@ function SuggestTasksCard({
       {interaction.status === "rejected" ? (
         <div className="rounded-sm border border-rose-500/60 bg-rose-500/10 px-4 py-3 text-sm text-rose-900 dark:text-rose-100">
           <div className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-rose-700">
-            Rejection reason
+            {tf("auto.e57499264f493e58")}
           </div>
           <p className={cn(
             "mt-1 leading-6",
@@ -913,7 +914,7 @@ function SuggestTasksCard({
                 {working === "accept" ? (
                   <>
                     <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                    Accepting...
+                    {tf("auto.31409c77894fb400")}
                   </>
                 ) : (
                   selectedCount === totalTasks ? "Accept drafts" : "Accept selected drafts"
@@ -925,7 +926,7 @@ function SuggestTasksCard({
                 disabled={!onRejectInteraction || working !== null}
                 onClick={() => setRejecting((current) => !current)}
               >
-                Reject
+                {tf("text.Reject")}
               </Button>
               {selectedCount < totalTasks ? (
                 <Button
@@ -934,7 +935,7 @@ function SuggestTasksCard({
                   disabled={working !== null}
                   onClick={() => setSelectedClientKeys(new Set(interaction.payload.tasks.map((task) => task.clientKey)))}
                 >
-                  Reset selection
+                  {tf("auto.2e9246864f088a40")}
                 </Button>
               ) : null}
             </div>
@@ -945,7 +946,7 @@ function SuggestTasksCard({
               <Textarea
                 value={rejectReason}
                 onChange={(event) => setRejectReason(event.target.value)}
-                placeholder="Add a short reason for rejecting this suggestion"
+                placeholder={tf("auto.11886cf22e87c75b")}
                 className="min-h-24 bg-background text-sm"
               />
               <div className="flex justify-end">
@@ -958,7 +959,7 @@ function SuggestTasksCard({
                   {working === "reject" ? (
                     <>
                       <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                      Saving...
+                      {tf("text.Saving...")}
                     </>
                   ) : (
                     "Save rejection"
@@ -1185,7 +1186,7 @@ function AskUserQuestionsCard({
       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <Badge variant="outline" className="border-border/70 bg-background/70 px-2.5 py-1 uppercase tracking-(--tracking-eyebrow) text-foreground/70">
           <MessageSquareQuote className="h-3 w-3" />
-          Ask user questions
+          {tf("auto.85f982633587e0c1")}
         </Badge>
         <span>
           {questions.length === 1
@@ -1223,7 +1224,7 @@ function AskUserQuestionsCard({
                   ) : null}
                 </div>
                 <TaskField
-                  label={question.selectionMode === "single" ? "Pick" : "Pick many"}
+                  label={question.selectionMode === "single" ? tf("auto.831a9d52a9c37435") : tf("auto.1c7919368277ed4e")}
                   value={question.required ? "Required" : "Optional"}
                   tone="subtle"
                 />
@@ -1260,7 +1261,7 @@ function AskUserQuestionsCard({
                                 ...current,
                                 [question.id]: event.target.value,
                               }))}
-                            placeholder="Type your answer"
+                            placeholder={tf("auto.d078bf7520a710d0")}
                             className="min-h-24 bg-background text-sm"
                             autoFocus
                           />
@@ -1290,7 +1291,7 @@ function AskUserQuestionsCard({
                       onClick={() =>
                         toggleOption(question.id, OTHER_ANSWER_ID, question.selectionMode)}
                     >
-                      Other
+                      {tf("auto.f97e9da0e3b879f0")}
                     </button>
                     {otherActiveQuestions[question.id] ? (
                       <Textarea
@@ -1301,7 +1302,7 @@ function AskUserQuestionsCard({
                             ...current,
                             [question.id]: event.target.value,
                           }))}
-                        placeholder="Type your answer"
+                        placeholder={tf("auto.d078bf7520a710d0")}
                         className="min-h-24 bg-background text-sm"
                       />
                     ) : null}
@@ -1314,7 +1315,7 @@ function AskUserQuestionsCard({
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-background/75 p-4">
             <div className="text-sm text-muted-foreground">
-              Submit once after you finish the full form.
+              {tf("auto.02885ec7af193b0a")}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {onCancelInteraction ? (
@@ -1327,7 +1328,7 @@ function AskUserQuestionsCard({
                   {cancelling ? (
                     <>
                       <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                      Cancelling...
+                      {tf("auto.7b26131098bb18b2")}
                     </>
                   ) : (
                     "Cancel question"
@@ -1342,7 +1343,7 @@ function AskUserQuestionsCard({
                 {working ? (
                   <>
                     <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                    Submitting...
+                    {tf("auto.64115d5b9c794c92")}
                   </>
                 ) : (
                   interaction.payload.submitLabel ?? "Submit answers"
@@ -1365,7 +1366,7 @@ function AskUserQuestionsCard({
           ) : interaction.result?.reason ? (
             <p className="mt-1">{interaction.result.reason}</p>
           ) : (
-            <p className="mt-1">No answer was recorded.</p>
+            <p className="mt-1">{tf("auto.9122bb871bbd9ae5")}</p>
           )}
         </div>
       ) : interaction.status === "expired" ? (
@@ -1390,7 +1391,7 @@ function AskUserQuestionsCard({
               href={`#comment-${interaction.result.commentId}`}
               className="mt-3 inline-flex text-sm font-medium underline underline-offset-4"
             >
-              Jump to comment
+              {tf("auto.c8799fd3b3b2fed8")}
             </a>
           ) : null}
         </div>
@@ -1412,10 +1413,10 @@ function AskUserQuestionsCard({
                 <div className="mt-2 flex flex-wrap gap-2">
                   {labels.length > 0 ? (
                     labels.map((label) => (
-                      <TaskField key={label} label="Answer" value={label} />
+                      <TaskField key={label} label={tf("auto.b2a3aa602762a782")} value={label} />
                     ))
                   ) : (
-                    <span className="text-sm text-muted-foreground">No answer recorded.</span>
+                    <span className="text-sm text-muted-foreground">{tf("auto.85dd23047a757de7")}</span>
                   )}
                 </div>
               </div>
@@ -1425,7 +1426,7 @@ function AskUserQuestionsCard({
           {interaction.result?.summaryMarkdown ? (
             <div className="rounded-2xl border border-emerald-300/60 bg-emerald-50/85 p-4">
               <div className="mb-2 text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-emerald-700">
-                Submitted summary
+                {tf("auto.6af3ea688c2d33de")}
               </div>
               <MarkdownBody externalReferences={externalReferences}>{interaction.result.summaryMarkdown}</MarkdownBody>
             </div>
@@ -1516,12 +1517,12 @@ function RequestConfirmationResolution({
       return (
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-sm leading-6 text-foreground">
-            <span className="font-medium">Confirmed</span>
+            <span className="font-medium">{tf("auto.fe00b67b6dd1143f")}</span>
             <RequestConfirmationTargetChip interaction={interaction} target={target} />
           </div>
           <div className="rounded-sm border border-amber-500/60 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-100">
             <div className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-amber-700">
-              Agent resume failed
+              {tf("auto.a456bede8c75f3c0")}
             </div>
             <p className="mt-1 leading-6">
               {resumeFailure.status === "retrying"
@@ -1539,7 +1540,7 @@ function RequestConfirmationResolution({
     }
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm leading-6 text-foreground">
-        <span className="font-medium">Confirmed</span>
+        <span className="font-medium">{tf("auto.fe00b67b6dd1143f")}</span>
         <RequestConfirmationTargetChip interaction={interaction} target={target} />
       </div>
     );
@@ -1549,7 +1550,7 @@ function RequestConfirmationResolution({
     return (
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2 text-sm leading-6 text-foreground">
-          <span className="font-medium">Declined</span>
+          <span className="font-medium">{tf("auto.dce083a2c47ffdc4")}</span>
           <RequestConfirmationTargetChip interaction={interaction} target={target} />
         </div>
         {interaction.result?.reason ? (
@@ -1568,7 +1569,7 @@ function RequestConfirmationResolution({
     // and no duplicated reason text.
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm leading-6 text-foreground">
-        <span className="font-medium">Withdrawn</span>
+        <span className="font-medium">{tf("auto.00c0b03fcfa2ac02")}</span>
         <RequestConfirmationTargetChip interaction={interaction} target={target} />
       </div>
     );
@@ -1600,7 +1601,7 @@ function RequestConfirmationResolution({
         </p>
         {expiredByComment && interaction.result?.commentId ? (
           <Button asChild size="sm" variant="ghost" className="h-7 px-2 text-amber-950 hover:bg-amber-500/15 dark:text-amber-50">
-            <a href={`#comment-${interaction.result.commentId}`}>Jump to comment</a>
+            <a href={`#comment-${interaction.result.commentId}`}>{tf("auto.c8799fd3b3b2fed8")}</a>
           </Button>
         ) : null}
         {expiredByTargetChange ? (
@@ -1623,7 +1624,7 @@ function RequestConfirmationResolution({
   if (interaction.status === "failed") {
     return (
       <p className="text-sm leading-6 text-muted-foreground">
-        This request could not be resolved. Try again or create a new request.
+        {tf("auto.7056ad01b4c11aa6")}
       </p>
     );
   }
@@ -1668,7 +1669,7 @@ function ToolActionResolution({
       {output ? (
         <Collapsible open={resultOpen} onOpenChange={setResultOpen}>
           <CollapsibleTrigger asChild>
-            <button type="button" className="flex items-center gap-1.5 rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={resultOpen ? "Hide result details" : "Show result details"}>
+            <button type="button" className="flex items-center gap-1.5 rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label={resultOpen ? tf("auto.1ff4e49e4fd49c0e") : tf("auto.68254305e7a9ea7d")}>
               {status}<ChevronDown className={cn("h-3 w-3", resultOpen && "rotate-180")} />
             </button>
           </CollapsibleTrigger>
@@ -1738,20 +1739,20 @@ function RequestToolActionCard({
           <Button size="sm" variant="ghost" disabled={!onRejectInteraction || working !== null} onClick={() => void decide("reject")}>
             {working === "reject" ? "Declining…" : "Decline"}
           </Button>
-          <div className="inline-flex" role="group" aria-label="Approve request">
+          <div className="inline-flex" role="group" aria-label={tf("auto.9ed200aeb78c5b9b")}>
             <Button size="sm" variant={variant} className={payload.rememberActionScope ? "rounded-r-none" : undefined} disabled={!onAcceptInteraction || working !== null} onClick={() => void decide("accept")}>
               {working === "accept" || working === "always" ? <><Loader2 className="h-3.5 w-3.5 animate-spin" />{working === "always" ? "Saving…" : "Approving…"}</> : "Approve & run"}
             </Button>
             {payload.rememberActionScope ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="icon-sm" variant={variant} className="rounded-l-none border-l border-background/30" aria-label="Approval options" disabled={!onAcceptInteraction || working !== null}>
+                  <Button size="icon-sm" variant={variant} className="rounded-l-none border-l border-background/30" aria-label={tf("auto.b8cd0e4b744cdfb7")} disabled={!onAcceptInteraction || working !== null}>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onSelect={() => void decide("always")} title={payload.rememberActionScope} aria-description={payload.rememberActionScope}>
-                    Always allow
+                    {tf("auto.977618bd8bc7eef4")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -1790,7 +1791,7 @@ function secretProposalStatusClasses(state: SecretProposalCardState) {
     return {
       shell: "border-2 border-red-500/80 bg-transparent",
       badge: "border-red-500/60 bg-red-500/10 text-red-900 dark:bg-red-500/15 dark:text-red-100",
-      label: "FAILED",
+      label: tf("auto.02bd349299173f7f"),
       Icon: XCircle,
     };
   }
@@ -1813,7 +1814,7 @@ function SecretProposalIdentityHeader({
       </div>
       <div className="min-w-0 flex-1">
         <div className="text-base font-bold leading-tight text-foreground">
-          Bind an existing secret
+          {tf("auto.2aea300f8bec71c0")}
         </div>
       </div>
     </div>
@@ -1829,19 +1830,19 @@ function SecretProposalDetails({
     <dl className="grid gap-3 rounded-sm border border-border/70 bg-muted/30 p-3 sm:grid-cols-2">
       <div className="min-w-0 space-y-1">
         <dt className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-          Source secret
+          {tf("auto.60e1f18db6c8a297")}
         </dt>
         <dd className="truncate text-sm font-medium text-foreground">{payload.sourceSecretLabel}</dd>
       </div>
       <div className="min-w-0 space-y-1">
         <dt className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-          Target agent
+          {tf("auto.d539091489783f89")}
         </dt>
         <dd className="truncate text-sm font-medium text-foreground">{payload.targetAgentName}</dd>
       </div>
       <div className="min-w-0 space-y-1 sm:col-span-2">
         <dt className="text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-          New config path
+          {tf("auto.be59ea68894f6302")}
         </dt>
         <dd className="break-all font-mono text-sm text-foreground">{payload.configPath}</dd>
       </div>
@@ -1873,7 +1874,7 @@ function SecretProposalResolution({
         <div>
           <div className="font-medium">Approved by {who} — creating the binding</div>
           <p className="mt-1 text-amber-900/80 dark:text-amber-100/80">
-            Paperclip is re-checking authority and the proposal snapshot before writing.
+            {tf("auto.5117fae9ab1d3182")}
           </p>
         </div>
       </div>
@@ -1902,17 +1903,17 @@ function SecretProposalResolution({
           <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <div className="font-semibold uppercase tracking-(--tracking-eyebrow)">
-              FAILED · binding was not created
+              {tf("auto.0c4d9095e29b66dd")}
             </div>
             <p className="mt-1 text-red-900/80 dark:text-red-100/80">
-              The request was accepted, but execution failed closed. No secret value was exposed.
+              {tf("auto.2b88620383f3113d")}
             </p>
           </div>
         </div>
         {errorCode ? (
           <div className="rounded-sm border border-red-500/50 bg-background/60 px-3 py-2">
             <span className="text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-eyebrow)">
-              Error code
+              {tf("auto.0570b384c3cecf81")}
             </span>{" "}
             <code className="font-mono text-foreground">{errorCode}</code>
           </div>
@@ -1929,7 +1930,7 @@ function SecretProposalResolution({
           <XCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <div className="font-medium">Rejected by {who}</div>
-            <p className="mt-1 text-red-900/80 dark:text-red-100/80">The binding was not created.</p>
+            <p className="mt-1 text-red-900/80 dark:text-red-100/80">{tf("auto.383649952b47b11a")}</p>
           </div>
         </div>
         {reason ? (
@@ -1946,7 +1947,7 @@ function SecretProposalResolution({
       <Clock className="mt-0.5 h-4 w-4 shrink-0" />
       <div>
         <div className="font-medium text-foreground">Proposal expired{when ? ` · ${when}` : ""}</div>
-        <p className="mt-1">The binding was not created. A fresh proposal is required.</p>
+        <p className="mt-1">{tf("auto.7676878454063aec")}</p>
       </div>
     </div>
   );
@@ -2157,7 +2158,7 @@ function ConfirmationActionRow({
           {working === "accept" ? (
             <>
               <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-              Approving…
+              {tf("auto.e99dcb0a97a2320d")}
             </>
           ) : (
             approveLabel
@@ -2188,7 +2189,7 @@ function ConfirmationActionRow({
             {working === "reject" && !revising ? (
               <>
                 <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                Rejecting…
+                {tf("auto.09868524d9262e41")}
               </>
             ) : (
               rejectLabel
@@ -2210,7 +2211,7 @@ function ConfirmationActionRow({
             )}
           />
           {attempted && reasonMissing ? (
-            <p className="text-xs text-destructive">Add a note describing the changes you want.</p>
+            <p className="text-xs text-destructive">{tf("auto.d5ef6ba97db8fdf1")}</p>
           ) : null}
           {revisePanelChildren}
           <div className="flex flex-wrap justify-end gap-2">
@@ -2223,7 +2224,7 @@ function ConfirmationActionRow({
                 setAttempted(false);
               }}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button
               size="sm"
@@ -2234,7 +2235,7 @@ function ConfirmationActionRow({
               {working === "reject" ? (
                 <>
                   <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                  Sending…
+                  {tf("auto.b8ed5279e897be5d")}
                 </>
               ) : (
                 "Send revision"
@@ -2263,7 +2264,7 @@ function connectionAuthorizationStatusClasses(
       return {
         shell: "border-2 border-sky-500/70 bg-transparent",
         badge: "border-sky-500/60 bg-sky-500/10 text-sky-900 dark:bg-sky-500/15 dark:text-sky-100",
-        label: "Action required",
+        label: tf("auto.adf69e75cc7d3c9d"),
         Icon: KeyRound,
       };
     case "waiting":
@@ -2286,7 +2287,7 @@ function connectionAuthorizationStatusClasses(
       return {
         shell: "border-border bg-transparent",
         badge: "border-border bg-muted/60 text-muted-foreground",
-        label: "Not connected",
+        label: tf("auto.0303e18246708180"),
         Icon: MinusCircle,
       };
     case "expired":
@@ -2294,7 +2295,7 @@ function connectionAuthorizationStatusClasses(
       return {
         shell: "border-border bg-transparent",
         badge: "border-border bg-muted/60 text-muted-foreground",
-        label: "Authorization expired",
+        label: tf("auto.92b4263f21419cf4"),
         Icon: CircleDashed,
       };
   }
@@ -2419,7 +2420,7 @@ function RequestConnectionAuthorizationCard({
                 {working ? (
                   <>
                     <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                    Saving…
+                    {tf("auto.23e39291d6135814")}
                   </>
                 ) : (
                   "Not now"
@@ -2693,12 +2694,12 @@ function RequestConfirmationCard({
                   {uploading ? (
                     <>
                       <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                      Uploading...
+                      {tf("auto.72cb29c90ccd8361")}
                     </>
                   ) : (
                     <>
                       <ImagePlus className="mr-2 h-3.5 w-3.5" />
-                      Attach screenshots
+                      {tf("auto.d0f8e01df872f862")}
                     </>
                   )}
                 </Button>
@@ -2754,7 +2755,7 @@ function RequestCheckboxConfirmationResolution({
         {visibleLabels.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {visibleLabels.map((label, index) => (
-              <TaskField key={`${label}-${index}`} label="Selected" value={label} />
+              <TaskField key={`${label}-${index}`} label={tf("auto.57fd7a0cf33f2666")} value={label} />
             ))}
             {hasHiddenLabels ? (
               <button
@@ -2786,7 +2787,7 @@ function RequestCheckboxConfirmationResolution({
   if (interaction.status === "failed") {
     return (
       <p className="text-sm leading-6 text-muted-foreground">
-        This request could not be resolved. Try again or create a new request.
+        {tf("auto.7056ad01b4c11aa6")}
       </p>
     );
   }
@@ -3006,7 +3007,7 @@ function RequestCheckboxConfirmationCard({
               disabled={working !== null || selectedCount === totalOptions || (maxSelected != null && selectedCount >= maxSelected)}
               onClick={handleSelectAll}
             >
-              Select all
+              {tf("auto.1fc9a387654d410f")}
             </Button>
             <Button
               size="sm"
@@ -3014,14 +3015,14 @@ function RequestCheckboxConfirmationCard({
               disabled={working !== null || selectedCount === 0}
               onClick={handleClearSelection}
             >
-              Clear selection
+              {tf("auto.cea4d2e010b8fd52")}
             </Button>
           </div>
         </div>
 
         <div
           role="group"
-          aria-label="Selectable options"
+          aria-label={tf("auto.aaabfe0b43a1950b")}
           className="max-h-80 overflow-y-auto rounded-sm border border-border/70"
         >
           {options.map((option) => {
@@ -3147,7 +3148,7 @@ function ItemVerdictSegmentedControl({
   return (
     <div
       role="group"
-      aria-label="Choose a verdict"
+      aria-label={tf("auto.849de4eb8d64c99c")}
       className="flex shrink-0 flex-wrap items-center gap-2"
     >
       {verdicts.map((verdict) => {
@@ -3361,7 +3362,7 @@ function RequestItemVerdictsCard({
       ) : null}
 
       {/* Item list (S1/S2/S3/S4) */}
-      <ul className="space-y-2" aria-label="Items to review">
+      <ul className="space-y-2" aria-label={tf("auto.6cac728c6d49cabe")}>
         {items.map((item) => {
           const resolved = resolvedById.get(item.id);
           const applying = applyingItemIds.has(item.id);
@@ -3404,12 +3405,12 @@ function RequestItemVerdictsCard({
                   ) : applying ? (
                     <span className="inline-flex items-center gap-1.5 rounded-sm border border-border/70 bg-muted/40 px-2 py-0.5 text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
                       <Loader2 className="h-3.5 w-3.5 motion-safe:animate-spin" aria-hidden />
-                      Applying…
+                      {tf("auto.3329a9bb48b9c8d4")}
                     </span>
                   ) : isTerminal ? (
                     <span className="inline-flex items-center gap-1 rounded-sm border border-border/70 bg-muted/30 px-2 py-0.5 text-(length:--text-micro) font-semibold uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
                       <CircleDashed className="h-3.5 w-3.5" aria-hidden />
-                      Not decided
+                      {tf("auto.4fb8e6bd5ffdafb6")}
                     </span>
                   ) : (
                     <ItemVerdictSegmentedControl
@@ -3436,7 +3437,7 @@ function RequestItemVerdictsCard({
                     id={`${interaction.id}-${item.id}-reason`}
                     value={draft.reason}
                     onChange={(event) => setDraftReason(item.id, event.target.value)}
-                    placeholder="Give the agent a reason so it can act on this item."
+                    placeholder={tf("auto.0149096b8e353627")}
                     aria-invalid={attempted && invalidDraftIds.has(item.id)}
                     className={cn(
                       "min-h-16 bg-background text-sm",
@@ -3482,7 +3483,7 @@ function RequestItemVerdictsCard({
                 onClick={handleApproveAll}
               >
                 <ThumbsUp className="h-4 w-4" aria-hidden />
-                Approve all
+                {tf("auto.ae067b6871072a45")}
               </Button>
             ) : null}
             <Button
@@ -3496,7 +3497,7 @@ function RequestItemVerdictsCard({
               {working ? (
                 <>
                   <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden />
-                  Applying…
+                  {tf("auto.3329a9bb48b9c8d4")}
                 </>
               ) : (
                 applyLabel
@@ -3525,7 +3526,7 @@ function VerdictProgressBadge({
       {pendingReason ? (
         <span className="inline-flex items-center gap-1 rounded-sm border border-amber-500/60 bg-amber-500/10 px-1.5 py-0.5 text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-eyebrow) text-amber-900 dark:text-amber-100">
           <AlertTriangle className="h-3 w-3" aria-hidden />
-          Reason needed
+          {tf("auto.e2d71a28dacc5d9e")}
         </span>
       ) : null}
       <div
@@ -3716,7 +3717,7 @@ export function IssueThreadInteractionCard({
                 <StatusIcon className={cn("h-3.5 w-3.5", iconSpin && "animate-spin")} />
                 {isSecretProposal ? (
                   <span className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
-                    <span>Secret binding</span>
+                    <span>{tf("auto.c769362857f641b3")}</span>
                     <span className="hidden text-current/60 sm:inline">/</span>
                     <span>{statusText}</span>
                   </span>
@@ -3932,11 +3933,11 @@ function ResolvedByAgentChip() {
           data-testid="interaction-resolved-by-agent-chip"
         >
           <Bot className="h-3 w-3" />
-          Agent
+          {tf("text.Agent")}
         </Badge>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-xs text-xs">
-        Resolved by an agent under the organization's interaction governance policy — audit-distinct from a human board resolution.
+        {tf("auto.a511fb1064bcb2a0")}
       </TooltipContent>
     </Tooltip>
   );

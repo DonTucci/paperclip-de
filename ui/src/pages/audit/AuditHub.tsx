@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect } from "react";
 import { History } from "lucide-react";
 import { EmptyState } from "@/components/EmptyState";
@@ -42,7 +43,7 @@ export function AuditHub({ section }: { section: AuditSection }) {
   useEffect(() => {
     const current = AUDIT_SECTIONS.find((candidate) => candidate.value === section);
     setBreadcrumbs([
-      { label: "Audit", href: section === "activity" ? undefined : "/activity" },
+      { label: tf("text.Audit"), href: section === "activity" ? undefined : "/activity" },
       ...(section === "activity" || !current ? [] : [{ label: current.label }]),
     ]);
   }, [section, setBreadcrumbs]);
@@ -78,13 +79,13 @@ export function AuditHub({ section }: { section: AuditSection }) {
   );
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={History} message="Select an organization to view Audit." />;
+    return <EmptyState icon={History} message={tf("auto.d3c397fc7ee839fb")} />;
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">Audit</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">{tf("text.Audit")}</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
           Review what happened, inspect agent runs, and understand the costs and budget controls
           behind your organization.

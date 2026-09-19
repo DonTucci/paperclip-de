@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { CompanySecret, EnvBinding, SecretVersionSelector, UserSecretDefinition } from "@paperclipai/shared";
 
 export type RowSource = "text" | "secret" | "user_secret";
@@ -181,14 +182,14 @@ export function validateName(
   const trimmed = name.trim();
   if (!trimmed) return null;
   if (!ENV_NAME_RE.test(trimmed)) {
-    return { level: "error", message: "Invalid name — use letters, digits and _" };
+    return { level: "error", message: tf("auto.222108d7d91666f4") };
   }
   if (duplicateNames.has(trimmed)) {
-    return { level: "error", message: "Duplicate name" };
+    return { level: "error", message: tf("auto.72e44e2a40e5f599") };
   }
   for (const prefix of reservedPrefixes) {
     if (prefix && trimmed.startsWith(prefix)) {
-      return { level: "warn", message: "Reserved prefix — provided automatically and may be overridden" };
+      return { level: "warn", message: tf("auto.99cfd6b1a277bda4") };
     }
   }
   return null;
@@ -248,14 +249,14 @@ export function computeRowHealth(row: EnvRow, secrets: readonly CompanySecret[])
     return {
       level: "error",
       kind: "missing",
-      message: "This secret no longer exists — runs will fail until you rebind.",
+      message: tf("auto.673fdd1542a03eed"),
     };
   }
   if (secret.status !== "active") {
     return {
       level: "warn",
       kind: "disabled",
-      message: "Runs will fail until re-enabled or rebound.",
+      message: tf("auto.8c5b84d730fbe46b"),
     };
   }
   return null;
@@ -272,14 +273,14 @@ export function computeUserSecretRowHealth(
     return {
       level: "error",
       kind: "missing",
-      message: "This user secret definition no longer exists — runs will fail until you rebind.",
+      message: tf("auto.b7b6e9d29b0ec229"),
     };
   }
   if (definition.status !== "active") {
     return {
       level: "warn",
       kind: "disabled",
-      message: "Runs will fail until this user secret definition is re-enabled or rebound.",
+      message: tf("auto.3ff9ba99d3d97636"),
     };
   }
   return null;

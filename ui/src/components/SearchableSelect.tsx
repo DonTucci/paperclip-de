@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -91,8 +92,8 @@ export function SearchableSelect<
   groups,
   onValueChange,
   placeholder,
-  searchPlaceholder = "Search...",
-  emptyMessage = "No options found.",
+  searchPlaceholder = tf("auto.7f55382219f0202c"),
+  emptyMessage = tf("auto.2d333ca8a101b88e"),
   loadingMessage = "Loading...",
   loading = false,
   disabled = false,

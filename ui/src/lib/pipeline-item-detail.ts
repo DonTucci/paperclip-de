@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { Issue } from "@paperclipai/shared";
 import type {
   PipelineCase,
@@ -248,7 +249,7 @@ export function itemHasChangedNotice(item: Pick<PipelineCase, "fields"> & {
   if (item.changeAcknowledgedAt || fields.changeAcknowledgedAt) return null;
   if (item.thisChanged || fields.thisChanged || fields.upstreamChanged || fields.upstreamDrift) {
     return {
-      title: "This changed",
+      title: tf("auto.56ec3b71e2f77331"),
       body: "Upstream work changed after this item was created. Review the latest details before continuing.",
     };
   }
@@ -272,7 +273,7 @@ export function eventsHaveUnacknowledgedDrift(events: PipelineCaseEvent[]) {
 export function changedNoticeFromEvents(events: PipelineCaseEvent[]) {
   if (!eventsHaveUnacknowledgedDrift(events)) return null;
   return {
-    title: "This changed",
+    title: tf("auto.56ec3b71e2f77331"),
     body: "Upstream work changed after this item was created. Review the latest details before continuing.",
   };
 }

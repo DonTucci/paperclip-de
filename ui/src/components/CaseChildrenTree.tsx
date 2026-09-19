@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Link, useCaseHref } from "@/lib/router";
@@ -26,7 +27,7 @@ export function CaseChildrenTree({
   const caseHref = useCaseHref();
   const [expanded, setExpanded] = useState(false);
   if (children.length === 0) {
-    return <p className="text-xs text-muted-foreground">No child cases.</p>;
+    return <p className="text-xs text-muted-foreground">{tf("auto.6317c59f9a827e22")}</p>;
   }
 
   const shouldCap = maxVisible != null && children.length > maxVisible;
@@ -44,7 +45,7 @@ export function CaseChildrenTree({
             >
               <CaseCopyableToken
                 value={child.identifier}
-                label="case ID"
+                label={tf("auto.9c869d6f7ed1f0c6")}
                 className="shrink-0 font-mono text-xs text-muted-foreground"
                 containerClassName="shrink-0"
                 stopPropagation

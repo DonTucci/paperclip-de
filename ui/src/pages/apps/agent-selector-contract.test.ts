@@ -1,8 +1,15 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import englishCatalog from "../../i18n/fork/en.json";
 
 function source(relativePath: string) {
   return readFileSync(new URL(relativePath, import.meta.url), "utf8");
+}
+
+function expectLocalizedText(fileSource: string, text: string) {
+  const key = Object.entries(englishCatalog).find(([, value]) => value === text)?.[0];
+  expect(key, `Missing English catalog entry for: ${text}`).toBeDefined();
+  expect(fileSource).toContain(`tf("${key}")`);
 }
 
 describe("Apps agent selector contract", () => {
@@ -17,7 +24,7 @@ describe("Apps agent selector contract", () => {
     expect(appConnect).toContain("<ConnectionSetupFlow");
     expect(connectionSetupFlow).toContain("<AgentMultiSelect");
     expect(permissions).toContain("<AgentMultiSelect");
-    expect(tester).toContain('placeholder="Search agents…"');
+    expectLocalizedText(tester, "Search agents…");
 
     expect(profiles.match(/<AgentSelect/g)).toHaveLength(2);
     expect(profiles).not.toContain("<Select value={agentId}");

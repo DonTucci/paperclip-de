@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ReactNode } from "react";
 import { Loader2, ShieldCheck, Terminal, TriangleAlert } from "lucide-react";
 import { Link } from "@/lib/router";
@@ -20,7 +21,7 @@ function CliFallback({ hasActiveInvite = false }: { hasActiveInvite?: boolean })
     <div className="mt-6 border-t border-border pt-5">
       <div className="flex items-center gap-2 text-sm font-medium">
         <Terminal className="size-4 text-muted-foreground" aria-hidden />
-        <span>Prefer to finish setup from the host?</span>
+        <span>{tf("auto.d29e5c6f243f37b2")}</span>
       </div>
       <p className="mt-2 text-sm text-muted-foreground">
         {hasActiveInvite
@@ -49,18 +50,18 @@ function displayIdentity(session: AuthSession) {
 function claimErrorCopy(error: BootstrapPendingPageProps["claimError"]) {
   if (error?.status === 409) {
     return {
-      title: "Someone else has already claimed this instance.",
+      title: tf("auto.e9efa2de4beb9287"),
       body: "Refresh to sign in, or ask the existing admin to invite you from Settings -> Access.",
     };
   }
   if (error?.status === 401) {
     return {
-      title: "Your session expired. Sign in again to claim this instance.",
+      title: tf("auto.7c6edab35d57a6ea"),
       body: "",
     };
   }
   return {
-    title: "We couldn't reach the server. Try again in a moment.",
+    title: tf("auto.2fca89bf798a816c"),
     body: "",
   };
 }
@@ -76,7 +77,7 @@ export function BootstrapPendingPage({
   if (!claimAvailable) {
     return (
       <StateChrome>
-        <h1 className="text-xl font-semibold">This Paperclip is waiting on its first admin</h1>
+        <h1 className="text-xl font-semibold">{tf("auto.fe4cc591f25169c0")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           This instance runs in invite-only mode. The operator must generate a one-time first-admin invite URL
           from the host. Once you have the link, open it from this browser to finish setup.
@@ -98,19 +99,19 @@ export function BootstrapPendingPage({
             <ShieldCheck className="size-5" aria-hidden />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">You're the instance admin</h1>
+            <h1 className="text-xl font-semibold">{tf("auto.7b0496df7733378f")}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Setup is complete. Taking you to onboarding to create your first organization...
+              {tf("auto.6e267116ea34ca14")}
             </p>
           </div>
         </div>
         <div className="mt-5 flex items-center gap-3">
           <Loader2 className="size-4 animate-spin text-muted-foreground" aria-hidden />
-          <span className="text-sm text-muted-foreground">Redirecting...</span>
+          <span className="text-sm text-muted-foreground">{tf("auto.cd23991b4e02a17e")}</span>
         </div>
         <div className="mt-5">
           <Button asChild variant="outline">
-            <a href="/">Continue to dashboard</a>
+            <a href="/">{tf("auto.740e1ec17c171f74")}</a>
           </Button>
         </div>
       </StateChrome>
@@ -120,14 +121,14 @@ export function BootstrapPendingPage({
   if (!session) {
     return (
       <StateChrome>
-        <h1 className="text-xl font-semibold">Finish setting up this Paperclip</h1>
+        <h1 className="text-xl font-semibold">{tf("auto.fd728e2533d2f522")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           No admin has claimed this instance yet. Sign in or create your Paperclip account to become the first
           admin from this browser.
         </p>
         <div className="mt-5">
           <Button asChild>
-            <Link to="/auth?next=/">Sign in / Create account</Link>
+            <Link to="/auth?next=/">{tf("auto.5d4f5eb117173ca0")}</Link>
           </Button>
         </div>
         <CliFallback hasActiveInvite={hasActiveInvite} />
@@ -139,9 +140,9 @@ export function BootstrapPendingPage({
   const isClaiming = claimState === "claiming";
   return (
     <StateChrome>
-      <h1 className="text-xl font-semibold">Finish setting up this Paperclip</h1>
+      <h1 className="text-xl font-semibold">{tf("auto.fd728e2533d2f522")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        No admin has claimed this instance yet. Claim it now to become the first admin and start onboarding.
+        {tf("auto.c5c1f5e47599200d")}
       </p>
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <Button onClick={onClaim} disabled={isClaiming}>
@@ -155,7 +156,7 @@ export function BootstrapPendingPage({
       <p className="mt-3 text-xs text-muted-foreground">
         Wrong account?{" "}
         <Link to="/auth?next=/" className="underline underline-offset-2">
-          Switch account
+          {tf("auto.fedce010cffcb86e")}
         </Link>
         .
       </p>

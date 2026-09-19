@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowDown } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -101,7 +102,7 @@ export function ScrollToBottom() {
           : "fixed bottom-(--sz-calc-21) right-6 md:bottom-6",
         !isMobile && panelVisible && panelContent && "md:right-(--sz-calc-22)",
       )}
-      aria-label="Scroll to bottom"
+      aria-label={tf("auto.6a36c1b26f1c1ab7")}
     >
       <ArrowDown className="h-4 w-4" />
     </button>

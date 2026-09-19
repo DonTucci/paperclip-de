@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -275,7 +276,6 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
       ?? null
     : null;
   const createStackUrl = isCloud ? cloudStackCreateUrl(cloudBaseUrl) : null;
-  const switcherNoun = "organization";
   // The one name the chrome shows for "where am I": the stack in cloud, the
   // company when self-hosted.
   const currentName = isCloud
@@ -372,8 +372,8 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
           className="h-9 min-w-0 flex-1 justify-start gap-2 px-4 text-left hover:bg-sidebar-accent hover:text-sidebar-accent-foreground has-[>svg]:px-4 dark:hover:bg-sidebar-accent dark:hover:text-sidebar-accent-foreground"
           aria-label={
             currentName
-              ? `Open ${currentName} ${switcherNoun} switcher`
-              : `Open ${switcherNoun} switcher`
+              ? tf("companySwitcher.openNamed", { name: currentName })
+              : tf("companySwitcher.open")
           }
         >
           <span className="flex min-w-0 flex-1 items-center gap-2">
@@ -391,7 +391,7 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               )}
               title={currentName ?? undefined}
             >
-              {currentName ?? `Select ${switcherNoun}`}
+              {currentName ?? tf("companySwitcher.select")}
             </span>
           </span>
           {!rail && <ChevronsUpDown className="size-3.5 shrink-0 text-muted-foreground" />}
@@ -404,7 +404,7 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
       >
         <div className="flex h-(--organization-popover-header-height) items-center justify-between gap-2 px-3.5">
           <DropdownMenuLabel className="p-0 text-(length:--text-compact) font-semibold text-foreground">
-            Organizations
+            {tf("text.Organizations")}
           </DropdownMenuLabel>
           {/* Stack order is owned by cloud's own portfolio in v1, so the
               drag-to-reorder affordance stays self-hosted-only. */}
@@ -472,7 +472,7 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
                 // offer the way back.
                 companyListUnavailable ? (
                   <>
-                    <DropdownMenuItem disabled>Couldn&apos;t load organizations</DropdownMenuItem>
+                    <DropdownMenuItem disabled>{tf("auto.85d97564a8cdcf01")}</DropdownMenuItem>
                     <DropdownMenuItem
                       onSelect={(event) => {
                         // Keep the menu open so the result of the retry is visible.
@@ -481,11 +481,11 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
                       }}
                     >
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Try again
+                      {tf("text.Try again")}
                     </DropdownMenuItem>
                   </>
                 ) : (
-                  <DropdownMenuItem disabled>No organizations</DropdownMenuItem>
+                  <DropdownMenuItem disabled>{tf("auto.c256efdc5810ef6b")}</DropdownMenuItem>
                 )
               ) : null}
             </>
@@ -503,7 +503,7 @@ export function SidebarCompanyMenu({ open: controlledOpen, onOpenChange }: Sideb
               <span className="flex size-5 shrink-0 items-center justify-center text-muted-foreground">
                 <Plus className="size-4" />
               </span>
-              <span className="min-w-0 flex-1 truncate">Create organization</span>
+              <span className="min-w-0 flex-1 truncate">{tf("text.Create organization")}</span>
             </DropdownMenuItem>
           )}
           {showInvitePeople ? (

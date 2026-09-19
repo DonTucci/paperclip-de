@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { PipelineCaseLiveness } from "@paperclipai/shared";
 
 /**
@@ -106,7 +107,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "blocked",
-        title: "Automation paused — waiting on a blocker",
+        title: tf("auto.e69c8d672505a7fe"),
         body: liveness.message,
         blockerLink: blockerLinkFromLiveness(liveness),
         automationLink: automationLinkFromLiveness(liveness),
@@ -121,7 +122,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "blocked",
-        title: "Automation paused — waiting on a blocker",
+        title: tf("auto.e69c8d672505a7fe"),
         body: liveness.message,
         blockerLink: blockerLinkFromLiveness(liveness),
         automationLink: automationLinkFromLiveness(liveness),
@@ -136,7 +137,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "permission",
-        title: "Permission needed before this can run",
+        title: tf("auto.88968c5b42d51c9c"),
         body: liveness.message,
         blockerLink: null,
         automationLink: automationLinkFromLiveness(liveness),
@@ -173,7 +174,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "attention",
-        title: "Waiting on breakdown evidence",
+        title: tf("auto.efdfcdf37e773acb"),
         body: liveness.message,
         blockerLink: null,
         automationLink: null,
@@ -188,7 +189,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "blocked",
-        title: "Breakdown is incomplete",
+        title: tf("auto.b6bc65763f400ae5"),
         body: missingPiecesBody(liveness),
         blockerLink: null,
         automationLink: null,
@@ -203,7 +204,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "attention",
-        title: "This item is stuck",
+        title: tf("auto.d440d10a056b3929"),
         body: NO_ACTION_PATH_BODY,
         blockerLink: null,
         automationLink: null,

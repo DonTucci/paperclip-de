@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -200,7 +201,7 @@ function useMutationErrorToast() {
         return;
       }
       const body =
-        error instanceof Error && error.message ? error.message : "Please try again.";
+        error instanceof Error && error.message ? error.message: tf("auto.eea4fb33efd38283");
       toast?.pushToast({ tone: "error", title, body });
     },
     [toast],
@@ -305,19 +306,19 @@ export function SkillStudio() {
     setBreadcrumbs(
       isCreateMode
         ? [
-            { label: "Skills", href: "/skills" },
-            { label: "Studio", href: "/skills/studio" },
-            { label: "New skill" },
+            { label: tf("text.Skills"), href: "/skills" },
+            { label: tf("auto.0aa91af2ec4c1fd7"), href: "/skills/studio" },
+            { label: tf("auto.9bf06a86c934b7de") },
           ]
         : skill
         ? [
-            { label: "Skills", href: "/skills" },
-            { label: "Studio", href: "/skills/studio" },
+            { label: tf("text.Skills"), href: "/skills" },
+            { label: tf("auto.0aa91af2ec4c1fd7"), href: "/skills/studio" },
             { label: skill.name },
           ]
         : [
-            { label: "Skills", href: "/skills" },
-            { label: "Studio" },
+            { label: tf("text.Skills"), href: "/skills" },
+            { label: tf("auto.0aa91af2ec4c1fd7") },
           ],
     );
   }, [isCreateMode, setBreadcrumbs, skill]);
@@ -329,7 +330,7 @@ export function SkillStudio() {
   }, [skill?.id]);
 
   if (!companyId) {
-    return <StudioMessage message="Select an organization to open Skill Studio." />;
+    return <StudioMessage message={tf("auto.5722dd9d9f8b475a")} />;
   }
   if (isCreateMode) {
     return (
@@ -358,10 +359,10 @@ export function SkillStudio() {
     );
   }
   if (detailQuery.isLoading) {
-    return <StudioMessage message="Loading skill…" />;
+    return <StudioMessage message={tf("auto.5c57e60fe4ca906b")} />;
   }
   if (detailQuery.isError || !detailQuery.data) {
-    return <StudioMessage message="Skill not found." />;
+    return <StudioMessage message={tf("auto.97cd06e1a48e2a01")} />;
   }
 
   return (
@@ -480,14 +481,14 @@ function StudioNewSkillPanel({
     onError: (error) => {
       toast?.pushToast({
         tone: "error",
-        title: "Skill creation failed",
-        body: error instanceof Error ? error.message : "Failed to create skill.",
+        title: tf("auto.bb3edc7034fe7d13"),
+        body: error instanceof Error ? error.message: tf("auto.993d12daccdd2de0"),
       });
     },
   });
 
   if (forkFromSkillId && forkLoading) {
-    return <StudioMessage message="Loading fork source..." />;
+    return <StudioMessage message={tf("auto.1604c13e4409daa0")} />;
   }
 
   const previewCard: DiscoveryCard = {
@@ -519,7 +520,7 @@ function StudioNewSkillPanel({
           {draft.forkedFromSkillId ? "Fork skill" : "Create a new skill"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Create an editable organization skill and open it directly in Studio.
+          {tf("auto.deec896561ffdbfc")}
         </p>
       </div>
 
@@ -531,18 +532,18 @@ function StudioNewSkillPanel({
       ) : forkError ? (
         <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           <AlertTriangle className="h-4 w-4" />
-          Fork source not found. You can still create a blank skill.
+          {tf("auto.e993a0331e068b6e")}
         </div>
       ) : null}
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-medium text-foreground">Basics</h2>
-          <p className="text-xs text-muted-foreground">Name the skill and set the route-safe slug.</p>
+          <h2 className="text-sm font-medium text-foreground">{tf("auto.8fdd2ee8475e29bc")}</h2>
+          <p className="text-xs text-muted-foreground">{tf("auto.0701145e12e7a307")}</p>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="skill-name">Name</Label>
+            <Label htmlFor="skill-name">{tf("text.Name")}</Label>
             <Input
               id="skill-name"
               value={draft.name}
@@ -556,11 +557,11 @@ function StudioNewSkillPanel({
                     : draft.markdown,
                 });
               }}
-              placeholder="Code review"
+              placeholder={tf("auto.3d2006711d4cf001")}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="skill-slug">Slug</Label>
+            <Label htmlFor="skill-slug">{tf("auto.d15387ecc6c5e22d")}</Label>
             <Input
               id="skill-slug"
               value={draft.slug}
@@ -569,13 +570,13 @@ function StudioNewSkillPanel({
                 setSlugDirty(nextSlug.length > 0);
                 patchDraft({ slug: nextSlug });
               }}
-              placeholder="code-review"
+              placeholder={tf("auto.717d32bb32dbbc16")}
               className="font-mono"
             />
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="skill-tagline">Tagline</Label>
+          <Label htmlFor="skill-tagline">{tf("auto.fdab2c2f2be28eaf")}</Label>
           <Textarea
             id="skill-tagline"
             value={draft.tagline}
@@ -589,7 +590,7 @@ function StudioNewSkillPanel({
                   : draft.markdown,
               });
             }}
-            placeholder="Review repository changes for correctness, tests, and maintainability."
+            placeholder={tf("auto.1ca7c5025827d113")}
             className="min-h-20"
           />
         </div>
@@ -597,8 +598,8 @@ function StudioNewSkillPanel({
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-medium text-foreground">Appearance</h2>
-          <p className="text-xs text-muted-foreground">Tune how the skill appears in the store and Studio switcher.</p>
+          <h2 className="text-sm font-medium text-foreground">{tf("text.Appearance")}</h2>
+          <p className="text-xs text-muted-foreground">{tf("auto.b87e0c2d950f3d45")}</p>
         </div>
         <div className="flex items-center gap-3">
           <SkillCardIcon card={previewCard} size={48} />
@@ -608,7 +609,7 @@ function StudioNewSkillPanel({
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Color</Label>
+          <Label>{tf("auto.6b73191a0a4b6742")}</Label>
           <div className="flex flex-wrap items-center gap-2">
             {SKILL_CREATE_ACCENTS.map((color) => (
               <button
@@ -624,7 +625,7 @@ function StudioNewSkillPanel({
               />
             ))}
             <Input
-              aria-label="Hex color"
+              aria-label={tf("auto.91f4e4b13e5701e3")}
               value={draft.color}
               onChange={(event) => patchDraft({ color: event.target.value })}
               className="h-7 w-28 font-mono text-xs"
@@ -632,20 +633,20 @@ function StudioNewSkillPanel({
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="skill-categories">Categories</Label>
+          <Label htmlFor="skill-categories">{tf("auto.b8b1d894c6837252")}</Label>
           <Input
             id="skill-categories"
             value={categoryDraft}
             onChange={(event) => setCategoryDraft(event.target.value)}
-            placeholder="engineering, review, memory"
+            placeholder={tf("auto.60bdd3ca934986f7")}
           />
         </div>
       </section>
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-medium text-foreground">Sharing</h2>
-          <p className="text-xs text-muted-foreground">Choose who can discover this skill inside Paperclip.</p>
+          <h2 className="text-sm font-medium text-foreground">{tf("auto.bbedc70e985fe0b6")}</h2>
+          <p className="text-xs text-muted-foreground">{tf("auto.4522d7745d48efc6")}</p>
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
           {(["company", "private"] as const).map((scope) => (
@@ -669,14 +670,14 @@ function StudioNewSkillPanel({
             disabled
             className="rounded-md border border-dashed border-border px-3 py-2 text-left text-sm text-muted-foreground"
           >
-            <span className="block font-medium">Public</span>
-            <span className="mt-1 block text-xs">Coming later.</span>
+            <span className="block font-medium">{tf("auto.591935b15b1c88e2")}</span>
+            <span className="mt-1 block text-xs">{tf("auto.3ff09ef158dc5fa2")}</span>
           </button>
         </div>
       </section>
 
       <details className="rounded-md border border-border px-3 py-2">
-        <summary className="cursor-pointer text-sm font-medium text-foreground">Starter content</summary>
+        <summary className="cursor-pointer text-sm font-medium text-foreground">{tf("auto.237b19788583e3fb")}</summary>
         <Textarea
           value={draft.markdown}
           onChange={(event) => patchDraft({ markdown: event.target.value })}
@@ -686,7 +687,7 @@ function StudioNewSkillPanel({
 
       <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
         <Button variant="ghost" onClick={() => navigate("/skills/studio")} disabled={createSkill.isPending}>
-          Cancel
+          {tf("text.Cancel")}
         </Button>
         <Button onClick={() => createSkill.mutate()} disabled={createSkill.isPending || !nameValid}>
           <FilePlus className="h-4 w-4" />
@@ -731,8 +732,8 @@ function StudioEmptyState({
         <div className="flex flex-1 items-center justify-center">
           <EmptyState
             icon={FileCode}
-            message={skillsLoading ? "Loading skills..." : "Select a skill to open Studio."}
-            action="Create a new skill"
+            message={skillsLoading ? tf("auto.7cf5fa27969286cf") : tf("auto.4173f6cd118861e0")}
+            action={tf("auto.334c7dd95ab433ad")}
             onAction={onCreateNew}
           />
         </div>
@@ -802,20 +803,20 @@ function StudioLanding({
           />
           <Button variant="ghost" size="sm" className="ml-auto" onClick={onCreateNew}>
             <Plus className="mr-1.5 h-3.5 w-3.5" />
-            New skill
+            {tf("auto.9bf06a86c934b7de")}
           </Button>
         </header>
         <div className="min-h-0 flex-1 overflow-auto">
           <div className="mx-auto w-full max-w-3xl space-y-8 px-4 py-8">
             {visited.length > 0 ? (
               <StudioLandingSection
-                title="Recently visited"
+                title={tf("auto.b3f3bc0459891f92")}
                 skills={visited}
                 onSelectSkill={onSelectSkill}
               />
             ) : null}
             <StudioLandingSection
-              title="Recently updated"
+              title={tf("auto.474b2a869ac1477d")}
               skills={updated}
               onSelectSkill={onSelectSkill}
             />
@@ -1135,11 +1136,11 @@ function StudioHeader({
   const copyShareLink = useCallback(() => {
     const href = typeof window !== "undefined" ? window.location.href : "";
     void copyTextToClipboard(href)
-      .then(() => toast?.pushToast({ tone: "success", title: "Link copied", body: "Skill Studio link copied to clipboard." }))
+      .then(() => toast?.pushToast({ tone: "success", title: tf("auto.d12860c21e78baa5"), body: "Skill Studio link copied to clipboard." }))
       .catch((error) => toast?.pushToast({
         tone: "error",
-        title: "Copy failed",
-        body: error instanceof Error ? error.message : "Could not copy the link.",
+        title: tf("auto.5b50e7a693fee952"),
+        body: error instanceof Error ? error.message: tf("auto.f5e805d39112ad2e"),
       }));
   }, [toast]);
 
@@ -1155,10 +1156,10 @@ function StudioHeader({
         <span className="font-mono text-xs text-muted-foreground">v{version}</span>
       )}
       {skillDirty ? (
-        <Badge variant="secondary">Unsaved edits</Badge>
+        <Badge variant="secondary">{tf("auto.4cea356a17a18510")}</Badge>
       ) : null}
       {!skill.editable ? (
-        <Badge variant="secondary">Read-only</Badge>
+        <Badge variant="secondary">{tf("auto.72bb90897ab1eadc")}</Badge>
       ) : null}
       {skill.forkedFromSkillId ? (
         <SkillLineageChip
@@ -1170,17 +1171,17 @@ function StudioHeader({
       <div className="ml-auto flex items-center gap-1">
         <Button variant="ghost" size="sm" onClick={onOpenVersions}>
           <History className="mr-1.5 h-3.5 w-3.5" />
-          Version history
+          {tf("auto.a6df11e706c514f1")}
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm" aria-label="Studio menu">
+            <Button variant="ghost" size="icon-sm" aria-label={tf("auto.b7bc60e8f9c3844e")}>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
             <DropdownMenuItem onClick={copyShareLink}>
-              <Share2 className="mr-2 h-4 w-4" /> Share link
+              <Share2 className="mr-2 h-4 w-4" /> {tf("auto.712a4823ccb996b0")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -1225,8 +1226,8 @@ function SkillSwitcher({
       loading={loading}
       loadingMessage="Loading skills..."
       placeholder={emptyLabel}
-      searchPlaceholder="Search skills..."
-      emptyMessage="No matching skills."
+      searchPlaceholder={tf("auto.65104bc415b31398")}
+      emptyMessage={tf("auto.18f3ee30c2ff2bf6")}
       onValueChange={(value) => {
         if (value !== skill?.id) onSelectSkill(value);
       }}
@@ -1324,7 +1325,7 @@ function SkillPane({
     if (
       dirty
       && typeof window !== "undefined"
-      && !window.confirm("Discard unsaved edits and switch files?")
+      && !window.confirm(tf("auto.8f639fa507ef75af"))
     ) {
       return;
     }
@@ -1413,7 +1414,7 @@ function SkillPane({
           />
         }
       >
-        <EmptyState icon={FileCode} message="This skill has no files yet." />
+        <EmptyState icon={FileCode} message={tf("auto.f677a0f2d473e1f5")} />
         <SkillPathDialog
           mode={createDialog}
           open={createDialog !== null}
@@ -1453,7 +1454,7 @@ function SkillPane({
         {dirty && !readOnly ? (
           <div className="flex items-start gap-2 border-b border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-            <span>Unsaved edits live only in this Studio session. Save to create the next version before running tests or switching files.</span>
+            <span>{tf("auto.9484eaf86e613e5f")}</span>
           </div>
         ) : null}
         <div className="max-h-(--sz-11_75rem) overflow-auto border-b border-border p-1">
@@ -1489,7 +1490,7 @@ function SkillPane({
                 onClick={onEditACopy}
               >
                 <GitFork className="mr-1.5 h-3.5 w-3.5" />
-                Edit a copy
+                {tf("auto.10b8272192c2bffc")}
               </Button>
             </div>
           </div>
@@ -1501,10 +1502,10 @@ function SkillPane({
           </span>
           <div className="flex items-center gap-2">
             {readOnly ? (
-              <Badge variant="secondary">Read-only</Badge>
+              <Badge variant="secondary">{tf("auto.72bb90897ab1eadc")}</Badge>
             ) : (
               <>
-                {dirty && <Badge variant="secondary">Unsaved</Badge>}
+                {dirty && <Badge variant="secondary">{tf("auto.6250d5725dda6d9f")}</Badge>}
                 <Button
                   size="sm"
                   disabled={!dirty || saveMutation.isPending}
@@ -1656,22 +1657,22 @@ function SkillFileActions({
       <Tooltip>
         <TooltipTrigger asChild>
           <span>
-            <Button variant="ghost" size="icon-sm" disabled={disabled} onClick={onAddFile} aria-label="Add file">
+            <Button variant="ghost" size="icon-sm" disabled={disabled} onClick={onAddFile} aria-label={tf("auto.2c83c00f0e83b39c")}>
               <FilePlus className="h-4 w-4" />
             </Button>
           </span>
         </TooltipTrigger>
-        <TooltipContent>Add file</TooltipContent>
+        <TooltipContent>{tf("auto.2c83c00f0e83b39c")}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
           <span>
-            <Button variant="ghost" size="icon-sm" disabled={disabled} onClick={onAddFolder} aria-label="Add folder">
+            <Button variant="ghost" size="icon-sm" disabled={disabled} onClick={onAddFolder} aria-label={tf("auto.5bbfc5a69b25b49c")}>
               <FolderPlus className="h-4 w-4" />
             </Button>
           </span>
         </TooltipTrigger>
-        <TooltipContent>Add folder</TooltipContent>
+        <TooltipContent>{tf("auto.5bbfc5a69b25b49c")}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -1685,7 +1686,7 @@ function SkillFileActions({
                   onDeleteFile();
                 }
               }}
-              aria-label="Delete file"
+              aria-label={tf("auto.28e18dc9db382d81")}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -1696,12 +1697,12 @@ function SkillFileActions({
       <Tooltip>
         <TooltipTrigger asChild>
           <span>
-            <Button variant="ghost" size="icon-sm" disabled={disabled} onClick={onDeleteFolder} aria-label="Delete folder">
+            <Button variant="ghost" size="icon-sm" disabled={disabled} onClick={onDeleteFolder} aria-label={tf("auto.39f35f2d44d61152")}>
               <FolderMinus className="h-4 w-4" />
             </Button>
           </span>
         </TooltipTrigger>
-        <TooltipContent>Delete folder</TooltipContent>
+        <TooltipContent>{tf("auto.39f35f2d44d61152")}</TooltipContent>
       </Tooltip>
     </div>
   );
@@ -1768,7 +1769,7 @@ function SkillPathDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Saved changes create a new version immediately. External sources are not updated until you publish or install an update.
+            {tf("auto.083269633fb9f8ed")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
@@ -1783,16 +1784,16 @@ function SkillPathDialog({
             placeholder={mode === "folder" ? "references/examples" : "references/examples.md"}
           />
           {mode === "folder" ? (
-            <p className="text-xs text-muted-foreground">A README.md seed file is created so the folder appears in the file tree.</p>
+            <p className="text-xs text-muted-foreground">{tf("auto.07f10711eadb62e3")}</p>
           ) : null}
           {error ? <p className="text-xs text-destructive">{error}</p> : null}
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button disabled={pending} onClick={submit}>
-            Create
+            {tf("text.Create")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1846,13 +1847,13 @@ function DeleteFolderDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete folder</DialogTitle>
+          <DialogTitle>{tf("auto.39f35f2d44d61152")}</DialogTitle>
           <DialogDescription>
-            This removes every skill file under the folder and saves the result as the next version.
+            {tf("auto.2055145168d1205e")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="skill-folder-delete">Folder path</Label>
+          <Label htmlFor="skill-folder-delete">{tf("auto.98bca2fab915abe0")}</Label>
           <Input
             id="skill-folder-delete"
             value={pathValue}
@@ -1866,10 +1867,10 @@ function DeleteFolderDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button variant="destructive" disabled={pending} onClick={submit}>
-            Delete
+            {tf("text.Delete")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1958,7 +1959,7 @@ function InputPane({
     if (!dirty) return true;
     return (
       typeof window === "undefined"
-      || window.confirm("Discard unsaved changes to this input?")
+      || window.confirm(tf("auto.f3dcc461481fa4fa"))
     );
   }, [dirty]);
 
@@ -2015,7 +2016,7 @@ function InputPane({
                 type="button"
                 variant="ghost"
                 size="icon-xs"
-                aria-label={collapsed ? "Expand input" : "Collapse input"}
+                aria-label={collapsed ? tf("auto.8999b91a9b7602e9") : tf("auto.55720f6ca31fc250")}
                 onClick={() => setCollapsed((current) => !current)}
               >
                 {collapsed ? (
@@ -2027,18 +2028,18 @@ function InputPane({
             </TooltipTrigger>
             <TooltipContent>{collapsed ? "Expand input" : "Collapse input"}</TooltipContent>
           </Tooltip>
-          <span>Input</span>
+          <span>{tf("text.Input")}</span>
         </span>
       }
       action={
         <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon-sm" onClick={selectAdHocInput} aria-label="New input">
+              <Button variant="ghost" size="icon-sm" onClick={selectAdHocInput} aria-label={tf("auto.6ab4b7742a1a3561")}>
                 <Plus className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>New input</TooltipContent>
+            <TooltipContent>{tf("auto.6ab4b7742a1a3561")}</TooltipContent>
           </Tooltip>
         </div>
       }
@@ -2050,19 +2051,19 @@ function InputPane({
           onClick={() => setCollapsed(false)}
         >
           <ChevronRight className="h-3.5 w-3.5" />
-          <span>Input folded</span>
+          <span>{tf("auto.32c15719fd6c491f")}</span>
         </button>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
           {loading || inputs.length > 0 ? (
             <div className="max-h-(--sz-11_75rem) overflow-auto border-b border-border p-1">
               {loading ? (
-                <div className="p-3 text-xs text-muted-foreground">Loading inputs…</div>
+                <div className="p-3 text-xs text-muted-foreground">{tf("auto.828e10622494186b")}</div>
               ) : (
                 <>
                   {adHocMode && (
                     <div className="flex items-center gap-2 rounded px-2 py-1.5 text-sm italic text-muted-foreground">
-                      <FilePlus className="h-3.5 w-3.5" /> New input (not saved)
+                      <FilePlus className="h-3.5 w-3.5" /> {tf("auto.dfc15bd19b4d3660")}
                     </div>
                   )}
                   <FileTree
@@ -2103,14 +2104,14 @@ function InputPane({
                                 if (input) void copyWithToast(input.content, "Input content copied");
                               }}
                             >
-                              <Copy className="mr-2 h-4 w-4" /> Copy content
+                              <Copy className="mr-2 h-4 w-4" /> {tf("auto.4ad7ba818148fe2d")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               variant="destructive"
                               onClick={() => deleteMutation.mutate(id)}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                              <Trash2 className="mr-2 h-4 w-4" /> {tf("text.Delete")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -2126,8 +2127,8 @@ function InputPane({
             <textarea
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder="Paste text - treated as a new issue description."
-              aria-label="Skill test input"
+              placeholder={tf("auto.7be6c2fbad6fdd4c")}
+              aria-label={tf("auto.b36f6be0a6f9ed5c")}
               className="min-h-0 flex-1 resize-none border-0 bg-transparent px-3 py-3 text-sm leading-6 outline-none placeholder:text-muted-foreground focus-visible:ring-0"
             />
           </div>
@@ -2136,7 +2137,7 @@ function InputPane({
               <span className="truncate">
                 {selectedInput ? selectedInput.name : adHocMode ? "New input" : "No input selected"}
               </span>
-              {dirty ? <Badge variant="secondary">Unsaved</Badge> : null}
+              {dirty ? <Badge variant="secondary">{tf("auto.6250d5725dda6d9f")}</Badge> : null}
             </div>
             {selectedInput && dirty ? (
               <>
@@ -2150,7 +2151,7 @@ function InputPane({
                     baselineContent: selectedInput.content,
                   })}
                 >
-                  Revert
+                  {tf("auto.0026c505347863ae")}
                 </Button>
                 <Button
                   variant="outline"
@@ -2167,7 +2168,7 @@ function InputPane({
               disabled={!draft.trim()}
               onClick={() => setSaveDialogOpen(true)}
             >
-              Save as input
+              {tf("auto.32f0265144e0e17d")}
             </Button>
           </div>
         </div>
@@ -2236,24 +2237,24 @@ function SaveInputDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Save test input</DialogTitle>
+          <DialogTitle>{tf("auto.a94553cb633d28e2")}</DialogTitle>
           <DialogDescription>
-            Runs snapshot input at run time — editing later won't change past runs.
+            {tf("auto.66fb8b9b1165f72f")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="input-name">Name</Label>
+            <Label htmlFor="input-name">{tf("text.Name")}</Label>
             <Input
               id="input-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="onboarding/happy-path"
             />
-            <p className="text-xs text-muted-foreground">Use “/” for folders, e.g. onboarding/happy-path</p>
+            <p className="text-xs text-muted-foreground">{tf("auto.51b6a98f49e45026")}</p>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="input-content">Content</Label>
+            <Label htmlFor="input-content">{tf("auto.47bd29075f8b8019")}</Label>
             <Textarea
               id="input-content"
               value={content}
@@ -2264,13 +2265,13 @@ function SaveInputDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button
             disabled={!name.trim() || !content.trim() || createMutation.isPending}
             onClick={() => createMutation.mutate()}
           >
-            Save
+            {tf("text.Save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -2357,7 +2358,7 @@ function RunsPane({
     updateTemplateSelection(resolution.selection);
     toast?.pushToast({
       tone: "warn",
-      title: "Run template reset",
+      title: tf("auto.e086416755d82c5a"),
       body: "The saved run template is no longer available. Default test template is selected.",
       dedupeKey: `skill-studio-template-reset:${companyId}`,
     });
@@ -2407,7 +2408,7 @@ function RunsPane({
       });
       toast?.pushToast({
         tone: "success",
-        title: "Template saved",
+        title: tf("auto.1b34f8ff69d42e9b"),
         body: `${template.name} is ready for Skills Studio runs.`,
       });
     },
@@ -2427,7 +2428,7 @@ function RunsPane({
       });
       toast?.pushToast({
         tone: "success",
-        title: "Template updated",
+        title: tf("auto.cc9213d2617d81c9"),
         body: `${template.name} is ready for Skills Studio runs.`,
       });
     },
@@ -2446,7 +2447,7 @@ function RunsPane({
       });
       toast?.pushToast({
         tone: "success",
-        title: "Template deleted",
+        title: tf("auto.8fa9d4a8b8272f35"),
         body: `${template.name} was removed from Skills Studio runs.`,
       });
     },
@@ -2502,7 +2503,7 @@ function RunsPane({
 
   return (
     <PaneScaffold
-      title="Test runs"
+      title={tf("auto.70b86f32d7b06f92")}
       action={
         <div className="flex items-center gap-2">
           <AgentPicker
@@ -2519,7 +2520,7 @@ function RunsPane({
                   disabled={gate.disabled || Boolean(templateGateReason) || createRunMutation.isPending}
                   onClick={() => createRunMutation.mutate()}
                 >
-                  <Play className="mr-1.5 h-3.5 w-3.5" /> Run
+                  <Play className="mr-1.5 h-3.5 w-3.5" /> {tf("text.Run")}
                 </Button>
               </span>
             </TooltipTrigger>
@@ -2561,7 +2562,7 @@ function RunsPane({
         {filterInput && (
           <div className="px-3 pt-2">
             <FilterBar
-              filters={[{ key: "input", label: "Input", value: filterInput.name }]}
+              filters={[{ key: "input", label: tf("text.Input"), value: filterInput.name }]}
               onRemove={onClearFilter}
               onClear={onClearFilter}
             />
@@ -2569,9 +2570,9 @@ function RunsPane({
         )}
         <div className="min-h-0 flex-1 overflow-auto p-3">
           {runsQuery.isLoading ? (
-            <div className="text-xs text-muted-foreground">Loading runs…</div>
+            <div className="text-xs text-muted-foreground">{tf("auto.8438ea394d1520d9")}</div>
           ) : runs.length === 0 ? (
-            <EmptyState icon={FlaskConical} message="No test runs yet. Pick an agent and Run." />
+            <EmptyState icon={FlaskConical} message={tf("auto.b255891684153e37")} />
           ) : (
             <div className="space-y-1 rounded-md border border-border p-1">
               {runs.map((run) => (
@@ -2654,9 +2655,9 @@ function RunTemplateAdvancedPanel({
     const noTemplateOption: RunTemplateOption = {
       key: "no-template",
       value: NO_TEST_RUN_TEMPLATE_STORAGE_VALUE,
-      label: "No template",
-      title: "No template",
-      description: "Run only the input text.",
+      label: tf("auto.46b57ee92f038c97"),
+      title: tf("auto.46b57ee92f038c97"),
+      description: tf("auto.f926120f6e82080c"),
       builtIn: true,
       searchText: "no template plain input",
     };
@@ -2672,8 +2673,8 @@ function RunTemplateAdvancedPanel({
     const builtIn = templates.filter((template) => template.builtIn).map(toOption);
     const custom = templates.filter((template) => !template.builtIn).map(toOption);
     return [
-      { id: "built-in", label: "Built in", options: [noTemplateOption, ...builtIn] },
-      ...(custom.length > 0 ? [{ id: "custom", label: "Custom", options: custom }] : []),
+      { id: "built-in", label: tf("auto.78a6a8fe9be5ec07"), options: [noTemplateOption, ...builtIn] },
+      ...(custom.length > 0 ? [{ id: "custom", label: tf("auto.494ca78f7374e46f"), options: custom }] : []),
     ];
   }, [templates]);
 
@@ -2695,23 +2696,23 @@ function RunTemplateAdvancedPanel({
         ) : (
           <ChevronRight className="h-3.5 w-3.5" />
         )}
-        <span className="font-semibold uppercase tracking-wide">Advanced</span>
+        <span className="font-semibold uppercase tracking-wide">{tf("text.Advanced")}</span>
         <span className="ml-auto truncate">{selectedTemplateName}</span>
       </button>
       {open ? (
         <div className="space-y-3 px-3 pb-3 pt-1">
           <div className="flex items-end gap-2">
             <div className="min-w-0 flex-1 space-y-1">
-              <Label>Run template</Label>
+              <Label>{tf("auto.b940a3fbe1da598b")}</Label>
               <SearchableSelect<string, RunTemplateOption>
                 value={selectedValue}
                 groups={templateGroups}
                 loading={templatesLoading}
                 disabled={templatesLoading || templatesError}
                 loadingMessage="Loading templates..."
-                placeholder="Select template"
-                searchPlaceholder="Search templates..."
-                emptyMessage="No templates."
+                placeholder={tf("auto.8e56330b72291e92")}
+                searchPlaceholder={tf("auto.79760c54dcedf91c")}
+                emptyMessage={tf("auto.1c9dddadddb3b9fd")}
                 contentClassName="w-(--sz-320px)"
                 onValueChange={(value) => onSelectTemplate(runTemplateSelectionFromOption(value))}
                 renderValue={(option) => option?.label ?? selectedTemplateName}
@@ -2731,14 +2732,14 @@ function RunTemplateAdvancedPanel({
                   type="button"
                   variant="outline"
                   size="icon-sm"
-                  aria-label="Create run template"
+                  aria-label={tf("auto.1306b1ea628075b9")}
                   disabled={actionPending}
                   onClick={onCreateTemplate}
                 >
                   <Plus />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Create run template</TooltipContent>
+              <TooltipContent>{tf("auto.1306b1ea628075b9")}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -2747,7 +2748,7 @@ function RunTemplateAdvancedPanel({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Edit run template"
+                    aria-label={tf("auto.2842f471425cfe04")}
                     disabled={!canEdit || actionPending}
                     onClick={() => selectedTemplate && onEditTemplate(selectedTemplate)}
                   >
@@ -2755,7 +2756,7 @@ function RunTemplateAdvancedPanel({
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent>Edit custom template</TooltipContent>
+              <TooltipContent>{tf("auto.72b92d094d8b176f")}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -2764,7 +2765,7 @@ function RunTemplateAdvancedPanel({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Duplicate run template"
+                    aria-label={tf("auto.d75ef08f8c129a78")}
                     disabled={!canDuplicate || actionPending}
                     onClick={() => selectedTemplate && onDuplicateTemplate(selectedTemplate)}
                   >
@@ -2783,7 +2784,7 @@ function RunTemplateAdvancedPanel({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Delete run template"
+                    aria-label={tf("auto.de584e7040923133")}
                     className="text-destructive hover:text-destructive"
                     disabled={!canDelete || actionPending || deletingTemplateId === selectedTemplate?.id}
                     onClick={() => selectedTemplate && onDeleteTemplate(selectedTemplate)}
@@ -2792,16 +2793,16 @@ function RunTemplateAdvancedPanel({
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent>Delete custom template</TooltipContent>
+              <TooltipContent>{tf("auto.08edc0924dda0d99")}</TooltipContent>
             </Tooltip>
           </div>
 
           {templatesError ? (
-            <p className="text-xs text-destructive">Run templates could not load.</p>
+            <p className="text-xs text-destructive">{tf("auto.b698b60fe284ee46")}</p>
           ) : selectedTemplateId === null ? (
-            <p className="text-xs text-muted-foreground">Runs will use only the input text.</p>
+            <p className="text-xs text-muted-foreground">{tf("auto.dcda7d05f46bd40c")}</p>
           ) : selectedMissing ? (
-            <p className="text-xs text-destructive">Selected template is no longer available.</p>
+            <p className="text-xs text-destructive">{tf("auto.3fb121a0db47f7a6")}</p>
           ) : selectedTemplate ? (
             <div className="space-y-2">
               {selectedTemplate.description ? (
@@ -2812,7 +2813,7 @@ function RunTemplateAdvancedPanel({
               </pre>
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">Loading template...</p>
+            <p className="text-xs text-muted-foreground">{tf("auto.f687834dd2b9e00a")}</p>
           )}
         </div>
       ) : null}
@@ -2861,25 +2862,25 @@ function RunTemplateDialog({
         </DialogHeader>
         <div className="space-y-3">
           <div className="space-y-1">
-            <Label htmlFor="run-template-name">Name</Label>
+            <Label htmlFor="run-template-name">{tf("text.Name")}</Label>
             <Input
               id="run-template-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Focused smoke"
+              placeholder={tf("auto.791d5c0fcd15c6ee")}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="run-template-description">Description</Label>
+            <Label htmlFor="run-template-description">{tf("text.Description")}</Label>
             <Input
               id="run-template-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Short instructions for common skill checks"
+              placeholder={tf("auto.d03d6192cf93d6e5")}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="run-template-body">Body</Label>
+            <Label htmlFor="run-template-body">{tf("auto.6ccaa6415b5ee449")}</Label>
             <Textarea
               id="run-template-body"
               value={body}
@@ -2893,7 +2894,7 @@ function RunTemplateDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {tf("text.Cancel")}
           </Button>
           <Button
             disabled={!name.trim() || !body.trim() || pending}
@@ -2960,15 +2961,15 @@ function AgentPicker({
           {selectedAgent ? (
             <Identity name={selectedAgent.name} size="xs" />
           ) : (
-            <span className="text-muted-foreground">Pick an agent</span>
+            <span className="text-muted-foreground">{tf("auto.012c15d65531b096")}</span>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64 p-0">
         <Command>
-          <CommandInput placeholder="Search agents…" />
+          <CommandInput placeholder={tf("auto.e05cb78e973da372")} />
           <CommandList>
-            <CommandEmpty>No agents.</CommandEmpty>
+            <CommandEmpty>{tf("auto.04e3179bbc03e72c")}</CommandEmpty>
             <CommandGroup>
               {agents.map((agent) => {
                 const selectable = isAgentSelectable(agent);
@@ -2994,7 +2995,7 @@ function AgentPicker({
                     <Identity name={agent.name} size="xs" />
                     {!selectable && (
                       <Badge variant="secondary" className="ml-auto">
-                        Paused
+                        {tf("text.Paused")}
                       </Badge>
                     )}
                   </CommandItem>
@@ -3092,15 +3093,15 @@ function RunDetailView({
 
   if (detailQuery.isLoading) {
     return (
-      <PaneScaffold title="Run" action={<BackButton onBack={onBack} />}>
-        <div className="p-3 text-xs text-muted-foreground">Loading run…</div>
+      <PaneScaffold title={tf("text.Run")} action={<BackButton onBack={onBack} />}>
+        <div className="p-3 text-xs text-muted-foreground">{tf("auto.ad8b3027693b8553")}</div>
       </PaneScaffold>
     );
   }
   if (!detail) {
     return (
-      <PaneScaffold title="Run" action={<BackButton onBack={onBack} />}>
-        <div className="p-3 text-xs text-muted-foreground">Run not found.</div>
+      <PaneScaffold title={tf("text.Run")} action={<BackButton onBack={onBack} />}>
+        <div className="p-3 text-xs text-muted-foreground">{tf("auto.3e498fa2dc954e53")}</div>
       </PaneScaffold>
     );
   }
@@ -3114,12 +3115,12 @@ function RunDetailView({
   const taskLink = testTaskLinkState(detail);
 
   return (
-    <PaneScaffold title="Run" action={<BackButton onBack={onBack} />}>
+    <PaneScaffold title={tf("text.Run")} action={<BackButton onBack={onBack} />}>
       <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3">
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={runBadgeStatus(detail.status)} />
           <Identity name={agentName} size="xs" />
-          {removed && <Badge variant="secondary">removed</Badge>}
+          {removed && <Badge variant="secondary">{tf("auto.e1f79758cc42e6fe")}</Badge>}
           <span className="font-mono text-xs text-muted-foreground">
             v{detail.skillVersion.revisionNumber}
           </span>
@@ -3130,17 +3131,17 @@ function RunDetailView({
 
         {/* snapshot property block */}
         <div className="rounded-md border border-border text-xs">
-          <PropRow label="Input" value={detail.inputId ? "saved input" : "ad-hoc paste"} />
-          <PropRow label="Template" value={detail.templateName ?? "No template"} />
-          <PropRow label="Skill version" value={`v${detail.skillVersion.revisionNumber}`} />
-          <PropRow label="Created" value={relativeTime(detail.createdAt)} />
+          <PropRow label={tf("text.Input")} value={detail.inputId ? "saved input" : "ad-hoc paste"} />
+          <PropRow label={tf("auto.0575f29df888a27e")} value={detail.templateName ?? "No template"} />
+          <PropRow label={tf("auto.4ba072982170dfa7")} value={`v${detail.skillVersion.revisionNumber}`} />
+          <PropRow label={tf("text.Created")} value={relativeTime(detail.createdAt)} />
         </div>
 
         {showRunErrorCard(detail.status) && (
           <Card className="border-destructive/50">
             <CardHeader className="flex-row items-center gap-2 space-y-0 pb-2">
               <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-              <span className="text-sm font-medium">Run failed</span>
+              <span className="text-sm font-medium">{tf("auto.97fddf2d43e8dfc8")}</span>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
               {detail.error ?? "The test task ended with an error."}
@@ -3160,7 +3161,7 @@ function RunDetailView({
           </section>
         ) : outputMode === "pending" ? (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" /> Working… output will appear here.
+            <Clock className="h-3.5 w-3.5" /> {tf("auto.b716072fd3518b27")}
           </div>
         ) : null}
 
@@ -3220,7 +3221,7 @@ function RunDetailView({
             disabled={reRunMutation.isPending}
             onClick={() => reRunMutation.mutate()}
           >
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Re-run
+            <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> {tf("auto.31e1d3ece08bf005")}
           </Button>
           {nonTerminal ? (
             <Button
@@ -3229,7 +3230,7 @@ function RunDetailView({
               disabled={cancelMutation.isPending}
               onClick={() => cancelMutation.mutate()}
             >
-              Cancel
+              {tf("text.Cancel")}
             </Button>
           ) : (
             <Button
@@ -3239,18 +3240,18 @@ function RunDetailView({
               disabled={deleteMutation.isPending}
               onClick={() => deleteMutation.mutate()}
             >
-              <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" /> {tf("text.Delete")}
             </Button>
           )}
           {taskLink.enabled && detail.harnessIssue ? (
             <Button variant="link" size="sm" asChild>
-              <Link to={`/issues/${detail.harnessIssue.id}`}>Open test task ↗</Link>
+              <Link to={`/issues/${detail.harnessIssue.id}`}>{tf("auto.0c16eec1cfdd39b0")}</Link>
             </Button>
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="cursor-not-allowed text-xs text-muted-foreground">
-                  Open test task ↗
+                  {tf("auto.0c16eec1cfdd39b0")}
                 </span>
               </TooltipTrigger>
               <TooltipContent>{taskLink.reason}</TooltipContent>
@@ -3290,7 +3291,7 @@ function RunDocumentsSection({ documents }: { documents: IssueDocument[] }) {
     <section className="space-y-2">
       <div className="flex items-center gap-2">
         <FileText className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
-        <h3 className="text-sm font-medium text-muted-foreground">Documents</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">{tf("text.Documents")}</h3>
         <span className="text-xs text-muted-foreground">{documents.length}</span>
       </div>
       <div className="space-y-2">
@@ -3363,7 +3364,7 @@ function InteractionSection({
   return (
     <section>
       <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Interactions
+        {tf("auto.9089e4b79eb7fd01")}
       </h3>
       <div className="space-y-2">
         {detail.interactions.map((summary) => {
@@ -3396,7 +3397,7 @@ function InteractionSection({
               trailing={
                 harnessIssueId ? (
                   <Button variant="link" size="xs" asChild>
-                    <Link to={`/issues/${harnessIssueId}`}>Open test task ↗</Link>
+                    <Link to={`/issues/${harnessIssueId}`}>{tf("auto.0c16eec1cfdd39b0")}</Link>
                   </Button>
                 ) : null
               }
@@ -3466,13 +3467,13 @@ function VersionHistorySheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-full sm:max-w-(--sz-560px)">
         <SheetHeader>
-          <SheetTitle>Version history</SheetTitle>
+          <SheetTitle>{tf("auto.a6df11e706c514f1")}</SheetTitle>
         </SheetHeader>
         <div className="mt-3 space-y-2 overflow-auto">
           {versionsQuery.isLoading ? (
-            <div className="text-xs text-muted-foreground">Loading versions…</div>
+            <div className="text-xs text-muted-foreground">{tf("auto.9780e2c99c1b82b2")}</div>
           ) : versions.length === 0 ? (
-            <EmptyState icon={History} message="No versions yet. Save changes to create the first." />
+            <EmptyState icon={History} message={tf("auto.1fba7c480a664b61")} />
           ) : (
             <div className="space-y-1 rounded-md border border-border p-1">
               {versions.map((v) => (
@@ -3574,7 +3575,7 @@ function PropRow({ label, value }: { label: string; value: string }) {
 function BackButton({ onBack }: { onBack: () => void }) {
   return (
     <Button variant="ghost" size="sm" onClick={onBack}>
-      <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> Back
+      <ArrowLeft className="mr-1.5 h-3.5 w-3.5" /> {tf("text.Back")}
     </Button>
   );
 }
@@ -3591,9 +3592,9 @@ function MobileTabs({
   return (
     <Tabs defaultValue="skill" className="flex flex-1 flex-col">
       <TabsList variant="line" className="px-3">
-        <TabsTrigger value="skill">Skill</TabsTrigger>
-        <TabsTrigger value="input">Input</TabsTrigger>
-        <TabsTrigger value="runs">Runs</TabsTrigger>
+        <TabsTrigger value="skill">{tf("text.Skill")}</TabsTrigger>
+        <TabsTrigger value="input">{tf("text.Input")}</TabsTrigger>
+        <TabsTrigger value="runs">{tf("text.Runs")}</TabsTrigger>
       </TabsList>
       <TabsContent value="skill" className="min-h-0 flex-1">
         {skill}

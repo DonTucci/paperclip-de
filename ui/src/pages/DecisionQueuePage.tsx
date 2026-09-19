@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Settings2, X } from "lucide-react";
@@ -126,7 +127,7 @@ export function DecisionQueuePage() {
   }, [agents]);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Decisions", href: "/decisions" }, { label: queue?.title ?? queueKey }]);
+    setBreadcrumbs([{ label: tf("text.Decisions"), href: "/decisions" }, { label: queue?.title ?? queueKey }]);
   }, [setBreadcrumbs, queue?.title, queueKey]);
 
   // Re-hydrate per-company preferences when the company changes.
@@ -205,14 +206,14 @@ export function DecisionQueuePage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.decisionQueues.list(selectedCompanyId!) }),
     onError: (err) =>
       pushToast({
-        title: "Could not update seeding",
-        body: err instanceof Error ? err.message : "Please try again.",
+        title: tf("auto.24e5e1e909558420"),
+        body: err instanceof Error ? err.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
 
   if (!selectedCompanyId) {
-    return <p className="text-sm text-muted-foreground">Select an organization first.</p>;
+    return <p className="text-sm text-muted-foreground">{tf("auto.0d7c81ffe0023b23")}</p>;
   }
   if (isLoading) {
     return <PageSkeleton variant="approvals" />;
@@ -264,17 +265,17 @@ export function DecisionQueuePage() {
 
       {isEmpty ? (
         <div className="rounded-xl border border-dashed border-border py-14 text-center">
-          <p className="text-sm font-medium text-foreground">This queue is empty.</p>
+          <p className="text-sm font-medium text-foreground">{tf("auto.1c3c77cb30ab7992")}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Decisions land here when they match the queue's rules or an agent adds them.
+            {tf("auto.b065343b4037aba4")}
           </p>
         </div>
       ) : (
         <div className="space-y-4">
           {visibleCount === 0 ? (
             <div className="rounded-xl border border-dashed border-border py-10 text-center">
-              <p className="text-sm font-medium text-foreground">No decisions match your filters.</p>
-              <p className="mt-1 text-xs text-muted-foreground">Adjust or clear the filters to see the rest.</p>
+              <p className="text-sm font-medium text-foreground">{tf("auto.080dd6d70ca9dd21")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{tf("auto.955c4e3ea39d81eb")}</p>
             </div>
           ) : (
             groups.map((group) => {
@@ -320,7 +321,7 @@ export function DecisionQueuePage() {
 
           {agingItems.length > 0 && (
             <Curtain
-              label="Aging"
+              label={tf("auto.90dd095da6be9e4c")}
               count={agingItems.length}
               open={agingOpen}
               onToggle={() => setAgingOpen((prev) => !prev)}
@@ -445,13 +446,13 @@ function QueueItemRow({
     onSuccess: () => {
       setOpen(false);
       setReason("");
-      pushToast({ title: "Removed from queue", body: item.subject.title ?? undefined, tone: "info" });
+      pushToast({ title: tf("auto.6a332fb31d80f382"), body: item.subject.title ?? undefined, tone: "info" });
       onExcluded();
     },
     onError: (err) =>
       pushToast({
-        title: "Could not exclude",
-        body: err instanceof Error ? err.message : "Please try again.",
+        title: tf("auto.ce5519cbe493afd0"),
+        body: err instanceof Error ? err.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });
@@ -463,20 +464,20 @@ function QueueItemRow({
           <PopoverTrigger asChild>
             <Button type="button" variant="ghost" size="xs" className="h-7 gap-1 text-muted-foreground">
               <X className="h-3.5 w-3.5" />
-              Exclude
+              {tf("auto.5b76f62e1ba0401f")}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-64 space-y-2 p-3">
-            <p className="text-xs font-medium text-foreground">Remove from this queue</p>
+            <p className="text-xs font-medium text-foreground">{tf("auto.e8cd13b57b82fca9")}</p>
             <textarea
               value={reason}
               onChange={(event) => setReason(event.target.value)}
-              placeholder="Reason (optional)…"
+              placeholder={tf("auto.395a199963d91d7e")}
               className="min-h-16 w-full rounded-sm border border-border bg-background px-2 py-1 text-xs"
             />
             <div className="flex justify-end gap-1">
               <Button type="button" variant="ghost" size="xs" onClick={() => setOpen(false)}>
-                Cancel
+                {tf("text.Cancel")}
               </Button>
               <Button
                 type="button"

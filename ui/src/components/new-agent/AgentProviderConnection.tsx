@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { healthApi } from "@/api/health";
 import { aiConnectionsApi } from "@/api/ai-connections";
 import { useLocalAiLogin } from "../ai-connections/useLocalAiLogin";
@@ -199,8 +200,7 @@ export function AgentProviderConnection({
       if (managedAccount) setApiKey("");
       setError(
         cause instanceof Error
-          ? cause.message
-          : "Could not connect to the provider.",
+          ? cause.message: tf("auto.5fd5eb22dff03dbf"),
       );
     } finally {
       if (run === epoch.current) setBusy(false);
@@ -217,7 +217,7 @@ export function AgentProviderConnection({
   return (
     <div className="min-w-0 max-w-full">
       <ModelSourceTiles
-        label="Connect your model provider"
+        label={tf("auto.763f7fb688ff5e4f")}
         sources={[
           {
             id: adapterType,
@@ -295,7 +295,7 @@ export function AgentProviderConnection({
                 />
                 {!selectedKey && (
                   <OnboardingCardField
-                    label="API key"
+                    label={tf("text.API key")}
                     masked
                     autoFocus
                     value={apiKey}
@@ -369,7 +369,7 @@ export function AgentProviderConnection({
       </motion.div>
       {method === "subscription" && storedLogin.isError && (
         <p role="alert" className="mt-4 text-sm text-destructive">
-          Could not check your saved Claude subscription. Try again.
+          {tf("auto.c8c6c2beb441b198")}
         </p>
       )}
       {error && (
@@ -378,7 +378,7 @@ export function AgentProviderConnection({
         </p>
       )}
       {localEnvironment && health.isError && (
-        <p role="alert" className="mt-4 text-sm text-destructive">Could not prepare sign-in. Reload this page to try again.</p>
+        <p role="alert" className="mt-4 text-sm text-destructive">{tf("auto.f89460cd30450471")}</p>
       )}
       <FooterNav
         onBack={() => {

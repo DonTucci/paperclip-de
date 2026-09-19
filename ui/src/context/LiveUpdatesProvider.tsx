@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { getPageVisibility, usePageVisibility } from "../lib/page-visibility";
 import {
   createContext,
@@ -1028,7 +1029,7 @@ function buildJoinRequestToast(
     title: `${label} wants to join`,
     body: "A new join request is waiting for approval.",
     tone: "info",
-    action: { label: "View inbox", href: "/inbox/mine" },
+    action: { label: tf("auto.1c8264bf1b95e945"), href: "/inbox/mine" },
     dedupeKey: `join-request:${entityId}`,
   };
 }
@@ -1057,7 +1058,7 @@ function buildAgentStatusToast(
     title,
     body,
     tone,
-    action: { label: "View agent", href: `/agents/${agentId}` },
+    action: { label: tf("auto.7ce7832e35e85d35"), href: `/agents/${agentId}` },
     dedupeKey: `agent-status:${agentId}:${status}`,
   };
 }
@@ -1092,7 +1093,7 @@ function buildRunStatusToast(
       body: "This external chat identity isn't linked, and isolated guest workspaces are disabled. Link the identity in Connectors or enable isolated workspaces, then start a new task.",
       tone: "warn",
       ttlMs: 10_000,
-      action: { label: "Open chat connections", href: "/apps" },
+      action: { label: tf("auto.9f7e518a1c2d2a53"), href: "/apps" },
       dedupeKey: `run-status:${runId}:${status}`,
     };
   }
@@ -1124,7 +1125,7 @@ function buildRunStatusToast(
     body,
     tone,
     ttlMs: status === "succeeded" ? 5000 : 7000,
-    action: { label: "View run", href: `/agents/${agentId}/runs/${runId}` },
+    action: { label: tf("auto.aaf7fccc7d1315f2"), href: `/agents/${agentId}/runs/${runId}` },
     dedupeKey: `run-status:${runId}:${status}`,
   };
 }

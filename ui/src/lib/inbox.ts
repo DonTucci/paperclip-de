@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   Approval,
   DashboardSummary,
@@ -649,7 +650,7 @@ export function resolveIssueWorkspaceGroup(
 
   return {
     key: "workspace:none",
-    label: "No workspace",
+    label: tf("auto.fce263d326818c62"),
   };
 }
 
@@ -897,14 +898,14 @@ function resolveIssueAssigneeGroup(
     };
   }
 
-  return { key: "assignee:none", label: "Unassigned" };
+  return { key: "assignee:none", label: tf("auto.14d33bd014e6b4e7") };
 }
 
 function resolveIssueProjectGroup(
   issue: Pick<Issue, "projectId">,
   { projectById }: Pick<InboxWorkspaceGroupingOptions, "projectById">,
 ): { key: string; label: string } {
-  if (!issue.projectId) return { key: "project:none", label: "No project" };
+  if (!issue.projectId) return { key: "project:none", label: tf("auto.f34c2be0d1c5f562") };
 
   const projectName = projectById?.get(issue.projectId)?.name?.trim();
   return {

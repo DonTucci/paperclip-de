@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
@@ -39,8 +40,8 @@ export function GatewaysList() {
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Connectors", href: "/apps" },
-      { label: "Gateways" },
+      { label: tf("text.Connectors"), href: "/apps" },
+      { label: tf("auto.9e4635769f0aaf0d") },
     ]);
     return () => setBreadcrumbs([]);
   }, [setBreadcrumbs]);
@@ -107,14 +108,14 @@ export function GatewaysList() {
     },
     onError: (error) =>
       pushToast({
-        title: "Couldn't update the gateway",
+        title: tf("auto.539a9ea1acfe7839"),
         body: error instanceof Error ? error.message : String(error),
         tone: "error",
       }),
   });
 
   if (!selectedCompanyId) {
-    return <div className="p-6 text-sm text-muted-foreground">Select an organization to manage gateways.</div>;
+    return <div className="p-6 text-sm text-muted-foreground">{tf("auto.3ae455c08f67c3b8")}</div>;
   }
 
   const gateways = gatewaysQuery.data?.gateways ?? [];
@@ -133,7 +134,7 @@ export function GatewaysList() {
   return (
     <div className="max-w-5xl space-y-5">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Apps</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{tf("auto.89dd748442c19485")}</h1>
         <p className="text-sm text-muted-foreground">
           A gateway is one safe MCP endpoint that exposes only the apps you assign. Hand it to a client
           like Cursor or Claude Desktop.
@@ -157,14 +158,14 @@ export function GatewaysList() {
               <Input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search by name, app, or owner"
+                placeholder={tf("auto.aa94f2364c8f78d2")}
                 className="pl-9"
-                aria-label="Search gateways"
+                aria-label={tf("auto.774e93aa11fcfe25")}
               />
             </div>
             <Button onClick={() => setCreating(true)}>
               <Plus className="mr-1.5 h-4 w-4" />
-              New gateway
+              {tf("auto.9dff4bab33a8fa47")}
             </Button>
           </div>
 
@@ -210,12 +211,12 @@ export function GatewaysList() {
                   <table className="w-full min-w-(--sz-40rem) text-sm">
                     <thead>
                       <tr className="border-b border-border bg-muted/40 text-left text-(length:--text-micro) font-semibold uppercase tracking-wide text-muted-foreground">
-                        <th className="whitespace-nowrap px-4 py-2.5">Gateway</th>
-                        <th className="whitespace-nowrap px-4 py-2.5">Scope</th>
-                        <th className="whitespace-nowrap px-4 py-2.5">Apps</th>
-                        <th className="whitespace-nowrap px-4 py-2.5">Tokens</th>
-                        <th className="whitespace-nowrap px-4 py-2.5">Last used</th>
-                        <th className="whitespace-nowrap px-4 py-2.5 text-right">On</th>
+                        <th className="whitespace-nowrap px-4 py-2.5">{tf("auto.41ed52921661c7f0")}</th>
+                        <th className="whitespace-nowrap px-4 py-2.5">{tf("auto.b073f6c68ef87211")}</th>
+                        <th className="whitespace-nowrap px-4 py-2.5">{tf("auto.89dd748442c19485")}</th>
+                        <th className="whitespace-nowrap px-4 py-2.5">{tf("text.Tokens")}</th>
+                        <th className="whitespace-nowrap px-4 py-2.5">{tf("auto.830ec7f812f9d862")}</th>
+                        <th className="whitespace-nowrap px-4 py-2.5 text-right">{tf("auto.130011756125313c")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -267,14 +268,14 @@ export function GatewaysList() {
                         <div className="shrink-0">{toggle(gateway)}</div>
                       </div>
                       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <MobileField label="Scope" value={scope} />
-                        <MobileField label="Apps" value={appsLabel} />
+                        <MobileField label={tf("auto.b073f6c68ef87211")} value={scope} />
+                        <MobileField label={tf("auto.89dd748442c19485")} value={appsLabel} />
                         <MobileField
-                          label="Tokens"
+                          label={tf("text.Tokens")}
                           value={`${active} active${expiring > 0 ? ` · ${expiring} expiring` : ""}`}
                         />
                         <MobileField
-                          label="Last used"
+                          label={tf("auto.830ec7f812f9d862")}
                           value={lastUsed ? <RelativeTime value={lastUsed} /> : "—"}
                         />
                       </dl>
@@ -289,7 +290,7 @@ export function GatewaysList() {
           })()}
 
           <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
-            <div className="text-sm font-semibold text-foreground">Why a gateway?</div>
+            <div className="text-sm font-semibold text-foreground">{tf("auto.3918f1693a1e3dce")}</div>
             <p className="mt-1 text-sm text-muted-foreground">
               You pick which apps go through it, who can use it, and how. Revoke the token, the whole
               gateway goes silent — no app-by-app cleanup.
@@ -321,14 +322,14 @@ function MobileField({ label, value }: { label: string; value: ReactNode }) {
 function EmptyGateways({ onCreate }: { onCreate: () => void }) {
   return (
     <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-      <h2 className="text-lg font-semibold text-foreground">No gateways yet</h2>
+      <h2 className="text-lg font-semibold text-foreground">{tf("auto.b7cc13ba88b56455")}</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
         Group your connected apps into one safe endpoint you can hand to a client, then revoke it in one
         move.
       </p>
       <Button className="mt-5" onClick={onCreate}>
         <Plus className="mr-1.5 h-4 w-4" />
-        New gateway
+        {tf("auto.9dff4bab33a8fa47")}
       </Button>
     </div>
   );

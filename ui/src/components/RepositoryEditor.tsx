@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState } from "react";
 import type { ProjectRepository } from "@paperclipai/shared";
 import { GitBranch, LockKeyhole, Plus, X } from "lucide-react";
@@ -16,7 +17,7 @@ function RepoRow({ repo, onRemove }: { repo: ProjectRepository; onRemove: () => 
           {repo.connections.join(" · ")}
         </span>}
       </div>
-      {repo.private && <LockKeyhole className="size-3 shrink-0 text-muted-foreground" aria-label="Private repository" />}
+      {repo.private && <LockKeyhole className="size-3 shrink-0 text-muted-foreground" aria-label={tf("auto.6ab5ea78cce6f30b")} />}
       <Button type="button" variant="ghost" size="icon-sm" aria-label={`Remove ${repo.fullName}`} onClick={onRemove}><X className="size-4" /></Button>
     </div>
   );
@@ -45,7 +46,7 @@ export function RepositoryEditor({ selected, onChange, state = "ready", availabl
   const addLabel = selected.length ? "Add another repo" : "Add GitHub repo";
   return (
     <fieldset disabled={disabled} className="flex min-w-0 flex-col gap-3">
-      <div className="flex items-baseline gap-2"><span className="text-sm font-medium">Source repos</span><span className="text-xs text-muted-foreground">optional</span></div>
+      <div className="flex items-baseline gap-2"><span className="text-sm font-medium">{tf("auto.3b318c3c6586f6e0")}</span><span className="text-xs text-muted-foreground">{tf("auto.ec91fdd9256cb75a")}</span></div>
       {selected.map((repo) => <RepoRow key={repo.id} repo={repo} onRemove={() => onChange(selected.filter((item) => item.id !== repo.id))} />)}
       {state === "disconnected" ? (
         <Popover>
@@ -53,29 +54,29 @@ export function RepositoryEditor({ selected, onChange, state = "ready", availabl
           <PopoverContent align="start" className="w-72">
             <div className="flex flex-col gap-3">
               <GithubIcon className="size-5" />
-              <div className="flex flex-col gap-1"><p className="text-sm font-medium">Connect GitHub to pick a repo</p><p className="text-xs text-muted-foreground">Choose from repos you can access through your GitHub connections.</p></div>
-              <Button type="button" onClick={onConnect}><GithubIcon className="size-4" />Connect GitHub</Button>
+              <div className="flex flex-col gap-1"><p className="text-sm font-medium">{tf("auto.a2c243e774a85012")}</p><p className="text-xs text-muted-foreground">{tf("auto.8b895eb539dd961d")}</p></div>
+              <Button type="button" onClick={onConnect}><GithubIcon className="size-4" />{tf("auto.4027e5b24418520f")}</Button>
             </div>
           </PopoverContent>
         </Popover>
       ) : showPicker ? (
         <div ref={picker} className="flex flex-col gap-2">
           <SearchableSelect<string, (typeof options)[number]>
-            value="" groups={[{ id: "available", label: "Available GitHub repos", options }]}
-            placeholder={addLabel} searchPlaceholder="Search GitHub repos…"
+            value="" groups={[{ id: "available", label: tf("auto.81d4cb8d534bb205"), options }]}
+            placeholder={addLabel} searchPlaceholder={tf("auto.ee8dc6c9972b7499")}
             contentClassName="max-h-(--radix-popover-content-available-height) overflow-hidden [&_[data-slot=command]]:max-h-(--radix-popover-content-available-height) [&_[data-slot=command-list]]:min-h-0 [&_[data-slot=command-list]]:flex-1 [&_[data-slot=command-input-wrapper]]:shrink-0"
             loading={state === "loading"} loadingMessage="Loading GitHub repos…"
-            emptyMessage={state === "error" ? "Couldn’t load GitHub repos. Try again." : state === "empty" ? "No repos available. Connect an account with repo access." : "No matching repos. Try another search or connection."}
+            emptyMessage={state === tf("auto.ca00fccfb408989e") ? "Couldn’t load GitHub repos. Try again." : state === "empty" ? tf("auto.76dafaaefb51c7fa") : tf("auto.c1f3c617f4060ef9")}
             renderValue={() => <span className="flex items-center gap-2 text-foreground"><GithubIcon className="size-4" />{addLabel}</span>}
             renderOption={({ repo }) => <><GitBranch className="size-4 shrink-0 text-muted-foreground" /><span className="flex min-w-0 flex-1 flex-col gap-1"><span className="truncate">{repo.fullName}</span><span className="truncate text-xs text-muted-foreground">{repo.connections.join(" · ")}</span></span>{repo.private && <LockKeyhole className="size-3 shrink-0 text-muted-foreground" />}</>}
             onValueChange={(_, option) => { onChange([...selected, option.repo]); setShowPicker(false); }}
             createItem={state === "error"
-              ? { render: () => <>Try again</>, onSelect: () => { onRetry(); } }
-              : { render: () => <><Plus className="size-4" />Connect another GitHub account</>, onSelect: onConnect }}
+              ? { render: () => <>{tf("text.Try again")}</>, onSelect: () => { onRetry(); } }
+              : { render: () => <><Plus className="size-4" />{tf("auto.2a30fb759f396bc8")}</>, onSelect: onConnect }}
           />
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">{"All GitHub connections you can use."}</p>
-            <Button type="button" variant="ghost" size="sm" onClick={() => setShowPicker(false)}>Cancel</Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setShowPicker(false)}>{tf("text.Cancel")}</Button>
           </div>
         </div>
       ) : <Button type="button" variant="outline" className={addClassName} onClick={() => setShowPicker(true)}><GithubIcon className="size-4" />{addLabel}</Button>}

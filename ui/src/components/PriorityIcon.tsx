@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { ArrowUp, ArrowDown, Minus, AlertTriangle } from "lucide-react";
 import { cn } from "../lib/utils";
@@ -6,10 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 
 const priorityConfig: Record<string, { icon: typeof ArrowUp; color: string; label: string }> = {
-  critical: { icon: AlertTriangle, color: priorityColor.critical ?? priorityColorDefault, label: "Critical" },
-  high: { icon: ArrowUp, color: priorityColor.high ?? priorityColorDefault, label: "High" },
-  medium: { icon: Minus, color: priorityColor.medium ?? priorityColorDefault, label: "Medium" },
-  low: { icon: ArrowDown, color: priorityColor.low ?? priorityColorDefault, label: "Low" },
+  critical: { icon: AlertTriangle, color: priorityColor.critical ?? priorityColorDefault, label: tf("auto.427dd2969bd140be") },
+  high: { icon: ArrowUp, color: priorityColor.high ?? priorityColorDefault, label: tf("auto.c4ebc6d4a5832cd9") },
+  medium: { icon: Minus, color: priorityColor.medium ?? priorityColorDefault, label: tf("auto.8e588cd187741f1c") },
+  low: { icon: ArrowDown, color: priorityColor.low ?? priorityColorDefault, label: tf("auto.f793de205ead5ac3") },
 };
 
 const allPriorities = ["critical", "high", "medium", "low"];

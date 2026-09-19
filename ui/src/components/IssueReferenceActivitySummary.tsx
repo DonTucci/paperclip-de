@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { ActivityEvent } from "@paperclipai/shared";
 import { Plus, Minus } from "lucide-react";
 import { IssueReferencePill } from "./IssueReferencePill";
@@ -58,12 +59,12 @@ export function IssueReferenceActivitySummary({ event }: { event: Pick<ActivityE
   return (
     <div className="mt-2 space-y-1">
       <Section
-        label="Added references"
+        label={tf("auto.add693ab1d659a0f")}
         icon={<Plus className="h-3 w-3 text-green-600 dark:text-green-400" aria-hidden="true" />}
         items={added}
       />
       <Section
-        label="Removed references"
+        label={tf("auto.2a89fc590d309853")}
         icon={<Minus className="h-3 w-3 text-red-600 dark:text-red-400" aria-hidden="true" />}
         items={removed}
         strikethrough

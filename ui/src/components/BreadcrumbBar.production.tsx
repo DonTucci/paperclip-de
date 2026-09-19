@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Link } from "@/lib/router";
 import { Menu } from "lucide-react";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
@@ -76,7 +77,7 @@ export function BreadcrumbBar() {
       size="icon-sm"
       className="mr-2 shrink-0"
       onClick={toggleSidebar}
-      aria-label="Open sidebar"
+      aria-label={tf("auto.45609089ee73fb94")}
     >
       <Menu className="h-5 w-5" />
     </Button>

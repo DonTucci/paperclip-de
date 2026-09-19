@@ -1,10 +1,10 @@
+import { tf } from "@/i18n/fork";
 import { cn } from "@/lib/utils";
 
 export type MatchSourceChipKind = "title" | "identifier" | "comment" | "document";
 
 const chipStyles: Record<MatchSourceChipKind, string> = {
-  title:
-    "bg-(--chip-match-title-bg) text-(--chip-match-title-fg) border-(--chip-match-title-border)",
+  title: tf("auto.7b0292cb4a13de5a"),
   identifier:
     "bg-(--chip-match-identifier-bg) text-(--chip-match-identifier-fg) border-(--chip-match-identifier-border)",
   comment:
@@ -14,7 +14,7 @@ const chipStyles: Record<MatchSourceChipKind, string> = {
 };
 
 const chipLabels: Record<MatchSourceChipKind, string> = {
-  title: "Title",
+  title: tf("text.Title"),
   identifier: "Identifier",
   comment: "Comment",
   document: "Doc",

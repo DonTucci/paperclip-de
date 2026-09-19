@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -200,9 +201,9 @@ export function PipelineItemBodyDocument({
     onSuccess: async () => {
       setSelectedRevisionId(null);
       await invalidateAll();
-      pushToast({ title: "Revision restored", tone: "success" });
+      pushToast({ title: tf("auto.96cc9071419bf42c"), tone: "success" });
     },
-    onError: () => pushToast({ title: "Could not restore the revision", tone: "error" }),
+    onError: () => pushToast({ title: tf("auto.c448c28e03711ce8"), tone: "error" }),
   });
 
   const beginEdit = useCallback(() => {
@@ -228,13 +229,13 @@ export function PipelineItemBodyDocument({
       if (error instanceof ApiError && error.status === 409) {
         await caseDocumentQuery.refetch();
         pushToast({
-          title: "Body changed elsewhere",
+          title: tf("auto.1602befac10333d6"),
           body: "This item body was updated by someone else. Reloaded the latest — re-apply your edit.",
           tone: "error",
         });
         return;
       }
-      pushToast({ title: "Could not save the body", tone: "error" });
+      pushToast({ title: tf("auto.e0a85d778b018375"), tone: "error" });
     }
   }, [caseDocumentQuery, doc?.latestRevisionId, draftBody, pushToast, saveMutation]);
 
@@ -264,7 +265,7 @@ export function PipelineItemBodyDocument({
         setPanelOpen(true);
       } catch {
         setPendingStartAnchor(null);
-        pushToast({ title: "Could not start the conversation", tone: "error" });
+        pushToast({ title: tf("auto.84ffc7a8c34f2803"), tone: "error" });
       }
     },
     [conversationIssueId, doc?.latestRevisionId, latestBody, onStartConversation, pushToast, saveMutation],
@@ -294,7 +295,7 @@ export function PipelineItemBodyDocument({
           <MarkdownEditor
             value={draftBody}
             onChange={setDraftBody}
-            placeholder="Write the item body in Markdown…"
+            placeholder={tf("auto.5090f3199c767500")}
             bordered={false}
             className="min-h-(--sz-220px) bg-transparent"
             contentClassName={bodyContentClassName}
@@ -309,7 +310,7 @@ export function PipelineItemBodyDocument({
           </span>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saveMutation.isPending}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
             <Button size="sm" onClick={() => void handleSave()} disabled={saveMutation.isPending}>
               {saveMutation.isPending ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
@@ -335,7 +336,7 @@ export function PipelineItemBodyDocument({
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Button variant="outline" size="sm" onClick={() => setSelectedRevisionId(null)}>
-                Return to latest
+                {tf("auto.f6b3b853ed208532")}
               </Button>
               <Button
                 size="sm"
@@ -356,7 +357,7 @@ export function PipelineItemBodyDocument({
   } else if (!hasDocument) {
     // Truly empty (A).
     bodyContent = (
-      <EmptyState icon={FileText} message="No body yet. Capture the item's details here." action="Add the item body" onAction={beginEdit} />
+      <EmptyState icon={FileText} message={tf("auto.20155a77f3afcc28")} action={tf("auto.a4fe5ab656fe6238")} onAction={beginEdit} />
     );
   } else if (annotationsLinked && bodyIssueDocument) {
     bodyContent = (
@@ -406,7 +407,7 @@ export function PipelineItemBodyDocument({
 
   return (
     <section
-      aria-label="Item body"
+      aria-label={tf("auto.256f4ed7fb87c605")}
       id="pipeline-item-body-document"
       data-testid="pipeline-item-body-document"
       className="rounded-lg border border-border p-3"
@@ -443,11 +444,11 @@ export function PipelineItemBodyDocument({
           />
         ) : null}
         actionsSlot={editing ? (
-          <span className="text-(length:--text-micro) font-medium text-amber-700 dark:text-amber-300">● Editing · unsaved</span>
+          <span className="text-(length:--text-micro) font-medium text-amber-700 dark:text-amber-300">{tf("auto.2260483e5fdfdba7")}</span>
         ) : (
           <Button variant="ghost" size="sm" className="h-auto gap-1.5 px-2 py-1 text-xs" onClick={beginEdit}>
             <FilePenLine className="h-3.5 w-3.5" />
-            Edit
+            {tf("text.Edit")}
           </Button>
         )}
       />

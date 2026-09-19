@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight, History, RotateCcw } from "lucide-react";
@@ -63,8 +64,8 @@ export function PipelineStageHistoryPanel({
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to restore revision",
-        body: error instanceof Error ? error.message : "Paperclip could not restore the revision.",
+        title: tf("auto.2dcf4f54fb056d5d"),
+        body: error instanceof Error ? error.message: tf("auto.a4aa014d3d681dc2"),
         tone: "error",
       });
     },
@@ -78,8 +79,8 @@ export function PipelineStageHistoryPanel({
         <div className="flex items-center gap-2">
           <History className="h-4 w-4 text-muted-foreground" />
           <div>
-            <p className="text-sm font-medium">History</p>
-            <p className="text-xs text-muted-foreground">Past versions of these instructions.</p>
+            <p className="text-sm font-medium">{tf("text.History")}</p>
+            <p className="text-xs text-muted-foreground">{tf("auto.9661a8c49ab2a2b0")}</p>
           </div>
         </div>
         {open ? (
@@ -91,16 +92,16 @@ export function PipelineStageHistoryPanel({
       <CollapsibleContent className="border-t border-border/70">
         {!hasDocument ? (
           <p className="px-4 py-3 text-xs text-muted-foreground">
-            No history yet. Save the instructions to create the first revision.
+            {tf("auto.a948c526c8d65fdb")}
           </p>
         ) : revisionsQuery.isLoading ? (
-          <p className="px-4 py-3 text-xs text-muted-foreground">Loading revisions…</p>
+          <p className="px-4 py-3 text-xs text-muted-foreground">{tf("auto.c5c85196599295f1")}</p>
         ) : revisionsQuery.error ? (
           <p className="px-4 py-3 text-xs text-destructive">
-            {revisionsQuery.error instanceof Error ? revisionsQuery.error.message : "Could not load revisions."}
+            {revisionsQuery.error instanceof Error ? revisionsQuery.error.message: tf("auto.95456453a0af1a25")}
           </p>
         ) : revisions.length === 0 ? (
-          <p className="px-4 py-3 text-xs text-muted-foreground">No revisions recorded yet.</p>
+          <p className="px-4 py-3 text-xs text-muted-foreground">{tf("auto.fbc3c414948758c8")}</p>
         ) : (
           <ul className="divide-y divide-border/70">
             {revisions.map((revision) => {
@@ -115,7 +116,7 @@ export function PipelineStageHistoryPanel({
                       Revision {revision.revisionNumber}
                       {isCurrent ? (
                         <Badge variant="ghost" className="ml-2 bg-muted text-(length:--text-micro) text-muted-foreground">
-                          Current
+                          {tf("auto.e0d1b68224bf0b31")}
                         </Badge>
                       ) : null}
                     </p>
@@ -133,7 +134,7 @@ export function PipelineStageHistoryPanel({
                       onClick={() => restore.mutate(revision.id)}
                     >
                       <RotateCcw className="h-3.5 w-3.5" />
-                      Restore
+                      {tf("text.Restore")}
                     </Button>
                   )}
                 </li>

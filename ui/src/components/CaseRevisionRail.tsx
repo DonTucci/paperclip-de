@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/router";
@@ -21,7 +22,7 @@ function RevisionByline({ revision }: { revision: CaseDocumentRevision }) {
       {revision.issue && (
         <>
           <span aria-hidden>·</span>
-          <span>via</span>
+          <span>{tf("auto.4d327af41f96c23c")}</span>
           <Link
             to={`/issues/${revision.issue.identifier}`}
             className="font-mono text-foreground/80 hover:underline"
@@ -88,10 +89,10 @@ function CaseDocumentDiffModal({
           </DialogHeader>
           <div className="flex shrink-0 items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-(length:--text-nano) font-medium uppercase tracking-(--tracking-caps) text-red-400">Old</span>
+              <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-(length:--text-nano) font-medium uppercase tracking-(--tracking-caps) text-red-400">{tf("auto.bca97160f4e1211f")}</span>
               <Select value={effectiveLeftId ?? ""} onValueChange={setLeftRevisionId}>
                 <SelectTrigger className="h-7 w-60 border-border/60 text-xs">
-                  <SelectValue placeholder="Select revision" />
+                  <SelectValue placeholder={tf("auto.4c84315133f7f48d")} />
                 </SelectTrigger>
                 <SelectContent>
                   {revisions.map((revision) => (
@@ -103,10 +104,10 @@ function CaseDocumentDiffModal({
               </Select>
             </div>
             <div className="flex items-center gap-2">
-              <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-(length:--text-nano) font-medium uppercase tracking-(--tracking-caps) text-green-400">New</span>
+              <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-(length:--text-nano) font-medium uppercase tracking-(--tracking-caps) text-green-400">{tf("auto.18fdd549b2ed367a")}</span>
               <Select value={effectiveRightId ?? ""} onValueChange={setRightRevisionId}>
                 <SelectTrigger className="h-7 w-60 border-border/60 text-xs">
-                  <SelectValue placeholder="Select revision" />
+                  <SelectValue placeholder={tf("auto.4c84315133f7f48d")} />
                 </SelectTrigger>
                 <SelectContent>
                   {revisions.map((revision) => (
@@ -122,16 +123,16 @@ function CaseDocumentDiffModal({
 
         <div className="flex-1 overflow-auto rounded-md border border-border text-xs">
           {!leftRevision || !rightRevision ? (
-            <div className="p-6 text-center text-sm text-muted-foreground">Select two revisions to compare.</div>
+            <div className="p-6 text-center text-sm text-muted-foreground">{tf("auto.e64fab56b5c2d8b0")}</div>
           ) : leftRevision.id === rightRevision.id ? (
-            <div className="p-6 text-center text-sm text-muted-foreground">Both sides are the same revision.</div>
+            <div className="p-6 text-center text-sm text-muted-foreground">{tf("auto.5c3e0d3775b294a3")}</div>
           ) : (
             <div className="font-mono text-xs leading-6">
               <div className="grid grid-cols-(--gtc-1) border-b border-border/60 bg-muted/30 px-3 py-2 text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">
-                <span>Old</span>
-                <span>New</span>
+                <span>{tf("auto.bca97160f4e1211f")}</span>
+                <span>{tf("auto.18fdd549b2ed367a")}</span>
                 <span />
-                <span>Content</span>
+                <span>{tf("auto.47bd29075f8b8019")}</span>
               </div>
               {diffRows.map((row, index) => (
                 <div
@@ -190,13 +191,13 @@ export function CaseRevisionRail({
   }, [revisions, selectedId]);
 
   if (revisionsQuery.isLoading) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">Loading revisions…</p>;
+    return <p className="py-6 text-center text-sm text-muted-foreground">{tf("auto.c5c85196599295f1")}</p>;
   }
   if (revisionsQuery.isError) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">Could not load revisions.</p>;
+    return <p className="py-6 text-center text-sm text-muted-foreground">{tf("auto.95456453a0af1a25")}</p>;
   }
   if (revisions.length === 0) {
-    return <p className="py-6 text-center text-sm text-muted-foreground">No revisions yet.</p>;
+    return <p className="py-6 text-center text-sm text-muted-foreground">{tf("auto.db4f9639355981b2")}</p>;
   }
 
   const selected = revisions.find((r) => r.id === selectedId) ?? revisions[0]!;
@@ -207,7 +208,7 @@ export function CaseRevisionRail({
       <aside className="space-y-1">
         <div className="flex items-center justify-between gap-2 px-1">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Revisions
+            {tf("auto.da80b1d5740caaef")}
           </h3>
           {revisions.length > 1 ? (
             <Button
@@ -218,7 +219,7 @@ export function CaseRevisionRail({
               onClick={() => setDiffOpen(true)}
             >
               <Diff className="h-3.5 w-3.5" />
-              Diff
+              {tf("auto.7ecf46284588f3fa")}
             </Button>
           ) : null}
         </div>
@@ -241,7 +242,7 @@ export function CaseRevisionRail({
                     rev {rev.revisionNumber}
                     {index === 0 && (
                       <span className="ml-1.5 rounded bg-muted px-1 py-0.5 text-(length:--text-nano) text-muted-foreground">
-                        latest
+                        {tf("auto.5e1e2bcac305958b")}
                       </span>
                     )}
                   </span>
@@ -269,7 +270,7 @@ export function CaseRevisionRail({
             {selected.body}
           </MarkdownBody>
         ) : (
-          <p className="text-sm text-muted-foreground">This revision has no body.</p>
+          <p className="text-sm text-muted-foreground">{tf("auto.73e89038a2a8666a")}</p>
         )}
       </Card>
       {revisions.length > 1 ? (

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { ExternalLink, Loader2, Play, ScrollText, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,12 +117,12 @@ export function WorkspaceAccessCard({
           </Button>
           {access.state === "ready" && !access.handoffAvailable ? (
             <span className="text-xs text-muted-foreground">
-              Signs in with the snapshot-local credentials captured when this clone was made.
+              {tf("auto.96e10c55a7607dd5")}
             </span>
           ) : null}
           {access.state === "ready" && access.handoffAvailable ? (
             <span className="text-xs text-muted-foreground">
-              Uses a single-use login handoff — no password needed.
+              {tf("auto.8df066a182f26c05")}
             </span>
           ) : null}
         </div>

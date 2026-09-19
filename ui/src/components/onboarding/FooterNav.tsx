@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { motion } from "motion/react";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 
@@ -66,7 +67,7 @@ export function FooterNav({
           disabled={loading}
         >
           <ArrowLeft className="mr-1 size-3.5" />
-          Back
+          {tf("text.Back")}
         </Button>
       ) : (
         <span />

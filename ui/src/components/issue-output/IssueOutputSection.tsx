@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { Play } from "lucide-react";
 import type { IssueWorkProduct } from "@paperclipai/shared";
 import {
@@ -120,10 +121,10 @@ export function IssueOutputSection({ workProducts, resolveCreatorName, onMediaCl
   const fileRest = rest.filter((item) => !isMediaOutput(item));
 
   return (
-    <section className="space-y-3" aria-label="Task outputs">
+    <section className="space-y-3" aria-label={tf("auto.9e5b285b313baa9f")}>
       <div className="flex items-center gap-2">
         <Play className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
-        <h3 className="text-sm font-medium text-muted-foreground">Output</h3>
+        <h3 className="text-sm font-medium text-muted-foreground">{tf("text.Output")}</h3>
         <span className="text-xs text-muted-foreground">{count}</span>
       </div>
 
@@ -135,7 +136,7 @@ export function IssueOutputSection({ workProducts, resolveCreatorName, onMediaCl
 
       {rest.length > 0 ? (
         <div className="space-y-2">
-          <p className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">Also produced</p>
+          <p className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.a17e2163cb177831")}</p>
           {mediaRest.length > 0 ? (
             <div className="grid grid-cols-4 gap-2">
               {mediaRest.map((item) => (

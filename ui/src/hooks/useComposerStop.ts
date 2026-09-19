@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useRef, useState } from "react";
 
 /** Keeps stop requests independent of draft submission and prevents double clicks. */
@@ -15,7 +16,7 @@ export function useComposerStop(onStop?: () => Promise<void>, pending = false) {
       await onStop();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Unable to stop. Try again.",
+        err instanceof Error ? err.message: tf("auto.88604c18c9fef7a0"),
       );
     } finally {
       inFlight.current = false;

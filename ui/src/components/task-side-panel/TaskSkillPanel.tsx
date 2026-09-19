@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, FileText, Loader2, Wrench } from "lucide-react";
 import { companySkillsApi } from "@/api/companySkills";
@@ -21,21 +22,21 @@ export function TaskSkillPanel({ companyId, skillId }: { companyId: string; skil
     return (
       <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground" role="status">
         <Loader2 className="size-4 animate-spin" aria-hidden />
-        Loading skill…
+        {tf("auto.5c57e60fe4ca906b")}
       </div>
     );
   }
   if (query.isError) {
     const status = query.error instanceof ApiError ? query.error.status : null;
     if (status === 404) {
-      return <div className="py-8 text-sm text-muted-foreground" role="status">Skill no longer available.</div>;
+      return <div className="py-8 text-sm text-muted-foreground" role="status">{tf("auto.f266c3fde7c5a432")}</div>;
     }
     if (status === 403) {
-      return <div className="py-8 text-sm text-muted-foreground" role="alert">You do not have access to this skill.</div>;
+      return <div className="py-8 text-sm text-muted-foreground" role="alert">{tf("auto.cc90e7ec78bd1a26")}</div>;
     }
     return (
       <div className="space-y-3 py-8 text-sm text-muted-foreground" role="alert">
-        <p>The skill could not be loaded.</p>
+        <p>{tf("auto.91aeb48a583b67d9")}</p>
         <Button variant="outline" size="sm" onClick={() => void query.refetch()} disabled={query.isFetching}>
           {query.isFetching ? "Retrying…" : "Retry"}
         </Button>
@@ -43,7 +44,7 @@ export function TaskSkillPanel({ companyId, skillId }: { companyId: string; skil
     );
   }
   if (!query.data) {
-    return <div className="py-8 text-sm text-muted-foreground" role="status">Skill no longer available.</div>;
+    return <div className="py-8 text-sm text-muted-foreground" role="status">{tf("auto.f266c3fde7c5a432")}</div>;
   }
   const skill = query.data;
   const previewMarkdown = parseFrontmatterMarkdown(skill.markdown).body;
@@ -61,7 +62,7 @@ export function TaskSkillPanel({ companyId, skillId }: { companyId: string; skil
             onClick={() => navigate(`/skills/studio/${encodeURIComponent(skill.id)}`)}
           >
             <ExternalLink className="mr-1.5 size-3.5" aria-hidden />
-            Open in Skill Studio
+            {tf("auto.90ec3b0d0d07e6b0")}
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -72,7 +73,7 @@ export function TaskSkillPanel({ companyId, skillId }: { companyId: string; skil
       <section className="space-y-2">
         <h3 className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <FileText className="size-3.5" aria-hidden />
-          Skill instructions
+          {tf("auto.f9f4685609f87af6")}
         </h3>
         <MarkdownBody>{previewMarkdown || "Skill instructions are empty."}</MarkdownBody>
       </section>

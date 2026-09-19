@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -122,34 +123,34 @@ function FinanceSummaryCard({
   return (
     <Card>
       <CardHeader className="px-5 pt-5 pb-2">
-        <CardTitle className="text-base">Finance ledger</CardTitle>
+        <CardTitle className="text-base">{tf("auto.46bfab69ff187f2f")}</CardTitle>
         <CardDescription>
-          Account-level charges that do not map to a single inference request.
+          {tf("auto.8ccd77355b45a380")}
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 px-5 pb-5 pt-2 sm:grid-cols-2 xl:grid-cols-4">
         <MetricTile
-          label="Debits"
+          label={tf("auto.a32f3e1601067040")}
           value={formatCents(debitCents)}
           subtitle={`${eventCount} total event${eventCount === 1 ? "" : "s"} in range`}
           icon={ArrowUpRight}
         />
         <MetricTile
-          label="Credits"
+          label={tf("auto.2a6b24ad28722034")}
           value={formatCents(creditCents)}
-          subtitle="Refunds, offsets, and credit returns"
+          subtitle={tf("auto.1183445aa4b21261")}
           icon={ArrowDownLeft}
         />
         <MetricTile
-          label="Net"
+          label={tf("auto.660fb2c41d028988")}
           value={formatCents(netCents)}
-          subtitle="Debit minus credit for the selected period"
+          subtitle={tf("auto.b2a026eef03d744c")}
           icon={ReceiptText}
         />
         <MetricTile
-          label="Estimated"
+          label={tf("auto.b774599a9cd1f9a7")}
           value={formatCents(estimatedDebitCents)}
-          subtitle="Estimated debits that are not yet invoice-authoritative"
+          subtitle={tf("auto.c26f21d9764a916e")}
           icon={Coins}
         />
       </CardContent>
@@ -185,7 +186,7 @@ export function Costs({
   } = useDateRange();
 
   useEffect(() => {
-    if (!embedded) setBreadcrumbs([{ label: "Costs" }]);
+    if (!embedded) setBreadcrumbs([{ label: tf("text.Costs") }]);
   }, [embedded, setBreadcrumbs]);
 
   useEffect(() => {
@@ -485,7 +486,7 @@ export function Costs({
         value: "all",
         label: (
           <span className="flex items-center gap-1.5">
-            <span>All providers</span>
+            <span>{tf("auto.20e56db7dfc7e08d")}</span>
             {providerKeys.length > 0 ? (
               <>
                 <span className="font-mono text-xs text-muted-foreground">{formatTokens(allTokens)}</span>
@@ -517,7 +518,7 @@ export function Costs({
         value: "all",
         label: (
           <span className="flex items-center gap-1.5">
-            <span>All billers</span>
+            <span>{tf("auto.b11f799538a14d78")}</span>
             {billerKeys.length > 0 ? (
               <>
                 <span className="font-mono text-xs text-muted-foreground">{formatTokens(allTokens)}</span>
@@ -550,7 +551,7 @@ export function Costs({
   }), [budgetPolicies]);
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={DollarSign} message="Select an organization to view costs." />;
+    return <EmptyState icon={DollarSign} message={tf("auto.6e64b9cf59c592a6")} />;
   }
 
   const showCustomPrompt = preset === "custom" && !customReady;
@@ -563,12 +564,12 @@ export function Costs({
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               {embedded ? (
-                <h2 className="text-lg font-semibold text-foreground">Costs</h2>
+                <h2 className="text-lg font-semibold text-foreground">{tf("text.Costs")}</h2>
               ) : (
-                <h1 className="text-3xl font-semibold tracking-tight">Costs</h1>
+                <h1 className="text-3xl font-semibold tracking-tight">{tf("text.Costs")}</h1>
               )}
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Inference spend, platform fees, credits, and live quota windows.
+                {tf("auto.4141e6f67e2c5a32")}
               </p>
             </div>
 
@@ -595,7 +596,7 @@ export function Costs({
                 onChange={(event) => setCustomFrom(event.target.value)}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
               />
-              <span className="text-sm text-muted-foreground">to</span>
+              <span className="text-sm text-muted-foreground">{tf("auto.663ea1bfffe5038f")}</span>
               <input
                 type="date"
                 value={customTo}
@@ -607,13 +608,13 @@ export function Costs({
 
           <div className="grid gap-3 lg:grid-cols-4">
             <MetricTile
-              label="Inference spend"
+              label={tf("auto.e24719c4a6e9f324")}
               value={formatCents(spendData?.summary.spendCents ?? 0)}
               subtitle={`${formatTokens(inferenceTokenTotal)} tokens across request-scoped events`}
               icon={DollarSign}
             />
             <MetricTile
-              label="Budget"
+              label={tf("text.Budget")}
               value={activeBudgetIncidents.length > 0 ? String(activeBudgetIncidents.length) : (
                 spendData?.summary.budgetCents && spendData.summary.budgetCents > 0
                   ? `${spendData.summary.utilizationPercent}%`
@@ -629,13 +630,13 @@ export function Costs({
               icon={Coins}
             />
             <MetricTile
-              label="Finance net"
+              label={tf("auto.b6985edcc86e54e4")}
               value={formatCents(financeData?.summary.netCents ?? 0)}
               subtitle={`${formatCents(financeData?.summary.debitCents ?? 0)} debits · ${formatCents(financeData?.summary.creditCents ?? 0)} credits`}
               icon={ReceiptText}
             />
             <MetricTile
-              label="Finance events"
+              label={tf("auto.6fbed76e2c32ee0e")}
               value={String(financeData?.summary.eventCount ?? 0)}
               subtitle={`${formatCents(financeData?.summary.estimatedDebitCents ?? 0)} estimated in range`}
               icon={ArrowUpRight}
@@ -647,17 +648,17 @@ export function Costs({
       <Tabs value={mainTab} onValueChange={(value) => setMainTab(value as typeof mainTab)}>
         {!lockTab ? (
           <TabsList variant="line" className="justify-start">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            {!hideBudgetsTab ? <TabsTrigger value="budgets">Budgets</TabsTrigger> : null}
-            <TabsTrigger value="providers">Providers</TabsTrigger>
-            <TabsTrigger value="billers">Billers</TabsTrigger>
-            <TabsTrigger value="finance">Finance</TabsTrigger>
+            <TabsTrigger value="overview">{tf("text.Overview")}</TabsTrigger>
+            {!hideBudgetsTab ? <TabsTrigger value="budgets">{tf("auto.a1a06e046b0b9ad3")}</TabsTrigger> : null}
+            <TabsTrigger value="providers">{tf("text.Providers")}</TabsTrigger>
+            <TabsTrigger value="billers">{tf("auto.2ae0e2cd6bd11bb6")}</TabsTrigger>
+            <TabsTrigger value="finance">{tf("auto.b696d75511dc16f2")}</TabsTrigger>
           </TabsList>
         ) : null}
 
         <TabsContent value="overview" className="mt-4 space-y-4">
           {showCustomPrompt ? (
-            <p className="text-sm text-muted-foreground">Select a start and end date to load data.</p>
+            <p className="text-sm text-muted-foreground">{tf("auto.1288f512731a783c")}</p>
           ) : showOverviewLoading ? (
             <PageSkeleton variant="costs" />
           ) : overviewError ? (
@@ -686,9 +687,9 @@ export function Costs({
               <div className="grid gap-4 xl:grid-cols-(--gtc-31)">
                 <Card>
                   <CardHeader className="px-5 pt-5 pb-2">
-                    <CardTitle className="text-base">Inference ledger</CardTitle>
+                    <CardTitle className="text-base">{tf("auto.41faba7cc38d6027")}</CardTitle>
                     <CardDescription>
-                      Request-scoped inference spend for the selected period.
+                      {tf("auto.5162c1fef9d2910e")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4 px-5 pb-5 pt-2">
@@ -704,7 +705,7 @@ export function Costs({
                         </div>
                       </div>
                       <div className="border border-border px-4 py-3 text-right">
-                        <div className="text-(length:--text-micro) uppercase tracking-(--tracking-eyebrow) text-muted-foreground">usage</div>
+                        <div className="text-(length:--text-micro) uppercase tracking-(--tracking-eyebrow) text-muted-foreground">{tf("auto.0a4e4c29432ecb01")}</div>
                         <div className="mt-1 text-lg font-medium tabular-nums">
                           {formatTokens(inferenceTokenTotal)}
                         </div>
@@ -745,12 +746,12 @@ export function Costs({
               <div className="grid gap-4 xl:grid-cols-(--gtc-32)">
                 <Card>
                   <CardHeader className="px-5 pt-5 pb-2">
-                    <CardTitle className="text-base">By agent</CardTitle>
-                    <CardDescription>What each agent consumed in the selected period.</CardDescription>
+                    <CardTitle className="text-base">{tf("auto.0cb8a702286dadaf")}</CardTitle>
+                    <CardDescription>{tf("auto.bea79d519a4c815b")}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2 px-5 pb-5 pt-2">
                     {(spendData?.byAgent.length ?? 0) === 0 ? (
-                      <p className="text-sm text-muted-foreground">No cost events yet.</p>
+                      <p className="text-sm text-muted-foreground">{tf("auto.219b9c37feb3fa52")}</p>
                     ) : (
                       spendData?.byAgent.map((row) => {
                         const modelRows = agentModelRows.get(row.agentId) ?? [];
@@ -833,12 +834,12 @@ export function Costs({
                 <div className="space-y-4">
                   <Card>
                     <CardHeader className="px-5 pt-5 pb-2">
-                      <CardTitle className="text-base">By project</CardTitle>
-                      <CardDescription>Run costs attributed through project-linked tasks.</CardDescription>
+                      <CardTitle className="text-base">{tf("auto.9335958ece132c08")}</CardTitle>
+                      <CardDescription>{tf("auto.730720835c9fc0ed")}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2 px-5 pb-5 pt-2">
                       {(spendData?.byProject.length ?? 0) === 0 ? (
-                        <p className="text-sm text-muted-foreground">No project-attributed run costs yet.</p>
+                        <p className="text-sm text-muted-foreground">{tf("auto.856de837b71098ed")}</p>
                       ) : (
                         spendData?.byProject.map((row, index) => (
                           <div
@@ -853,7 +854,7 @@ export function Costs({
                     </CardContent>
                   </Card>
 
-                  <FinanceTimelineCard rows={topFinanceEvents.slice(0, 6)} emptyMessage="No finance events yet. Add account-level charges once biller invoices or credits land." />
+                  <FinanceTimelineCard rows={topFinanceEvents.slice(0, 6)} emptyMessage={tf("auto.f10b41dac20c00d9")} />
                 </div>
               </div>
             </>
@@ -869,34 +870,34 @@ export function Costs({
             <>
               <Card className="border-border/70 bg-(image:--gradient-extract-2)">
                 <CardHeader className="px-5 pt-5 pb-3">
-                  <CardTitle className="text-base">Budget control plane</CardTitle>
+                  <CardTitle className="text-base">{tf("auto.24583d5b98662237")}</CardTitle>
                   <CardDescription>
-                    Hard-stop spend limits for agents and projects. Provider subscription quota stays separate and appears under Providers.
+                    {tf("auto.666a3a619c81b105")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-3 px-5 pb-5 pt-0 md:grid-cols-4">
                   <MetricTile
-                    label="Active incidents"
+                    label={tf("auto.0d5b14c485598692")}
                     value={String(activeBudgetIncidents.length)}
-                    subtitle="Open soft or hard threshold crossings"
+                    subtitle={tf("auto.41ab14a5dbfff798")}
                     icon={ReceiptText}
                   />
                   <MetricTile
-                    label="Pending approvals"
+                    label={tf("auto.0405f4b67edd2784")}
                     value={String(budgetData?.pendingApprovalCount ?? 0)}
-                    subtitle="Budget override approvals awaiting board action"
+                    subtitle={tf("auto.1792320c21fd985f")}
                     icon={ArrowUpRight}
                   />
                   <MetricTile
-                    label="Paused agents"
+                    label={tf("auto.751e5a2323f2a240")}
                     value={String(budgetData?.pausedAgentCount ?? 0)}
-                    subtitle="Agent heartbeats blocked by budget"
+                    subtitle={tf("auto.49bd0807f5255fdb")}
                     icon={Coins}
                   />
                   <MetricTile
-                    label="Paused projects"
+                    label={tf("auto.5be643e6acfebdf9")}
                     value={String(budgetData?.pausedProjectCount ?? 0)}
-                    subtitle="Project execution blocked by budget"
+                    subtitle={tf("auto.0628458bd0e5f2fe")}
                     icon={DollarSign}
                   />
                 </CardContent>
@@ -905,9 +906,9 @@ export function Costs({
               {activeBudgetIncidents.length > 0 ? (
                 <div className="space-y-3">
                   <div>
-                    <h2 className="text-lg font-semibold">Active incidents</h2>
+                    <h2 className="text-lg font-semibold">{tf("auto.0d5b14c485598692")}</h2>
                     <p className="text-sm text-muted-foreground">
-                      Resolve hard stops here by raising the budget or explicitly keeping the scope paused.
+                      {tf("auto.6913c66bc7f273bb")}
                     </p>
                   </div>
                   <div className="grid gap-4 xl:grid-cols-2">
@@ -968,7 +969,7 @@ export function Costs({
                 {budgetPolicies.length === 0 ? (
                   <Card>
                     <CardContent className="px-5 py-8 text-sm text-muted-foreground">
-                      No budget policies yet. Set agent and project budgets from their detail pages, or use the existing organization monthly budget control.
+                      {tf("auto.64167086cbffc6ca")}
                     </CardContent>
                   </Card>
                 ) : null}
@@ -979,7 +980,7 @@ export function Costs({
 
         <TabsContent value="providers" className="mt-4 space-y-4">
           {showCustomPrompt ? (
-            <p className="text-sm text-muted-foreground">Select a start and end date to load data.</p>
+            <p className="text-sm text-muted-foreground">{tf("auto.1288f512731a783c")}</p>
           ) : (
             <>
               <Tabs value={effectiveProvider} onValueChange={setActiveProvider}>
@@ -987,7 +988,7 @@ export function Costs({
 
                 <TabsContent value="all" className="mt-4">
                   {providers.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No cost events in this period.</p>
+                    <p className="text-sm text-muted-foreground">{tf("auto.5eeb31929690cbcf")}</p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
                       {providers.map((provider) => (
@@ -1034,7 +1035,7 @@ export function Costs({
 
         <TabsContent value="billers" className="mt-4 space-y-4">
           {showCustomPrompt ? (
-            <p className="text-sm text-muted-foreground">Select a start and end date to load data.</p>
+            <p className="text-sm text-muted-foreground">{tf("auto.1288f512731a783c")}</p>
           ) : (
             <>
               <Tabs value={effectiveBiller} onValueChange={setActiveBiller}>
@@ -1042,7 +1043,7 @@ export function Costs({
 
                 <TabsContent value="all" className="mt-4">
                   {billers.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No billable events in this period.</p>
+                    <p className="text-sm text-muted-foreground">{tf("auto.408a4cc5b3653299")}</p>
                   ) : (
                     <div className="grid gap-4 md:grid-cols-2">
                       {billers.map((biller) => {
@@ -1087,7 +1088,7 @@ export function Costs({
 
         <TabsContent value="finance" className="mt-4 space-y-4">
           {showCustomPrompt ? (
-            <p className="text-sm text-muted-foreground">Select a start and end date to load data.</p>
+            <p className="text-sm text-muted-foreground">{tf("auto.1288f512731a783c")}</p>
           ) : financeLoading ? (
             <PageSkeleton variant="costs" />
           ) : financeError ? (
@@ -1106,12 +1107,12 @@ export function Costs({
                 <div className="space-y-4">
                   <Card>
                     <CardHeader className="px-5 pt-5 pb-2">
-                      <CardTitle className="text-base">By biller</CardTitle>
-                      <CardDescription>Account-level financial events grouped by who charged or credited them.</CardDescription>
+                      <CardTitle className="text-base">{tf("auto.27b8241be4a85eda")}</CardTitle>
+                      <CardDescription>{tf("auto.cf37bd4e0396fe2a")}</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4 px-5 pb-5 pt-2 md:grid-cols-2">
                       {(financeData?.byBiller.length ?? 0) === 0 ? (
-                        <p className="text-sm text-muted-foreground">No finance events yet.</p>
+                        <p className="text-sm text-muted-foreground">{tf("auto.40a93ddf87ee1732")}</p>
                       ) : (
                         financeData?.byBiller.map((row) => <FinanceBillerCard key={row.biller} row={row} />)
                       )}

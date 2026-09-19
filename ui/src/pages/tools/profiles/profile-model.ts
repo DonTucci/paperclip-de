@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   ToolCatalogEntry,
   ToolProfileDefaultAction,
@@ -368,11 +369,11 @@ export interface TemplateDef {
 }
 
 export const TEMPLATES: TemplateDef[] = [
-  { key: "read_only", title: "Read-only", description: "See and fetch, but never change anything." },
-  { key: "everyday", title: "Everyday work", description: "Read and make routine changes — no destructive tools." },
-  { key: "full_access", title: "Full access", description: "Everything every connected app offers." },
-  { key: "scratch", title: "Start from scratch", description: "An empty profile you build up tool by tool." },
-  { key: "copy", title: "Copy an existing profile", description: "Start from a profile you already have." },
+  { key: "read_only", title: tf("auto.72bb90897ab1eadc"), description: tf("auto.d1bebc224d280d15") },
+  { key: "everyday", title: tf("auto.0460cfbf95fc4af5"), description: tf("auto.06bd9df6ef280f13") },
+  { key: "full_access", title: tf("auto.f19611c61ca5f369"), description: tf("auto.057eec2e937c1c93") },
+  { key: "scratch", title: tf("auto.a4822ffed15b5e7d"), description: tf("auto.5f36b6517f10f17c") },
+  { key: "copy", title: tf("auto.5bfbefd7213c1b1b"), description: tf("auto.3100ce83a74a5f62") },
 ];
 
 function capabilityPredicate(key: TemplateKey): (tool: ToolCatalogEntry) => boolean {

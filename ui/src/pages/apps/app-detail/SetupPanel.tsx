@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import type { ToolCatalogEntry, ToolConnection } from "@paperclipai/shared";
@@ -37,9 +38,9 @@ export function SetupPanel({
   return (
     <div className="space-y-10">
       {identities}
-      <SetupLinkSection title="Agents" summary={agentsSummary} onClick={onOpenPermissions} />
+      <SetupLinkSection title={tf("text.Agents")} summary={agentsSummary} onClick={onOpenPermissions} />
       <SetupLinkSection
-        title="Actions"
+        title={tf("text.Actions")}
         summary={permissionsLoading ? "Loading permissions…" : permissionsSummary ?? "Manage permissions"}
         onClick={onOpenPermissions}
       />
@@ -121,9 +122,9 @@ function PostHogConfigurationSection({ connection }: { connection: ToolConnectio
   ];
   return (
     <section>
-      <h2 className="text-sm font-bold text-foreground">PostHog access scope</h2>
+      <h2 className="text-sm font-bold text-foreground">{tf("auto.8b34d1f1c52bff22")}</h2>
       <p className="mt-0.5 text-sm text-muted-foreground">
-        PostHog uses its normal account defaults unless you narrow the optional controls below.
+        {tf("auto.84a948202f43818f")}
       </p>
       <dl className="mt-4 divide-y divide-border">
         {rows.map(([label, value]) => (
@@ -164,15 +165,15 @@ function GoogleSheetsAllowlistSection({
   return (
     <section>
       <div>
-        <h2 className="text-sm font-bold text-foreground">Sheets agents can use</h2>
+        <h2 className="text-sm font-bold text-foreground">{tf("auto.38b73bee33887701")}</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          Agents can only use the sheets listed here.
+          {tf("auto.17ba1daf3a11cf47")}
         </p>
       </div>
 
       <div className="mt-4 space-y-2">
         {ids.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No sheets are connected yet.</div>
+          <div className="text-sm text-muted-foreground">{tf("auto.ee54c8d9967185a1")}</div>
         ) : (
           ids.map((id) => {
             const sheetUrl = googleSheetsUrlForId(id);
@@ -184,7 +185,7 @@ function GoogleSheetsAllowlistSection({
                   rel="noreferrer"
                   className="min-w-0 flex-1 text-sm font-medium text-foreground underline-offset-2 hover:underline"
                 >
-                  <span className="block truncate">Open sheet</span>
+                  <span className="block truncate">{tf("auto.f2df2497ff599b79")}</span>
                   <span className="block truncate font-mono text-xs font-normal text-muted-foreground">
                     {sheetUrl}
                   </span>
@@ -200,7 +201,7 @@ function GoogleSheetsAllowlistSection({
                   title={ids.length <= 1 ? "Add another sheet before removing this one." : undefined}
                   onClick={() => saveIds(ids.filter((current) => current !== id))}
                 >
-                  Remove
+                  {tf("text.Remove")}
                 </Button>
               </div>
             );
@@ -236,7 +237,7 @@ function GoogleSheetsAllowlistSection({
             setDraft("");
           }}
         >
-          Add sheet
+          {tf("auto.e05a0e967b4ce3d7")}
         </Button>
       </div>
       {error && <div className="mt-2 text-xs text-destructive">{error}</div>}
@@ -264,7 +265,7 @@ export function QuarantinedActionsReview({
             Review {count} new {count === 1 ? "action" : "actions"}
           </div>
           <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-            Turn on the actions agents may use. Anything left off stays blocked when you save.
+            {tf("auto.6a8de879543faa87")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -274,7 +275,7 @@ export function QuarantinedActionsReview({
             disabled={disabled}
             onClick={() => setEnabledIds(new Set(entries.map((entry) => entry.id)))}
           >
-            Turn all on
+            {tf("auto.08f6d3f555b7c1f5")}
           </button>
           <button
             type="button"
@@ -282,7 +283,7 @@ export function QuarantinedActionsReview({
             disabled={disabled}
             onClick={() => setEnabledIds(new Set())}
           >
-            Turn all off
+            {tf("auto.59d74fd7dc6c7617")}
           </button>
         </div>
       </div>

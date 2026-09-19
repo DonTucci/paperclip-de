@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { Link } from "@/lib/router";
 import {
@@ -334,11 +335,11 @@ function KanbanCard({
           {isSuccessfulRunHandoffRequired(issue) ? (
             <Badge variant="outline"
               className="border-amber-400/45 bg-amber-50/60 px-1.5 text-(length:--text-nano) text-amber-700 dark:border-amber-300/35 dark:bg-amber-400/10 dark:text-amber-300"
-              title="This task needs a next step"
-              aria-label="Needs next step"
+              title={tf("auto.aa4b55368cd2026a")}
+              aria-label={tf("auto.e45a2c0f61e00966")}
             >
               <AlertTriangle className="h-3 w-3" />
-              Next step
+              {tf("auto.298a9207a732a11d")}
             </Badge>
           ) : null}
           {isLive && (

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type {
   AttentionDetailImage,
   AttentionFeed,
@@ -48,18 +49,18 @@ interface SourceMeta {
 }
 
 const SOURCE_META: Record<AttentionSourceKind, SourceMeta> = {
-  approval: { label: "Approval" },
-  decision: { label: "Decision" },
-  issue_thread_interaction: { label: "Decision requested" },
-  join_request: { label: "Join request" },
-  recovery_action: { label: "Recovery" },
+  approval: { label: tf("auto.147fb813a2515718") },
+  decision: { label: tf("auto.640ae4baf96061fe") },
+  issue_thread_interaction: { label: tf("auto.a1db1b31d8647e72") },
+  join_request: { label: tf("auto.d7d9cd19632538b7") },
+  recovery_action: { label: tf("auto.48f6a8d5688b0cf5") },
   // Read compatibility for persisted decisions from the retired feature.
-  productivity_review: { label: "Task" },
-  blocker_attention: { label: "Blocked dependency" },
-  review: { label: "Review" },
-  failed_run: { label: "Failed run" },
-  budget_alert: { label: "Budget" },
-  agent_error_alert: { label: "Agent error" },
+  productivity_review: { label: tf("text.Task") },
+  blocker_attention: { label: tf("auto.c4b95fcddef41ed0") },
+  review: { label: tf("auto.aff0766a5290e117") },
+  failed_run: { label: tf("auto.3f23cd69ecb80fe4") },
+  budget_alert: { label: tf("text.Budget") },
+  agent_error_alert: { label: tf("auto.2934a62999d9eed5") },
 };
 
 export function sourceMeta(kind: AttentionSourceKind): SourceMeta {
@@ -74,10 +75,10 @@ interface SeverityStyle {
 }
 
 const SEVERITY_STYLE: Record<AttentionSeverity, SeverityStyle> = {
-  critical: { accent: "bg-red-500", dot: "bg-red-500", label: "Critical" },
-  high: { accent: "bg-orange-500", dot: "bg-orange-500", label: "High" },
-  medium: { accent: "bg-yellow-500", dot: "bg-yellow-500", label: "Medium" },
-  low: { accent: "bg-blue-500", dot: "bg-blue-500", label: "Low" },
+  critical: { accent: "bg-red-500", dot: "bg-red-500", label: tf("auto.427dd2969bd140be") },
+  high: { accent: "bg-orange-500", dot: "bg-orange-500", label: tf("auto.c4ebc6d4a5832cd9") },
+  medium: { accent: "bg-yellow-500", dot: "bg-yellow-500", label: tf("auto.8e588cd187741f1c") },
+  low: { accent: "bg-blue-500", dot: "bg-blue-500", label: tf("auto.f793de205ead5ac3") },
 };
 
 export function severityStyle(severity: AttentionSeverity): SeverityStyle {
@@ -371,9 +372,9 @@ export function buildDeskShelves(items: AttentionItem[], now: number): DeskShelf
   const earlier = rest.filter((item) => !attentionIsNewToday(item, now));
 
   const shelves: DeskShelf[] = [];
-  if (decideNow.length > 0) shelves.push({ key: "desk:decide-now", label: "Decide now", items: decideNow });
-  if (newToday.length > 0) shelves.push({ key: "desk:new-today", label: "New today", items: newToday });
-  if (earlier.length > 0) shelves.push({ key: "desk:earlier", label: "Earlier", items: earlier });
+  if (decideNow.length > 0) shelves.push({ key: "desk:decide-now", label: tf("auto.8b60cfd14d5a368d"), items: decideNow });
+  if (newToday.length > 0) shelves.push({ key: "desk:new-today", label: tf("auto.51a7540f41dcb947"), items: newToday });
+  if (earlier.length > 0) shelves.push({ key: "desk:earlier", label: tf("auto.e10ae99074011888"), items: earlier });
   return shelves;
 }
 
@@ -896,7 +897,7 @@ export function groupAttentionItems(
         ? { key: `type:${item.sourceKind}`, label: sourceMeta(item.sourceKind).label }
         : item.project
           ? { key: `project:${item.project.id}`, label: item.project.name }
-          : { key: `project:${NO_GROUP_SENTINEL}`, label: "No project" };
+          : { key: `project:${NO_GROUP_SENTINEL}`, label: tf("auto.f34c2be0d1c5f562") };
     const existing = groups.get(resolved.key);
     const ts = attentionActivityTimestamp(item);
     if (existing) {

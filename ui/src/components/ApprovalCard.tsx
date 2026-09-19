@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Link } from "@/lib/router";
 import { Badge } from "@/components/ui/badge";
@@ -70,7 +71,7 @@ export function ApprovalCard({
                 </Badge>
                 {requesterAgent && (
                   <div className="inline-flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-                    <span>Requested by</span>
+                    <span>{tf("auto.9199a054972b1489")}</span>
                     <Identity name={requesterAgent.name} size="sm" className="inline-flex" />
                   </div>
                 )}
@@ -104,7 +105,7 @@ export function ApprovalCard({
 
       {approval.decisionNote && (
         <div className="mt-4 rounded-lg border border-border/60 bg-muted/30 px-3.5 py-3 text-xs leading-5 text-muted-foreground">
-          <span className="font-medium text-foreground">Decision note.</span> {approval.decisionNote}
+          <span className="font-medium text-foreground">{tf("auto.c45917b3c53d8ce7")}</span> {approval.decisionNote}
         </div>
       )}
 
@@ -138,11 +139,11 @@ export function ApprovalCard({
                 to={detailLink}
                 className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-auto px-2 text-xs text-muted-foreground")}
               >
-                View details
+                {tf("auto.d1bf045bb524dae5")}
               </Link>
             ) : (
               <Button variant="ghost" size="sm" className="h-auto px-2 text-xs text-muted-foreground" onClick={onOpen}>
-                View details
+                {tf("auto.d1bf045bb524dae5")}
               </Button>
             )
           ) : null}

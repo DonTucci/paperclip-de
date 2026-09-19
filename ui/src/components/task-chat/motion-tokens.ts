@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Catalog of the redesign's motion tokens. This mirrors the `--motion-*`
  * custom properties declared in ui/src/index.css :root, and is the list the dev
@@ -71,11 +72,11 @@ export const MOTION_TOKENS: MotionTokenDef[] = [
 
 /** Common easing presets offered by the tweak panel's easing picker. */
 export const EASING_PRESETS: { label: string; value: string }[] = [
-  { label: "ease-out-expo (house)", value: "cubic-bezier(0.16, 1, 0.3, 1)" },
-  { label: "standard (house)", value: "cubic-bezier(0.4, 0, 0.2, 1)" },
-  { label: "ease-out", value: "cubic-bezier(0, 0, 0.2, 1)" },
-  { label: "ease-in-out", value: "cubic-bezier(0.42, 0, 0.58, 1)" },
-  { label: "linear", value: "linear" },
+  { label: tf("auto.59e1c263e702536b"), value: "cubic-bezier(0.16, 1, 0.3, 1)" },
+  { label: tf("auto.20f4407eb9e69922"), value: "cubic-bezier(0.4, 0, 0.2, 1)" },
+  { label: tf("auto.791c2d09976d44b3"), value: "cubic-bezier(0, 0, 0.2, 1)" },
+  { label: tf("auto.16c2539d96224e3c"), value: "cubic-bezier(0.42, 0, 0.58, 1)" },
+  { label: tf("auto.7f2fe580edb35154"), value: "linear" },
 ];
 
 /** Ordered list of the panel's groups. */

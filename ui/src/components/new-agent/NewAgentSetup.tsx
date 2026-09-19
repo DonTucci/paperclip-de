@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { AiConnectionField, aiProviderForAdapter } from "../ai-connections/AiConnectionField";
 import type { AiConnectionBinding } from "@paperclipai/shared";
 import { DEFAULT_CODEX_LOCAL_MODEL } from "@paperclipai/adapter-codex-local";
@@ -76,7 +77,7 @@ export function NewAgentSetup() {
   if (!selectedCompanyId)
     return (
       <p className="text-sm text-muted-foreground">
-        Select an organization to create an agent.
+        {tf("auto.28b980d2331ceb2e")}
       </p>
     );
   return (
@@ -253,8 +254,7 @@ function Setup({
   } catch (cause) {
     environmentError =
       cause instanceof Error
-        ? cause.message
-        : "Could not resolve the environment.";
+        ? cause.message: tf("auto.3c252c09c28e0541");
   }
   const environment = envs.data?.find((env) => env.id === environmentId);
   const sandboxProvider =
@@ -448,7 +448,7 @@ function Setup({
     } catch (cause) {
       if (run === generation.current) {
         setError(
-          cause instanceof Error ? cause.message : "Could not test the agent.",
+          cause instanceof Error ? cause.message: tf("auto.c7631b525000a002"),
         );
         setTestState("fail");
       }
@@ -534,7 +534,7 @@ function Setup({
       ]);
     } catch (cause) {
       setError(
-        cause instanceof Error ? cause.message : "Could not create the agent.",
+        cause instanceof Error ? cause.message: tf("auto.31a0a736b93a8d32"),
       );
     } finally {
       if (!hired) {
@@ -656,7 +656,7 @@ function Setup({
         )}
         {adapters.data && !available && (
           <p role="alert" className="text-sm text-destructive">
-            This adapter is unavailable. Choose an enabled adapter.
+            {tf("auto.36fcb6b4dee1b3d0")}
           </p>
         )}
         {(managedOnly || forced.forced) &&
@@ -668,7 +668,7 @@ function Setup({
             </p>
           )}
         <div className="flex flex-col gap-8 md:flex-row">
-          <nav aria-label="Agent setup steps" className="shrink-0 md:w-44">
+          <nav aria-label={tf("auto.1f28c3a9138a01ad")} className="shrink-0 md:w-44">
             <ol className="flex flex-wrap gap-2 md:flex-col">
               {steps.map((step, index) => (
                 <li key={step}>
@@ -709,7 +709,7 @@ function Setup({
                   <OnboardingCard className="mx-auto">
                     <div className="mb-8">
                       <OnboardingHeading
-                        title="Connect a model"
+                        title={tf("auto.87bdaaf8ac10de0f")}
                         lede={`Connect ${name} to ${connectionAdapter === "claude_local" ? "Claude" : connectionAdapter === "grok_local" ? "Grok" : "OpenAI"}.`}
                         center
                       />
@@ -753,17 +753,17 @@ function Setup({
                           : "Your agent is ready"}
                       </h2>
                       <dl className="grid grid-cols-2 gap-4 text-sm">
-                        <dt className="text-muted-foreground">Adapter</dt>
+                        <dt className="text-muted-foreground">{tf("text.Adapter")}</dt>
                         <dd>{getAdapterDisplay(adapterType).label}</dd>
                         {showModel && (
                           <>
-                            <dt className="text-muted-foreground">Model</dt>
+                            <dt className="text-muted-foreground">{tf("text.Model")}</dt>
                             <dd className="break-all">
                               {String(confirmationModel)}
                             </dd>
                           </>
                         )}
-                        <dt className="text-muted-foreground">Environment</dt>
+                        <dt className="text-muted-foreground">{tf("text.Environment")}</dt>
                         <dd>{environmentLabel}</dd>
                       </dl>
                       <p className="text-sm text-muted-foreground">
@@ -778,7 +778,7 @@ function Setup({
                         onClick={() => navigate(`${agentUrl(created)}/runtime`)}
                       >
                         <Settings2 className="size-4" />
-                        Edit configuration
+                        {tf("auto.3076810095c3d8be")}
                       </Button>
                       <Button
                         disabled={created.status === "pending_approval"}
@@ -803,19 +803,19 @@ function Setup({
                     }}
                   >
                     <h2 className="text-xl font-semibold">
-                      Configure your agent
+                      {tf("auto.be9ca645b7c107ce")}
                     </h2>
                     <fieldset disabled={busy} className="space-y-8">
                       <section className="space-y-5">
-                        <h3 className="text-sm font-semibold">Runtime</h3>
+                        <h3 className="text-sm font-semibold">{tf("auto.1093115897879aa3")}</h3>
                         {aiProviderForAdapter(brandType) && (
                           connection && !aiBinding ? (
                             <div className="space-y-3">
                               <p className="text-sm text-muted-foreground">
-                                Using the connection selected in the Connect step.
+                                {tf("auto.7129ce38e602bf34")}
                               </p>
                               <Button type="button" variant="outline" onClick={() => setScreen("connect")}>
-                                Change connection
+                                {tf("auto.286b1c9dc3f5b4aa")}
                               </Button>
                             </div>
                           ) : (
@@ -823,7 +823,7 @@ function Setup({
                               onChange={binding => { setRuntimeAiBinding(binding); resetTest(); }} />
                           )
                         )}
-                        {models.error && <p role="alert" className="text-sm text-destructive">Could not load models. Retry or enter a model ID manually.</p>}
+                        {models.error && <p role="alert" className="text-sm text-destructive">{tf("auto.c8cad4cf31602f08")}</p>}
                         {((showModel && !usingKimiApi) ||
                           efforts.length > 0) && (
                           <div className="grid items-start gap-5 sm:grid-cols-2">
@@ -861,9 +861,9 @@ function Setup({
                               />
                             )}
                             {efforts.length > 0 && (
-                              <Field label="Thinking effort">
+                              <Field label={tf("auto.264c28cbf01ce9fa")}>
                                 <select
-                                  aria-label="Thinking effort"
+                                  aria-label={tf("auto.264c28cbf01ce9fa")}
                                   className={controlClass}
                                   value={effort}
                                   onChange={(event) => {
@@ -871,7 +871,7 @@ function Setup({
                                     resetTest();
                                   }}
                                 >
-                                  <option value="">Auto</option>
+                                  <option value="">{tf("auto.0286249762f7c943")}</option>
                                   {efforts.map((value) => (
                                     <option key={value} value={value}>
                                       {value}
@@ -896,9 +896,9 @@ function Setup({
                         {hasCredentialField && !aiBinding && (
                           <div className="grid gap-5 sm:grid-cols-2">
                             {chooseProvider && (
-                              <Field label="API key provider">
+                              <Field label={tf("auto.d8551dcfa9b4cad2")}>
                                 <select
-                                  aria-label="API key provider"
+                                  aria-label={tf("auto.d8551dcfa9b4cad2")}
                                   className={controlClass}
                                   value={provider}
                                   onChange={(event) => {
@@ -965,7 +965,7 @@ function Setup({
                                       rel="noopener noreferrer"
                                       className="shrink-0 text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
                                     >
-                                      get api key
+                                      {tf("auto.b2384483ca1f2377")}
                                     </a>
                                   )}
                                 </div>
@@ -977,7 +977,7 @@ function Setup({
                                   chooseProvider ? "sm:col-span-2" : undefined
                                 }
                               >
-                                <Field label="Or use an organization secret">
+                                <Field label={tf("auto.961df787a0b10638")}>
                                   <SecretPicker
                                     secretId={
                                       selectedBinding &&
@@ -1009,9 +1009,9 @@ function Setup({
                           </div>
                         )}
                         {adapterType === "hermes_gateway" && (
-                          <Field label="Hermes API base URL">
+                          <Field label={tf("auto.ccec8cd458fb93f6")}>
                             <Input
-                              aria-label="Hermes API base URL"
+                              aria-label={tf("auto.ccec8cd458fb93f6")}
                               value={gatewayUrl}
                               onChange={(event) => {
                                 setGatewayUrl(event.target.value);
@@ -1023,20 +1023,20 @@ function Setup({
                         )}
                         {usingKimiApi && (
                           <div className="grid gap-5 sm:grid-cols-2">
-                            <Field label="Kimi API model name">
+                            <Field label={tf("auto.d880c2be9c0434c9")}>
                               <Input
-                                aria-label="Kimi API model name"
+                                aria-label={tf("auto.d880c2be9c0434c9")}
                                 value={kimiModel}
                                 onChange={(event) => {
                                   setKimiModel(event.target.value);
                                   resetTest();
                                 }}
-                                placeholder="kimi-for-coding"
+                                placeholder={tf("auto.a856fb3d089962f7")}
                               />
                             </Field>
-                            <Field label="Kimi API protocol">
+                            <Field label={tf("auto.2fd46541e58944c0")}>
                               <select
-                                aria-label="Kimi API protocol"
+                                aria-label={tf("auto.2fd46541e58944c0")}
                                 className={controlClass}
                                 value={kimiProtocol}
                                 onChange={(event) => {
@@ -1052,26 +1052,26 @@ function Setup({
                               </select>
                             </Field>
                             <Field
-                              label="Kimi API base URL"
+                              label={tf("auto.b46e77c4df79ef57")}
                               hint="Optional override for your provider endpoint."
                             >
                               <Input
-                                aria-label="Kimi API base URL"
+                                aria-label={tf("auto.b46e77c4df79ef57")}
                                 value={kimiBaseUrl}
                                 onChange={(event) => {
                                   setKimiBaseUrl(event.target.value);
                                   resetTest();
                                 }}
-                                placeholder="Provider default"
+                                placeholder={tf("auto.352a25678fb9c8a3")}
                               />
                             </Field>
                           </div>
                         )}
                         {adapterType === "cursor_cloud" && (
                           <div className="grid gap-5 sm:grid-cols-2">
-                            <Field label="GitHub repository">
+                            <Field label={tf("auto.505554929de39d80")}>
                               <Input
-                                aria-label="GitHub repository"
+                                aria-label={tf("auto.505554929de39d80")}
                                 value={repository}
                                 onChange={(event) => {
                                   setRepository(event.target.value);
@@ -1080,10 +1080,10 @@ function Setup({
                                 placeholder="https://github.com/your-org/repo"
                               />
                             </Field>
-                            <Field label="Branch">
+                            <Field label={tf("text.Branch")}>
                               <Input
-                                aria-label="Branch"
-                                placeholder="Repository default"
+                                aria-label={tf("text.Branch")}
+                                placeholder={tf("auto.e88cba3b99d1e596")}
                                 value={branch}
                                 onChange={(event) => {
                                   setBranch(event.target.value);
@@ -1098,9 +1098,9 @@ function Setup({
                         adapterType,
                       ) && (
                         <section className="space-y-5">
-                          <h3 className="text-sm font-semibold">Environment</h3>
+                          <h3 className="text-sm font-semibold">{tf("text.Environment")}</h3>
                           <select
-                            aria-label="Environment"
+                            aria-label={tf("text.Environment")}
                             className={controlClass}
                             value={environmentOverride}
                             disabled={forced.forced || managedOnly}
@@ -1146,7 +1146,7 @@ function Setup({
                           onClick={() => setScreen("connect")}
                         >
                           <ArrowLeft className="size-4" />
-                          Connection
+                          {tf("auto.639a40e82b9a96f0")}
                         </Button>
                       ) : (
                         <span />

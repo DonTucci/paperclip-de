@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import {
   attachmentArtifactWorkProductMetadataSchema,
   type AttachmentArtifactWorkProductMetadata,
@@ -184,26 +185,26 @@ export function getOutputFileGlyph(contentType: string | null | undefined): Outp
   const type = normalizeOutputContentType(contentType);
   if (type.startsWith("video/")) {
     const subtype = type.slice("video/".length);
-    if (subtype === "quicktime") return { label: "MOV", tone: "video" };
+    if (subtype === "quicktime") return { label: tf("auto.3098b1708ea4f0f6"), tone: "video" };
     return { label: (subtype || "vid").toUpperCase().slice(0, 4), tone: "video" };
   }
-  if (type === "application/pdf") return { label: "PDF", tone: "pdf" };
+  if (type === "application/pdf") return { label: tf("auto.1d393b0081b632c5"), tone: "pdf" };
   if (isZipContentType(type)) {
-    return { label: "ZIP", tone: "zip" };
+    return { label: tf("auto.eaca4b30692888d0"), tone: "zip" };
   }
-  if (type.startsWith("image/")) return { label: "IMG", tone: "image" };
-  if (MARKDOWN_CONTENT_TYPES.has(type)) return { label: "MD", tone: "bin" };
-  if (type === "text/plain") return { label: "TXT", tone: "bin" };
-  if (type === "text/csv" || type === "application/csv") return { label: "CSV", tone: "bin" };
+  if (type.startsWith("image/")) return { label: tf("auto.d083ab0535d61b80"), tone: "image" };
+  if (MARKDOWN_CONTENT_TYPES.has(type)) return { label: tf("auto.7abcf6dac49247ef"), tone: "bin" };
+  if (type === "text/plain") return { label: tf("auto.d3dc6ac9490999b5"), tone: "bin" };
+  if (type === "text/csv" || type === "application/csv") return { label: tf("auto.eb6b42f54c42d283"), tone: "bin" };
   if (type === "text/html" || type === "application/html" || type === "application/xhtml+xml") {
-    return { label: "HTML", tone: "bin" };
+    return { label: tf("auto.07239dbd2a1a1dd7"), tone: "bin" };
   }
-  if (type === "application/json" || type.endsWith("+json")) return { label: "JSON", tone: "bin" };
+  if (type === "application/json" || type.endsWith("+json")) return { label: tf("auto.db1a21a0bc2ef8fb"), tone: "bin" };
   if (type === "application/xml" || type === "text/xml" || type.endsWith("+xml")) {
-    return { label: "XML", tone: "bin" };
+    return { label: tf("auto.40658e9af8fd9222"), tone: "bin" };
   }
-  if (type === "application/wasm") return { label: "WASM", tone: "bin" };
-  return { label: "BIN", tone: "bin" };
+  if (type === "application/wasm") return { label: tf("auto.4bec5a51a3d35e53"), tone: "bin" };
+  return { label: tf("auto.c73f954a0dcd410a"), tone: "bin" };
 }
 
 export function isVideoContentType(contentType: string | null | undefined): boolean {

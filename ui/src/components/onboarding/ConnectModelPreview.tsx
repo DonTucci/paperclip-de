@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { MotionConfig } from "motion/react";
 
@@ -46,12 +47,12 @@ import { Stepper } from "./Stepper";
 const MODEL_SOURCES: ModelSource[] = [
   {
     id: "claude_local",
-    label: "Claude Code",
+    label: tf("auto.246ef8c1130d56f5"),
     icon: <img src="/brands/claude-color.svg" alt="" className="size-full" />,
   },
   {
     id: "codex_local",
-    label: "Codex",
+    label: tf("auto.616efbe96852d8c9"),
     icon: <img src="/brands/codex-color.svg" alt="" className="size-full" />,
   },
 ];
@@ -105,14 +106,14 @@ export function ConnectModelPreview({
         <div className="pt-6">
           <OnboardingHeading
             center
-            title="Connect a model"
+            title={tf("auto.87bdaaf8ac10de0f")}
             lede="Paperclip works with your existing subscription or API keys."
           />
         </div>
 
         <div className="space-y-2 pt-12">
           <ModelSourceTiles
-            label="Model source"
+            label={tf("auto.9fb88c74db9bfbbb")}
             sources={MODEL_SOURCES}
             mode={mode}
             selectedId={selectedId}
@@ -132,7 +133,7 @@ export function ConnectModelPreview({
                 onCheckedChange={(checked) => setUseApiKeys(checked === true)}
               />
               <span className="text-sm font-medium text-foreground">
-                Use API keys instead
+                {tf("auto.13febab47b8de21b")}
               </span>
             </label>
           )}

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useRef } from "react";
 import {
   Activity as ActivityIcon,
@@ -40,21 +41,21 @@ type NavGroup = {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: "Routine",
+    label: tf("text.Routine"),
     items: [
-      { key: "overview", label: "Overview", icon: Circle },
-      { key: "triggers", label: "Triggers", icon: Clock3 },
-      { key: "variables", label: "Variables", icon: LayoutGrid },
-      { key: "secrets", label: "Secrets", icon: KeyRound },
-      { key: "delivery", label: "Delivery", icon: Send },
+      { key: "overview", label: tf("text.Overview"), icon: Circle },
+      { key: "triggers", label: tf("text.Triggers"), icon: Clock3 },
+      { key: "variables", label: tf("text.Variables"), icon: LayoutGrid },
+      { key: "secrets", label: tf("text.Secrets"), icon: KeyRound },
+      { key: "delivery", label: tf("auto.52bfe584a5fc4505"), icon: Send },
     ],
   },
   {
-    label: "Operate",
+    label: tf("auto.58c3939c4ce986c8"),
     items: [
-      { key: "runs", label: "Runs", icon: Play },
-      { key: "activity", label: "Activity", icon: ActivityIcon },
-      { key: "history", label: "History", icon: HistoryIcon },
+      { key: "runs", label: tf("text.Runs"), icon: Play },
+      { key: "activity", label: tf("text.Activity"), icon: ActivityIcon },
+      { key: "history", label: tf("text.History"), icon: HistoryIcon },
     ],
   },
 ];
@@ -109,7 +110,7 @@ export function RoutineSubSidebar({
 
   return (
     <nav
-      aria-label="Routine sections"
+      aria-label={tf("auto.05ddb20fccb7fc9e")}
       className="hidden h-full w-52 shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-background px-3 py-4 md:flex"
     >
       {NAV_GROUPS.map((group) => (
@@ -152,7 +153,7 @@ export function RoutineSubSidebar({
                   <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 motion-safe:animate-pulse" />
                 ) : dirty ? (
                   <span
-                    aria-label="Unsaved changes"
+                    aria-label={tf("auto.a710c2b90913b537")}
                     className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500 ring-2 ring-background"
                   />
                 ) : null}
@@ -185,7 +186,7 @@ export function RoutineSectionPicker({
           }
         }}
       >
-        <SelectTrigger className="h-11 w-full" aria-label="Routine section">
+        <SelectTrigger className="h-11 w-full" aria-label={tf("auto.0f3c4f87d442a219")}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

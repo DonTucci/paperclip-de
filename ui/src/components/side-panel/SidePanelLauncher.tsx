@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState, type ReactNode } from "react";
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import {
@@ -47,7 +48,7 @@ function LauncherContent({
               {section.loading ? (
                 <div className="flex items-center gap-2 px-2 py-3 text-sm text-muted-foreground" role="status">
                   <Loader2 className="size-4 animate-spin" aria-hidden />
-                  Loading…
+                  {tf("auto.ba3bbbe10d8bef66")}
                 </div>
               ) : null}
               {section.error ? (
@@ -74,7 +75,7 @@ function LauncherContent({
                       </span>
                     ) : null}
                   </span>
-                  {item.alreadyOpen ? <Check className="size-4 text-muted-foreground" aria-label="Already open" /> : null}
+                  {item.alreadyOpen ? <Check className="size-4 text-muted-foreground" aria-label={tf("auto.390a958f3b46f6a9")} /> : null}
                   {item.shortcut ? <CommandShortcut>{item.shortcut}</CommandShortcut> : null}
                 </CommandItem>
               ))}
@@ -93,10 +94,10 @@ export function SidePanelLauncher({
   trigger,
   open: controlledOpen,
   onOpenChange,
-  title = "Open a side panel tab",
-  description = "Choose a view or resource to open.",
-  placeholder = "Search tabs and resources…",
-  emptyMessage = "No matching tabs or resources.",
+  title = tf("auto.995d1f304f2f1a11"),
+  description = tf("auto.210dbbe11bffce43"),
+  placeholder = tf("auto.06311a8538b971d5"),
+  emptyMessage = tf("auto.de04bc42e40057c2"),
   className,
 }: SidePanelLauncherProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect } from "react";
 import { History } from "lucide-react";
 import { useSearchParams } from "@/lib/router";
@@ -21,7 +22,7 @@ export function CompanyActivity() {
   const mode: AuditFeedMode = searchParams.get("mode") === "agents" ? "agents" : "all";
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Activity" }]);
+    setBreadcrumbs([{ label: tf("text.Activity") }]);
   }, [setBreadcrumbs]);
 
   const handleModeChange = useCallback(
@@ -42,7 +43,7 @@ export function CompanyActivity() {
   );
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={History} message="Select a company to view activity." />;
+    return <EmptyState icon={History} message={tf("auto.529d90044f8238e0")} />;
   }
 
   return <AuditFeed companyId={selectedCompanyId} mode={mode} onModeChange={handleModeChange} />;

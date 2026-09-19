@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Pause, Play, RotateCcw } from "lucide-react";
@@ -145,10 +146,10 @@ function useStreamingReplay(
  * page-surface treatment.
  */
 const BUBBLE_VARIANTS = [
-  { id: "", label: "Chosen · C · On bg" },
-  { id: "former", label: "Former" },
-  { id: "darker", label: "A · Darker" },
-  { id: "hairline", label: "B · Hairline" },
+  { id: "", label: tf("auto.8bb852cbace5d1a2") },
+  { id: "former", label: tf("auto.9b5c6b4a00e9a576") },
+  { id: "darker", label: tf("auto.8f813722c0c3d46d") },
+  { id: "hairline", label: tf("auto.9b29ba041cc5107d") },
 ] as const;
 type BubbleVariantId = (typeof BUBBLE_VARIANTS)[number]["id"];
 
@@ -168,15 +169,15 @@ export function TaskChatLab() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <header className="border-b border-border px-4 py-2">
-        <h1 className="text-sm font-semibold">Task Chat Lab</h1>
+        <h1 className="text-sm font-semibold">{tf("auto.eadc4f8ea60bd314")}</h1>
         <p className="text-xs text-muted-foreground">
-          Synthetic harness for the task chat redesign · every state renders here with no live agent.
+          {tf("auto.a9cded41c7679e98")}
         </p>
       </header>
 
       <div className="flex min-h-0 flex-1">
         {/* State switcher */}
-        <nav className="w-56 shrink-0 overflow-y-auto border-r border-border p-2" aria-label="States">
+        <nav className="w-56 shrink-0 overflow-y-auto border-r border-border p-2" aria-label={tf("auto.2f6e9daec8e9b3b3")}>
           {(["live", "tier-b"] as const).map((tier) => (
             <div key={tier} className="mb-3">
               <p className="mb-1 px-1 text-(length:--text-nano) font-semibold uppercase tracking-wide text-muted-foreground">
@@ -223,10 +224,10 @@ export function TaskChatLab() {
               className="flex items-center gap-1 rounded border border-border px-2 py-1 hover:bg-accent"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              Replay
+              {tf("auto.c8dae6371b33b8d6")}
             </button>
             <label className="flex items-center gap-2">
-              <span className="text-muted-foreground">Speed</span>
+              <span className="text-muted-foreground">{tf("auto.c372fee9b4566b85")}</span>
               <input
                 type="range"
                 min={0.1}
@@ -234,14 +235,14 @@ export function TaskChatLab() {
                 step={0.1}
                 value={speed}
                 onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                aria-label="Streaming speed"
+                aria-label={tf("auto.7b7ee70ee5be121f")}
                 className="w-32"
               />
               <span className="w-10 tabular-nums">{speed.toFixed(1)}×</span>
             </label>
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-muted-foreground">Agent bubble</span>
-              <div className="flex items-center gap-0.5 rounded border border-border p-0.5" role="group" aria-label="Agent bubble treatment">
+              <span className="text-muted-foreground">{tf("auto.5f9372eebcdf522a")}</span>
+              <div className="flex items-center gap-0.5 rounded border border-border p-0.5" role="group" aria-label={tf("auto.5273d49985cbddf8")}>
                 {BUBBLE_VARIANTS.map((v) => (
                   <button
                     key={v.id || "current"}

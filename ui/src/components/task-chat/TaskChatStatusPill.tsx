@@ -5,6 +5,7 @@ import type { TaskChatStatusItem } from "./task-chat-model";
 import { statusLabelIcon, toolTaxonomy } from "./tool-taxonomy";
 import { isGenericStatusLabel, whimsyWord } from "./status-whimsy";
 import { parseCssTimeMs } from "./motion-tokens";
+import { formatUiNumber } from "@/i18n/fork";
 
 function elapsedLabel(ms?: number): string | null {
   if (ms == null) return null;
@@ -356,7 +357,7 @@ export function TaskChatStatusPill({
           ) : null}
           {item.tokens ? (
             <span className="ml-auto shrink-0 font-mono text-(length:--text-micro)">
-              {item.tokens.used.toLocaleString()}/{item.tokens.size.toLocaleString()} ctx
+              {formatUiNumber(item.tokens.used)}/{formatUiNumber(item.tokens.size)} ctx
             </span>
           ) : null}
         </span>
@@ -422,7 +423,7 @@ export function TaskChatStatusPill({
           {elapsed ? <span>{elapsed}</span> : null}
           {item.tokens ? (
             <span>
-              {item.tokens.used.toLocaleString()}/{item.tokens.size.toLocaleString()} ctx
+              {formatUiNumber(item.tokens.used)}/{formatUiNumber(item.tokens.size)} ctx
             </span>
           ) : null}
         </span>

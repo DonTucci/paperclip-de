@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * @fileoverview Classifies a failed skill mutation into the four visual states
  * from the Phase 3 UX spec (PAP-13865 / §9.10 Company Skill Policy Contract).
@@ -136,7 +137,7 @@ export function classifySkillDenial(
       state: "platform_admin",
       code,
       reason,
-      title: "This change needs administration access.",
+      title: tf("auto.ecff0048bd239b57"),
       remediation: remediation ?? DEFAULT_ADMIN_REMEDIATION,
     };
   }

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sun } from "lucide-react";
@@ -77,12 +78,12 @@ export function AgingItemRow({
     mutationFn: () => decisionQueuesApi.setKeep(companyId, item.sourceKind, item.subject.id, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attention(companyId) });
-      pushToast({ title: "Kept on desk", body: item.subject.title ?? undefined, tone: "success" });
+      pushToast({ title: tf("auto.d5c41d425cac9474"), body: item.subject.title ?? undefined, tone: "success" });
     },
     onError: (error) =>
       pushToast({
-        title: "Could not keep this decision",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tf("auto.f5156cd3b49f0448"),
+        body: error instanceof Error ? error.message: tf("auto.eea4fb33efd38283"),
         tone: "error",
       }),
   });

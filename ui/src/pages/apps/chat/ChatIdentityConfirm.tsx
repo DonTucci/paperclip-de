@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -40,7 +41,7 @@ export function ChatIdentityConfirm() {
   if (token.length < 32 || preview.isError) {
     return (
       <main className="mx-auto max-w-lg space-y-4 px-6 py-12">
-        <h1 className="text-xl font-bold">This identity link is unavailable</h1>
+        <h1 className="text-xl font-bold">{tf("auto.4f759618376d45ce")}</h1>
         <p className="text-sm text-muted-foreground">
           The link is invalid, expired, already used, or belongs to another
           Paperclip organization.
@@ -52,7 +53,7 @@ export function ChatIdentityConfirm() {
     return (
       <main className="flex items-center justify-center gap-2 px-6 py-12 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Checking identity link…
+        {tf("auto.b27af017f568b4d9")}
       </main>
     );
   }
@@ -67,7 +68,7 @@ export function ChatIdentityConfirm() {
       <main className="mx-auto max-w-lg space-y-5 px-6 py-12">
         <CheckCircle2 className="h-8 w-8" />
         <div>
-          <h1 className="text-xl font-bold">Identity linked</h1>
+          <h1 className="text-xl font-bold">{tf("auto.ce755132aac6fe72")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Future messages from {identity.externalLabel} use your current
             Paperclip permissions in {identity.companyName}.
@@ -77,7 +78,7 @@ export function ChatIdentityConfirm() {
           <Link
             to={`/${identity.companyPrefix}/apps/chat/${identity.endpointId}/access`}
           >
-            Return to connection
+            {tf("auto.3fb7e361afae59a2")}
           </Link>
         </Button>
       </main>
@@ -87,28 +88,28 @@ export function ChatIdentityConfirm() {
     <main className="mx-auto max-w-lg space-y-6 px-6 py-12">
       <div>
         <p className="text-sm text-muted-foreground">{identity.companyName}</p>
-        <h1 className="mt-1 text-xl font-bold">Link your external identity</h1>
+        <h1 className="mt-1 text-xl font-bold">{tf("auto.61da1fc184b014d1")}</h1>
       </div>
       <dl className="divide-y divide-border border-y border-border">
         <div className="flex items-center justify-between gap-4 py-3">
-          <dt className="text-sm text-muted-foreground">Provider</dt>
+          <dt className="text-sm text-muted-foreground">{tf("text.Provider")}</dt>
           <dd className="text-sm font-medium">
             {providerNames[identity.provider]}
           </dd>
         </div>
         <div className="flex items-center justify-between gap-4 py-3">
-          <dt className="text-sm text-muted-foreground">External identity</dt>
+          <dt className="text-sm text-muted-foreground">{tf("auto.22da535329727958")}</dt>
           <dd className="text-right text-sm font-medium">
             {identity.externalLabel}
             {identity.externalDetail ? ` · ${identity.externalDetail}` : ""}
           </dd>
         </div>
         <div className="flex items-center justify-between gap-4 py-3">
-          <dt className="text-sm text-muted-foreground">Paperclip account</dt>
+          <dt className="text-sm text-muted-foreground">{tf("auto.deb2783e82b1167b")}</dt>
           <dd className="text-right text-sm font-medium">{paperclipAccount}</dd>
         </div>
         <div className="flex items-center justify-between gap-4 py-3">
-          <dt className="text-sm text-muted-foreground">Agent</dt>
+          <dt className="text-sm text-muted-foreground">{tf("text.Agent")}</dt>
           <dd className="text-sm font-medium">
             {identity.botLabel ?? "Paperclip agent"}
           </dd>
@@ -121,7 +122,7 @@ export function ChatIdentityConfirm() {
       </p>
       {confirm.isError && (
         <p className="text-sm text-destructive">
-          This link could not be confirmed. It may have expired or been revoked.
+          {tf("auto.bdb905e514f38157")}
         </p>
       )}
       <Button disabled={confirm.isPending} onClick={() => confirm.mutate()}>

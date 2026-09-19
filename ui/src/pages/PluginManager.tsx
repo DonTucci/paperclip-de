@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * @fileoverview Plugin Manager page — admin UI for discovering,
  * installing, enabling/disabling, and uninstalling plugins.
@@ -63,7 +64,7 @@ function ExperimentalBadge() {
       variant="outline"
       className="border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/10 dark:text-amber-200"
     >
-      Experimental
+      {tf("auto.3dc9f569422dcfda")}
     </Badge>
   );
 }
@@ -100,8 +101,8 @@ export function PluginManager() {
   useEffect(() => {
     setBreadcrumbs([
       { label: selectedCompany?.name ?? "Organization", href: "/dashboard" },
-      { label: "Settings", href: "/company/settings" },
-      { label: "Plugins" },
+      { label: tf("text.Settings"), href: "/company/settings" },
+      { label: tf("auto.9514b7ff4860ead7") },
     ]);
   }, [selectedCompany?.name, setBreadcrumbs]);
 
@@ -128,10 +129,10 @@ export function PluginManager() {
       invalidatePluginQueries();
       setInstallDialogOpen(false);
       setInstallPackage("");
-      pushToast({ title: "Plugin installed successfully", tone: "success" });
+      pushToast({ title: tf("auto.bdc72b12c043a579"), tone: "success" });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Failed to install plugin", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.3a078590c1e20801"), body: err.message, tone: "error" });
     },
   });
 
@@ -139,10 +140,10 @@ export function PluginManager() {
     mutationFn: (pluginId: string) => pluginsApi.uninstall(pluginId),
     onSuccess: () => {
       invalidatePluginQueries();
-      pushToast({ title: "Plugin uninstalled successfully", tone: "success" });
+      pushToast({ title: tf("auto.d77e15c14904fd7a"), tone: "success" });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Failed to uninstall plugin", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.633e573dbad1a7a8"), body: err.message, tone: "error" });
     },
   });
 
@@ -150,10 +151,10 @@ export function PluginManager() {
     mutationFn: (pluginId: string) => pluginsApi.enable(pluginId),
     onSuccess: () => {
       invalidatePluginQueries();
-      pushToast({ title: "Plugin enabled", tone: "success" });
+      pushToast({ title: tf("auto.4ca803ee7c291a70"), tone: "success" });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Failed to enable plugin", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.71e15485a3ea888d"), body: err.message, tone: "error" });
     },
   });
 
@@ -161,10 +162,10 @@ export function PluginManager() {
     mutationFn: (pluginId: string) => pluginsApi.disable(pluginId),
     onSuccess: () => {
       invalidatePluginQueries();
-      pushToast({ title: "Plugin disabled", tone: "info" });
+      pushToast({ title: tf("auto.a7600976da827cce"), tone: "info" });
     },
     onError: (err: Error) => {
-      pushToast({ title: "Failed to disable plugin", body: err.message, tone: "error" });
+      pushToast({ title: tf("auto.ceb9e4f939859073"), body: err.message, tone: "error" });
     },
   });
 
@@ -185,34 +186,34 @@ export function PluginManager() {
     [installedPlugins]
   );
 
-  if (isLoading) return <div className="p-4 text-sm text-muted-foreground">Loading plugins...</div>;
-  if (error) return <div className="p-4 text-sm text-destructive">Failed to load plugins.</div>;
+  if (isLoading) return <div className="p-4 text-sm text-muted-foreground">{tf("auto.336bfcb060987f9d")}</div>;
+  if (error) return <div className="p-4 text-sm text-destructive">{tf("auto.4725f8bc7a47062c")}</div>;
 
   return (
     <div className="max-w-6xl space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Puzzle className="h-6 w-6 text-muted-foreground" />
-          <h1 className="text-xl font-semibold">Plugin Manager</h1>
+          <h1 className="text-xl font-semibold">{tf("auto.112d5581ed3187eb")}</h1>
         </div>
         
         <Dialog open={installDialogOpen} onOpenChange={setInstallDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
               <Plus className="h-4 w-4" />
-              Install Plugin
+              {tf("auto.70720c526fa27619")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Install Plugin</DialogTitle>
+              <DialogTitle>{tf("auto.70720c526fa27619")}</DialogTitle>
               <DialogDescription>
-                Enter the npm package name of the plugin you wish to install.
+                {tf("auto.c920321046ea46a9")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="packageName">npm Package Name</Label>
+                <Label htmlFor="packageName">{tf("auto.f207940a3b4fcf3d")}</Label>
                 <Input
                   id="packageName"
                   placeholder="@paperclipai/plugin-example"
@@ -222,7 +223,7 @@ export function PluginManager() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setInstallDialogOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setInstallDialogOpen(false)}>{tf("text.Cancel")}</Button>
               <Button
                 onClick={() => installMutation.mutate({ packageName: installPackage })}
                 disabled={!installPackage || installMutation.isPending}
@@ -238,9 +239,9 @@ export function PluginManager() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
           <div className="space-y-1 text-sm">
-            <p className="font-medium text-foreground">Plugins are alpha.</p>
+            <p className="font-medium text-foreground">{tf("auto.db0437508f7b7606")}</p>
             <p className="text-muted-foreground">
-              The plugin runtime and API surface are still changing. Expect breaking changes while this feature settles.
+              {tf("auto.8c8321130a92e532")}
             </p>
           </div>
         </div>
@@ -249,8 +250,8 @@ export function PluginManager() {
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <FlaskConical className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-base font-semibold">Available Plugins</h2>
-          <Badge variant="outline">Bundled</Badge>
+          <h2 className="text-base font-semibold">{tf("auto.cbc75f52cd091a19")}</h2>
+          <Badge variant="outline">{tf("auto.79d3a1f108e8d9c3")}</Badge>
         </div>
 
         {installErrorMessage && (
@@ -260,12 +261,12 @@ export function PluginManager() {
         )}
 
         {bundledQuery.isLoading ? (
-          <div className="text-sm text-muted-foreground">Loading bundled plugins...</div>
+          <div className="text-sm text-muted-foreground">{tf("auto.c450a4bd670fc549")}</div>
         ) : bundledQuery.error ? (
-          <div className="text-sm text-destructive">Failed to load bundled plugins.</div>
+          <div className="text-sm text-destructive">{tf("auto.be9b5091ec441d62")}</div>
         ) : bundledPlugins.length === 0 ? (
           <div className="rounded-md border border-dashed px-4 py-3 text-sm text-muted-foreground">
-            No bundled plugins were found in this checkout.
+            {tf("auto.c6230ee90e286690")}
           </div>
         ) : (
           <Card className="block py-0">
@@ -299,13 +300,13 @@ export function PluginManager() {
                             {installedPlugin.status}
                           </Badge>
                         ) : (
-                          <Badge variant="secondary">Not installed</Badge>
+                          <Badge variant="secondary">{tf("auto.d177cdc09a4ea3f3")}</Badge>
                         )}
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{bundledPlugin.description}</p>
                       <p className="mt-1 text-xs text-muted-foreground">{bundledPlugin.packageName}</p>
                       {installPending && !bundledPlugin.hasBuiltEntrypoints && (
-                        <p className="mt-2 text-xs text-muted-foreground">Building plugin...</p>
+                        <p className="mt-2 text-xs text-muted-foreground">{tf("auto.3476dbbfb78f50f1")}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -318,7 +319,7 @@ export function PluginManager() {
                               disabled={enableMutation.isPending}
                               onClick={() => enableMutation.mutate(installedPlugin.id)}
                             >
-                              Enable
+                              {tf("text.Enable")}
                             </Button>
                           )}
                           <Button variant="outline" size="sm" asChild>
@@ -354,16 +355,16 @@ export function PluginManager() {
       <section className="space-y-3">
         <div className="flex items-center gap-2">
           <Puzzle className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-base font-semibold">Installed Plugins</h2>
+          <h2 className="text-base font-semibold">{tf("auto.15c826069645c629")}</h2>
         </div>
 
         {!installedPlugins.length ? (
           <Card className="bg-muted/30">
             <CardContent className="flex flex-col items-center justify-center py-10">
               <Puzzle className="h-10 w-10 text-muted-foreground mb-4" />
-              <p className="text-sm font-medium">No plugins installed</p>
+              <p className="text-sm font-medium">{tf("auto.1411b824310b9a07")}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Install a plugin to extend functionality.
+                {tf("auto.b6cb35a2d4a919a7")}
               </p>
             </CardContent>
           </Card>
@@ -410,7 +411,7 @@ export function PluginManager() {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 text-sm font-medium text-red-700 dark:text-red-300">
                               <AlertTriangle className="h-4 w-4 shrink-0" />
-                              <span>Plugin error</span>
+                              <span>{tf("auto.ba1be93089864a83")}</span>
                             </div>
                             <p
                               className="mt-1 text-sm text-red-700/90 dark:text-red-200/90 break-words"
@@ -425,7 +426,7 @@ export function PluginManager() {
                             className="border-red-500/30 bg-background/60 text-red-700 hover:bg-red-500/10 hover:text-red-800 dark:text-red-200 dark:hover:text-red-100"
                             onClick={() => setErrorDetailsPlugin(plugin)}
                           >
-                            View full error
+                            {tf("auto.2a64ebe088c4ba12")}
                           </Button>
                         </div>
                       </div>
@@ -453,7 +454,7 @@ export function PluginManager() {
                           variant="outline"
                           size="icon-sm"
                           className="h-8 w-8"
-                          title={plugin.status === "ready" ? "Disable" : "Enable"}
+                          title={plugin.status === "ready" ? tf("text.Disable") : tf("text.Enable")}
                           onClick={() => {
                             if (plugin.status === "ready") {
                               disableMutation.mutate(plugin.id);
@@ -469,7 +470,7 @@ export function PluginManager() {
                           variant="outline"
                           size="icon-sm"
                           className="h-8 w-8 text-destructive hover:text-destructive"
-                          title="Uninstall"
+                          title={tf("text.Uninstall")}
                           onClick={() => {
                             setUninstallPluginId(plugin.id);
                             setUninstallPluginName(plugin.manifestJson.displayName ?? plugin.packageName);
@@ -482,7 +483,7 @@ export function PluginManager() {
                       <Button variant="outline" size="sm" className="mt-2 h-8" asChild>
                         <Link to={`/company/settings/instance/plugins/${plugin.id}`}>
                           <Settings className="h-4 w-4" />
-                          Configure
+                          {tf("text.Configure")}
                         </Link>
                       </Button>
                     </div>
@@ -501,13 +502,13 @@ export function PluginManager() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Uninstall Plugin</DialogTitle>
+            <DialogTitle>{tf("auto.6bac25dc7bc81ab6")}</DialogTitle>
             <DialogDescription>
               Are you sure you want to uninstall <strong>{uninstallPluginName}</strong>? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setUninstallPluginId(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setUninstallPluginId(null)}>{tf("text.Cancel")}</Button>
             <Button
               variant="destructive"
               disabled={uninstallMutation.isPending}
@@ -531,7 +532,7 @@ export function PluginManager() {
       >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Error Details</DialogTitle>
+            <DialogTitle>{tf("auto.674c0b62eba94a34")}</DialogTitle>
             <DialogDescription>
               {errorDetailsPlugin?.manifestJson.displayName ?? errorDetailsPlugin?.packageName ?? "Plugin"} hit an error state.
             </DialogDescription>
@@ -542,7 +543,7 @@ export function PluginManager() {
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-700 dark:text-red-300" />
                 <div className="space-y-1 text-sm">
                   <p className="font-medium text-red-700 dark:text-red-300">
-                    What errored
+                    {tf("auto.118242fa3c0d6245")}
                   </p>
                   <p className="text-red-700/90 dark:text-red-200/90 break-words">
                     {errorDetailsPlugin ? getPluginErrorSummary(errorDetailsPlugin) : "No error summary available."}
@@ -551,7 +552,7 @@ export function PluginManager() {
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-medium">Full error output</p>
+              <p className="text-sm font-medium">{tf("auto.414e8495f202750c")}</p>
               <pre className="max-h-(--sz-50vh) overflow-auto rounded-md border bg-muted/40 p-3 text-xs leading-5 whitespace-pre-wrap break-words">
                 {errorDetailsPlugin?.lastError ?? "No stored error message."}
               </pre>
@@ -559,7 +560,7 @@ export function PluginManager() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setErrorDetailsPlugin(null)}>
-              Close
+              {tf("text.Close")}
             </Button>
           </DialogFooter>
         </DialogContent>

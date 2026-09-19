@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy } from "lucide-react";
@@ -14,26 +15,26 @@ import { Badge } from "@/components/ui/badge";
 const inviteRoleOptions = [
   {
     value: "viewer",
-    label: "Viewer",
-    description: "Can view organization work and follow along.",
+    label: tf("auto.678bfa6af48b17cd"),
+    description: tf("auto.c0074ebb95a9e2a0"),
     gets: "View-only organization membership.",
   },
   {
     value: "operator",
-    label: "Operator",
-    description: "Recommended for people who need to help run work without managing access.",
+    label: tf("auto.291101a07fe980e9"),
+    description: tf("auto.2090f335caf02911"),
     gets: "Can assign tasks.",
   },
   {
     value: "admin",
-    label: "Admin",
-    description: "Recommended for operators who need to invite people, create agents, and approve joins.",
+    label: tf("auto.c1c224b03cd9bc7b"),
+    description: tf("auto.508b27fb468c1743"),
     gets: "Can create agents, invite users, assign tasks, and approve join requests.",
   },
   {
     value: "owner",
-    label: "Owner",
-    description: "Full organization access, including membership management.",
+    label: tf("text.Owner"),
+    description: tf("auto.050eacd9817fac07"),
     gets: "Everything in Admin, plus managing members.",
   },
 ] as const;
@@ -76,7 +77,7 @@ export function InvitesSection() {
       afterFallback?.();
     }
     pushToast({
-      title: "Clipboard unavailable",
+      title: tf("auto.4ff69f6f16e0499a"),
       body: unavailableBody,
       tone: "warn",
     });
@@ -121,15 +122,15 @@ export function InvitesSection() {
 
       await queryClient.invalidateQueries({ queryKey: inviteHistoryQueryKey });
       pushToast({
-        title: "Invite created",
+        title: tf("auto.eb00b164c6b4ab08"),
         body: copied ? "Invite ready below and copied to clipboard." : "Invite ready below.",
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to create invite",
-        body: error instanceof Error ? error.message : "Unknown error",
+        title: tf("auto.23a0de73f2e96e10"),
+        body: error instanceof Error ? error.message: tf("auto.27c2ccd962c2b8dc"),
         tone: "error",
       });
     },
@@ -139,23 +140,23 @@ export function InvitesSection() {
     mutationFn: (inviteId: string) => accessApi.revokeInvite(inviteId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: inviteHistoryQueryKey });
-      pushToast({ title: "Invite revoked", tone: "success" });
+      pushToast({ title: tf("auto.d8fb3309e7d72c4d"), tone: "success" });
     },
     onError: (error) => {
       pushToast({
-        title: "Failed to revoke invite",
-        body: error instanceof Error ? error.message : "Unknown error",
+        title: tf("auto.ac674f0b0e047e9d"),
+        body: error instanceof Error ? error.message: tf("auto.27c2ccd962c2b8dc"),
         tone: "error",
       });
     },
   });
 
   if (!selectedCompanyId) {
-    return <div className="text-sm text-muted-foreground">Select an organization to manage invites.</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.462e1828e0e43501")}</div>;
   }
 
   if (invitesQuery.isLoading) {
-    return <div className="text-sm text-muted-foreground">Loading invites…</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.5c525c4dec9c3db7")}</div>;
   }
 
   if (invitesQuery.error) {
@@ -163,8 +164,7 @@ export function InvitesSection() {
       invitesQuery.error instanceof ApiError && invitesQuery.error.status === 403
         ? "You do not have permission to manage organization invites."
         : invitesQuery.error instanceof Error
-          ? invitesQuery.error.message
-          : "Failed to load invites.";
+          ? invitesQuery.error.message: tf("auto.d62fcfaa307f6974");
     return <div className="text-sm text-destructive">{message}</div>;
   }
 
@@ -177,14 +177,14 @@ export function InvitesSection() {
 
       <section className="space-y-4 rounded-xl border border-border p-5">
         <div className="space-y-1">
-          <h2 className="text-sm font-semibold">Invite a person</h2>
+          <h2 className="text-sm font-semibold">{tf("auto.f76f965ea88c9603")}</h2>
           <p className="text-sm text-muted-foreground">
-            Generate a human invite link and choose the default access it should request.
+            {tf("auto.dd31c56fa8afb739")}
           </p>
         </div>
 
         <fieldset className="space-y-3">
-          <legend className="text-sm font-medium">Choose a role</legend>
+          <legend className="text-sm font-medium">{tf("auto.a49c49b04c4db041")}</legend>
           <div className="rounded-xl border border-border">
             {inviteRoleOptions.map((option, index) => {
               const checked = humanRole === option.value;
@@ -206,7 +206,7 @@ export function InvitesSection() {
                       <span className="text-sm font-medium">{option.label}</span>
                       {option.value === "operator" ? (
                         <Badge variant="outline" className="border-border text-muted-foreground">
-                          Default
+                          {tf("text.Default")}
                         </Badge>
                       ) : null}
                     </span>
@@ -220,34 +220,34 @@ export function InvitesSection() {
         </fieldset>
 
         <div className="rounded-lg border border-border px-4 py-3 text-sm text-muted-foreground">
-          Each invite link is single-use. Human invitees get the selected role immediately after sign-in; agent invites still create a join request for approval.
+          {tf("auto.879640378d52e078")}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Button onClick={() => createInviteMutation.mutate()} disabled={createInviteMutation.isPending}>
             {createInviteMutation.isPending ? "Creating…" : "Create invite"}
           </Button>
-          <span className="text-sm text-muted-foreground">Invite history below keeps the audit trail.</span>
+          <span className="text-sm text-muted-foreground">{tf("auto.030769230dd5036b")}</span>
         </div>
 
         {latestInviteUrl ? (
           <div className="space-y-3 rounded-lg border border-border px-4 py-4">
             <div className="space-y-1">
               <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-medium">Latest invite link</div>
+                <div className="text-sm font-medium">{tf("auto.ee47fab1ca3c2865")}</div>
                 {latestInviteCopied ? (
                   <div className="inline-flex items-center gap-1 text-xs font-medium text-foreground">
                     <Check className="h-3.5 w-3.5" />
-                    Copied
+                    {tf("text.Copied")}
                   </div>
                 ) : null}
               </div>
               <div className="text-sm text-muted-foreground">
-                This URL includes the current Paperclip domain returned by the server.
+                {tf("auto.3bad0330adbc296f")}
               </div>
             </div>
             <label className="block space-y-1">
-              <span className="sr-only">Latest invite URL</span>
+              <span className="sr-only">{tf("auto.35fbc9bc2efb0632")}</span>
               <input
                 ref={latestInviteInputRef}
                 readOnly
@@ -255,7 +255,7 @@ export function InvitesSection() {
                 onFocus={(event) => event.currentTarget.select()}
                 onClick={(event) => event.currentTarget.select()}
                 className="w-full rounded-md border border-border bg-muted/60 px-3 py-2 text-sm text-foreground outline-none transition-colors selection:bg-primary selection:text-primary-foreground focus:border-ring"
-                aria-label="Latest invite URL"
+                aria-label={tf("auto.35fbc9bc2efb0632")}
               />
             </label>
             <div className="flex flex-wrap gap-2">
@@ -269,7 +269,7 @@ export function InvitesSection() {
                 }}
               >
                 <Copy className="h-4 w-4" />
-                Copy link
+                {tf("text.Copy link")}
               </Button>
             </div>
           </div>
@@ -279,19 +279,19 @@ export function InvitesSection() {
       <section className="rounded-xl border border-border">
         <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
           <div className="space-y-1">
-            <h2 className="text-sm font-semibold">Invite history</h2>
+            <h2 className="text-sm font-semibold">{tf("auto.0269fea65ff5e59e")}</h2>
             <p className="text-sm text-muted-foreground">
-              Review invite status, audience, inviter, and any linked join request.
+              {tf("auto.bc3cae1e723ab784")}
             </p>
           </div>
           <Link to="/inbox/requests" className="text-sm underline underline-offset-4">
-            Open join request queue
+            {tf("auto.3f3aa696e2b98cc0")}
           </Link>
         </div>
 
         {inviteHistory.length === 0 ? (
           <div className="border-t border-border px-5 py-8 text-sm text-muted-foreground">
-            No invites have been created for this organization yet.
+            {tf("auto.c20447f4073b9b59")}
           </div>
         ) : (
           <div className="border-t border-border">
@@ -299,12 +299,12 @@ export function InvitesSection() {
               <table className="min-w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="px-5 py-3 font-medium text-muted-foreground">State</th>
-                    <th className="px-5 py-3 font-medium text-muted-foreground">For</th>
-                    <th className="px-5 py-3 font-medium text-muted-foreground">Invited by</th>
-                    <th className="px-5 py-3 font-medium text-muted-foreground">Created</th>
-                    <th className="px-5 py-3 font-medium text-muted-foreground">Join request</th>
-                    <th className="px-5 py-3 text-right font-medium text-muted-foreground">Action</th>
+                    <th className="px-5 py-3 font-medium text-muted-foreground">{tf("auto.a3b50c476732c740")}</th>
+                    <th className="px-5 py-3 font-medium text-muted-foreground">{tf("auto.ca15ebc05a3c5c13")}</th>
+                    <th className="px-5 py-3 font-medium text-muted-foreground">{tf("auto.c7a6f15607da6325")}</th>
+                    <th className="px-5 py-3 font-medium text-muted-foreground">{tf("text.Created")}</th>
+                    <th className="px-5 py-3 font-medium text-muted-foreground">{tf("auto.d7d9cd19632538b7")}</th>
+                    <th className="px-5 py-3 text-right font-medium text-muted-foreground">{tf("auto.64cff1319d2fd2cb")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -328,7 +328,7 @@ export function InvitesSection() {
                       <td className="px-5 py-3 align-top">
                         {invite.relatedJoinRequestId ? (
                           <Link to="/inbox/requests" className="underline underline-offset-4">
-                            Review request
+                            {tf("auto.dcea8abbdff03524")}
                           </Link>
                         ) : (
                           <span className="text-muted-foreground">—</span>
@@ -342,10 +342,10 @@ export function InvitesSection() {
                             onClick={() => revokeMutation.mutate(invite.id)}
                             disabled={revokeMutation.isPending}
                           >
-                            Revoke
+                            {tf("auto.87e6d00bbf53ec5a")}
                           </Button>
                         ) : (
-                          <span className="text-xs text-muted-foreground">Inactive</span>
+                          <span className="text-xs text-muted-foreground">{tf("auto.ac7c949f1211b781")}</span>
                         )}
                       </td>
                     </tr>

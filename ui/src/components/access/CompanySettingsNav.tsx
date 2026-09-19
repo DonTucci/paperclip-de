@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { PageTabBar } from "@/components/PageTabBar";
 import { Tabs } from "@/components/ui/tabs";
 import { useCloudInstance } from "@/hooks/useCloudInstance";
@@ -6,17 +7,17 @@ import { INSTANCE_SETTINGS_PATH_PREFIX } from "@/lib/instance-settings";
 import { useLocation, useNavigate } from "@/lib/router";
 
 const items = [
-  { value: "general", label: "General", href: "/company/settings" },
-  { value: "export", label: "Export", href: "/company/export" },
-  { value: "import", label: "Import", href: "/company/import" },
-  { value: "members", label: "Members", href: "/company/settings/members" },
-  { value: "secrets", label: "Secrets", href: "/company/settings/secrets" },
-  { value: "instance-profile", label: "Profile", href: `${INSTANCE_SETTINGS_PATH_PREFIX}/profile` },
-  { value: "instance-environments", label: "Environments", href: `${INSTANCE_SETTINGS_PATH_PREFIX}/environments` },
-  { value: "instance-access", label: "Access", href: `${INSTANCE_SETTINGS_PATH_PREFIX}/access` },
-  { value: "instance-experimental", label: "Experimental", href: `${INSTANCE_SETTINGS_PATH_PREFIX}/experimental` },
-  { value: "instance-plugins", label: "Plugins", href: `${INSTANCE_SETTINGS_PATH_PREFIX}/plugins` },
-  { value: "instance-adapters", label: "Adapters", href: `${INSTANCE_SETTINGS_PATH_PREFIX}/adapters` },
+  { value: "general", label: tf("text.General"), href: "/company/settings" },
+  { value: "export", label: tf("text.Export"), href: "/company/export" },
+  { value: "import", label: tf("text.Import"), href: "/company/import" },
+  { value: "members", label: tf("text.Members"), href: "/company/settings/members" },
+  { value: "secrets", label: tf("text.Secrets"), href: "/company/settings/secrets" },
+  { value: "instance-profile", label: tf("text.Profile"), href: `${INSTANCE_SETTINGS_PATH_PREFIX}/profile` },
+  { value: "instance-environments", label: tf("text.Environments"), href: `${INSTANCE_SETTINGS_PATH_PREFIX}/environments` },
+  { value: "instance-access", label: tf("text.Access"), href: `${INSTANCE_SETTINGS_PATH_PREFIX}/access` },
+  { value: "instance-experimental", label: tf("auto.3dc9f569422dcfda"), href: `${INSTANCE_SETTINGS_PATH_PREFIX}/experimental` },
+  { value: "instance-plugins", label: tf("auto.9514b7ff4860ead7"), href: `${INSTANCE_SETTINGS_PATH_PREFIX}/plugins` },
+  { value: "instance-adapters", label: tf("text.Adapters"), href: `${INSTANCE_SETTINGS_PATH_PREFIX}/adapters` },
 ] as const;
 
 type CompanySettingsTab = (typeof items)[number]["value"];

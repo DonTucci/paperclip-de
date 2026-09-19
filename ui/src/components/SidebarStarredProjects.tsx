@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useMemo } from "react";
 import { NavLink, useLocation } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -104,7 +105,7 @@ export function SidebarStarredProjects() {
   }
 
   return (
-    <div className="flex flex-col gap-0.5" aria-label="Starred projects">
+    <div className="flex flex-col gap-0.5" aria-label={tf("auto.2212799bd8ac8377")}>
       {starredProjects.map((project) => {
         const routeRef = projectRouteRef(project);
         const isActive = activeProjectRef === routeRef || activeProjectRef === project.id;
@@ -131,7 +132,7 @@ export function SidebarStarredProjects() {
             <ProjectTile color={project.color ?? null} icon={project.icon ?? null} size="xs" />
             <span className={rail ? SIDEBAR_RAIL_HIDDEN_LABEL : "flex-1 truncate"}>{project.name}</span>
             {!rail && project.pauseReason === "budget" ? (
-              <BudgetSidebarMarker title="Project paused by budget" />
+              <BudgetSidebarMarker title={tf("auto.1aa2562895efb503")} />
             ) : null}
           </NavLink>
         );
@@ -190,7 +191,7 @@ export function SidebarStarredProjects() {
                     ) : (
                       <Star className="size-4 fill-amber-500 text-amber-500" />
                     )}
-                    <span>Remove from starred</span>
+                    <span>{tf("auto.f1133f6566cd1093")}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -205,7 +206,7 @@ export function SidebarStarredProjects() {
                     ) : (
                       <LogOut className="size-4" />
                     )}
-                    <span>Leave project</span>
+                    <span>{tf("auto.4c6941ff7aa37c0c")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

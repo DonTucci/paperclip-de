@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox, LoaderCircle, Save } from "lucide-react";
@@ -13,18 +14,18 @@ import { RadioCardGroup, type RadioCardOption } from "@/components/ui/radio-card
 const MODE_OPTIONS: RadioCardOption[] = [
   {
     value: "open",
-    title: "Any of my agents",
-    description: "Let any agent you manage archive tasks out of your inbox.",
+    title: tf("auto.4146a13b798954ae"),
+    description: tf("auto.d2820c83bc3ee6fb"),
   },
   {
     value: "allowlist",
-    title: "Only chosen agents",
-    description: "Restrict inbox tidying to the agents you pick below.",
+    title: tf("auto.ff0b72ddcd4c41b7"),
+    description: tf("auto.ea27e1b1563c7bed"),
   },
   {
     value: "disabled",
-    title: "Off",
-    description: "Agents can never archive tasks from your inbox.",
+    title: tf("auto.ca7981b46ecf2c17"),
+    description: tf("auto.7d3cc88caf21b56e"),
   },
 ];
 
@@ -112,30 +113,29 @@ export function InboxAgentPolicyControl({ companyId }: { companyId: string | nul
   if (policyQuery.error) {
     return (
       <div className="text-sm text-destructive">
-        {policyQuery.error instanceof Error ? policyQuery.error.message : "Failed to load inbox agent policy."}
+        {policyQuery.error instanceof Error ? policyQuery.error.message: tf("auto.3b66e0953e064e8f")}
       </div>
     );
   }
 
   if (policyQuery.isLoading || !draft) {
-    return <div className="text-sm text-muted-foreground">Loading inbox agent policy…</div>;
+    return <div className="text-sm text-muted-foreground">{tf("auto.c6c02848cae4c5ef")}</div>;
   }
 
   return (
-    <section className="space-y-4" aria-label="Let agents tidy my inbox">
+    <section className="space-y-4" aria-label={tf("auto.e2e2d36a8d54bf7e")}>
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <Inbox className="h-5 w-5 text-muted-foreground" />
-          <h2 className="text-base font-semibold">Let agents tidy my inbox</h2>
+          <h2 className="text-base font-semibold">{tf("auto.e2e2d36a8d54bf7e")}</h2>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Choose whether the agents you manage may archive tasks out of your inbox on your behalf. You can
-          undo any archive, and every agent archive is attributed in the task&apos;s properties.
+          {tf("inboxPolicy.description")}
         </p>
       </div>
 
       <RadioCardGroup
-        ariaLabel="Inbox agent archiving policy"
+        ariaLabel={tf("inboxPolicy.ariaLabel")}
         value={draft.mode}
         onValueChange={(value) => setDraft((current) => (current ? { ...current, mode: value as InboxAgentPolicyMode } : current))}
         options={MODE_OPTIONS}
@@ -144,7 +144,7 @@ export function InboxAgentPolicyControl({ companyId }: { companyId: string | nul
 
       {draft.mode === "allowlist" ? (
         <div className="max-w-2xl space-y-2">
-          <div className="text-sm font-medium">Agents allowed to tidy my inbox</div>
+          <div className="text-sm font-medium">{tf("auto.d849f31dad4a1160")}</div>
           <AgentMultiSelect
             agents={agentOptions}
             selectedAgentIds={selectedAgentIds}
@@ -155,25 +155,25 @@ export function InboxAgentPolicyControl({ companyId }: { companyId: string | nul
             }
             triggerLabel={
               selectedAgentIds.size === 0
-                ? "Select agents"
-                : `${selectedAgentIds.size} ${selectedAgentIds.size === 1 ? "agent" : "agents"} selected`
+                ? tf("inboxPolicy.selectAgents")
+                : tf(selectedAgentIds.size === 1 ? "inboxPolicy.selected_one" : "inboxPolicy.selected_other", { count: selectedAgentIds.size })
             }
             triggerFullWidth={false}
             showSelectionPreview={false}
-            emptyMessage="You don’t manage any agents yet."
+            emptyMessage={tf("auto.7816c363638ed23b")}
           />
         </div>
       ) : null}
 
       {updateMutation.error ? (
         <div className="max-w-2xl rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-          {updateMutation.error instanceof Error ? updateMutation.error.message : "Failed to save inbox agent policy."}
+          {updateMutation.error instanceof Error ? updateMutation.error.message: tf("auto.0cb3feff96ee1bb7")}
         </div>
       ) : null}
 
       <div className="flex max-w-2xl items-center justify-end gap-3">
         {updateMutation.isSuccess && !isDirty ? (
-          <span className="text-xs text-muted-foreground" role="status">Saved</span>
+          <span className="text-xs text-muted-foreground" role="status">{tf("auto.b5c120b316c237a0")}</span>
         ) : null}
         <Button
           type="button"
@@ -181,7 +181,7 @@ export function InboxAgentPolicyControl({ companyId }: { companyId: string | nul
           onClick={() => draft && updateMutation.mutate(draft)}
         >
           {updateMutation.isPending ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
-          {updateMutation.isPending ? "Saving…" : "Save"}
+          {updateMutation.isPending ? tf("text.Saving...") : tf("text.Save")}
         </Button>
       </div>
     </section>

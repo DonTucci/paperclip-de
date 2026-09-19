@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2, Users } from "lucide-react";
@@ -201,10 +202,10 @@ export function AgentsUsingSkillDialog({
       ]);
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to update agent skills.";
+      const message = error instanceof Error ? error.message: tf("auto.f491569a7cec22f8");
       toast?.pushToast({
         tone: "error",
-        title: "Update failed",
+        title: tf("auto.e58282fd73fb8580"),
         body: message.includes("403") ? "You don't have permission to change this agent's skills." : message,
       });
     },
@@ -390,7 +391,7 @@ function AgentRow({
               {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Remove"}
             </Button>
             <Button variant="ghost" size="sm" onClick={onCancelRemove} disabled={busy}>
-              Cancel
+              {tf("text.Cancel")}
             </Button>
           </div>
         ) : (
@@ -440,9 +441,9 @@ function AddAgentPicker({
       groups={groups}
       loading={loading}
       loadingMessage="Loading agents..."
-      placeholder="Add agent…"
-      searchPlaceholder="Search agents..."
-      emptyMessage="All eligible agents already have this skill."
+      placeholder={tf("auto.51189bf03b3a84f3")}
+      searchPlaceholder={tf("auto.32f4468b0b6f9410")}
+      emptyMessage={tf("auto.e8e90b54634e2f11")}
       disabled={disabled}
       onValueChange={(_value, option) => {
         onSelect(option.agent);
@@ -453,7 +454,7 @@ function AddAgentPicker({
       renderValue={() => (
         <span className="flex items-center gap-1.5 text-muted-foreground">
           <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-          Add agent…
+          {tf("auto.51189bf03b3a84f3")}
         </span>
       )}
       renderOption={(option) => (

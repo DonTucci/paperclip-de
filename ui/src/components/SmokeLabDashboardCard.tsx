@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useQuery } from "@tanstack/react-query";
 import { FlaskConical, ChevronRight } from "lucide-react";
 import { Link } from "@/lib/router";
@@ -72,7 +73,7 @@ export function SmokeLabDashboardCard({ companyId }: { companyId: string }) {
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", HEALTH_DOT[health])} />
-            <p className="truncate text-sm font-semibold text-foreground">Integration smoke</p>
+            <p className="truncate text-sm font-semibold text-foreground">{tf("auto.287f380234204487")}</p>
           </div>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {HEALTH_LABEL[health]}

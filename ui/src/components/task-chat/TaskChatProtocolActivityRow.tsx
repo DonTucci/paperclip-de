@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useId, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
@@ -76,7 +77,7 @@ function ResearchDetails({ item }: { item: TaskChatProviderActivityItem }) {
     <div className="flex min-w-0 flex-col gap-2.5">
       {query ? (
         <div className="min-w-0 rounded-sm bg-muted/40 px-2.5 py-2" data-testid="task-chat-research-query">
-          <p className="text-(length:--text-nano) font-medium uppercase tracking-wide text-muted-foreground">Query</p>
+          <p className="text-(length:--text-nano) font-medium uppercase tracking-wide text-muted-foreground">{tf("auto.b80a37564fbb3c07")}</p>
           <p className="mt-0.5 min-w-0 break-words font-mono text-(length:--text-micro) text-foreground">{query.value}</p>
         </div>
       ) : null}
@@ -85,7 +86,7 @@ function ResearchDetails({ item }: { item: TaskChatProviderActivityItem }) {
           <p className="mb-1 text-(length:--text-nano) font-medium uppercase tracking-wide text-muted-foreground">
             {item.links.length} {item.links.length === 1 ? "result" : "results"}
           </p>
-          <ol className="divide-y divide-border/60" aria-label="Research sources">
+          <ol className="divide-y divide-border/60" aria-label={tf("auto.6891cd2295ca833c")}>
             {visibleLinks.map((link, index) => (
               <li className="min-w-0 py-1.5 first:pt-0 last:pb-0" key={`${link.href}:${index}`}>
                 <a className="flex min-w-0 items-center gap-1 font-medium text-foreground hover:underline" href={link.href} target="_blank" rel="noreferrer">
@@ -113,14 +114,14 @@ function ResearchDetails({ item }: { item: TaskChatProviderActivityItem }) {
               className="mt-1.5 text-muted-foreground hover:text-foreground"
               onClick={() => setShowAllResults(false)}
             >
-              Show fewer results
+              {tf("auto.b27c7ae586f1c9a0")}
             </button>
           ) : null}
         </div>
       ) : null}
       <DetailList details={additionalDetails} />
       {item.output || item.outputTruncated ? (
-        <p className="text-muted-foreground">Additional provider output is available in Runner Inspector.</p>
+        <p className="text-muted-foreground">{tf("auto.d70af4779b65d062")}</p>
       ) : null}
     </div>
   );
@@ -131,7 +132,7 @@ function ProviderDetails({ item, neutral = false }: { item: TaskChatProviderActi
   return (
     <div className="flex min-w-0 flex-col gap-2">
       {item.steps.length > 0 ? (
-        <ol className="flex flex-col gap-1" aria-label="Plan steps">
+        <ol className="flex flex-col gap-1" aria-label={tf("auto.3fa02f98189b8323")}>
           {item.steps.map((step) => (
             <li className="flex min-w-0 items-start gap-2" key={step.id}>
               <span className="mt-0.5 shrink-0">{stepStatusIcon(step.status, neutral)}</span>
@@ -141,7 +142,7 @@ function ProviderDetails({ item, neutral = false }: { item: TaskChatProviderActi
         </ol>
       ) : null}
       {item.links.length > 0 ? (
-        <ul className="flex flex-col gap-1.5" aria-label="Research sources">
+        <ul className="flex flex-col gap-1.5" aria-label={tf("auto.6891cd2295ca833c")}>
           {item.links.map((link) => (
             <li key={link.href}>
               <a className="inline-flex min-w-0 items-center gap-1 font-medium text-primary hover:underline" href={link.href} target="_blank" rel="noreferrer">
@@ -154,7 +155,7 @@ function ProviderDetails({ item, neutral = false }: { item: TaskChatProviderActi
         </ul>
       ) : null}
       {item.children.length > 0 ? (
-        <ul className="flex flex-col gap-1.5" aria-label="Delegated agents">
+        <ul className="flex flex-col gap-1.5" aria-label={tf("auto.a3a4ad04fa0db247")}>
           {item.children.map((child) => (
             <li className="flex min-w-0 flex-col gap-0.5" key={child.id}>
               <span className="flex min-w-0 items-center gap-2">
@@ -173,18 +174,18 @@ function ProviderDetails({ item, neutral = false }: { item: TaskChatProviderActi
       {item.output ? (
         <pre className="max-h-(--sz-64) overflow-auto whitespace-pre-wrap rounded-sm bg-muted/50 p-2 font-mono text-(length:--text-micro) text-foreground">{item.output}</pre>
       ) : null}
-      {item.outputTruncated ? <p className="text-muted-foreground">Output truncated to 8 KiB.</p> : null}
+      {item.outputTruncated ? <p className="text-muted-foreground">{tf("auto.71045c3c3bab4c2d")}</p> : null}
     </div>
   );
 }
 
 function WorkspaceChangeDetails({ item }: { item: TaskChatWorkspaceChangeItem }) {
-  if (item.files.length === 0) return <p className="text-muted-foreground">No changed-file details were reported.</p>;
+  if (item.files.length === 0) return <p className="text-muted-foreground">{tf("auto.ab8948ff38f05f00")}</p>;
   const visibleFiles = item.files.slice(0, COMPACT_WORKSPACE_FILE_LIMIT);
   const hiddenFileCount = item.files.length - visibleFiles.length;
   return (
     <div className="min-w-0" data-testid="task-chat-workspace-change-details">
-      <ul className="flex min-w-0 flex-col divide-y divide-border/60" aria-label="Changed files">
+      <ul className="flex min-w-0 flex-col divide-y divide-border/60" aria-label={tf("auto.5d4041aa7af3b4ad")}>
         {visibleFiles.map((file) => (
           <li className="flex min-w-0 items-center gap-2 py-1.5 first:pt-0 last:pb-0" key={`${file.operation}:${file.path}`}>
             <span className="min-w-0 flex-1 truncate font-mono text-foreground" title={file.previousPath ? `${file.previousPath} → ${file.path}` : file.path}>
@@ -221,8 +222,8 @@ function WorkspaceFileDetails({ item }: { item: TaskChatWorkspaceFileItem }) {
         ) : (
           <pre className="max-h-(--sz-64) overflow-auto whitespace-pre-wrap rounded-sm bg-muted/50 p-2 font-mono text-(length:--text-micro) text-foreground">{item.preview}</pre>
         )
-      ) : <p className="text-muted-foreground">Preview unavailable.</p>}
-      {item.previewTruncated ? <p className="text-muted-foreground">Preview truncated by the runner.</p> : null}
+      ) : <p className="text-muted-foreground">{tf("auto.769469b525dc9989")}</p>}
+      {item.previewTruncated ? <p className="text-muted-foreground">{tf("auto.c8a44a1ed087a82c")}</p> : null}
     </div>
   );
 }

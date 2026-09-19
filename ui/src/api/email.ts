@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { api } from "./client";
 import type {
   EmailConnectionInput,

@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ActivityEvent, Issue, Agent, ProviderTraceMetadata } from "@paperclipai/shared";
 import {
@@ -92,59 +93,58 @@ type LivenessCopy = {
 
 const LIVENESS_COPY: Record<RunLivenessState, LivenessCopy> = {
   completed: {
-    label: "Completed",
+    label: tf("auto.22a970d2e5b1cc23"),
     tone: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-    description: "Task reached a terminal state.",
+    description: tf("auto.7623e22c86a8d752"),
   },
   advanced: {
-    label: "Advanced",
+    label: tf("text.Advanced"),
     tone: "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300",
-    description: "Run produced concrete evidence of progress.",
+    description: tf("auto.a4a1d1706c6b46d3"),
   },
   plan_only: {
-    label: "Plan only",
+    label: tf("auto.d98936aefe993ef2"),
     tone: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-    description: "Run described future work without concrete action evidence.",
+    description: tf("auto.420f269d6ddee53c"),
   },
   empty_response: {
-    label: "Empty response",
+    label: tf("auto.25cae3e9481af1ac"),
     tone: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300",
-    description: "Run finished without useful output.",
+    description: tf("auto.3b4b2172700cd92b"),
   },
   blocked: {
-    label: "Blocked",
+    label: tf("status.blocked"),
     tone: "border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-300",
-    description: "Run or task declared a blocker.",
+    description: tf("auto.3e663836775e2b30"),
   },
   failed: {
-    label: "Failed",
+    label: tf("text.Failed"),
     tone: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
-    description: "Run ended unsuccessfully.",
+    description: tf("auto.c2016eef1d2b4e2f"),
   },
   needs_followup: {
-    label: "Needs follow-up",
+    label: tf("auto.7594b78e4bc01ce0"),
     tone: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300",
-    description:
-      "Run produced useful output but did not prove concrete progress.",
+    description: tf("auto.027b06a13fc4b632"),
   },
 };
 
 const PENDING_LIVENESS_COPY: LivenessCopy = {
-  label: "Checks after finish",
+  label: tf("auto.7e7da8b2c2bcd19d"),
   tone: "border-border bg-background text-muted-foreground",
-  description: "Liveness is evaluated after the run finishes.",
+  description: tf("auto.9ef0c0067dc8f6b2"),
 };
 
 const RETRY_PENDING_LIVENESS_COPY: LivenessCopy = {
-  label: "Retry pending",
+  label: tf("auto.355257ddfc9bfbcb"),
   tone: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
-  description: "Paperclip queued an automatic retry that has not started yet.",
+  description: tf("auto.6af0dfe308004bda"),
 };
 
 const MISSING_LIVENESS_COPY: LivenessCopy = {
-  label: "No liveness data",
+  label: tf("auto.0c25b5c8fd8e016f"),
   tone: "border-border bg-background text-muted-foreground",
-  description: "This run has no persisted liveness classification.",
+  description: tf("auto.405e298d1c867302"),
 };
 
 const TERMINAL_CHILD_STATUSES = new Set<Issue["status"]>(["done", "cancelled"]);
@@ -163,15 +163,15 @@ const RUN_OUTPUT_SILENCE_COPY: Partial<
   Record<RunOutputSilenceLevel, RunOutputSilenceCopy>
 > = {
   suspicious: {
-    label: "Output silence",
+    label: tf("auto.f896b1f4e28c96ef"),
     tone: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
   },
   critical: {
-    label: "Critical silence",
+    label: tf("auto.a463a943d5099856"),
     tone: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
   },
   snoozed: {
-    label: "Silence snoozed",
+    label: tf("auto.335a36f8f6f9a527"),
     tone: "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300",
   },
 };
@@ -425,8 +425,7 @@ function watchdogDecisionErrorMessage(error: unknown) {
     return "Only the board or the assigned recovery owner can record watchdog decisions";
   }
   return error instanceof Error && error.message.trim().length > 0
-    ? error.message
-    : "Paperclip could not record the watchdog decision.";
+    ? error.message: tf("auto.e45ace3279dbc7ac");
 }
 
 export function IssueRunLedger({
@@ -511,7 +510,7 @@ export function IssueRunLedger({
         error instanceof ApiError ? String(error.status) : "error";
       setWatchdogDecisionError(message);
       pushToast({
-        title: "Watchdog decision not recorded",
+        title: tf("auto.152723f3492e2d61"),
         body: message,
         tone: "error",
         dedupeKey: `watchdog-decision:${issueId}:${dedupeSuffix}`,
@@ -551,11 +550,10 @@ export function IssueRunLedger({
     },
     onError: (error) =>
       pushToast({
-        title: "Trace re-run not started",
+        title: tf("auto.efabea93f73a63c7"),
         body:
           error instanceof Error
-            ? error.message
-            : "Paperclip could not start the trace re-run.",
+            ? error.message: tf("auto.cbb5c55ea4c53d8d"),
         tone: "error",
         dedupeKey: `provider-trace-rerun:${issueId}`,
       }),
@@ -664,11 +662,11 @@ export function IssueRunLedgerContent({
   }, [activityEvents, canRenderActivityEvents, ledgerRuns]);
 
   return (
-    <section className="space-y-3" aria-label="Task run ledger">
+    <section className="space-y-3" aria-label={tf("auto.40b0051564c9d30b")}>
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-sm font-medium text-muted-foreground">
-            Run ledger
+            {tf("auto.d70212d76d595258")}
           </h3>
           <p className="text-xs text-muted-foreground">
             {latestRun
@@ -683,7 +681,7 @@ export function IssueRunLedgerContent({
             to={`/agents/${latestRun.agentId}/runs/${latestRun.runId}`}
             className="shrink-0 rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
           >
-            Latest run
+            {tf("auto.36adcd07b9bda0b9")}
           </Link>
         ) : null}
       </div>
@@ -691,7 +689,7 @@ export function IssueRunLedgerContent({
       {children.total > 0 ? (
         <div className="rounded-md border border-border/70 px-3 py-2">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-medium text-foreground">Child work</span>
+            <span className="font-medium text-foreground">{tf("auto.ae375d5fcb1551cd")}</span>
             <span className="text-muted-foreground">
               {children.active.length > 0
                 ? `${children.active.length} active, ${children.done} done, ${children.cancelled} cancelled`
@@ -778,7 +776,7 @@ export function IssueRunLedgerContent({
                 }
                 disabled={pendingWatchdogDecision != null}
               >
-                Continue monitoring
+                {tf("auto.78802065bcaf83de")}
               </button>
               <button
                 type="button"
@@ -797,7 +795,7 @@ export function IssueRunLedgerContent({
                 }
                 disabled={pendingWatchdogDecision != null}
               >
-                Snooze 1h
+                {tf("auto.346de4c52716add3")}
               </button>
               <button
                 type="button"
@@ -813,7 +811,7 @@ export function IssueRunLedgerContent({
                 }
                 disabled={pendingWatchdogDecision != null}
               >
-                Mark false positive
+                {tf("auto.d5125919eb3bdbad")}
               </button>
             </div>
           ) : null}
@@ -864,7 +862,7 @@ export function IssueRunLedgerContent({
                 className="space-y-1.5 rounded-lg border border-border/60 px-3 py-2 text-xs text-muted-foreground"
               >
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="font-medium text-foreground">Run</span>
+                  <span className="font-medium text-foreground">{tf("text.Run")}</span>
                   <Link
                     to={`/agents/${run.agentId}/runs/${run.runId}`}
                     className="min-w-0 max-w-full truncate font-mono text-foreground hover:underline"
@@ -888,7 +886,7 @@ export function IssueRunLedgerContent({
                   {run.isLive ? (
                     <span className="inline-flex items-center gap-1 rounded-md border border-blue-500/30 bg-blue-500/10 px-1.5 py-0.5 text-(length:--text-micro) text-blue-700 dark:text-blue-300">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                      live
+                      {tf("auto.247610f4dedd4ab7")}
                     </span>
                   ) : null}
                   <ProviderTraceStatusBadge
@@ -907,7 +905,7 @@ export function IssueRunLedgerContent({
                   </span>
                   {exhausted ? (
                     <span className="rounded-md border border-red-500/30 bg-red-500/10 px-1.5 py-0.5 text-(length:--text-micro) font-medium text-red-700 dark:text-red-300">
-                      Exhausted
+                      {tf("auto.a51ee30495b32b91")}
                     </span>
                   ) : null}
                   {continuation ? (
@@ -945,21 +943,21 @@ export function IssueRunLedgerContent({
                     className="rounded-md border border-border px-1.5 py-0.5 text-(length:--text-micro) text-foreground hover:bg-accent/40"
                     onClick={() => setInspectedRun(run)}
                   >
-                    Inspect run
+                    {tf("auto.2671a485bfeea820")}
                   </button>
                 </div>
 
                 <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
                   <div className="min-w-0">
-                    <span className="text-foreground">Elapsed</span>{" "}
+                    <span className="text-foreground">{tf("auto.a194a68a45d32cab")}</span>{" "}
                     {duration ?? "unknown"}
                   </div>
                   <div className="min-w-0">
-                    <span className="text-foreground">Last useful action</span>{" "}
+                    <span className="text-foreground">{tf("auto.72876fff40e86f64")}</span>{" "}
                     {lastUsefulActionLabel(run)}
                   </div>
                   <div className="min-w-0">
-                    <span className="text-foreground">Stop</span>{" "}
+                    <span className="text-foreground">{tf("text.Stop")}</span>{" "}
                     {stopStatusLabel(run, stopReason)}
                   </div>
                 </div>

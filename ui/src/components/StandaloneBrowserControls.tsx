@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { ExternalLink, RefreshCw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,10 +74,10 @@ export function StandaloneBrowserControls({ mobile }: { mobile: boolean }) {
         return;
       }
       await copyTextToClipboard(url);
-      toastActions?.pushToast({ title: "Link copied", tone: "success" });
+      toastActions?.pushToast({ title: tf("auto.d12860c21e78baa5"), tone: "success" });
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      toastActions?.pushToast({ title: "Share failed", body: "Try opening the page in your browser.", tone: "error" });
+      toastActions?.pushToast({ title: tf("auto.609fbf097c29767a"), body: "Try opening the page in your browser.", tone: "error" });
     }
   }, [toastActions]);
 
@@ -88,13 +89,13 @@ export function StandaloneBrowserControls({ mobile }: { mobile: boolean }) {
 
   return (
     <div className="flex h-10 items-center justify-end gap-1 border-b border-border bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-      <ControlButton label="Refresh" onClick={refresh}>
+      <ControlButton label={tf("text.Refresh")} onClick={refresh}>
         <RefreshCw className="h-4 w-4" />
       </ControlButton>
-      <ControlButton label="Share" onClick={share}>
+      <ControlButton label={tf("auto.29887a5ff9846ccc")} onClick={share}>
         <Share2 className="h-4 w-4" />
       </ControlButton>
-      <ControlButton label="Open in Browser" onClick={openInBrowser}>
+      <ControlButton label={tf("auto.32f8dcaafb6ccafc")} onClick={openInBrowser}>
         <ExternalLink className="h-4 w-4" />
       </ControlButton>
     </div>

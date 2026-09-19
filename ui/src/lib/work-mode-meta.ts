@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import type { IssueWorkMode } from "@paperclipai/shared";
 import { ClipboardList, Hammer, MessageCircleQuestion, type LucideIcon } from "lucide-react";
 
@@ -45,21 +46,21 @@ export function workModeMetaList(): WorkModeMeta[] {
   return [
     {
       value: "standard",
-      label: "Auto mode",
+      label: tf("auto.9ba1e1b64aa5543e"),
       icon: Hammer,
       tone: "neutral",
       classes: STANDARD_CLASSES,
     },
     {
       value: "planning",
-      label: "Plan mode",
+      label: tf("auto.3ca7d842d1209b4d"),
       icon: ClipboardList,
       tone: "planning",
       classes: PLANNING_CLASSES,
     },
     {
       value: "ask",
-      label: "Ask mode",
+      label: tf("auto.ae649982d52fdae7"),
       icon: MessageCircleQuestion,
       tone: "ask",
       classes: ASK_CLASSES,

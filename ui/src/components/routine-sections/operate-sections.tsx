@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useMemo, useState } from "react";
 import { Activity as ActivityIcon, Play, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,10 +20,10 @@ import { RoutineActivityRow } from "../RoutineActivityRow";
 import { useRoutineDetail } from "./context";
 
 const DATE_WINDOW_OPTIONS: { value: string; label: string; ms: number | null }[] = [
-  { value: "any", label: "Any time", ms: null },
-  { value: "24h", label: "Last 24h", ms: 24 * 60 * 60 * 1000 },
-  { value: "7d", label: "Last 7d", ms: 7 * 24 * 60 * 60 * 1000 },
-  { value: "30d", label: "Last 30d", ms: 30 * 24 * 60 * 60 * 1000 },
+  { value: "any", label: tf("auto.5e7de49a40c3d754"), ms: null },
+  { value: "24h", label: tf("auto.3033b37ea23466d2"), ms: 24 * 60 * 60 * 1000 },
+  { value: "7d", label: tf("auto.9976054f2ae7088c"), ms: 7 * 24 * 60 * 60 * 1000 },
+  { value: "30d", label: tf("auto.bbada0d68c50286d"), ms: 30 * 24 * 60 * 60 * 1000 },
 ];
 
 export function RunsSection() {
@@ -56,13 +57,13 @@ export function RunsSection() {
 
   const activeFilters = useMemo<FilterValue[]>(() => {
     const list: FilterValue[] = [];
-    if (sourceFilter !== "any") list.push({ key: "source", label: "Source", value: sourceFilter });
+    if (sourceFilter !== "any") list.push({ key: "source", label: tf("text.Source"), value: sourceFilter });
     if (statusFilter !== "any") {
-      list.push({ key: "status", label: "Status", value: statusFilter.replaceAll("_", " ") });
+      list.push({ key: "status", label: tf("text.Status"), value: statusFilter.replaceAll("_", " ") });
     }
     if (dateFilter !== "any") {
       const label = DATE_WINDOW_OPTIONS.find((option) => option.value === dateFilter)?.label ?? dateFilter;
-      list.push({ key: "date", label: "Date", value: label });
+      list.push({ key: "date", label: tf("text.Date"), value: label });
     }
     return list;
   }, [sourceFilter, statusFilter, dateFilter]);
@@ -88,8 +89,8 @@ export function RunsSection() {
       {runs.length === 0 ? (
         <EmptyState
           icon={Play}
-          message="No runs yet. Trigger a run from the header or wait for the schedule."
-          action="Run now"
+          message={tf("auto.e5e464b6c6ed0250")}
+          action={tf("text.Run now")}
           onAction={onOpenRunDialog}
         />
       ) : (
@@ -98,12 +99,12 @@ export function RunsSection() {
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                <SelectTrigger size="sm" className="h-8 w-auto gap-1.5 text-xs" aria-label="Filter by source">
-                  <span className="text-muted-foreground">Source:</span>
+                <SelectTrigger size="sm" className="h-8 w-auto gap-1.5 text-xs" aria-label={tf("auto.e150d205164c213c")}>
+                  <span className="text-muted-foreground">{tf("auto.c707ee4ecc240442")}</span>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">any</SelectItem>
+                  <SelectItem value="any">{tf("auto.d6a7cd2a7371b1a1")}</SelectItem>
                   {sourceOptions.map((source) => (
                     <SelectItem key={source} value={source}>
                       {source}
@@ -112,12 +113,12 @@ export function RunsSection() {
                 </SelectContent>
               </Select>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger size="sm" className="h-8 w-auto gap-1.5 text-xs" aria-label="Filter by status">
-                  <span className="text-muted-foreground">Status:</span>
+                <SelectTrigger size="sm" className="h-8 w-auto gap-1.5 text-xs" aria-label={tf("auto.94d5a7703a8250de")}>
+                  <span className="text-muted-foreground">{tf("auto.755c8b2a9fb11446")}</span>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">any</SelectItem>
+                  <SelectItem value="any">{tf("auto.d6a7cd2a7371b1a1")}</SelectItem>
                   {statusOptions.map((status) => (
                     <SelectItem key={status} value={status}>
                       {status.replaceAll("_", " ")}
@@ -126,8 +127,8 @@ export function RunsSection() {
                 </SelectContent>
               </Select>
               <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger size="sm" className="h-8 w-auto gap-1.5 text-xs" aria-label="Filter by date">
-                  <span className="text-muted-foreground">Date:</span>
+                <SelectTrigger size="sm" className="h-8 w-auto gap-1.5 text-xs" aria-label={tf("auto.385d4932fa7d5e92")}>
+                  <span className="text-muted-foreground">{tf("auto.b51489bde8d89513")}</span>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,8 +146,8 @@ export function RunsSection() {
           {filtered.length === 0 ? (
             <EmptyState
               icon={SlidersHorizontal}
-              message="No runs match these filters."
-              action="Clear filters"
+              message={tf("auto.aedae6e517ebb7db")}
+              action={tf("text.Clear filters")}
               onAction={clearFilters}
             />
           ) : (
@@ -205,7 +206,7 @@ export function ActivitySection() {
   const groups = useMemo(() => {
     const byDay = new Map<string, typeof events>();
     for (const event of events) {
-      let label = "Earlier";
+      let label = tf("auto.e10ae99074011888");
       try {
         label = new Date(event.createdAt).toLocaleDateString(undefined, {
           weekday: "short",
@@ -223,7 +224,7 @@ export function ActivitySection() {
   }, [events]);
 
   if (events.length === 0) {
-    return <EmptyState icon={ActivityIcon} message="No activity yet." />;
+    return <EmptyState icon={ActivityIcon} message={tf("auto.a288d2d0a21eed3c")} />;
   }
 
   return (

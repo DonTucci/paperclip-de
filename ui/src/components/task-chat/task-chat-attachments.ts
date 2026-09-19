@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 /**
  * Attachment-chip helpers for the task-chat redesign (PAP-351): map a filename
  * to a kind icon + label for the shadcn base/attachment chips, and extract the
@@ -37,48 +38,48 @@ const IMAGE_EXTENSIONS = new Set([
 ]);
 
 const KIND_BY_EXTENSION: Record<string, FileKind> = {
-  pdf: { icon: FileText, label: "PDF" },
-  doc: { icon: FileText, label: "Doc" },
-  docx: { icon: FileText, label: "Doc" },
-  txt: { icon: FileText, label: "Text" },
-  md: { icon: FileText, label: "Markdown" },
-  rtf: { icon: FileText, label: "Text" },
-  csv: { icon: FileSpreadsheet, label: "CSV" },
-  tsv: { icon: FileSpreadsheet, label: "TSV" },
-  xls: { icon: FileSpreadsheet, label: "Sheet" },
-  xlsx: { icon: FileSpreadsheet, label: "Sheet" },
-  zip: { icon: FileArchive, label: "ZIP" },
-  gz: { icon: FileArchive, label: "Archive" },
-  tar: { icon: FileArchive, label: "Archive" },
-  tgz: { icon: FileArchive, label: "Archive" },
-  rar: { icon: FileArchive, label: "Archive" },
-  "7z": { icon: FileArchive, label: "Archive" },
-  mp3: { icon: FileAudio, label: "Audio" },
-  wav: { icon: FileAudio, label: "Audio" },
-  m4a: { icon: FileAudio, label: "Audio" },
-  ogg: { icon: FileAudio, label: "Audio" },
-  mp4: { icon: FileVideo, label: "Video" },
-  mov: { icon: FileVideo, label: "Video" },
-  webm: { icon: FileVideo, label: "Video" },
-  json: { icon: FileCode, label: "JSON" },
-  yaml: { icon: FileCode, label: "YAML" },
-  yml: { icon: FileCode, label: "YAML" },
-  xml: { icon: FileCode, label: "XML" },
-  html: { icon: FileCode, label: "HTML" },
-  css: { icon: FileCode, label: "CSS" },
-  js: { icon: FileCode, label: "Code" },
-  jsx: { icon: FileCode, label: "Code" },
-  ts: { icon: FileCode, label: "Code" },
-  tsx: { icon: FileCode, label: "Code" },
-  py: { icon: FileCode, label: "Code" },
-  rb: { icon: FileCode, label: "Code" },
-  go: { icon: FileCode, label: "Code" },
-  rs: { icon: FileCode, label: "Code" },
-  sh: { icon: FileCode, label: "Code" },
-  sql: { icon: FileCode, label: "SQL" },
-  log: { icon: FileText, label: "Log" },
-  patch: { icon: FileCode, label: "Patch" },
-  diff: { icon: FileCode, label: "Patch" },
+  pdf: { icon: FileText, label: tf("auto.1d393b0081b632c5") },
+  doc: { icon: FileText, label: tf("auto.49f4e57c2625d4ae") },
+  docx: { icon: FileText, label: tf("auto.49f4e57c2625d4ae") },
+  txt: { icon: FileText, label: tf("auto.71988c4d8e0803ba") },
+  md: { icon: FileText, label: tf("auto.0e52f6b9d02515c5") },
+  rtf: { icon: FileText, label: tf("auto.71988c4d8e0803ba") },
+  csv: { icon: FileSpreadsheet, label: tf("auto.eb6b42f54c42d283") },
+  tsv: { icon: FileSpreadsheet, label: tf("auto.fca17147560446ce") },
+  xls: { icon: FileSpreadsheet, label: tf("auto.54bf0ebbfb3e0e37") },
+  xlsx: { icon: FileSpreadsheet, label: tf("auto.54bf0ebbfb3e0e37") },
+  zip: { icon: FileArchive, label: tf("auto.eaca4b30692888d0") },
+  gz: { icon: FileArchive, label: tf("text.Archive") },
+  tar: { icon: FileArchive, label: tf("text.Archive") },
+  tgz: { icon: FileArchive, label: tf("text.Archive") },
+  rar: { icon: FileArchive, label: tf("text.Archive") },
+  "7z": { icon: FileArchive, label: tf("text.Archive") },
+  mp3: { icon: FileAudio, label: tf("auto.bc1b88907d3b748a") },
+  wav: { icon: FileAudio, label: tf("auto.bc1b88907d3b748a") },
+  m4a: { icon: FileAudio, label: tf("auto.bc1b88907d3b748a") },
+  ogg: { icon: FileAudio, label: tf("auto.bc1b88907d3b748a") },
+  mp4: { icon: FileVideo, label: tf("auto.d534be829e32196b") },
+  mov: { icon: FileVideo, label: tf("auto.d534be829e32196b") },
+  webm: { icon: FileVideo, label: tf("auto.d534be829e32196b") },
+  json: { icon: FileCode, label: tf("auto.db1a21a0bc2ef8fb") },
+  yaml: { icon: FileCode, label: tf("auto.9b6e8abe425e34bb") },
+  yml: { icon: FileCode, label: tf("auto.9b6e8abe425e34bb") },
+  xml: { icon: FileCode, label: tf("auto.40658e9af8fd9222") },
+  html: { icon: FileCode, label: tf("auto.07239dbd2a1a1dd7") },
+  css: { icon: FileCode, label: tf("auto.b581e46042cbfbb0") },
+  js: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  jsx: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  ts: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  tsx: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  py: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  rb: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  go: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  rs: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  sh: { icon: FileCode, label: tf("auto.340f463033e0fd5d") },
+  sql: { icon: FileCode, label: tf("auto.a7056a455639d1c7") },
+  log: { icon: FileText, label: tf("auto.21e49eb2b299c9f7") },
+  patch: { icon: FileCode, label: tf("auto.7e345470de240d11") },
+  diff: { icon: FileCode, label: tf("auto.7e345470de240d11") },
 };
 
 function extensionOf(name: string): string {
@@ -115,7 +116,7 @@ export function isImageAttachment(ref: AttachmentRef): boolean {
 
 /** Kind icon + short label for a filename; unknown extensions get File/"File". */
 export function fileKindForName(name: string): FileKind {
-  return KIND_BY_EXTENSION[extensionOf(name)] ?? { icon: FileIcon, label: "File" };
+  return KIND_BY_EXTENSION[extensionOf(name)] ?? { icon: FileIcon, label: tf("text.File") };
 }
 
 export function fileKindForAttachment(ref: AttachmentRef): FileKind {
@@ -123,18 +124,18 @@ export function fileKindForAttachment(ref: AttachmentRef): FileKind {
   if (byName.label !== "File") return byName;
 
   const contentType = normalizedContentType(ref.contentType);
-  if (contentType === "application/pdf") return { icon: FileText, label: "PDF" };
+  if (contentType === "application/pdf") return { icon: FileText, label: tf("auto.1d393b0081b632c5") };
   if (contentType === "application/json" || contentType.endsWith("+json")) {
-    return { icon: FileCode, label: "JSON" };
+    return { icon: FileCode, label: tf("auto.db1a21a0bc2ef8fb") };
   }
   if (contentType === "text/csv" || contentType === "application/csv") {
-    return { icon: FileSpreadsheet, label: "CSV" };
+    return { icon: FileSpreadsheet, label: tf("auto.eb6b42f54c42d283") };
   }
-  if (contentType.startsWith("text/")) return { icon: FileText, label: "Text" };
-  if (contentType.startsWith("audio/")) return { icon: FileAudio, label: "Audio" };
-  if (contentType.startsWith("video/")) return { icon: FileVideo, label: "Video" };
+  if (contentType.startsWith("text/")) return { icon: FileText, label: tf("auto.71988c4d8e0803ba") };
+  if (contentType.startsWith("audio/")) return { icon: FileAudio, label: tf("auto.bc1b88907d3b748a") };
+  if (contentType.startsWith("video/")) return { icon: FileVideo, label: tf("auto.d534be829e32196b") };
   if (contentType.includes("zip") || contentType.includes("archive")) {
-    return { icon: FileArchive, label: "Archive" };
+    return { icon: FileArchive, label: tf("text.Archive") };
   }
   return byName;
 }

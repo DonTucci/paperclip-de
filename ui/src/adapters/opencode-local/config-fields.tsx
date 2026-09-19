@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { configFieldsForSection } from "../config-sections";
 import type { AdapterConfigFieldsProps } from "../types";
 import {
@@ -26,7 +27,7 @@ export function OpenCodeLocalConfigFields({
   return configFieldsForSection(section, (
     <>
       {!hideInstructionsFile && (
-        <Field label="Agent instructions file" hint={instructionsFileHint}>
+        <Field label={tf("auto.ce46e7f310ea3f64")} hint={instructionsFileHint}>
           <div className="flex items-center gap-2">
             <DraftInput
               value={
@@ -52,7 +53,7 @@ export function OpenCodeLocalConfigFields({
         </Field>
       )}
       <ToggleField
-        label="Skip permissions"
+        label={tf("auto.77c4c0c6d19bf9b4")}
         hint={help.dangerouslySkipPermissions}
         checked={
           isCreate
