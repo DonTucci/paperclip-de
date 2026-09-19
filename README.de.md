@@ -44,7 +44,7 @@ Die Prüfliste unter `tmp/german-ui-audit.json` meldet aktuell 0 wahrscheinliche
 
 Lokal existiert der Branch `fork/deutsch`; `upstream` zeigt auf das Originalprojekt und `origin` auf den eigenen GitHub-Fork [DonTucci/paperclip-de](https://github.com/DonTucci/paperclip-de). Der deutsche Branch ist dort veröffentlicht.
 
-Nach der Veröffentlichung müssen GitHub Actions aktiviert und das Erstellen von Pull Requests durch Actions erlaubt werden. Der vorbereitete Update-Workflow prüft täglich um 05:23 UTC das neueste stabile Paperclip-Release. Bei einem neuen Stand erstellt er einen Merge-Branch und einen Entwurfs-Pull-Request und startet den deutschen Prüfworkflow. Merge-Konflikte werden sichtbar gemeldet und nicht automatisch zugunsten einer Seite aufgelöst.
+GitHub Actions sind aktiviert; `fork/deutsch` ist der Standardbranch. Der Update-Workflow prüft täglich um 05:23 UTC das neueste stabile Paperclip-Release. Bei einem neuen Stand erstellt er einen Merge-Branch und einen Entwurfs-Pull-Request und startet den deutschen Prüfworkflow. Merge-Konflikte werden sichtbar gemeldet und nicht automatisch zugunsten einer Seite aufgelöst.
 
 Die Übernahme eines Updates und die Umstellung einer laufenden Installation erfolgen erst nach Prüfung der Änderungen und einer Datensicherung.
 

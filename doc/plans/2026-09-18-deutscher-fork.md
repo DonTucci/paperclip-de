@@ -46,4 +46,4 @@ Vom Server gelieferte Ankündigungen, Benutzertexte, Agentenausgaben, Plugins un
 
 ## Verbleibender Veröffentlichungsschritt
 
-Der lokale Stand ist bis zum GitHub-Fork abgeschlossen. Als Nächstes wird im verbundenen GitHub-Konto ein Fork erstellt, `origin` gesetzt, der Branch veröffentlicht und der erste Actions-Lauf geprüft. Die produktive Installation wird erst danach getrennt und mit vorheriger Datensicherung umgestellt.
+Der GitHub-Fork ist eingerichtet, `origin` gesetzt, `fork/deutsch` veröffentlicht und als Standardbranch gesetzt. Beide Fork-Workflows sind auf GitHub aktiv; ein manueller Prüf-Lauf dient als erste Funktionskontrolle. Die produktive Installation wird erst danach getrennt und mit vorheriger Datensicherung umgestellt.
