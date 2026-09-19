@@ -8,7 +8,8 @@ Paperclip mit einer deutschen Oberfläche in Schweizer Schreibweise betreiben un
 
 - Arbeitsbranch: `fork/deutsch`
 - Original-Remote: `upstream` auf `https://github.com/paperclipai/paperclip.git`
-- Eigener Fork und `origin`: noch nicht eingerichtet
+- Eigener Fork: `https://github.com/DonTucci/paperclip-de`
+- `origin`: zeigt auf den eigenen Fork; Branch `fork/deutsch` ist veröffentlicht
 - Eigener i18next-Namespace `fork` mit Englisch als Referenz und Deutsch als Standard
 - 6'033 Schlüssel je Sprache
 - Gespeicherte Sprachauswahl in den Profileinstellungen
