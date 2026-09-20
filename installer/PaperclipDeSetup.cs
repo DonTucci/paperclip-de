@@ -54,6 +54,8 @@ internal static class PaperclipDeSetup
 
     private static string Quote(string value)
     {
-        return "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+        // Die Installationsparameter enthalten normale Windows-Pfade. Nur
+        // Anführungszeichen müssen escaped werden; Backslashes bleiben intakt.
+        return "\"" + value.Replace("\"", "\\\"") + "\"";
     }
 }
