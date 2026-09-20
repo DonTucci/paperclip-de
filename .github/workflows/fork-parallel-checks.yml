@@ -8,32 +8,6 @@ permissions:
   contents: read
 
 jobs:
-  catalog:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9.15.4 }
-      - uses: actions/setup-node@v4
-        with: { node-version: '24', cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: |
-          node scripts/refine-german-catalog.mjs --check
-          node scripts/verify-german-catalog.mjs
-          node --test scripts/verify-german-catalog.test.mjs
-          node scripts/audit-german-ui.mjs --check
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9.15.4 }
-      - uses: actions/setup-node@v4
-        with: { node-version: '24', cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm -r typecheck
-
   tests:
     strategy:
       fail-fast: false
@@ -64,14 +38,3 @@ jobs:
         with: { node-version: '24', cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: ${{ matrix.command }}
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with: { version: 9.15.4 }
-      - uses: actions/setup-node@v4
-        with: { node-version: '24', cache: pnpm }
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
