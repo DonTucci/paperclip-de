@@ -12,6 +12,8 @@ internal static class PaperclipDeSetup
     {
         string scriptPath = Path.Combine(Path.GetTempPath(), "paperclip-de-install-" + Guid.NewGuid().ToString("N") + ".ps1");
         int exitCode = 1;
+        Console.OutputEncoding = new UTF8Encoding(false);
+        Console.InputEncoding = new UTF8Encoding(false);
         Console.Title = "Paperclip auf Deutsch installieren";
         Console.WriteLine("========================================");
         Console.WriteLine(" Paperclip auf Deutsch installieren");
@@ -25,7 +27,8 @@ internal static class PaperclipDeSetup
             File.WriteAllText(
                 scriptPath,
                 Encoding.UTF8.GetString(Convert.FromBase64String(InstallScriptBase64)),
-                new UTF8Encoding(false));
+                // Windows PowerShell 5.1 erkennt UTF-8 ohne BOM sonst als ANSI.
+                new UTF8Encoding(true));
 
             string powershell = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.Windows),
@@ -44,6 +47,8 @@ internal static class PaperclipDeSetup
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                StandardOutputEncoding = new UTF8Encoding(false),
+                StandardErrorEncoding = new UTF8Encoding(false),
                 WorkingDirectory = Environment.CurrentDirectory
             };
             using (Process process = Process.Start(startInfo))

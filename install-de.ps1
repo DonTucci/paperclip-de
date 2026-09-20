@@ -5,13 +5,26 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$utf8 = New-Object System.Text.UTF8Encoding($false)
+[Console]::OutputEncoding = $utf8
+$OutputEncoding = $utf8
 $repository = 'https://github.com/DonTucci/paperclip-de.git'
 $branch = 'fork/deutsch'
 
-function Require-Command([string]$Name) {
-  if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-    throw "$Name wurde nicht gefunden. Bitte zuerst Node.js 24.11 oder neuer und Git installieren."
+function Ensure-Command([string]$Name, [string[]]$Candidates, [string]$InstallHint) {
+  if (Get-Command $Name -ErrorAction SilentlyContinue) {
+    return (Get-Command $Name).Source
   }
+  foreach ($candidate in $Candidates) {
+    if (Test-Path -LiteralPath $candidate) {
+      $candidateDirectory = Split-Path -Parent $candidate
+      $env:PATH = "$candidateDirectory;$env:PATH"
+      if (Get-Command $Name -ErrorAction SilentlyContinue) {
+        return (Get-Command $Name).Source
+      }
+    }
+  }
+  throw "${Name} wurde nicht gefunden. Bitte installieren Sie ${Name}: $InstallHint"
 }
 
 function Invoke-Checked([string]$Command, [string[]]$Arguments) {
@@ -22,8 +35,23 @@ function Invoke-Checked([string]$Command, [string[]]$Arguments) {
 }
 
 Write-Host 'Prüfe Voraussetzungen ...'
-Require-Command 'git'
-Require-Command 'node'
+$gitPath = Ensure-Command 'git' @(
+  (Join-Path $env:ProgramFiles 'Git\cmd\git.exe'),
+  (Join-Path ${env:ProgramFiles(x86)} 'Git\cmd\git.exe'),
+  (Join-Path $env:LOCALAPPDATA 'Programs\Git\cmd\git.exe')
+) 'https://git-scm.com/download/win'
+$nodePath = Ensure-Command 'node' @(
+  (Join-Path $env:ProgramFiles 'nodejs\node.exe'),
+  (Join-Path ${env:ProgramFiles(x86)} 'nodejs\node.exe'),
+  (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\node.exe')
+) 'https://nodejs.org/en/download'
+Ensure-Command 'corepack' @(
+  (Join-Path $env:ProgramFiles 'nodejs\corepack.cmd'),
+  (Join-Path ${env:ProgramFiles(x86)} 'nodejs\corepack.cmd'),
+  (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\corepack.cmd')
+) 'https://nodejs.org/en/download' | Out-Null
+Write-Host "Git: $gitPath"
+Write-Host "Node.js: $nodePath"
 
 $nodeVersion = (& node --version).Trim().TrimStart('v')
 $nodeMajor = [int]($nodeVersion.Split('.')[0])
