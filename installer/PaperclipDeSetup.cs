@@ -14,9 +14,9 @@ internal static class PaperclipDeSetup
         int exitCode = 1;
         Console.OutputEncoding = new UTF8Encoding(false);
         Console.InputEncoding = new UTF8Encoding(false);
-        Console.Title = "Paperclip auf Deutsch installieren";
+        Console.Title = "Paperclip DE installieren";
         Console.WriteLine("========================================");
-        Console.WriteLine(" Paperclip auf Deutsch installieren");
+        Console.WriteLine(" Paperclip DE installieren");
         Console.WriteLine("========================================");
         Console.WriteLine();
         Console.WriteLine("Das Fenster bleibt nach der Installation geöffnet.");
@@ -70,8 +70,8 @@ internal static class PaperclipDeSetup
                 if (exitCode == 0)
                 {
                     Console.WriteLine("Die Installation wurde erfolgreich abgeschlossen.");
-                    Console.WriteLine("Die deutsche Version liegt unter %LOCALAPPDATA%\\Paperclip-DE.");
-                    Console.WriteLine("Zum Starten: corepack pnpm@9.15.4 dev:once");
+                    Console.WriteLine("Paperclip DE liegt unter %LOCALAPPDATA%\\Paperclip-DE.");
+                    Console.WriteLine("Zum Starten doppelklicken Sie auf die Desktop-Verknüpfung Paperclip DE.");
                 }
                 else
                 {

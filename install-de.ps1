@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
   [string]$InstallPath = (Join-Path $env:LOCALAPPDATA 'Paperclip-DE'),
-  [switch]$Start
+  [switch]$Start,
+  [switch]$SkipPrerequisiteInstall
 )
 
 $ErrorActionPreference = 'Stop'
@@ -15,7 +16,22 @@ if ($releaseTag -eq '__RELEASE_TAG__') {
   $releaseTag = $env:PAPERCLIP_DE_RELEASE_TAG
 }
 
-function Ensure-Command([string]$Name, [string[]]$Candidates, [string]$InstallHint) {
+function Install-Prerequisite([string]$Name, [string]$PackageId) {
+  if ($SkipPrerequisiteInstall) {
+    throw "$Name wurde nicht gefunden. Die automatische Installation wurde übersprungen."
+  }
+  if (-not (Get-Command 'winget' -ErrorAction SilentlyContinue)) {
+    throw "$Name wurde nicht gefunden und Windows App Installer (winget) ist nicht verfügbar. Installieren Sie $Name und starten Sie die EXE erneut."
+  }
+
+  Write-Host "$Name wird automatisch eingerichtet ..."
+  & winget install --id $PackageId --exact --silent --accept-package-agreements --accept-source-agreements
+  if ($LASTEXITCODE -ne 0) {
+    throw "$Name konnte nicht automatisch installiert werden (Fehlercode $LASTEXITCODE). Installieren Sie $Name und starten Sie die EXE erneut."
+  }
+}
+
+function Ensure-Command([string]$Name, [string[]]$Candidates, [string]$PackageId, [string]$InstallHint) {
   if (Get-Command $Name -ErrorAction SilentlyContinue) {
     return (Get-Command $Name).Source
   }
@@ -28,7 +44,18 @@ function Ensure-Command([string]$Name, [string[]]$Candidates, [string]$InstallHi
       }
     }
   }
-  throw "${Name} wurde nicht gefunden. Bitte installieren Sie ${Name}: $InstallHint"
+
+  Install-Prerequisite $Name $PackageId
+  foreach ($candidate in $Candidates) {
+    if (Test-Path -LiteralPath $candidate) {
+      $candidateDirectory = Split-Path -Parent $candidate
+      $env:PATH = "$candidateDirectory;$env:PATH"
+      if (Get-Command $Name -ErrorAction SilentlyContinue) {
+        return (Get-Command $Name).Source
+      }
+    }
+  }
+  throw "${Name} wurde nach der automatischen Installation nicht gefunden. Bitte starten Sie Windows neu und führen Sie die EXE erneut aus. Hilfe: $InstallHint"
 }
 
 function Invoke-Checked([string]$Command, [string[]]$Arguments) {
@@ -38,24 +65,55 @@ function Invoke-Checked([string]$Command, [string[]]$Arguments) {
   }
 }
 
+function New-PaperclipShortcut([string]$TargetInstallPath) {
+  $desktopPath = [Environment]::GetFolderPath([Environment+SpecialFolder]::DesktopDirectory)
+  if ([string]::IsNullOrWhiteSpace($desktopPath)) {
+    Write-Warning 'Desktop-Ordner konnte nicht ermittelt werden. Die Verknüpfung wurde nicht erstellt.'
+    return
+  }
+  $startScript = Join-Path $TargetInstallPath 'scripts\start-paperclip-de.ps1'
+  if (-not (Test-Path -LiteralPath $startScript)) {
+    throw "Startskript fehlt: $startScript"
+  }
+
+  $shortcutPath = Join-Path $desktopPath 'Paperclip DE.lnk'
+  $powerShellPath = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
+  $iconPath = Join-Path $TargetInstallPath 'ui\public\favicon.ico'
+  $shell = New-Object -ComObject WScript.Shell
+  $shortcut = $shell.CreateShortcut($shortcutPath)
+  $shortcut.TargetPath = $powerShellPath
+  $shortcut.Arguments = "-NoLogo -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$startScript`""
+  $shortcut.WorkingDirectory = $TargetInstallPath
+  if (Test-Path -LiteralPath $iconPath) {
+    $shortcut.IconLocation = "$iconPath,0"
+  }
+  $shortcut.Description = 'Paperclip DE starten'
+  $shortcut.Save()
+  Write-Host "Desktop-Verknüpfung wurde erstellt: $shortcutPath"
+}
+
 Write-Host 'Prüfe Voraussetzungen ...'
 $gitPath = Ensure-Command 'git' @(
   (Join-Path $env:ProgramFiles 'Git\cmd\git.exe'),
   (Join-Path ${env:ProgramFiles(x86)} 'Git\cmd\git.exe'),
-  (Join-Path $env:LOCALAPPDATA 'Programs\Git\cmd\git.exe')
-) 'https://git-scm.com/download/win'
+  (Join-Path $env:LOCALAPPDATA 'Programs\Git\cmd\git.exe'),
+  (Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Links\git.exe')
+) 'Git.Git' 'https://git-scm.com/download/win'
 $nodePath = Ensure-Command 'node' @(
   (Join-Path $env:ProgramFiles 'nodejs\node.exe'),
   (Join-Path ${env:ProgramFiles(x86)} 'nodejs\node.exe'),
-  (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\node.exe')
-) 'https://nodejs.org/en/download'
-Ensure-Command 'corepack' @(
+  (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\node.exe'),
+  (Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Links\node.exe')
+) 'OpenJS.NodeJS.LTS' 'https://nodejs.org/en/download'
+$corepackPath = Ensure-Command 'corepack' @(
   (Join-Path $env:ProgramFiles 'nodejs\corepack.cmd'),
   (Join-Path ${env:ProgramFiles(x86)} 'nodejs\corepack.cmd'),
-  (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\corepack.cmd')
-) 'https://nodejs.org/en/download' | Out-Null
+  (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\corepack.cmd'),
+  (Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Links\corepack.cmd')
+) 'OpenJS.NodeJS.LTS' 'https://nodejs.org/en/download'
 Write-Host "Git: $gitPath"
 Write-Host "Node.js: $nodePath"
+Invoke-Checked $corepackPath @('enable')
 
 $nodeVersion = (& node --version).Trim().TrimStart('v')
 $nodeMajor = [int]($nodeVersion.Split('.')[0])
@@ -83,11 +141,12 @@ try {
   if ($LASTEXITCODE -ne 0) {
     throw "Der vorkompilierte Windows-Runner konnte nicht eingerichtet werden."
   }
+  New-PaperclipShortcut $InstallPath
   Write-Host "Paperclip DE wurde unter $InstallPath eingerichtet."
   if ($Start) {
     & corepack pnpm@9.15.4 dev:once
   } else {
-    Write-Host 'Zum Starten: corepack pnpm@9.15.4 dev:once'
+    Write-Host 'Zum Starten doppelklicken Sie auf die Desktop-Verknüpfung Paperclip DE.'
   }
 } finally {
   Pop-Location

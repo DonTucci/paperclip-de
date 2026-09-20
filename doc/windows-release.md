@@ -10,7 +10,7 @@ Der deutsche Fork kann Windows-Dateien mit einem bereits kompilierten nativen Ru
 4. Einen neuen Tag wie `de-v2026.920.0` eintragen.
 5. `publish` auf `false` lassen.
 
-Der Workflow baut `paperclip-runnerd.exe`, erstellt den kleinen Windows-Installer und legt Prüfsummen als GitHub-Artefakt ab. Das Artefakt kann vor einer Veröffentlichung heruntergeladen und getestet werden.
+Der Workflow baut `paperclip-runnerd.exe`, erstellt den Windows-Installer und legt Prüfsummen als GitHub-Artefakt ab. Das Artefakt kann vor einer Veröffentlichung heruntergeladen und getestet werden.
 
 ## Veröffentlichung
 
@@ -27,7 +27,7 @@ Der Tag startet den gleichen Workflow automatisch. Er veröffentlicht diese Date
 - `paperclip-runnerd-windows-x64.exe`
 - `SHA256SUMS.txt`
 
-Der Installer lädt den Runner passend zum Release und muss ihn nicht lokal kompilieren.
+Der Installer richtet fehlendes Git und Node.js über Windows automatisch ein, lädt den Runner passend zum Release und muss ihn nicht lokal kompilieren. Danach erstellt er die Desktop-Verknüpfung **Paperclip DE**.
 
 ## Signatur
 
