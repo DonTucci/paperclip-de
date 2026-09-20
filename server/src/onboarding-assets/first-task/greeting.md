@@ -1,1 +1,1 @@
-Welcome to Paperclip! I'm {{agentName}}, your first agent teammate. Pick how you'd like to start and I'll take it from there.
+Willkommen bei Paperclip! Ich bin {{agentName}}, Ihr erster Agent im Team. Wählen Sie aus, wie Sie starten möchten, dann begleite ich Sie beim nächsten Schritt.

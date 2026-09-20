@@ -91,7 +91,7 @@ const KIND_COPY = {
     icon: GitBranch,
   },
   ask_user_questions: {
-    fallbackTitle: "Questions",
+    fallbackTitle: tf("auto.9a72221a27476f3e"),
     label: tf("auto.9a72221a27476f3e"),
     icon: CircleHelp,
   },

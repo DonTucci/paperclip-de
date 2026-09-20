@@ -1,16 +1,16 @@
 {
-  "prompt": "What would you like to do?",
-  "submitLabel": "Continue",
+  "prompt": "Wie möchten Sie starten?",
+  "submitLabel": "Weiter",
   "options": [
     {
       "id": "interview",
-      "label": "Interview me and propose a plan and an agent team to execute it.",
-      "description": "A few questions about what you're building, then a short plan and the team to carry it out, for you to approve."
+      "label": "Ich möchte meine Situation besprechen und einen Plan mit Agententeam erhalten.",
+      "description": "Ich stelle Ihnen einige Fragen zu Ihrem Vorhaben. Danach erhalten Sie einen kurzen Plan und einen Vorschlag für das passende Agententeam zur Freigabe."
     },
     {
       "id": "task",
-      "label": "I have a task in mind",
-      "description": "Describe it and I'll propose how to get it done.",
+      "label": "Ich habe bereits eine konkrete Aufgabe.",
+      "description": "Beschreiben Sie sie, und ich schlage das weitere Vorgehen vor.",
       "freeText": true
     }
   ]

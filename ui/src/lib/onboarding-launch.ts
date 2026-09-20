@@ -1,6 +1,6 @@
 import type { Goal, Project } from "@paperclipai/shared";
 
-export const ONBOARDING_PROJECT_NAME = "Onboarding";
+export const ONBOARDING_PROJECT_NAME = "Einrichtung";
 
 function goalCreatedAt(goal: Goal) {
   const createdAt = goal.createdAt instanceof Date ? goal.createdAt : new Date(goal.createdAt);

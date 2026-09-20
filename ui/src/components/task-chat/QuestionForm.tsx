@@ -671,7 +671,7 @@ export function QuestionForm({
             {working === "cancel" ? (
               <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
             ) : null}{" "}
-            Cancel
+            {tf("text.Cancel")}
           </Button>
         ) : null}
         {!question.required ? (
@@ -694,7 +694,7 @@ export function QuestionForm({
           {working === "submit" ? (
             <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
           ) : null}
-          {isLastPage ? (questionSet.submitLabel ?? "Submit answers") : "Next"}
+          {isLastPage ? (questionSet.submitLabel ?? tf("text.Submit")) : tf("text.Next")}
         </Button>
       </div>
     </div>
