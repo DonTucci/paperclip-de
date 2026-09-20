@@ -16,8 +16,7 @@ $runnerBinary = Join-Path $repo 'packages\paperclip-runner\dist\bin\paperclip-ru
 $env:COREPACK_HOME = $corepackHome
 $env:PATH = "$shimDir;$userHome\.cargo\bin;C:\Program Files\nodejs;$env:PATH"
 if (-not (Test-Path -LiteralPath $runnerBinary)) {
-  # Übergangslösung für die Oberfläche, bis der native Runner gebaut ist.
-  $env:PAPERCLIP_RUNNER_BINARY = Join-Path $env:WINDIR 'System32\cmd.exe'
+  throw "Der native Paperclip-Runner fehlt: $runnerBinary"
 }
 
 function Test-PaperclipReady {
