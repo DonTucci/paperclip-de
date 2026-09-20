@@ -2,6 +2,16 @@
 
 Dies ist der vorbereitete deutsche Paperclip-Fork mit Schweizer Schreibweise. Die statische Oberfläche ist vollständig in einen eigenen Übersetzungskatalog überführt. Deutsch ist die Standardsprache; Englisch bleibt als Rückfall und kann in den Profileinstellungen gewählt werden.
 
+## Direkt herunterladen und installieren
+
+**[Windows-Installationsroutine herunterladen](https://github.com/DonTucci/paperclip-de/releases/download/de-v2026.916.0/install-de.ps1)** · **[Release öffnen](https://github.com/DonTucci/paperclip-de/releases/tag/de-v2026.916.0)**
+
+Die Installationsroutine richtet die deutsche Version automatisch ein. Voraussetzung sind Git und Node.js 24.11 oder neuer. Nach dem Download in PowerShell ausführen:
+
+```powershell
+.\install-de.ps1
+```
+
 ## Umfang
 
 - 6'033 englische Referenztexte und 6'033 deutsche Texte im Namespace `fork`.
