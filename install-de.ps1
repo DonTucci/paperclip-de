@@ -113,7 +113,10 @@ $corepackPath = Ensure-Command 'corepack' @(
 ) 'OpenJS.NodeJS.LTS' 'https://nodejs.org/en/download'
 Write-Host "Git: $gitPath"
 Write-Host "Node.js: $nodePath"
-Invoke-Checked $corepackPath @('enable')
+& $corepackPath 'enable'
+if ($LASTEXITCODE -ne 0) {
+  Write-Warning 'Corepack konnte nicht dauerhaft aktiviert werden. Die Installation versucht trotzdem, pnpm direkt über Corepack zu verwenden.'
+}
 
 $nodeVersion = (& node --version).Trim().TrimStart('v')
 $nodeMajor = [int]($nodeVersion.Split('.')[0])
