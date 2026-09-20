@@ -14,6 +14,14 @@ function Require-Command([string]$Name) {
   }
 }
 
+function Invoke-Checked([string]$Command, [string[]]$Arguments) {
+  & $Command @Arguments
+  if ($LASTEXITCODE -ne 0) {
+    throw "$Command wurde mit Fehlercode $LASTEXITCODE beendet."
+  }
+}
+
+Write-Host 'Prüfe Voraussetzungen ...'
 Require-Command 'git'
 Require-Command 'node'
 
@@ -24,17 +32,20 @@ if ($nodeMajor -lt 24) {
 }
 
 if (-not (Test-Path (Join-Path $InstallPath '.git'))) {
+  Write-Host "Lade die deutsche Version nach $InstallPath ..."
   New-Item -ItemType Directory -Path (Split-Path $InstallPath -Parent) -Force | Out-Null
-  & git clone --branch $branch --single-branch $repository $InstallPath
+  Invoke-Checked 'git' @('clone', '--branch', $branch, '--single-branch', $repository, $InstallPath)
 } else {
-  & git -C $InstallPath fetch origin $branch
-  & git -C $InstallPath checkout $branch
-  & git -C $InstallPath reset --hard "origin/$branch"
+  Write-Host "Aktualisiere die deutsche Version unter $InstallPath ..."
+  Invoke-Checked 'git' @('-C', $InstallPath, 'fetch', 'origin', $branch)
+  Invoke-Checked 'git' @('-C', $InstallPath, 'checkout', $branch)
+  Invoke-Checked 'git' @('-C', $InstallPath, 'reset', '--hard', "origin/$branch")
 }
 
 Push-Location $InstallPath
 try {
-  & corepack pnpm@9.15.4 install --frozen-lockfile
+  Write-Host 'Installiere Abhängigkeiten. Dieser Schritt kann mehrere Minuten dauern ...'
+  Invoke-Checked 'corepack' @('pnpm@9.15.4', 'install', '--frozen-lockfile')
   Write-Host "Paperclip auf Deutsch wurde unter $InstallPath eingerichtet."
   if ($Start) {
     & corepack pnpm@9.15.4 dev:once

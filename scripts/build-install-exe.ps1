@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$Version = 'de-v2026.916.2',
+  [string]$Version = 'de-v2026.916.3',
   [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\releases\windows')
 )
 

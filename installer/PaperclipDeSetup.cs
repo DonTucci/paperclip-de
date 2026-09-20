@@ -11,6 +11,15 @@ internal static class PaperclipDeSetup
     public static int Main(string[] args)
     {
         string scriptPath = Path.Combine(Path.GetTempPath(), "paperclip-de-install-" + Guid.NewGuid().ToString("N") + ".ps1");
+        int exitCode = 1;
+        Console.Title = "Paperclip auf Deutsch installieren";
+        Console.WriteLine("========================================");
+        Console.WriteLine(" Paperclip auf Deutsch installieren");
+        Console.WriteLine("========================================");
+        Console.WriteLine();
+        Console.WriteLine("Das Fenster bleibt nach der Installation geöffnet.");
+        Console.WriteLine("Bitte warten Sie, bis die Erfolgsmeldung erscheint.");
+        Console.WriteLine();
         try
         {
             File.WriteAllText(
@@ -27,29 +36,62 @@ internal static class PaperclipDeSetup
                 arguments += " " + Quote(argument);
             }
 
-            using (Process process = Process.Start(new ProcessStartInfo
+            ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = powershell,
                 Arguments = arguments,
                 UseShellExecute = false,
-                CreateNoWindow = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 WorkingDirectory = Environment.CurrentDirectory
-            }))
+            };
+            using (Process process = Process.Start(startInfo))
             {
+                process.OutputDataReceived += (sender, eventArgs) =>
+                {
+                    if (eventArgs.Data != null) Console.WriteLine(eventArgs.Data);
+                };
+                process.ErrorDataReceived += (sender, eventArgs) =>
+                {
+                    if (eventArgs.Data != null) Console.Error.WriteLine(eventArgs.Data);
+                };
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
                 process.WaitForExit();
-                return process.ExitCode;
+                process.WaitForExit();
+                exitCode = process.ExitCode;
+                Console.WriteLine();
+                if (exitCode == 0)
+                {
+                    Console.WriteLine("Die Installation wurde erfolgreich abgeschlossen.");
+                    Console.WriteLine("Die deutsche Version liegt unter %LOCALAPPDATA%\\Paperclip-DE.");
+                    Console.WriteLine("Zum Starten: corepack pnpm@9.15.4 dev:once");
+                }
+                else
+                {
+                    Console.WriteLine("Die Installation ist fehlgeschlagen (Fehlercode " + exitCode + ").");
+                    Console.WriteLine("Prüfen Sie die Meldung oben und versuchen Sie es erneut.");
+                }
             }
         }
         catch (Exception error)
         {
+            Console.WriteLine();
             Console.Error.WriteLine("Die Paperclip-Installation konnte nicht gestartet werden.");
             Console.Error.WriteLine(error.Message);
-            return 1;
         }
         finally
         {
             try { if (File.Exists(scriptPath)) File.Delete(scriptPath); } catch { }
+            if (!Console.IsInputRedirected)
+            {
+                Console.WriteLine();
+                Console.Write("Zum Schliessen bitte Enter drücken ... ");
+                Console.ReadLine();
+            }
         }
+        return exitCode;
     }
 
     private static string Quote(string value)
