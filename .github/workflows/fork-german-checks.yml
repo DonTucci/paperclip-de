@@ -11,7 +11,9 @@ jobs:
   verify:
     if: github.repository != 'paperclipai/paperclip'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # Der vollständige Vitest-Lauf umfasst auch serielle Server-Suites und
+    # benötigt auf einem einzelnen GitHub-Runner deutlich länger als eine Stunde.
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
         with:
