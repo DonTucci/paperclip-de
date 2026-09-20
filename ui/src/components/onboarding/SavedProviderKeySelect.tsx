@@ -92,7 +92,7 @@ export function SavedProviderKeySelect({
     <div className="space-y-2">
       {options.length > 0 && (
         <label className="block space-y-2 text-sm">
-          <span>{kind === "api" ? "API key" : "Subscription"}</span>
+          <span>{kind === "api" ? tf("onboarding.apiKey") : tf("onboarding.subscription")}</span>
           <select
             aria-label={kind === "api" ? tf("auto.90acb76dcf19b352") : tf("auto.d4e6deb711205e25")}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -107,8 +107,8 @@ export function SavedProviderKeySelect({
             ))}
             <option value="">
               {kind === "api"
-                ? "Enter a new API key"
-                : "Sign in to another account"}
+                ? tf("onboarding.enterNewApiKey")
+                : tf("onboarding.signInAnotherAccount")}
             </option>
           </select>
         </label>
@@ -125,8 +125,9 @@ export function SavedProviderKeySelect({
       )}
       {value && (
         <p className="text-sm text-muted-foreground">
-          Reuse this saved {kind === "api" ? "key" : "subscription"} for this
-          agent.
+          {tf("onboarding.reuseSavedCredential", {
+            credential: kind === "api" ? tf("onboarding.apiKey") : tf("onboarding.subscription"),
+          })}
         </p>
       )}
     </div>

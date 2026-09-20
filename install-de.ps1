@@ -83,7 +83,7 @@ try {
   if ($LASTEXITCODE -ne 0) {
     throw "Der vorkompilierte Windows-Runner konnte nicht eingerichtet werden."
   }
-  Write-Host "Paperclip auf Deutsch wurde unter $InstallPath eingerichtet."
+  Write-Host "Paperclip DE wurde unter $InstallPath eingerichtet."
   if ($Start) {
     & corepack pnpm@9.15.4 dev:once
   } else {

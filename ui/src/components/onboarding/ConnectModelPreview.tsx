@@ -91,7 +91,14 @@ export function ConnectModelPreview({
       <div className="w-(--sz-560px) max-w-full p-10">
         {/* Connect is the arc's second step. `Stepper` carries its own bottom
             margin, which is the gap the frame wants under the dots. */}
-        <Stepper step={2} />
+        <Stepper
+          step={2}
+          labels={[
+            tf("onboarding.createFirstAgent"),
+            tf("onboarding.connectModel"),
+            tf("onboarding.review"),
+          ]}
+        />
 
         <div className="flex flex-col items-center">
           {/* `relative` is load-bearing: the sleep marks anchor to this box and
@@ -107,7 +114,7 @@ export function ConnectModelPreview({
           <OnboardingHeading
             center
             title={tf("auto.87bdaaf8ac10de0f")}
-            lede="Paperclip works with your existing subscription or API keys."
+            lede={tf("onboarding.modelDescription")}
           />
         </div>
 
@@ -143,7 +150,7 @@ export function ConnectModelPreview({
             disabled rather than failing on press. */}
         <FooterNav
           onBack={() => {}}
-          primaryLabel="Connect"
+          primaryLabel={tf("text.Connect")}
           primaryDisabled={selectedId === null}
           onPrimary={() => {}}
         />

@@ -1,5 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { tf } from "@/i18n/fork";
 
 import { cn } from "../../lib/utils";
 import {
@@ -29,11 +30,6 @@ export type ModelSource = {
   icon: ReactNode;
 };
 
-const CREDENTIAL_TAG_LABEL: Record<CredentialMode, string> = {
-  subscription: "Subscription",
-  api: "API",
-};
-
 /**
  * The credential tag, swapping in a fixed-height slot.
  *
@@ -54,7 +50,7 @@ export function CredentialTag({ mode }: { mode: CredentialMode }) {
           animate={{ opacity: 1, y: 0, transition: TAG_SWAP_ENTER }}
           exit={{ opacity: 0, y: TAG_SWAP_TRAVEL, transition: TAG_SWAP_EXIT }}
         >
-          {CREDENTIAL_TAG_LABEL[mode]}
+          {mode === "subscription" ? tf("onboarding.subscription") : "API"}
         </motion.span>
       </AnimatePresence>
     </span>

@@ -119,7 +119,6 @@ import { PillGuy } from "./onboarding/PillGuy";
 import { SleepingZs } from "./onboarding/SleepingZs";
 import {
   AGENT_ARC_WIZARD_STEPS,
-  ONBOARDING_STEP_LABELS,
   ONBOARDING_WIZARD_STEPS,
   Stepper,
   agentArcStepFor,
@@ -1200,7 +1199,7 @@ function OnboardingWizardInner({
   */
   const connectCollapsed =
     connectPhase !== "idle" && connectPhase !== "unwindRow" && sourceSelected;
-  const connectProgress = adapterEnvLoading ? "Testing connection…" : loading ? "Connecting…" : null;
+  const connectProgress = adapterEnvLoading ? tf("onboarding.testingConnection") : loading ? tf("onboarding.connecting") : null;
   const hasSavedSubscription = Boolean(savedSubscription || savedKeys.storedLogin.data ||
     (credentialMode !== "api" && managedBindingForStep()));
   const connectHasCard = credentialMode === "api" || connectStepNeedsLogin || connectStepHasNoSandbox || Boolean(connectProgress);
@@ -1345,7 +1344,7 @@ function OnboardingWizardInner({
   const connectSourceLabel = CONNECT_SOURCE_NAMES[adapterType] ?? adapterType;
   const connectCta: { label: string; icon: FooterPrimaryIcon; disabled: boolean } =
     connectProgress
-      ? { label: adapterEnvLoading ? "Testing…" : connectProgress, icon: "spinner", disabled: true }
+      ? { label: adapterEnvLoading ? tf("onboarding.testingConnection") : connectProgress, icon: "spinner", disabled: true }
       : connectPhase === "waiting"
       ? { label: tf("auto.f22b705c3b7ce68f"), icon: "spinner", disabled: true }
       : connectPhase === "connecting"
@@ -1353,7 +1352,7 @@ function OnboardingWizardInner({
         : connectPhase === "ready"
           ? connectStepNeedsLogin
             ? {
-                label: `Sign in to ${connectSourceLabel}`,
+                label: tf("onboarding.signInTo", { provider: connectSourceLabel }),
                 icon: "none",
                 disabled: !connectAuthUrl,
               }
@@ -2422,7 +2421,12 @@ function OnboardingWizardInner({
                 <Stepper
                   step={onboardingStepPositionFor(step)}
                   total={ONBOARDING_WIZARD_STEPS.length}
-                  labels={ONBOARDING_STEP_LABELS}
+                  labels={[
+                    tf("onboarding.nameOrganization"),
+                    tf("onboarding.createFirstAgent"),
+                    tf("onboarding.connectModel"),
+                    tf("onboarding.review"),
+                  ]}
                   canJumpToStep={(target) =>
                     canJumpToOnboardingStep({
                       targetStep: ONBOARDING_WIZARD_STEPS[target - 1]!,
@@ -2442,6 +2446,11 @@ function OnboardingWizardInner({
               {showsAgentArcStepper && (
                 <Stepper
                   step={agentArcStepFor(step)!}
+                  labels={[
+                    tf("onboarding.createFirstAgent"),
+                    tf("onboarding.connectModel"),
+                    tf("onboarding.review"),
+                  ]}
                   canJumpToStep={(target) =>
                     canJumpToOnboardingStep({
                       targetStep: AGENT_ARC_WIZARD_STEPS[target - 1]!,
@@ -2502,19 +2511,19 @@ function OnboardingWizardInner({
                       center
                       title={
                         step === 3
-                          ? "Create your first agent"
+                          ? tf("onboarding.createFirstAgent")
                           : step === 4
-                            ? "Connect a model"
-                            : "Let's get started..."
+                            ? tf("onboarding.connectModel")
+                            : tf("onboarding.getStarted")
                       }
                       // The agent step carries no lede, as the prototype has it:
                       // the capsule and the heading say what this is, and a
                       // sentence restating it only pushes the fields down.
                       lede={
                         step === 3 ? undefined : step === 4 ? (
-                          <>Paperclip works with your subscription or API keys.</>
+                          <>{tf("onboarding.modelDescription")}</>
                         ) : (
-                          <>{agentName.trim() || "Your first agent"} is ready to work!</>
+                          <>{tf("onboarding.readyDescription", { agentName: agentName.trim() || tf("onboarding.firstAgent") })}</>
                         )
                       }
                     />
@@ -2536,7 +2545,7 @@ function OnboardingWizardInner({
                   <OnboardingHeading
                     center
                     title={tf("auto.315be75f1b324889")}
-                    lede="Welcome to Paperclip — let's set up your organization."
+                    lede={tf("onboarding.welcome")}
                   />
                   {/* The field takes the agent step's measure rather than the
                       column's, so the two questions the wizard asks — name the
@@ -2670,7 +2679,9 @@ function OnboardingWizardInner({
                     >
                       <div className="-ml-3 mt-1">
                         <CredentialModeLink mode={credentialMode} onChange={setCredentialMode} />
-                        {savedKeys.options.length > 0 && <p className="px-3 text-sm text-muted-foreground">{savedKeys.options.length} saved API {savedKeys.options.length === 1 ? "key available" : "keys available"}.</p>}
+                        {savedKeys.options.length > 0 && <p className="px-3 text-sm text-muted-foreground">{savedKeys.options.length === 1
+                          ? tf("onboarding.savedApiKeyAvailable")
+                          : tf("onboarding.savedApiKeysAvailable", { count: savedKeys.options.length })}</p>}
                         {credentialMode === "subscription" && authSignalStatus === "present" && <p className="px-3 text-sm text-muted-foreground">{tf("auto.e34ff189bffb6e8f")}</p>}
                       </div>
                     </motion.div>
@@ -2719,9 +2730,11 @@ function OnboardingWizardInner({
                       </p>
                     ) : credentialMode === "api" ? (
                       <OnboardingLoginCard
-                        instruction={savedKeys.options.length ? "Choose a saved API key or enter a new one" : `Provide your ${
-                          CONNECT_SOURCE_NAMES[adapterType] ?? adapterType
-                        } API key to connect`}
+                        instruction={savedKeys.options.length
+                          ? tf("onboarding.chooseSavedApiKey")
+                          : tf("onboarding.provideApiKey", {
+                              provider: CONNECT_SOURCE_NAMES[adapterType] ?? adapterType,
+                            })}
                       >
                         <SavedProviderKeySelect {...savedKeys} disabled={loading || adapterEnvLoading} value={selectedApiKey?.id ?? ""} onChange={(id) => {
                           setSelectedSavedKey(createdCompanyId ? { companyId: createdCompanyId, envKey: apiKeyEnvKeyFor(adapterType), id } : null);
@@ -3038,19 +3051,19 @@ function OnboardingWizardInner({
                   // prototype's own local flow draws with "Next".
                   primaryLabel={
                     step === 1
-                      ? "Continue"
+                      ? tf("onboarding.continue")
                       : step === 5
-                        ? "Get started"
+                        ? tf("onboarding.getStarted")
                         : step === 4
                           ? connectCta.label: tf("text.Next")
                   }
                   primaryIcon={step === 4 ? connectCta.icon : undefined}
                   loadingLabel={
                     step === 1
-                      ? "Creating..."
+                      ? tf("onboarding.creating")
                       : step === 4
-                        ? "Connecting"
-                        : "Launching..."
+                        ? tf("onboarding.connectingShort")
+                        : tf("onboarding.launching")
                   }
                   // The browser-code login is finished on this screen, so the
                   // button is genuinely busy for its duration and shows it. The
