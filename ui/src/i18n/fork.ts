@@ -14,13 +14,14 @@ export function tf(key: ForkMessageKey, options: TOptions = {}): string {
 }
 
 export function statusLabel(status: string, fallback: string): string {
-  if (i18n.language !== "de") return fallback;
+  if (!i18n.language.startsWith("de")) return fallback;
   const key = `status.${status}`;
   return Object.hasOwn(en, key) ? tf(key as ForkMessageKey) : fallback;
 }
 
-export function getUiLocale(): "de-CH" | "en-US" {
-  return i18n.language === "de" ? "de-CH" : "en-US";
+export function getUiLocale(): "de-DE" | "de-AT" | "de-CH" | "en-US" {
+  if (i18n.language === "de-DE" || i18n.language === "de-AT" || i18n.language === "de-CH") return i18n.language;
+  return i18n.language.startsWith("de") ? "de-CH" : "en-US";
 }
 
 export function formatUiNumber(value: number): string {

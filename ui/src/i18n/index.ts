@@ -10,13 +10,16 @@ const resources = {
   ...i18nextResources,
   en: { ...i18nextResources.en, fork: forkEnglish },
   de: { ...i18nextResources.de, fork: forkGerman },
+  "de-DE": { ...i18nextResources.de, fork: forkGerman },
+  "de-AT": { ...i18nextResources.de, fork: forkGerman },
+  "de-CH": { ...i18nextResources.de, fork: forkGerman },
 };
 
 const i18nextOptions: InitOptions = {
   resources,
   lng: readLanguage(),
   fallbackLng: DEFAULT_LOCALE,
-  supportedLngs: supportedLocales,
+  supportedLngs: [...supportedLocales, "de-DE", "de-AT", "de-CH"],
   defaultNS: "translation",
   interpolation: { escapeValue: false },
   returnObjects: false,
@@ -28,7 +31,7 @@ void i18n.use(initReactI18next).init(i18nextOptions).catch((error: unknown) => {
 });
 
 if (typeof document !== "undefined") {
-  document.documentElement.lang = i18n.language === "de" ? "de-CH" : "en";
+  document.documentElement.lang = i18n.language.startsWith("de") ? i18n.language : "en";
 }
 
 export function t(key: string, options: TOptions = {}) {
