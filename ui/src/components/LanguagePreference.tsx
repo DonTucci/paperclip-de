@@ -18,9 +18,7 @@ export function LanguagePreference() {
         onChange={(event) => setLanguage(event.target.value as ForkLanguage)}
         className="rounded-md border border-input bg-background px-3 py-2 text-sm"
       >
-        <option value="de-DE">Deutsch (Deutschland)</option>
-        <option value="de-AT">Deutsch (Österreich)</option>
-        <option value="de-CH">Deutsch (Schweiz)</option>
+        <option value="de">{tf("auto.b0f39c44af654d3a")}</option>
         <option value="en">{tf("auto.ba118bf7fc9c1aed")}</option>
       </select>
       <Button

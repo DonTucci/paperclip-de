@@ -1,10 +1,9 @@
 export const LANGUAGE_STORAGE_KEY = "paperclip.ui.language";
-export type ForkLanguage = "de-DE" | "de-AT" | "de-CH" | "en";
+export type ForkLanguage = "de" | "en";
 
 export function readLanguage(): ForkLanguage {
   try {
-    const saved = globalThis.localStorage?.getItem(LANGUAGE_STORAGE_KEY);
-    return saved === "en" || saved === "de-DE" || saved === "de-AT" || saved === "de-CH" ? saved : "de-CH";
+    return globalThis.localStorage?.getItem(LANGUAGE_STORAGE_KEY) === "en" ? "en" : "de";
   } catch {
     return "de";
   }

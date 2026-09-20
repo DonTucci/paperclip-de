@@ -17,9 +17,9 @@ afterEach(async () => {
 describe("deutscher Fork", () => {
   it("verwendet Deutsch ohne gespeicherte Auswahl", () => {
     localStorage.removeItem(LANGUAGE_STORAGE_KEY);
-    expect(readLanguage()).toBe("de-CH");
+    expect(readLanguage()).toBe("de");
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "invalid");
-    expect(readLanguage()).toBe("de-CH");
+    expect(readLanguage()).toBe("de");
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     expect(readLanguage()).toBe("en");
   });
