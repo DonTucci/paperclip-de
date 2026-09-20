@@ -13,8 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Server
-            command: node scripts/run-vitest-stable.mjs --mode general --group general-server
+          - name: Server 1
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 0 --shard-count 3
+          - name: Server 2
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 1 --shard-count 3
+          - name: Server 3
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 2 --shard-count 3
           - name: Workspaces A
             command: node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-a
           - name: Workspaces B
