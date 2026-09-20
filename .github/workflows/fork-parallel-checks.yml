@@ -14,11 +14,15 @@ jobs:
       matrix:
         include:
           - name: Server 1
-            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 0 --shard-count 3
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 0 --shard-count 5
           - name: Server 2
-            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 1 --shard-count 3
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 1 --shard-count 5
           - name: Server 3
-            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 2 --shard-count 3
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 2 --shard-count 5
+          - name: Server 4
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 3 --shard-count 5
+          - name: Server 5
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 4 --shard-count 5
           - name: Workspaces A
             command: node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-a
           - name: Workspaces B
