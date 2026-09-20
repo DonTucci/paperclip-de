@@ -484,7 +484,12 @@ export function LocalProviderLoginInstructions({ adapterType, login }: {
       {!showCommand && <button type="button" className="underline underline-offset-4" onClick={() => setShowCommand(true)}>{tf("onboarding.useDifferentAccount")}</button>}
     </> : <p>{tf(isolated ? "onboarding.signInLocal" : "onboarding.connectsLocal", { provider })}</p>}
     {(!ready || showCommand) && !login?.error && <>
-      <p>{tf("auto.98b7fd47b3b8f21b")}</p>
+      {isolated && <p className="font-medium text-foreground">{tf("onboarding.signInForPaperclip", { provider })}</p>}
+      <ol className="list-decimal space-y-1 pl-5">
+        <li>{tf("onboarding.loginStepOpenTerminal")}</li>
+        <li>{tf("onboarding.loginStepRunCommand")}</li>
+        <li>{tf("onboarding.loginStepFinishInBrowser")}</li>
+      </ol>
       {command && <div className="flex min-w-0 max-w-full items-start gap-2 rounded-md border bg-muted p-3 text-foreground">
         <pre className="min-w-0 flex-1 whitespace-pre-wrap break-all font-mono text-xs"><code>{command}</code></pre>
         <LoginCardCopyButton value={command} label={tf("auto.20cc735b64b8fe82")} />

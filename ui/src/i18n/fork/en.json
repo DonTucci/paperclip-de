@@ -6067,5 +6067,9 @@
   "onboarding.apiKey": "API key",
   "onboarding.enterNewApiKey": "Enter a new API key",
   "onboarding.signInAnotherAccount": "Sign in to another account",
-  "onboarding.reuseSavedCredential": "Reuse this saved {{credential}} for this agent."
+  "onboarding.reuseSavedCredential": "Reuse this saved {{credential}} for this agent.",
+  "onboarding.signInForPaperclip": "Sign in to {{provider}} for Paperclip",
+  "onboarding.loginStepOpenTerminal": "Open a terminal on this computer.",
+  "onboarding.loginStepRunCommand": "Copy the command below, paste it into the terminal, and press Enter.",
+  "onboarding.loginStepFinishInBrowser": "Finish signing in in your browser, then return here. Paperclip checks the connection automatically."
 }

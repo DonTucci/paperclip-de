@@ -16,15 +16,28 @@ function loginHome(id: string) {
   return path.join(resolvePaperclipInstanceRoot(), "ai-local-logins", id);
 }
 const shellQuote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
+const powerShellQuote = (value: string) => `'${value.replaceAll("'", "''")}'`;
+
+function loginCommand(directory: string, provider: string) {
+  if (process.platform === "win32") {
+    return provider === "openai"
+      ? `$env:CODEX_HOME = ${powerShellQuote(directory)}; New-Item -ItemType Directory -Force -Path $env:CODEX_HOME | Out-Null; codex -c 'cli_auth_credentials_store="file"' login --device-auth`
+      : provider === "anthropic"
+        ? `$env:CLAUDE_CONFIG_DIR = ${powerShellQuote(directory)}; New-Item -ItemType Directory -Force -Path $env:CLAUDE_CONFIG_DIR | Out-Null; claude auth login`
+        : `$env:GROK_HOME = ${powerShellQuote(directory)}; New-Item -ItemType Directory -Force -Path $env:GROK_HOME | Out-Null; grok login --device-auth`;
+  }
+  return provider === "openai"
+    ? `(export CODEX_HOME=${shellQuote(directory)} && mkdir -p "$CODEX_HOME" && codex -c 'cli_auth_credentials_store="file"' login --device-auth)`
+    : provider === "anthropic"
+      ? `(export CLAUDE_CONFIG_DIR=${shellQuote(directory)} && mkdir -p "$CLAUDE_CONFIG_DIR" && claude auth login)`
+      : `(export GROK_HOME=${shellQuote(directory)} && mkdir -p "$GROK_HOME" && grok login --device-auth)`;
+}
+
 function presentAttempt(id: string, expiresAt: Date, provider: string): LocalAiLoginAttempt {
   const directory = loginHome(id);
   return {
     sessionId: id, expiresAt: expiresAt.toISOString(),
-    command: provider === "openai"
-      ? `(export CODEX_HOME=${shellQuote(directory)} && mkdir -p "$CODEX_HOME" && codex -c 'cli_auth_credentials_store="file"' login --device-auth)`
-      : provider === "anthropic"
-        ? `(export CLAUDE_CONFIG_DIR=${shellQuote(directory)} && mkdir -p "$CLAUDE_CONFIG_DIR" && claude auth login)`
-        : `(export GROK_HOME=${shellQuote(directory)} && mkdir -p "$GROK_HOME" && grok login --device-auth)`,
+    command: loginCommand(directory, provider),
   };
 }
 async function prepareHome(id: string, provider: string) {

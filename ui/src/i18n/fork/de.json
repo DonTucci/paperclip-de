@@ -6067,5 +6067,9 @@
   "onboarding.apiKey": "API-Schlüssel",
   "onboarding.enterNewApiKey": "Neuen API-Schlüssel eingeben",
   "onboarding.signInAnotherAccount": "Bei einem anderen Konto anmelden",
-  "onboarding.reuseSavedCredential": "Gespeicherten {{credential}} für diesen Agenten wiederverwenden."
+  "onboarding.reuseSavedCredential": "Gespeicherten {{credential}} für diesen Agenten wiederverwenden.",
+  "onboarding.signInForPaperclip": "{{provider}} für Paperclip anmelden",
+  "onboarding.loginStepOpenTerminal": "Öffnen Sie auf diesem Computer Windows Terminal oder PowerShell.",
+  "onboarding.loginStepRunCommand": "Kopieren Sie den folgenden Befehl, fügen Sie ihn im Terminal ein und drücken Sie die Eingabetaste.",
+  "onboarding.loginStepFinishInBrowser": "Schliessen Sie die Anmeldung im Browser ab und kehren Sie danach hierher zurück. Paperclip prüft die Verbindung automatisch."
 }
