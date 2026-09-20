@@ -10,6 +10,10 @@ $utf8 = New-Object System.Text.UTF8Encoding($false)
 $OutputEncoding = $utf8
 $repository = 'https://github.com/DonTucci/paperclip-de.git'
 $branch = 'fork/deutsch'
+$releaseTag = '__RELEASE_TAG__'
+if ($releaseTag -eq '__RELEASE_TAG__') {
+  $releaseTag = $env:PAPERCLIP_DE_RELEASE_TAG
+}
 
 function Ensure-Command([string]$Name, [string[]]$Candidates, [string]$InstallHint) {
   if (Get-Command $Name -ErrorAction SilentlyContinue) {
@@ -74,6 +78,11 @@ Push-Location $InstallPath
 try {
   Write-Host 'Installiere Abhängigkeiten. Dieser Schritt kann mehrere Minuten dauern ...'
   Invoke-Checked 'corepack' @('pnpm@9.15.4', 'install', '--frozen-lockfile')
+  Write-Host 'Richte den vorkompilierten Windows-Runner ein ...'
+  & (Join-Path $InstallPath 'scripts\download-runner-windows.ps1') -InstallPath $InstallPath -ReleaseTag $releaseTag
+  if ($LASTEXITCODE -ne 0) {
+    throw "Der vorkompilierte Windows-Runner konnte nicht eingerichtet werden."
+  }
   Write-Host "Paperclip auf Deutsch wurde unter $InstallPath eingerichtet."
   if ($Start) {
     & corepack pnpm@9.15.4 dev:once

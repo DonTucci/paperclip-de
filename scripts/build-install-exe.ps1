@@ -22,7 +22,8 @@ if (-not (Test-Path $windowsPowerShell)) {
 
 New-Item -ItemType Directory -Path $temporaryDirectory -Force | Out-Null
 try {
-  $scriptBase64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Content -LiteralPath $scriptPath -Raw)))
+  $installScript = (Get-Content -LiteralPath $scriptPath -Raw).Replace("'__RELEASE_TAG__'", "'$Version'")
+  $scriptBase64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($installScript))
   $source = (Get-Content -LiteralPath $templatePath -Raw).Replace('__SCRIPT_BASE64__', $scriptBase64)
   Set-Content -LiteralPath $sourcePath -Value $source -Encoding UTF8
 

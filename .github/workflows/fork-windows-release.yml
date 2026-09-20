@@ -1,0 +1,137 @@
+name: Deutsche Windows-Veröffentlichung
+
+on:
+  push:
+    tags:
+      - 'de-v*'
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Quellbranch oder Commit für den Build
+        required: true
+        default: fork/deutsch
+        type: string
+      release_tag:
+        description: Release-Tag, zum Beispiel de-v2026.920.0
+        required: true
+        type: string
+      publish:
+        description: GitHub Release mit den Dateien veröffentlichen
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deutsche-windows-veröffentlichung-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Windows-Paket bauen
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - name: Quellcode laden
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.ref }}
+          fetch-depth: 0
+
+      - name: pnpm einrichten
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Rust für Windows einrichten
+        shell: pwsh
+        run: |
+          rustup toolchain install stable-x86_64-pc-windows-msvc --profile minimal
+          rustup default stable-x86_64-pc-windows-msvc
+          rustc --version
+
+      - name: Abhängigkeiten ohne Build-Skripte installieren
+        shell: pwsh
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Native Runner bauen
+        shell: pwsh
+        run: pnpm --filter @paperclipai/paperclip-runner build:binary
+
+      - name: Installer und Prüfsummen vorbereiten
+        id: package
+        shell: pwsh
+        env:
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+          EVENT_TAG: ${{ github.ref_name }}
+        run: |
+          $tag = if ($env:INPUT_RELEASE_TAG) { $env:INPUT_RELEASE_TAG } else { $env:EVENT_TAG }
+          if ($tag -notmatch '^de-v[0-9]+\.[0-9]+\.[0-9]+$') {
+            throw "Ungültiger Release-Tag: $tag"
+          }
+          $output = Join-Path $env:GITHUB_WORKSPACE 'release-output'
+          New-Item -ItemType Directory -Path $output -Force | Out-Null
+          pwsh -NoLogo -NoProfile -File scripts/build-install-exe.ps1 -Version $tag -OutputDirectory $output
+          $runner = 'packages/paperclip-runner/dist/bin/paperclip-runnerd.exe'
+          if (-not (Test-Path -LiteralPath $runner)) { throw "Runner-Datei fehlt: $runner" }
+          Copy-Item -LiteralPath $runner -Destination (Join-Path $output 'paperclip-runnerd-windows-x64.exe') -Force
+          $checksums = foreach ($file in (Get-ChildItem -LiteralPath $output -Filter '*.exe' -File)) {
+            $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $file.FullName).Hash.ToLowerInvariant()
+            "$hash  $($file.Name)"
+          }
+          $checksums | Set-Content -LiteralPath (Join-Path $output 'SHA256SUMS.txt') -Encoding ascii
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Get-ChildItem -LiteralPath $output -File | Select-Object Name,Length
+
+      - name: Windows-Dateien signieren
+        if: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 != '' && secrets.WINDOWS_SIGN_CERT_PASSWORD != '' }}
+        shell: pwsh
+        env:
+          WINDOWS_SIGN_CERT_BASE64: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 }}
+          WINDOWS_SIGN_CERT_PASSWORD: ${{ secrets.WINDOWS_SIGN_CERT_PASSWORD }}
+        run: |
+          $certificate = Join-Path $env:RUNNER_TEMP 'paperclip-de-signing.pfx'
+          [IO.File]::WriteAllBytes($certificate, [Convert]::FromBase64String($env:WINDOWS_SIGN_CERT_BASE64))
+          $signtool = Get-ChildItem "$env:ProgramFiles(x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw 'signtool.exe wurde nicht gefunden.' }
+          Get-ChildItem 'release-output' -Filter '*.exe' | ForEach-Object {
+            & $signtool.FullName sign /fd SHA256 /td SHA256 /tr https://timestamp.digicert.com /f $certificate /p $env:WINDOWS_SIGN_CERT_PASSWORD $_.FullName
+            if ($LASTEXITCODE -ne 0) { throw "Signieren fehlgeschlagen: $($_.Name)" }
+          }
+
+      - name: Hinweis bei fehlender Signatur
+        if: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 == '' || secrets.WINDOWS_SIGN_CERT_PASSWORD == '' }}
+        shell: pwsh
+        run: Write-Host '::warning::Kein Windows-Signaturzertifikat hinterlegt. Die Dateien bleiben unsigniert und können SmartScreen anzeigen.'
+
+      - name: Windows-Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: paperclip-de-windows-${{ steps.package.outputs.tag }}
+          path: release-output/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: GitHub Release veröffentlichen
+        if: ${{ startsWith(github.ref, 'refs/tags/de-v') || inputs.publish == true }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.package.outputs.tag }}
+        run: |
+          gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --title "Paperclip auf Deutsch $env:RELEASE_TAG" --generate-notes --target $env:GITHUB_SHA
+            if ($LASTEXITCODE -ne 0) { throw 'GitHub Release konnte nicht erstellt werden.' }
+          }
+          gh release upload $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --clobber release-output/*
+          if ($LASTEXITCODE -ne 0) { throw 'Windows-Dateien konnten nicht an das GitHub Release angehängt werden.' }
