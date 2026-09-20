@@ -33,6 +33,8 @@ jobs:
     name: Windows-Paket bauen
     runs-on: windows-2022
     timeout-minutes: 60
+    env:
+      WINDOWS_SIGNING_CONFIGURED: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 != '' && secrets.WINDOWS_SIGN_CERT_PASSWORD != '' }}
     steps:
       - name: Quellcode laden
         uses: actions/checkout@v4
@@ -93,7 +95,7 @@ jobs:
           Get-ChildItem -LiteralPath $output -File | Select-Object Name,Length
 
       - name: Windows-Dateien signieren
-        if: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 != '' && secrets.WINDOWS_SIGN_CERT_PASSWORD != '' }}
+        if: ${{ env.WINDOWS_SIGNING_CONFIGURED == 'true' }}
         shell: pwsh
         env:
           WINDOWS_SIGN_CERT_BASE64: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 }}
@@ -109,7 +111,7 @@ jobs:
           }
 
       - name: Hinweis bei fehlender Signatur
-        if: ${{ secrets.WINDOWS_SIGN_CERT_BASE64 == '' || secrets.WINDOWS_SIGN_CERT_PASSWORD == '' }}
+        if: ${{ env.WINDOWS_SIGNING_CONFIGURED != 'true' }}
         shell: pwsh
         run: Write-Host '::warning::Kein Windows-Signaturzertifikat hinterlegt. Die Dateien bleiben unsigniert und können SmartScreen anzeigen.'
 
