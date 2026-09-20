@@ -78,3 +78,7 @@ tests/storybook-visual/playwright-report/
 .vercel/
 .env.local
 test-results/
+
+# Lokale Windows-Installer werden als GitHub-Release-Assets veröffentlicht.
+releases/windows/*.exe
+releases/windows/*.DDF

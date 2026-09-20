@@ -4,9 +4,13 @@ Dies ist der vorbereitete deutsche Paperclip-Fork mit Schweizer Schreibweise. Di
 
 ## Direkt herunterladen und installieren
 
-**[Windows-Installationsroutine herunterladen](https://github.com/DonTucci/paperclip-de/releases/download/de-v2026.916.0/install-de.ps1)** · **[Release öffnen](https://github.com/DonTucci/paperclip-de/releases/tag/de-v2026.916.0)**
+**[Windows-Installer (EXE) herunterladen](https://github.com/DonTucci/paperclip-de/releases/download/de-v2026.916.1/Paperclip-DE-Setup-de-v2026.916.1.exe)** · **[Release öffnen](https://github.com/DonTucci/paperclip-de/releases/tag/de-v2026.916.1)**
 
-Die Installationsroutine richtet die deutsche Version automatisch ein. Voraussetzung sind Git und Node.js 24.11 oder neuer. Nach dem Download in PowerShell ausführen:
+Die EXE startet die Installationsroutine automatisch. Voraussetzung sind Git und Node.js 24.11 oder neuer. EXE herunterladen, doppelt anklicken und den Anweisungen folgen. Die EXE enthält keine Node.js- oder Git-Kopie; diese Programme werden für den Quellcode und die Abhängigkeiten benötigt.
+
+Wer lieber PowerShell verwendet, kann die einzelne Installationsroutine herunterladen:
+
+[install-de.ps1 herunterladen](https://github.com/DonTucci/paperclip-de/releases/download/de-v2026.916.1/install-de.ps1)
 
 ```powershell
 .\install-de.ps1
