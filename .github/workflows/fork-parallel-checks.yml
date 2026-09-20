@@ -35,8 +35,27 @@ jobs:
       - run: pnpm -r typecheck
 
   tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Server
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-server
+          - name: Workspaces A
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-a
+          - name: Workspaces B
+            command: node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-b
+          - name: Serialized 1
+            command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 0 --shard-count 4
+          - name: Serialized 2
+            command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 1 --shard-count 4
+          - name: Serialized 3
+            command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 2 --shard-count 4
+          - name: Serialized 4
+            command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 3 --shard-count 4
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    name: Tests – ${{ matrix.name }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -44,7 +63,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '24', cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test:run
+      - run: ${{ matrix.command }}
 
   build:
     runs-on: ubuntu-latest
