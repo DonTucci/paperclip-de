@@ -29,7 +29,7 @@ try {
 
   @'
 param([string]$SourcePath, [string]$OutputPath)
-Add-Type -Path $SourcePath -OutputType ConsoleApplication -OutputAssembly $OutputPath
+Add-Type -Path $SourcePath -OutputType WindowsApplication -OutputAssembly $OutputPath -ReferencedAssemblies @('System.Windows.Forms.dll', 'System.Drawing.dll')
 '@ | Set-Content -LiteralPath $compileScriptPath -Encoding UTF8
 
   if (Test-Path $outputPath) { Remove-Item -LiteralPath $outputPath -Force }
