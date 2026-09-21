@@ -10,6 +10,9 @@ internal static class PaperclipDeSetup
 {
     // Der Build ersetzt diesen Platzhalter durch install-de.ps1 als Base64-Text.
     private const string InstallScriptBase64 = "__SCRIPT_BASE64__";
+    // Der vorkompilierte Windows-Runner wird als Ressource eingebettet, damit
+    // die EXE ohne separates Release-Asset installiert werden kann.
+    private const string BundledRunnerResourceName = "PaperclipDeSetup.paperclip-runnerd.exe";
 
     [STAThread]
     public static void Main(string[] args)
@@ -157,6 +160,7 @@ internal static class PaperclipDeSetup
         private int RunInstaller()
         {
             string scriptPath = Path.Combine(Path.GetTempPath(), "paperclip-de-install-" + Guid.NewGuid().ToString("N") + ".ps1");
+            string runnerPath = Path.Combine(Path.GetTempPath(), "paperclip-de-runner-" + Guid.NewGuid().ToString("N") + ".exe");
             try
             {
                 File.WriteAllText(
@@ -164,11 +168,13 @@ internal static class PaperclipDeSetup
                     Encoding.UTF8.GetString(Convert.FromBase64String(InstallScriptBase64)),
                     // Windows PowerShell 5.1 erkennt UTF-8 ohne BOM sonst als ANSI.
                     new UTF8Encoding(true));
+                CopyBundledRunner(runnerPath);
 
                 string powershell = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.Windows),
                     "System32\\WindowsPowerShell\\v1.0\\powershell.exe");
                 string arguments = "-NoLogo -NoProfile -ExecutionPolicy Bypass -File " + Quote(scriptPath);
+                arguments += " -BundledRunnerPath " + Quote(runnerPath);
                 foreach (string argument in installArguments)
                     arguments += " " + Quote(argument);
 
@@ -210,6 +216,7 @@ internal static class PaperclipDeSetup
             finally
             {
                 try { if (File.Exists(scriptPath)) File.Delete(scriptPath); } catch { }
+                try { if (File.Exists(runnerPath)) File.Delete(runnerPath); } catch { }
             }
         }
 
@@ -228,6 +235,17 @@ internal static class PaperclipDeSetup
                 statusLabel.Text = "Paperclip DE konnte nicht gestartet werden";
                 statusLabel.ForeColor = Color.FromArgb(252, 165, 165);
                 WriteLine("Fehler: " + error.Message);
+            }
+        }
+
+        private static void CopyBundledRunner(string destinationPath)
+        {
+            using (Stream source = typeof(PaperclipDeSetup).Assembly.GetManifestResourceStream(BundledRunnerResourceName))
+            {
+                if (source == null)
+                    throw new InvalidOperationException("Der in der EXE enthaltene Windows-Runner fehlt.");
+                using (var destination = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None))
+                    source.CopyTo(destination);
             }
         }
 

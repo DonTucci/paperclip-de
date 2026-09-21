@@ -2,7 +2,8 @@
 param(
   [string]$InstallPath = (Join-Path $env:LOCALAPPDATA 'Paperclip-DE'),
   [switch]$Start,
-  [switch]$SkipPrerequisiteInstall
+  [switch]$SkipPrerequisiteInstall,
+  [string]$BundledRunnerPath = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -92,6 +93,21 @@ function New-PaperclipShortcut([string]$TargetInstallPath) {
   Write-Host "Desktop-Verknüpfung wurde erstellt: $shortcutPath"
 }
 
+function Install-BundledRunner([string]$TargetInstallPath, [string]$SourcePath) {
+  if (-not (Test-Path -LiteralPath $SourcePath)) {
+    throw "Der in der EXE enthaltene Windows-Runner wurde nicht gefunden: $SourcePath"
+  }
+  $sourceFile = Get-Item -LiteralPath $SourcePath
+  if ($sourceFile.Length -lt 1MB) {
+    throw "Der in der EXE enthaltene Windows-Runner ist unerwartet klein ($($sourceFile.Length) Bytes)."
+  }
+  $runnerDirectory = Join-Path $TargetInstallPath 'packages\paperclip-runner\dist\bin'
+  $runnerPath = Join-Path $runnerDirectory 'paperclip-runnerd.exe'
+  New-Item -ItemType Directory -Path $runnerDirectory -Force | Out-Null
+  Copy-Item -LiteralPath $SourcePath -Destination $runnerPath -Force
+  Write-Host 'Der vorkompilierte Windows-Runner wurde aus der EXE eingerichtet.'
+}
+
 Write-Host 'Prüfe Voraussetzungen ...'
 $gitPath = Ensure-Command 'git' @(
   (Join-Path $env:ProgramFiles 'Git\cmd\git.exe'),
@@ -139,10 +155,14 @@ Push-Location $InstallPath
 try {
   Write-Host 'Installiere Abhängigkeiten. Dieser Schritt kann mehrere Minuten dauern ...'
   Invoke-Checked 'corepack' @('pnpm@9.15.4', 'install', '--frozen-lockfile')
-  Write-Host 'Richte den vorkompilierten Windows-Runner ein ...'
-  & (Join-Path $InstallPath 'scripts\download-runner-windows.ps1') -InstallPath $InstallPath -ReleaseTag $releaseTag
-  if ($LASTEXITCODE -ne 0) {
-    throw "Der vorkompilierte Windows-Runner konnte nicht eingerichtet werden."
+  if (-not [string]::IsNullOrWhiteSpace($BundledRunnerPath)) {
+    Install-BundledRunner $InstallPath $BundledRunnerPath
+  } else {
+    Write-Host 'Richte den vorkompilierten Windows-Runner ein ...'
+    & (Join-Path $InstallPath 'scripts\download-runner-windows.ps1') -InstallPath $InstallPath -ReleaseTag $releaseTag
+    if ($LASTEXITCODE -ne 0) {
+      throw "Der vorkompilierte Windows-Runner konnte nicht eingerichtet werden."
+    }
   }
   New-PaperclipShortcut $InstallPath
   Write-Host "Paperclip DE wurde unter $InstallPath eingerichtet."
