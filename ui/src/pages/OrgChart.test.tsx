@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { queryKeys } from "@/lib/queryKeys";
-import { OrgChart } from "./OrgChart";
+import { hierarchyChangeIssue, OrgChart } from "./OrgChart";
 
 const navigateMock = vi.fn();
 const orgMock = vi.fn();
@@ -28,6 +28,7 @@ vi.mock("../api/agents", () => ({
   agentsApi: {
     org: () => orgMock(),
     list: () => listMock(),
+    update: vi.fn(),
   },
 }));
 
@@ -106,6 +107,18 @@ const agents = [
     permissions: null,
   },
 ];
+
+describe("hierarchyChangeIssue", () => {
+  it("permits a new manager and moving an agent to board level", () => {
+    expect(hierarchyChangeIssue(agents, "agent-2", "agent-1")).toBe("unchanged");
+    expect(hierarchyChangeIssue(agents, "agent-2", null)).toBeNull();
+  });
+
+  it("rejects self-references and reporting cycles before saving", () => {
+    expect(hierarchyChangeIssue(agents, "agent-1", "agent-1")).toBe("self");
+    expect(hierarchyChangeIssue(agents, "agent-1", "agent-2")).toBe("cycle");
+  });
+});
 
 function createTouchEvent(type: string, touches: Array<{ clientX: number; clientY: number }>) {
   const event = new Event(type, { bubbles: true, cancelable: true });

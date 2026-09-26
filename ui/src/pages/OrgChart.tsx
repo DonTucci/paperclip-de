@@ -1,7 +1,7 @@
 import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "@/lib/router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { agentsApi, type OrgNode } from "../api/agents";
 import { useCompany } from "../context/CompanyContext";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
@@ -9,13 +9,24 @@ import { queryKeys } from "../lib/queryKeys";
 import { agentUrl } from "../lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { EmptyState } from "../components/EmptyState";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { AgentIcon } from "../components/AgentIconPicker";
-import { Download, Maximize2, Minus, Network, Plus, Upload } from "lucide-react";
+import { Download, Link2, Maximize2, Minus, Network, Plus, Unlink, Upload } from "lucide-react";
 import { AGENT_ROLE_LABELS, type Agent } from "@paperclipai/shared";
 import { useCloudInstance } from "@/hooks/useCloudInstance";
 import { useHiddenSettings } from "@/hooks/useHiddenSettings";
+import { useOptionalToastActions } from "../context/ToastContext";
 
 // Layout constants
 const CARD_W = 200;
@@ -53,6 +64,48 @@ interface TouchGesture {
   startDistance: number;
   startCenter: Point;
   moved: boolean;
+}
+
+interface RelationshipDrag {
+  sourceId: string;
+  pointer: Point;
+  targetId: string | null;
+}
+
+interface PendingHierarchyChange {
+  sourceId: string;
+  targetId: string | null;
+}
+
+export type HierarchyChangeIssue = "self" | "cycle" | "unchanged" | null;
+
+/**
+ * Visuelle Absicherung für Hierarchieänderungen. Der Server setzt dieselben
+ * Regeln durch; hier kann das Organigramm aber vor dem Speichern erklären,
+ * weshalb eine Verbindung ungültig ist.
+ */
+export function hierarchyChangeIssue(
+  agents: Pick<Agent, "id" | "reportsTo">[],
+  sourceId: string,
+  targetId: string | null,
+): HierarchyChangeIssue {
+  if (targetId === null) return null;
+  if (sourceId === targetId) return "self";
+
+  const source = agents.find((agent) => agent.id === sourceId);
+  if (!source) return "cycle";
+  if (source.reportsTo === targetId) return "unchanged";
+
+  const byId = new Map(agents.map((agent) => [agent.id, agent]));
+  const visited = new Set<string>();
+  let cursor: string | null = targetId;
+  while (cursor) {
+    if (cursor === sourceId) return "cycle";
+    if (visited.has(cursor)) return "cycle";
+    visited.add(cursor);
+    cursor = byId.get(cursor)?.reportsTo ?? null;
+  }
+  return null;
 }
 
 // ── Layout algorithm ────────────────────────────────────────────────────
@@ -210,6 +263,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   const { selectedCompanyId } = useCompany();
   const { setBreadcrumbs } = useBreadcrumbs();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const toastActions = useOptionalToastActions();
   // Import is floored server-side on cloud-managed instances (403 cloud_managed), so the
   // button is hidden rather than dead-ending. Export stays available. Both
   // buttons also respect the operator-hidden settings registry.
@@ -231,12 +286,43 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   });
   const orgTree = providedOrgTree ?? queriedOrgTree;
   const agents = providedAgents ?? queriedAgents;
+  const [relationshipDrag, setRelationshipDrag] = useState<RelationshipDrag | null>(null);
+  const [pendingHierarchyChange, setPendingHierarchyChange] = useState<PendingHierarchyChange | null>(null);
+  const [relationshipWarning, setRelationshipWarning] = useState<string | null>(null);
 
   const agentMap = useMemo(() => {
     const m = new Map<string, Agent>();
     for (const a of agents ?? []) m.set(a.id, a);
     return m;
   }, [agents]);
+
+  const updateHierarchy = useMutation({
+    mutationFn: ({ sourceId, targetId }: PendingHierarchyChange) =>
+      agentsApi.update(sourceId, { reportsTo: targetId }, selectedCompanyId ?? undefined),
+    onSuccess: (_, change) => {
+      if (selectedCompanyId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.agents.list(selectedCompanyId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.org(selectedCompanyId) });
+      }
+      const source = agentMap.get(change.sourceId);
+      const target = change.targetId ? agentMap.get(change.targetId) : undefined;
+      toastActions?.pushToast({
+        title: tf("orgChart.hierarchySaved"),
+        body: target
+          ? tf("orgChart.hierarchySavedWithManager", { agent: source?.name ?? "", manager: target.name })
+          : tf("orgChart.hierarchySavedToBoard", { agent: source?.name ?? "" }),
+        tone: "success",
+      });
+      setPendingHierarchyChange(null);
+    },
+    onError: (error) => {
+      toastActions?.pushToast({
+        title: tf("orgChart.hierarchySaveFailed"),
+        body: error instanceof Error ? error.message : tf("orgChart.hierarchySaveFailedDescription"),
+        tone: "error",
+      });
+    },
+  });
 
   useEffect(() => {
     if (!embedded) setBreadcrumbs([{ label: tf("auto.aab3e6c8a0d87c7d") }]);
@@ -301,6 +387,52 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     setPan(fitted.pan);
   }, [allNodes, bounds]);
 
+  const relationshipIssueMessage = useCallback((issue: Exclude<HierarchyChangeIssue, null>) => {
+    if (issue === "self") return tf("orgChart.hierarchyCannotReportToSelf");
+    if (issue === "unchanged") return tf("orgChart.hierarchyAlreadyReportsToManager");
+    return tf("orgChart.hierarchyCannotCreateCycle");
+  }, []);
+
+  const proposeHierarchyChange = useCallback((sourceId: string, targetId: string | null) => {
+    const issue = hierarchyChangeIssue(agents ?? [], sourceId, targetId);
+    if (issue) {
+      setRelationshipWarning(relationshipIssueMessage(issue));
+      return;
+    }
+    setRelationshipWarning(null);
+    setPendingHierarchyChange({ sourceId, targetId });
+  }, [agents, relationshipIssueMessage]);
+
+  const relationshipTargetAt = useCallback((clientX: number, clientY: number) => {
+    const element = document.elementFromPoint(clientX, clientY);
+    const card = element?.closest<HTMLElement>("[data-org-card]");
+    return card?.dataset.agentId ?? null;
+  }, []);
+
+  const handleRelationshipMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!relationshipDrag || !containerRef.current) return false;
+    const rect = containerRef.current.getBoundingClientRect();
+    const targetId = relationshipTargetAt(e.clientX, e.clientY);
+    setRelationshipDrag({
+      ...relationshipDrag,
+      pointer: { x: e.clientX - rect.left, y: e.clientY - rect.top },
+      targetId,
+    });
+    return true;
+  }, [relationshipDrag, relationshipTargetAt]);
+
+  const handleRelationshipMouseUp = useCallback(() => {
+    if (!relationshipDrag) return false;
+    const { sourceId, targetId } = relationshipDrag;
+    setRelationshipDrag(null);
+    if (!targetId) {
+      setRelationshipWarning(tf("orgChart.hierarchyDropOnManager"));
+      return true;
+    }
+    proposeHierarchyChange(sourceId, targetId);
+    return true;
+  }, [proposeHierarchyChange, relationshipDrag]);
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
     // Don't drag if clicking a card
@@ -311,15 +443,17 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [pan]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (handleRelationshipMouseMove(e)) return;
     if (!dragging) return;
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
     setPan({ x: dragStart.current.panX + dx, y: dragStart.current.panY + dy });
-  }, [dragging]);
+  }, [dragging, handleRelationshipMouseMove]);
 
   const handleMouseUp = useCallback(() => {
+    if (handleRelationshipMouseUp()) return;
     setDragging(false);
-  }, []);
+  }, [handleRelationshipMouseUp]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -465,6 +599,20 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     };
   }, [pan, zoom]);
 
+  const relationshipSourceNode = relationshipDrag
+    ? allNodes.find((node) => node.id === relationshipDrag.sourceId)
+    : undefined;
+  const relationshipDragIssue = relationshipDrag?.targetId
+    ? hierarchyChangeIssue(agents ?? [], relationshipDrag.sourceId, relationshipDrag.targetId)
+    : null;
+  const pendingSource = pendingHierarchyChange ? agentMap.get(pendingHierarchyChange.sourceId) : undefined;
+  const pendingTarget = pendingHierarchyChange?.targetId
+    ? agentMap.get(pendingHierarchyChange.targetId)
+    : undefined;
+  const pendingPreviousManager = pendingSource?.reportsTo
+    ? agentMap.get(pendingSource.reportsTo)
+    : undefined;
+
   if (!selectedCompanyId) {
     return <EmptyState icon={Network} message={tf("auto.8d07c01265ef9637")} />;
   }
@@ -522,6 +670,16 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchEnd}
       >
+        <div className="absolute left-3 top-3 z-10 max-w-(--sz-calc-20) rounded-md border border-border bg-background/95 px-3 py-2 text-xs shadow-sm">
+          <div className="flex items-center gap-1.5 font-medium text-foreground">
+            <Link2 className="size-3.5" />
+            {tf("orgChart.hierarchyEditTitle")}
+          </div>
+          <p className={relationshipWarning ? "mt-1 text-destructive" : "mt-1 text-muted-foreground"}>
+            {relationshipWarning ?? tf("orgChart.hierarchyEditHint")}
+          </p>
+        </div>
+
         {/* Zoom controls */}
         <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
           <button
@@ -595,6 +753,26 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           </g>
         </svg>
 
+        {relationshipDrag && relationshipSourceNode ? (
+          <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
+            <line
+              x1={pan.x + zoom * (relationshipSourceNode.x + CARD_W / 2)}
+              y1={pan.y + zoom * (relationshipSourceNode.y + CARD_H / 2)}
+              x2={relationshipDrag.pointer.x}
+              y2={relationshipDrag.pointer.y}
+              stroke={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
+              strokeWidth={2}
+              strokeDasharray="6 4"
+            />
+            <circle
+              cx={relationshipDrag.pointer.x}
+              cy={relationshipDrag.pointer.y}
+              r={5}
+              fill={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
+            />
+          </svg>
+        ) : null}
+
         {/* Card layer */}
         <div
           data-testid="org-chart-card-layer"
@@ -612,14 +790,18 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
               <Card
                 key={node.id}
                 data-org-card
-                className="block absolute py-0 hover:shadow-md hover:border-foreground/20 transition-(--tp-box-shadow-border-color) duration-150 cursor-pointer select-none"
+                data-agent-id={node.id}
+                className={`block absolute py-0 hover:shadow-md hover:border-foreground/20 transition-(--tp-box-shadow-border-color) duration-150 cursor-pointer select-none ${relationshipDrag?.targetId === node.id ? (relationshipDragIssue ? "border-destructive ring-1 ring-destructive" : "border-primary ring-1 ring-primary") : ""}`}
                 style={{
                   left: node.x,
                   top: node.y,
                   width: CARD_W,
                   minHeight: CARD_H,
                 }}
-                onClick={() => navigate(agent ? agentUrl(agent) : `/agents/${node.id}`)}
+                onClick={() => {
+                  if (relationshipDrag) return;
+                  navigate(agent ? agentUrl(agent) : `/agents/${node.id}`);
+                }}
                 onClickCapture={(e) => {
                   if (!suppressNextCardClick.current) return;
                   suppressNextCardClick.current = false;
@@ -657,12 +839,86 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                       </span>
                     )}
                   </div>
+                  <div className="flex shrink-0 flex-col gap-1">
+                    <button
+                      type="button"
+                      className="flex size-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                      title={tf("orgChart.hierarchyDragHandle")}
+                      aria-label={tf("orgChart.hierarchyDragHandle")}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const rect = containerRef.current?.getBoundingClientRect();
+                        if (!rect) return;
+                        setRelationshipWarning(null);
+                        suppressNextCardClick.current = true;
+                        setRelationshipDrag({
+                          sourceId: node.id,
+                          pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
+                          targetId: null,
+                        });
+                      }}
+                    >
+                      <Link2 className="size-3.5" />
+                    </button>
+                    {agent?.reportsTo ? (
+                      <button
+                        type="button"
+                        className="flex size-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                        title={tf("orgChart.hierarchyMoveToBoard")}
+                        aria-label={tf("orgChart.hierarchyMoveToBoard")}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          proposeHierarchyChange(node.id, null);
+                        }}
+                      >
+                        <Unlink className="size-3.5" />
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </Card>
             );
           })}
         </div>
       </div>
+      <AlertDialog
+        open={Boolean(pendingHierarchyChange)}
+        onOpenChange={(open) => {
+          if (!open && !updateHierarchy.isPending) setPendingHierarchyChange(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{tf("orgChart.hierarchyConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingHierarchyChange?.targetId
+                ? tf("orgChart.hierarchyConfirmManager", {
+                    agent: pendingSource?.name ?? "",
+                    manager: pendingTarget?.name ?? "",
+                    previousManager: pendingPreviousManager?.name ?? tf("orgChart.hierarchyBoardLevel"),
+                  })
+                : tf("orgChart.hierarchyConfirmBoard", {
+                    agent: pendingSource?.name ?? "",
+                    previousManager: pendingPreviousManager?.name ?? tf("orgChart.hierarchyBoardLevel"),
+                  })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updateHierarchy.isPending}>{tf("text.Cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={updateHierarchy.isPending || !pendingHierarchyChange}
+              onClick={(event) => {
+                event.preventDefault();
+                if (pendingHierarchyChange) updateHierarchy.mutate(pendingHierarchyChange);
+              }}
+            >
+              {updateHierarchy.isPending ? tf("orgChart.hierarchySaving") : tf("text.Confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
