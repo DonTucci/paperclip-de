@@ -6094,6 +6094,7 @@
   "orgChart.positionEditHint": "Use the six-dot handle on a card to place it freely. Its position is saved automatically.",
   "orgChart.positionDragHandle": "Drag to move this agent in the chart",
   "orgChart.editAgent": "Edit this agent",
+  "agent.assignTask": "Assign task",
   "orgChart.positionAgentNotFound": "This agent is no longer available.",
   "orgChart.positionSaveFailed": "Could not save chart position",
   "orgChart.positionSaveFailedDescription": "Please try moving the agent again."

@@ -1264,14 +1264,19 @@ export function AgentDetail() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate(`/agents/${canonicalAgentRef}/configuration`)}
-          >
-            <Pencil className="h-3.5 w-3.5 sm:mr-1" />
-            <span className="hidden sm:inline">{tf("orgChart.editAgent")}</span>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label={tf("orgChart.editAgent")}
+                onClick={() => navigate(`/agents/${canonicalAgentRef}/configuration`)}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{tf("orgChart.editAgent")}</TooltipContent>
+          </Tooltip>
           <StarToggle
             size="button"
             starred={agentStarred}
@@ -1287,7 +1292,8 @@ export function AgentDetail() {
           <AgentActionButtons
             agent={agent}
             companyId={resolvedCompanyId}
-            assignLabel="Assign Task"
+            assignLabel={tf("agent.assignTask")}
+            runLabel={tf("text.Run now")}
             showStatus={false}
             canRunWithProviderTrace={canUseProviderTrace}
             actionsDisabled={agentAction.isPending}

@@ -6094,6 +6094,7 @@
   "orgChart.positionEditHint": "Verschieben Sie einen Kasten frei über den Griff mit den sechs Punkten. Die Position wird automatisch gespeichert.",
   "orgChart.positionDragHandle": "Diesen Agenten im Organigramm verschieben",
   "orgChart.editAgent": "Diesen Agenten bearbeiten",
+  "agent.assignTask": "Aufgabe zuweisen",
   "orgChart.positionAgentNotFound": "Dieser Agent ist nicht mehr verfügbar.",
   "orgChart.positionSaveFailed": "Position im Organigramm konnte nicht gespeichert werden",
   "orgChart.positionSaveFailedDescription": "Bitte verschieben Sie den Agenten erneut."
