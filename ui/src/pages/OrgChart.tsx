@@ -405,8 +405,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
 
   const relationshipTargetAt = useCallback((clientX: number, clientY: number) => {
     const element = document.elementFromPoint(clientX, clientY);
-    const card = element?.closest<HTMLElement>("[data-org-card]");
-    return card?.dataset.agentId ?? null;
+    const managerPort = element?.closest<HTMLElement>("[data-org-manager-port]");
+    return managerPort?.dataset.agentId ?? null;
   }, []);
 
   const handleRelationshipMouseMove = useCallback((e: React.MouseEvent) => {
@@ -757,7 +757,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
             <line
               x1={pan.x + zoom * (relationshipSourceNode.x + CARD_W / 2)}
-              y1={pan.y + zoom * (relationshipSourceNode.y + CARD_H / 2)}
+              y1={pan.y + zoom * relationshipSourceNode.y}
               x2={relationshipDrag.pointer.x}
               y2={relationshipDrag.pointer.y}
               stroke={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
@@ -791,7 +791,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 key={node.id}
                 data-org-card
                 data-agent-id={node.id}
-                className={`block absolute py-0 hover:shadow-md hover:border-foreground/20 transition-(--tp-box-shadow-border-color) duration-150 cursor-pointer select-none ${relationshipDrag?.targetId === node.id ? (relationshipDragIssue ? "border-destructive ring-1 ring-destructive" : "border-primary ring-1 ring-primary") : ""}`}
+                className={`relative block absolute py-0 hover:shadow-md hover:border-foreground/20 transition-(--tp-box-shadow-border-color) duration-150 cursor-pointer select-none ${relationshipDrag?.targetId === node.id ? (relationshipDragIssue ? "border-destructive ring-1 ring-destructive" : "border-primary ring-1 ring-primary") : ""}`}
                 style={{
                   left: node.x,
                   top: node.y,
@@ -809,6 +809,35 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                   e.stopPropagation();
                 }}
               >
+                <button
+                  type="button"
+                  data-org-report-source
+                  className="absolute -top-2 left-1/2 z-10 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary"
+                  title={tf("orgChart.hierarchyDragHandle")}
+                  aria-label={tf("orgChart.hierarchyDragHandle")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const rect = containerRef.current?.getBoundingClientRect();
+                    if (!rect) return;
+                    setRelationshipWarning(null);
+                    suppressNextCardClick.current = true;
+                    setRelationshipDrag({
+                      sourceId: node.id,
+                      pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
+                      targetId: null,
+                    });
+                  }}
+                >
+                  <Link2 className="size-2.5" />
+                </button>
+                <span
+                  data-org-manager-port
+                  data-agent-id={node.id}
+                  className="absolute -bottom-2 left-1/2 z-10 size-4 -translate-x-1/2 rounded-full border-2 border-background bg-muted-foreground shadow-sm"
+                  title={tf("orgChart.hierarchyManagerPort")}
+                  aria-label={tf("orgChart.hierarchyManagerPort")}
+                />
                 <div className="flex items-center px-4 py-3 gap-3">
                   {/* Agent icon + status dot */}
                   <div className="relative shrink-0">
@@ -839,44 +868,21 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                       </span>
                     )}
                   </div>
-                  <div className="flex shrink-0 flex-col gap-1">
+                  {agent?.reportsTo ? (
                     <button
                       type="button"
-                      className="flex size-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
-                      title={tf("orgChart.hierarchyDragHandle")}
-                      aria-label={tf("orgChart.hierarchyDragHandle")}
-                      onMouseDown={(event) => {
+                      className="flex size-7 shrink-0 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                      title={tf("orgChart.hierarchyMoveToBoard")}
+                      aria-label={tf("orgChart.hierarchyMoveToBoard")}
+                      onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        const rect = containerRef.current?.getBoundingClientRect();
-                        if (!rect) return;
-                        setRelationshipWarning(null);
-                        suppressNextCardClick.current = true;
-                        setRelationshipDrag({
-                          sourceId: node.id,
-                          pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
-                          targetId: null,
-                        });
+                        proposeHierarchyChange(node.id, null);
                       }}
                     >
-                      <Link2 className="size-3.5" />
+                      <Unlink className="size-3.5" />
                     </button>
-                    {agent?.reportsTo ? (
-                      <button
-                        type="button"
-                        className="flex size-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
-                        title={tf("orgChart.hierarchyMoveToBoard")}
-                        aria-label={tf("orgChart.hierarchyMoveToBoard")}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          proposeHierarchyChange(node.id, null);
-                        }}
-                      >
-                        <Unlink className="size-3.5" />
-                      </button>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
               </Card>
             );
