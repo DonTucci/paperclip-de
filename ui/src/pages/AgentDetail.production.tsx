@@ -88,6 +88,7 @@ import {
   HelpCircle,
   FolderOpen,
   AlertTriangle,
+  Pencil,
 } from "lucide-react";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -1303,6 +1304,15 @@ export function AgentDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/agents/${canonicalAgentRef}/configuration`)}
+            disabled={activeView === "configuration"}
+          >
+            <Pencil className="h-3.5 w-3.5 sm:mr-1" />
+            <span className="hidden sm:inline">{tf("orgChart.editAgent")}</span>
+          </Button>
           <StarToggle
             size="button"
             starred={agentStarred}

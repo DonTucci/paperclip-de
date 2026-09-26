@@ -22,7 +22,7 @@ import {
 import { EmptyState } from "../components/EmptyState";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { AgentIcon } from "../components/AgentIconPicker";
-import { Download, GripVertical, Link2, Maximize2, Minus, Network, Plus, Unlink, Upload } from "lucide-react";
+import { Download, GripVertical, Link2, Maximize2, Minus, Network, Pencil, Plus, Unlink, Upload } from "lucide-react";
 import { AGENT_ROLE_LABELS, type Agent } from "@paperclipai/shared";
 import { useCloudInstance } from "@/hooks/useCloudInstance";
 import { useHiddenSettings } from "@/hooks/useHiddenSettings";
@@ -961,6 +961,22 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 >
                   <GripVertical className="size-3.5" />
                 </button>
+                {agent ? (
+                  <button
+                    type="button"
+                    data-org-edit-agent
+                    className="absolute right-7 top-1 z-10 flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+                    title={tf("orgChart.editAgent")}
+                    aria-label={tf("orgChart.editAgent")}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      navigate(`${agentUrl(agent)}/configuration`);
+                    }}
+                  >
+                    <Pencil className="size-3" />
+                  </button>
+                ) : null}
                 <div className="flex items-center px-4 py-3 gap-3">
                   {/* Agent icon + status dot */}
                   <div className="relative shrink-0">
