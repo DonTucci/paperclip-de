@@ -1,3 +1,4 @@
+import { tf } from "@/i18n/fork";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "@/lib/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ import {
 import { EmptyState } from "../components/EmptyState";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { AgentIcon } from "../components/AgentIconPicker";
-import { Download, Link2, Maximize2, Minus, Network, Plus, Unlink, Upload } from "lucide-react";
+import { Download, GripVertical, Link2, Maximize2, Minus, Network, Plus, Unlink, Upload } from "lucide-react";
 import { AGENT_ROLE_LABELS, type Agent } from "@paperclipai/shared";
 import { useCloudInstance } from "@/hooks/useCloudInstance";
 import { useHiddenSettings } from "@/hooks/useHiddenSettings";
@@ -76,7 +77,27 @@ interface PendingHierarchyChange {
   targetId: string | null;
 }
 
+interface OrgChartPosition {
+  x: number;
+  y: number;
+}
+
+interface PositionDrag {
+  agentId: string;
+  startPointer: Point;
+  startPosition: OrgChartPosition;
+}
+
 export type HierarchyChangeIssue = "self" | "cycle" | "unchanged" | null;
+
+function orgChartPosition(metadata: Record<string, unknown> | null): OrgChartPosition | null {
+  const position = metadata?.orgChartPosition;
+  if (!position || typeof position !== "object" || Array.isArray(position)) return null;
+  const { x, y } = position as Record<string, unknown>;
+  return typeof x === "number" && Number.isFinite(x) && typeof y === "number" && Number.isFinite(y)
+    ? { x, y }
+    : null;
+}
 
 /**
  * Visuelle Absicherung für Hierarchieänderungen. Der Server setzt dieselben
@@ -288,6 +309,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   const [relationshipDrag, setRelationshipDrag] = useState<RelationshipDrag | null>(null);
   const [pendingHierarchyChange, setPendingHierarchyChange] = useState<PendingHierarchyChange | null>(null);
   const [relationshipWarning, setRelationshipWarning] = useState<string | null>(null);
+  const [positionDrag, setPositionDrag] = useState<PositionDrag | null>(null);
+  const [positionOverrides, setPositionOverrides] = useState<Record<string, OrgChartPosition>>({});
 
   const agentMap = useMemo(() => {
     const m = new Map<string, Agent>();
@@ -323,25 +346,82 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     },
   });
 
+  const savePosition = useMutation({
+    mutationFn: ({ agentId, position }: { agentId: string; position: OrgChartPosition }) => {
+      const agent = agentMap.get(agentId);
+      if (!agent) throw new Error(tf("orgChart.positionAgentNotFound"));
+      return agentsApi.update(
+        agentId,
+        {
+          metadata: {
+            ...(agent.metadata ?? {}),
+            orgChartPosition: position,
+          },
+        },
+        selectedCompanyId ?? undefined,
+      );
+    },
+    onSuccess: (_, { agentId }) => {
+      if (selectedCompanyId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.agents.list(selectedCompanyId) });
+      }
+      setPositionOverrides((positions) => {
+        const next = { ...positions };
+        delete next[agentId];
+        return next;
+      });
+    },
+    onError: (error, { agentId }) => {
+      setPositionOverrides((positions) => {
+        const next = { ...positions };
+        delete next[agentId];
+        return next;
+      });
+      toastActions?.pushToast({
+        title: tf("orgChart.positionSaveFailed"),
+        body: error instanceof Error ? error.message : tf("orgChart.positionSaveFailedDescription"),
+        tone: "error",
+      });
+    },
+  });
+
   useEffect(() => {
-    if (!embedded) setBreadcrumbs([{ label: "Org Chart" }]);
+    if (!embedded) setBreadcrumbs([{ label: tf("auto.aab3e6c8a0d87c7d") }]);
   }, [embedded, setBreadcrumbs]);
 
   // Layout computation
   const layout = useMemo(() => layoutForest(orgTree ?? []), [orgTree]);
   const allNodes = useMemo(() => flattenLayout(layout), [layout]);
   const edges = useMemo(() => collectEdges(layout), [layout]);
+  const positionedNodes = useMemo(
+    () => allNodes.map((node) => {
+      const position = positionOverrides[node.id] ?? orgChartPosition(agentMap.get(node.id)?.metadata ?? null);
+      return position ? { ...node, ...position } : node;
+    }),
+    [agentMap, allNodes, positionOverrides],
+  );
+  const positionedNodeById = useMemo(
+    () => new Map(positionedNodes.map((node) => [node.id, node])),
+    [positionedNodes],
+  );
+  const positionedEdges = useMemo(
+    () => edges.map(({ parent, child }) => ({
+      parent: positionedNodeById.get(parent.id) ?? parent,
+      child: positionedNodeById.get(child.id) ?? child,
+    })),
+    [edges, positionedNodeById],
+  );
 
   // Compute SVG bounds
   const bounds = useMemo(() => {
-    if (allNodes.length === 0) return { width: 800, height: 600 };
+    if (positionedNodes.length === 0) return { width: 800, height: 600 };
     let maxX = 0, maxY = 0;
-    for (const n of allNodes) {
+    for (const n of positionedNodes) {
       maxX = Math.max(maxX, n.x + CARD_W);
       maxY = Math.max(maxY, n.y + CARD_H);
     }
     return { width: maxX + PADDING, height: maxY + PADDING };
-  }, [allNodes]);
+  }, [positionedNodes]);
 
   // Pan & zoom state
   const containerRef = useRef<HTMLDivElement>(null);
@@ -404,8 +484,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
 
   const relationshipTargetAt = useCallback((clientX: number, clientY: number) => {
     const element = document.elementFromPoint(clientX, clientY);
-    const card = element?.closest<HTMLElement>("[data-org-card]");
-    return card?.dataset.agentId ?? null;
+    const managerPort = element?.closest<HTMLElement>("[data-org-manager-port]");
+    return managerPort?.dataset.agentId ?? null;
   }, []);
 
   const handleRelationshipMouseMove = useCallback((e: React.MouseEvent) => {
@@ -432,6 +512,28 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     return true;
   }, [proposeHierarchyChange, relationshipDrag]);
 
+  const handlePositionMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!positionDrag) return false;
+    const dx = (e.clientX - positionDrag.startPointer.x) / zoom;
+    const dy = (e.clientY - positionDrag.startPointer.y) / zoom;
+    setPositionOverrides((positions) => ({
+      ...positions,
+      [positionDrag.agentId]: {
+        x: Math.round(positionDrag.startPosition.x + dx),
+        y: Math.round(positionDrag.startPosition.y + dy),
+      },
+    }));
+    return true;
+  }, [positionDrag, zoom]);
+
+  const handlePositionMouseUp = useCallback(() => {
+    if (!positionDrag) return false;
+    const position = positionOverrides[positionDrag.agentId] ?? positionDrag.startPosition;
+    setPositionDrag(null);
+    savePosition.mutate({ agentId: positionDrag.agentId, position });
+    return true;
+  }, [positionDrag, positionOverrides, savePosition]);
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
     // Don't drag if clicking a card
@@ -443,16 +545,18 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (handleRelationshipMouseMove(e)) return;
+    if (handlePositionMouseMove(e)) return;
     if (!dragging) return;
     const dx = e.clientX - dragStart.current.x;
     const dy = e.clientY - dragStart.current.y;
     setPan({ x: dragStart.current.panX + dx, y: dragStart.current.panY + dy });
-  }, [dragging, handleRelationshipMouseMove]);
+  }, [dragging, handlePositionMouseMove, handleRelationshipMouseMove]);
 
   const handleMouseUp = useCallback(() => {
     if (handleRelationshipMouseUp()) return;
+    if (handlePositionMouseUp()) return;
     setDragging(false);
-  }, [handleRelationshipMouseUp]);
+  }, [handlePositionMouseUp, handleRelationshipMouseUp]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -599,7 +703,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [pan, zoom]);
 
   const relationshipSourceNode = relationshipDrag
-    ? allNodes.find((node) => node.id === relationshipDrag.sourceId)
+    ? positionedNodes.find((node) => node.id === relationshipDrag.sourceId)
     : undefined;
   const relationshipDragIssue = relationshipDrag?.targetId
     ? hierarchyChangeIssue(agents ?? [], relationshipDrag.sourceId, relationshipDrag.targetId)
@@ -613,7 +717,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     : undefined;
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Network} message="Select an organization to view the org chart." />;
+    return <EmptyState icon={Network} message={tf("auto.8d07c01265ef9637")} />;
   }
 
   if (providedOrgTree === undefined && isLoading) {
@@ -621,7 +725,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }
 
   if (orgTree && orgTree.length === 0) {
-    return <EmptyState icon={Network} message="No organizational hierarchy defined." />;
+    return <EmptyState icon={Network} message={tf("auto.7ac9886550455b61")} />;
   }
 
   return (
@@ -636,7 +740,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <Link to="/company/import">
             <Button variant="outline" size="sm">
               <Upload className="mr-1.5 h-3.5 w-3.5" />
-              Import organization
+              {tf("auto.837ee932677d818e")}
             </Button>
           </Link>
         ) : null}
@@ -644,7 +748,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <Link to="/company/export">
             <Button variant="outline" size="sm">
               <Download className="mr-1.5 h-3.5 w-3.5" />
-              Export organization
+              {tf("auto.38a8481ada8cca1b")}
             </Button>
           </Link>
         ) : null}
@@ -677,6 +781,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <p className={relationshipWarning ? "mt-1 text-destructive" : "mt-1 text-muted-foreground"}>
             {relationshipWarning ?? tf("orgChart.hierarchyEditHint")}
           </p>
+          <p className="mt-1 text-muted-foreground">{tf("orgChart.positionEditHint")}</p>
         </div>
 
         {/* Zoom controls */}
@@ -692,8 +797,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 });
               }
             }}
-            title="Zoom in"
-            aria-label="Zoom in"
+            title={tf("auto.0e47f09a748fa132")}
+            aria-label={tf("auto.0e47f09a748fa132")}
           >
             <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
@@ -708,16 +813,16 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 });
               }
             }}
-            title="Zoom out"
-            aria-label="Zoom out"
+            title={tf("auto.bc7b631a689b45ca")}
+            aria-label={tf("auto.bc7b631a689b45ca")}
           >
             <Minus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
           <button
             className="flex size-9 items-center justify-center rounded border border-border bg-background text-(length:--text-nano) transition-colors hover:bg-accent sm:size-7"
             onClick={fitToScreen}
-            title="Fit to screen"
-            aria-label="Fit chart to screen"
+            title={tf("auto.32bb0d298ca1545c")}
+            aria-label={tf("auto.3dc2e33313f5cf3c")}
           >
             <Maximize2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
@@ -732,7 +837,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           }}
         >
           <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-            {edges.map(({ parent, child }) => {
+          {positionedEdges.map(({ parent, child }) => {
               const x1 = parent.x + CARD_W / 2;
               const y1 = parent.y + CARD_H;
               const x2 = child.x + CARD_W / 2;
@@ -756,7 +861,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
             <line
               x1={pan.x + zoom * (relationshipSourceNode.x + CARD_W / 2)}
-              y1={pan.y + zoom * (relationshipSourceNode.y + CARD_H / 2)}
+              y1={pan.y + zoom * relationshipSourceNode.y}
               x2={relationshipDrag.pointer.x}
               y2={relationshipDrag.pointer.y}
               stroke={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
@@ -781,7 +886,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
             transformOrigin: "0 0",
           }}
         >
-          {allNodes.map((node) => {
+          {positionedNodes.map((node) => {
             const agent = agentMap.get(node.id);
             const dotColor = statusDotColor[node.status] ?? defaultDotColor;
 
@@ -790,7 +895,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 key={node.id}
                 data-org-card
                 data-agent-id={node.id}
-                className={`block absolute py-0 hover:shadow-md hover:border-foreground/20 transition-(--tp-box-shadow-border-color) duration-150 cursor-pointer select-none ${relationshipDrag?.targetId === node.id ? (relationshipDragIssue ? "border-destructive ring-1 ring-destructive" : "border-primary ring-1 ring-primary") : ""}`}
+                className={`relative block absolute py-0 hover:shadow-md hover:border-foreground/20 transition-(--tp-box-shadow-border-color) duration-150 cursor-pointer select-none ${positionDrag?.agentId === node.id ? "cursor-grabbing ring-1 ring-primary" : ""} ${relationshipDrag?.targetId === node.id ? (relationshipDragIssue ? "border-destructive ring-1 ring-destructive" : "border-primary ring-1 ring-primary") : ""}`}
                 style={{
                   left: node.x,
                   top: node.y,
@@ -808,6 +913,54 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                   e.stopPropagation();
                 }}
               >
+                <button
+                  type="button"
+                  data-org-report-source
+                  className="absolute -top-2 left-1/2 z-10 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary"
+                  title={tf("orgChart.hierarchyDragHandle")}
+                  aria-label={tf("orgChart.hierarchyDragHandle")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const rect = containerRef.current?.getBoundingClientRect();
+                    if (!rect) return;
+                    setRelationshipWarning(null);
+                    suppressNextCardClick.current = true;
+                    setRelationshipDrag({
+                      sourceId: node.id,
+                      pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
+                      targetId: null,
+                    });
+                  }}
+                >
+                  <Link2 className="size-2.5" />
+                </button>
+                <span
+                  data-org-manager-port
+                  data-agent-id={node.id}
+                  className="absolute -bottom-2 left-1/2 z-10 size-4 -translate-x-1/2 rounded-full border-2 border-background bg-muted-foreground shadow-sm"
+                  title={tf("orgChart.hierarchyManagerPort")}
+                  aria-label={tf("orgChart.hierarchyManagerPort")}
+                />
+                <button
+                  type="button"
+                  data-org-position-handle
+                  className="absolute right-1 top-1 z-10 flex size-6 cursor-grab items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+                  title={tf("orgChart.positionDragHandle")}
+                  aria-label={tf("orgChart.positionDragHandle")}
+                  onMouseDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    suppressNextCardClick.current = true;
+                    setPositionDrag({
+                      agentId: node.id,
+                      startPointer: { x: event.clientX, y: event.clientY },
+                      startPosition: { x: node.x, y: node.y },
+                    });
+                  }}
+                >
+                  <GripVertical className="size-3.5" />
+                </button>
                 <div className="flex items-center px-4 py-3 gap-3">
                   {/* Agent icon + status dot */}
                   <div className="relative shrink-0">
@@ -838,44 +991,21 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                       </span>
                     )}
                   </div>
-                  <div className="flex shrink-0 flex-col gap-1">
+                  {agent?.reportsTo ? (
                     <button
                       type="button"
-                      className="flex size-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
-                      title={tf("orgChart.hierarchyDragHandle")}
-                      aria-label={tf("orgChart.hierarchyDragHandle")}
-                      onMouseDown={(event) => {
+                      className="flex size-7 shrink-0 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
+                      title={tf("orgChart.hierarchyMoveToBoard")}
+                      aria-label={tf("orgChart.hierarchyMoveToBoard")}
+                      onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        const rect = containerRef.current?.getBoundingClientRect();
-                        if (!rect) return;
-                        setRelationshipWarning(null);
-                        suppressNextCardClick.current = true;
-                        setRelationshipDrag({
-                          sourceId: node.id,
-                          pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
-                          targetId: null,
-                        });
+                        proposeHierarchyChange(node.id, null);
                       }}
                     >
-                      <Link2 className="size-3.5" />
+                      <Unlink className="size-3.5" />
                     </button>
-                    {agent?.reportsTo ? (
-                      <button
-                        type="button"
-                        className="flex size-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
-                        title={tf("orgChart.hierarchyMoveToBoard")}
-                        aria-label={tf("orgChart.hierarchyMoveToBoard")}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          proposeHierarchyChange(node.id, null);
-                        }}
-                      >
-                        <Unlink className="size-3.5" />
-                      </button>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
               </Card>
             );
