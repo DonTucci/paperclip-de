@@ -6090,5 +6090,10 @@
   "orgChart.hierarchySavedWithManager": "{{agent}} now reports to {{manager}}.",
   "orgChart.hierarchySavedToBoard": "{{agent}} is now at board level.",
   "orgChart.hierarchySaveFailed": "Could not save reporting line",
-  "orgChart.hierarchySaveFailedDescription": "Please try again."
+  "orgChart.hierarchySaveFailedDescription": "Please try again.",
+  "orgChart.positionEditHint": "Use the six-dot handle on a card to place it freely. Its position is saved automatically.",
+  "orgChart.positionDragHandle": "Drag to move this agent in the chart",
+  "orgChart.positionAgentNotFound": "This agent is no longer available.",
+  "orgChart.positionSaveFailed": "Could not save chart position",
+  "orgChart.positionSaveFailedDescription": "Please try moving the agent again."
 }
