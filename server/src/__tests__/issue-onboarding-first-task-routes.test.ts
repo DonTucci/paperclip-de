@@ -204,7 +204,7 @@ describeEmbeddedPostgres("issue create onboarding first-task routes", () => {
     expect(payload.questions[0].selectionMode).toBe("single");
     expect(payload.questions[0].options.map((option) => option.id)).toEqual(["interview", "task"]);
     expect(payload.questions[0].options[0].label).toBe(
-      "Interview me and propose a plan and an agent team to execute it.",
+      "Ich möchte meine Situation besprechen und einen Plan mit Agententeam erhalten.",
     );
     expect(payload.questions[0].options[1]).toMatchObject({ label: "I have a task in mind", freeText: true });
 
