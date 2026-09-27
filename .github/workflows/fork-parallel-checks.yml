@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   tests:
+    if: ${{ inputs.test_group == 'all' }}
     strategy:
       fail-fast: false
       matrix:
@@ -58,7 +59,6 @@ jobs:
             id: serialized-4
             command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 3 --shard-count 4
     runs-on: ubuntu-latest
-    if: ${{ inputs.test_group == 'all' || inputs.test_group == matrix.id }}
     timeout-minutes: 180
     name: Tests – ${{ matrix.name }}
     steps:
@@ -70,3 +70,34 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @paperclipai/plugin-sdk ensure-build-deps
       - run: ${{ matrix.command }}
+
+  targeted-test:
+    if: ${{ inputs.test_group != 'all' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    name: Tests – ${{ inputs.test_group }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.4 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '24', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @paperclipai/plugin-sdk ensure-build-deps
+      - name: Gewählten Bereich prüfen
+        run: |
+          case "${{ inputs.test_group }}" in
+            server-1)
+              node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 0 --shard-count 5
+              ;;
+            workspaces-a)
+              node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-a
+              ;;
+            serialized-2)
+              node scripts/run-vitest-stable.mjs --mode serialized --shard-index 1 --shard-count 4
+              ;;
+            *)
+              echo "Unbekannter Prüfbereich: ${{ inputs.test_group }}" >&2
+              exit 1
+              ;;
+          esac
