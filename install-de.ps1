@@ -59,6 +59,28 @@ function Ensure-Command([string]$Name, [string[]]$Candidates, [string]$PackageId
   throw "${Name} wurde nach der automatischen Installation nicht gefunden. Bitte starten Sie Windows neu und führen Sie die EXE erneut aus. Hilfe: $InstallHint"
 }
 
+function Test-VisualCppRuntime {
+  $runtime = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64' -ErrorAction SilentlyContinue
+  if ($runtime -and $runtime.Installed -eq 1) {
+    return $true
+  }
+
+  return (Test-Path -LiteralPath (Join-Path $env:WINDIR 'System32\vcruntime140.dll')) -and
+    (Test-Path -LiteralPath (Join-Path $env:WINDIR 'System32\msvcp140.dll'))
+}
+
+function Ensure-VisualCppRuntime {
+  if (Test-VisualCppRuntime) {
+    Write-Host 'Microsoft Visual C++ Runtime (x64) ist bereits vorhanden.'
+    return
+  }
+
+  Install-Prerequisite 'Microsoft Visual C++ Runtime (x64)' 'Microsoft.VCRedist.2015+.x64'
+  if (-not (Test-VisualCppRuntime)) {
+    throw 'Microsoft Visual C++ Runtime (x64) wurde nach der automatischen Installation nicht gefunden. Starten Sie Windows neu und führen Sie die EXE erneut aus.'
+  }
+}
+
 function Invoke-Checked([string]$Command, [string[]]$Arguments) {
   & $Command @Arguments
   if ($LASTEXITCODE -ne 0) {
@@ -127,6 +149,7 @@ $corepackPath = Ensure-Command 'corepack' @(
   (Join-Path $env:LOCALAPPDATA 'Programs\nodejs\corepack.cmd'),
   (Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Links\corepack.cmd')
 ) 'OpenJS.NodeJS.LTS' 'https://nodejs.org/en/download'
+Ensure-VisualCppRuntime
 Write-Host "Git: $gitPath"
 Write-Host "Node.js: $nodePath"
 & $corepackPath 'enable'

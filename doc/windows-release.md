@@ -1,6 +1,6 @@
 # Windows-Veröffentlichung
 
-Der deutsche Fork kann Windows-Dateien mit einem bereits kompilierten nativen Runner veröffentlichen. Der Runner ist direkt in der EXE enthalten. Nutzer benötigen dadurch keine C++-Build-Tools und keinen separaten Runner-Download. Der Installer öffnet ein eigenes Windows-Fenster, zeigt den Fortschritt und das Installationsprotokoll an und kann Paperclip DE danach direkt starten. Er richtet fehlendes Git und Node.js automatisch über Windows ein.
+Der deutsche Fork kann Windows-Dateien mit einem bereits kompilierten nativen Runner veröffentlichen. Der Runner ist direkt in der EXE enthalten. Nutzer benötigen dadurch keine C++-Build-Tools und keinen separaten Runner-Download. Der Installer öffnet ein eigenes Windows-Fenster, zeigt den Fortschritt und das Installationsprotokoll an und kann Paperclip DE danach direkt starten. Er richtet fehlendes Git, Node.js und die Microsoft Visual C++ Runtime (x64) automatisch über Windows ein.
 
 ## Testpaket bauen
 
@@ -27,7 +27,7 @@ Der Tag startet den gleichen Workflow automatisch. Er veröffentlicht diese Date
 - `paperclip-runnerd-windows-x64.exe`
 - `SHA256SUMS.txt`
 
-Der Installer richtet fehlendes Git und Node.js über Windows automatisch ein, lädt den Runner passend zum Release und muss ihn nicht lokal kompilieren. Danach erstellt er die Desktop-Verknüpfung **Paperclip DE**.
+Der Installer richtet fehlendes Git, Node.js und die Microsoft Visual C++ Runtime (x64) über Windows automatisch ein. Der Runner ist bereits in der EXE enthalten und muss weder separat geladen noch lokal kompiliert werden. Danach erstellt er die Desktop-Verknüpfung **Paperclip DE**.
 
 ## Signatur
 
