@@ -206,7 +206,7 @@ describeEmbeddedPostgres("issue create onboarding first-task routes", () => {
     expect(payload.questions[0].options[0].label).toBe(
       "Ich möchte meine Situation besprechen und einen Plan mit Agententeam erhalten.",
     );
-    expect(payload.questions[0].options[1]).toMatchObject({ label: "Ich habe bereits eine konkrete Aufgabe", freeText: true });
+    expect(payload.questions[0].options[1]).toMatchObject({ label: "Ich habe bereits eine konkrete Aufgabe.", freeText: true });
 
     // The seeded card is read-only for the thread until the user answers: it
     // must not have queued a run by itself.
