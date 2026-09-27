@@ -3122,9 +3122,9 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
         await settle();
       }
       function expectTesting() {
-        expect(button("Testing…").disabled).toBe(true);
-        expect(button("Testing…").querySelector("svg.animate-spin")).not.toBeNull();
-        expect([...document.body.querySelectorAll('[role="status"]')].some(e => e.textContent === "Testing connection…")).toBe(true);
+        const testing = button("Testing connection…");
+        expect(testing.disabled).toBe(true);
+        expect(testing.querySelector("svg.animate-spin")).not.toBeNull();
         expect(document.body.querySelector('[aria-label="Saved subscription"]')).toBeNull();
         expect(document.body.textContent).not.toContain("Open a terminal on this computer.");
         expect(document.body.textContent).not.toContain("Start sign-in again");
