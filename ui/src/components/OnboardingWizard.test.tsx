@@ -318,7 +318,7 @@ async function pickFirstSource(
  * the label.
  */
 function isArcPrimary(text: string): boolean {
-  return text.startsWith("Weiter") || text.startsWith("Verbinden");
+  return text.startsWith("Next") || text.startsWith("Connect");
 }
 
 describe("OnboardingWizard restore-gate (stale localStorage across accounts)", () => {
@@ -2048,7 +2048,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
         expect(mockAgentsApi.hire).toHaveBeenCalledWith("company-new", expect.objectContaining({ runtimeConfig: expect.objectContaining({ aiConnection: { provider, method: "subscription", mode: "responsible_user" } }) }));
         for (let i = 0; i < 4; i++) await flushReact();
         expect(document.body.textContent).toContain("Temporary hire failure");
-        const retry = [...document.body.querySelectorAll("button")].find(button => button.textContent?.trim() === "Verbinden");
+        const retry = [...document.body.querySelectorAll("button")].find(button => button.textContent?.trim() === "Connect");
         expect(retry).toBeTruthy();
         expect(retry!.disabled).toBe(false);
         await act(async () => { retry!.click(); });
@@ -2300,7 +2300,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
 
       // Back unwinds rather than leaving the step: the row is a question again.
       const back = [...document.body.querySelectorAll("button")].find((b) =>
-        b.textContent?.trim().startsWith("Zurück"),
+        b.textContent?.trim().startsWith("Back"),
       );
       await act(async () => {
         back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -2483,7 +2483,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       });
       try {
         const back = [...document.body.querySelectorAll("button")].find((b) =>
-          b.textContent?.trim().startsWith("Zurück"),
+          b.textContent?.trim().startsWith("Back"),
         );
         await act(async () => {
           back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -2571,7 +2571,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
           }),
         });
         const back = [...document.body.querySelectorAll("button")].find((b) =>
-          b.textContent?.trim().startsWith("Zurück"),
+          b.textContent?.trim().startsWith("Back"),
         );
         await act(async () => {
           back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -2703,7 +2703,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       );
 
       const back = [...document.body.querySelectorAll("button")].find((b) =>
-        b.textContent?.trim().startsWith("Zurück"),
+        b.textContent?.trim().startsWith("Back"),
       );
       await act(async () => {
         back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -2816,7 +2816,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
         expect(mockAgentsApi.startClaudeSetupTokenLogin).not.toHaveBeenCalled();
 
         const back = [...document.body.querySelectorAll("button")].find((b) =>
-          b.textContent?.trim().startsWith("Zurück"),
+          b.textContent?.trim().startsWith("Back"),
         );
         await act(async () => {
           back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -2943,7 +2943,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       expect(mockAgentsApi.startClaudeSetupTokenLogin).toHaveBeenCalledTimes(1);
 
       const back = [...document.body.querySelectorAll("button")].find((b) =>
-        b.textContent?.trim().startsWith("Zurück"),
+        b.textContent?.trim().startsWith("Back"),
       );
       await act(async () => {
         back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -2977,7 +2977,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       expect(mockAgentsApi.startAdapterAuthLogin).toHaveBeenCalledTimes(1);
 
       const back = [...document.body.querySelectorAll("button")].find((b) =>
-        b.textContent?.trim().startsWith("Zurück"),
+        b.textContent?.trim().startsWith("Back"),
       );
       await act(async () => {
         back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -3008,7 +3008,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       expect(mockAgentsApi.startClaudeSetupTokenLogin).toHaveBeenCalledTimes(1);
 
       const back = [...document.body.querySelectorAll("button")].find((b) =>
-        b.textContent?.trim().startsWith("Zurück"),
+        b.textContent?.trim().startsWith("Back"),
       );
       await act(async () => {
         back!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -3124,10 +3124,10 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
       function expectTesting() {
         expect(button("Testing…").disabled).toBe(true);
         expect(button("Testing…").querySelector("svg.animate-spin")).not.toBeNull();
-        expect([...document.body.querySelectorAll('[role="status"]')].some(e => e.textContent === "Verbindung wird geprüft…")).toBe(true);
+        expect([...document.body.querySelectorAll('[role="status"]')].some(e => e.textContent === "Testing connection…")).toBe(true);
         expect(document.body.querySelector('[aria-label="Saved subscription"]')).toBeNull();
-        expect(document.body.textContent).not.toContain("Öffnen Sie ein Terminal auf diesem Computer.");
-        expect(document.body.textContent).not.toContain("Anmeldung erneut starten");
+        expect(document.body.textContent).not.toContain("Run this in a terminal");
+        expect(document.body.textContent).not.toContain("Start sign-in again");
       }
 
       it.each(providers)("automatically verifies detected %s once through connection refreshes and advances", async (adapterType, provider, label) => {
@@ -3136,7 +3136,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
         const { root, queryClient } = await openStep4({ adapterType });
         try {
           await pickSource(label);
-          expect(document.body.textContent).toContain("Öffnen Sie ein Terminal auf diesem Computer.");
+          expect(document.body.textContent).toContain("Run this in a terminal");
           expect(button("Connect").disabled).toBe(false);
           await detected();
           expectTesting();
@@ -3208,7 +3208,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
           await settle();
           expect(mockAgentsApi.testEnvironment).not.toHaveBeenCalled();
           expect(mockAgentsApi.hire).not.toHaveBeenCalled();
-          expect(document.body.textContent).toContain("Öffnen Sie ein Terminal auf diesem Computer.");
+          expect(document.body.textContent).toContain("Run this in a terminal");
           expect(button("Connect").disabled).toBe(false);
         } finally { await act(async () => root.unmount()); }
       });
@@ -3295,7 +3295,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
           await pickSource(/OpenAI/);
           await detected();
           expect(button("Connecting…").disabled).toBe(true);
-          expect(document.body.textContent).not.toContain("Öffnen Sie ein Terminal auf diesem Computer.");
+          expect(document.body.textContent).not.toContain("Run this in a terminal");
           await act(async () => saved({ connectionId: "local-connection", grantId: "local-grant" }));
           await settle();
           expectTesting();
