@@ -1852,7 +1852,7 @@ describe("TaskChatComposer", () => {
       />));
       expect(container.textContent).toContain("Subtree is paused.");
       expect(container.textContent).not.toContain("Answer question");
-      expect(container.textContent).not.toContain("Überspringen");
+      expect(container.textContent).not.toContain("Skip");
       expect(container.querySelector('[contenteditable="true"]')).toBeNull();
       expect(container.querySelector("button")!.disabled).toBe(true);
     });
@@ -1989,7 +1989,7 @@ describe("TaskChatComposer", () => {
       expect(container.textContent).not.toContain("Write instead");
       const skip = Array.from(
         container.querySelectorAll<HTMLButtonElement>("button"),
-      ).find((button) => button.textContent?.trim() === "Überspringen");
+      ).find((button) => button.textContent?.trim() === "Skip");
       flushSync(() => skip?.click());
       await flushAsync();
       expect(onSkip).toHaveBeenCalledTimes(1);
@@ -2025,7 +2025,7 @@ describe("TaskChatComposer", () => {
       render(<Harness />);
       const skip = Array.from(
         container.querySelectorAll<HTMLButtonElement>("button"),
-      ).find((button) => button.textContent?.trim() === "Überspringen");
+      ).find((button) => button.textContent?.trim() === "Skip");
       flushSync(() => skip?.click());
       await flushAsync();
 
@@ -2148,7 +2148,7 @@ describe("TaskChatComposer", () => {
 
       // A required question cannot be skipped.
       expect(
-        buttons().find((button) => button.textContent?.trim() === "Überspringen"),
+        buttons().find((button) => button.textContent?.trim() === "Skip"),
       ).toBeUndefined();
 
       // The submit button carries the card's label and does the sending.
@@ -2221,13 +2221,13 @@ describe("TaskChatComposer", () => {
 
       // Page 1: required, so no Skip; Next waits for an answer. Answering
       // enables Next but stays put — only Next moves on.
-      expect(byLabel("Überspringen")).toBeUndefined();
-      expect(byLabel("Weiter")?.disabled).toBe(true);
+      expect(byLabel("Skip")).toBeUndefined();
+      expect(byLabel("Next")?.disabled).toBe(true);
       flushSync(() => byLabel("Staging")?.click());
       await flushAsync();
       expect(container.textContent).toContain("Where?");
-      expect(byLabel("Weiter")?.disabled).toBe(false);
-      flushSync(() => byLabel("Weiter")?.click());
+      expect(byLabel("Next")?.disabled).toBe(false);
+      flushSync(() => byLabel("Next")?.click());
       await flushAsync();
       expect(onSubmit).not.toHaveBeenCalled();
       expect(container.textContent).toContain("When?");
@@ -2236,22 +2236,22 @@ describe("TaskChatComposer", () => {
       // Page 2: answer, then Next. Go back to confirm it is saved, then skip.
       flushSync(() => byLabel("Today")?.click());
       await flushAsync();
-      flushSync(() => byLabel("Weiter")?.click());
+      flushSync(() => byLabel("Next")?.click());
       await flushAsync();
       expect(container.textContent).toContain("Who?");
-      flushSync(() => container.querySelector<HTMLButtonElement>('button[aria-label="Vorherige Frage"]')?.click());
+      flushSync(() => container.querySelector<HTMLButtonElement>('button[aria-label="Previous question"]')?.click());
       await flushAsync();
       expect(byLabel("Today")?.getAttribute("aria-checked")).toBe("true");
-      flushSync(() => byLabel("Überspringen")?.click());
+      flushSync(() => byLabel("Skip")?.click());
       await flushAsync();
       expect(container.textContent).toContain("Who?");
       expect(onSubmit).not.toHaveBeenCalled();
 
       // Last page: primary reads Submit answers and sends everything.
-      expect(byLabel("Weiter")).toBeUndefined();
+      expect(byLabel("Next")).toBeUndefined();
       flushSync(() => byLabel("Me")?.click());
       await flushAsync();
-      flushSync(() => byLabel("Antworten senden")?.click());
+      flushSync(() => byLabel("Submit answers")?.click());
       await flushAsync();
       expect(onSubmit).toHaveBeenCalledTimes(1);
       const response = onSubmit.mock.calls[0]?.[0];
@@ -2281,11 +2281,11 @@ describe("TaskChatComposer", () => {
         .find((button) => button.textContent?.trim() === label)!;
       // Restoring a selection does not advance. Other needs text first.
       expect(container.textContent).toContain("1 of 3");
-      flushSync(() => byLabel("Andere").click());
+      flushSync(() => byLabel("Other").click());
       await flushAsync();
       expect(container.textContent).toContain("1 of 3");
       expect(container.querySelector('[data-testid="question-other-answer-composer"]')).not.toBeNull();
-      expect(byLabel("Weiter").disabled).toBe(true);
+      expect(byLabel("Next").disabled).toBe(true);
       flushSync(() => {
         if (input === "click") byLabel("SQLite").click();
         else byLabel("SQLite").dispatchEvent(new KeyboardEvent("keydown", { key: "1", bubbles: true }));
@@ -2295,8 +2295,8 @@ describe("TaskChatComposer", () => {
       expect(container.textContent).toContain("1 of 3");
       expect(container.querySelector('[data-testid="question-other-answer-composer"]')).toBeNull();
       expect(byLabel("SQLite").getAttribute("aria-checked")).toBe("true");
-      expect(byLabel("Weiter").disabled).toBe(false);
-      flushSync(() => byLabel("Weiter").click());
+      expect(byLabel("Next").disabled).toBe(false);
+      flushSync(() => byLabel("Next").click());
       await flushAsync();
       expect(container.textContent).toContain("2 of 3");
       expect(document.activeElement?.textContent).toBe("Features?");
@@ -2308,10 +2308,10 @@ describe("TaskChatComposer", () => {
       expect(byLabel("Sign in").getAttribute("aria-checked")).toBe("true");
       expect(byLabel("Search").getAttribute("aria-checked")).toBe("true");
       expect(onSubmit).not.toHaveBeenCalled();
-      flushSync(() => byLabel("Weiter").click());
+      flushSync(() => byLabel("Next").click());
       await flushAsync();
       expect(container.textContent).toContain("3 of 3");
-      flushSync(() => byLabel("Antworten senden").click());
+      flushSync(() => byLabel("Submit answers").click());
       await flushAsync();
       expect(onSubmit).toHaveBeenCalledExactlyOnceWith({
         schema: "paperclip.question_response.v1",
@@ -2361,7 +2361,7 @@ describe("TaskChatComposer", () => {
         render(form());
         click('[role="radio"]');
         expect(container.textContent).toContain("1 of 3");
-        act(() => { flushSync(() => buttonByText("Weiter")!.click()); });
+        act(() => { flushSync(() => buttonByText("Next")!.click()); });
         expect(container.textContent).toContain("2 of 3");
         expect(document.activeElement?.textContent).toBe("Second");
       });
@@ -2400,7 +2400,7 @@ describe("TaskChatComposer", () => {
         );
         const radios = () => Array.from(container.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
         act(() => { flushSync(() => radios()[0]!.click()); });
-        act(() => { flushSync(() => buttonByText("Antworten senden")!.click()); });
+        act(() => { flushSync(() => buttonByText("Submit answers")!.click()); });
         await flushAsync();
         expect(onSubmit).toHaveBeenCalledOnce();
         expect(container.textContent).toContain("Network unreachable");
@@ -2438,7 +2438,7 @@ describe("TaskChatComposer", () => {
         // reach the end with the first question still blank. Skip on the last
         // question then sends, which is where the complaint comes from.
         click('[aria-label="Next question"]');
-        act(() => { flushSync(() => buttonByText("Überspringen")!.click()); });
+        act(() => { flushSync(() => buttonByText("Skip")!.click()); });
         await flushAsync();
         expect(container.textContent).toContain("Question 1 needs an answer");
         act(() => { flushSync(() => radios()[0]!.click()); });
@@ -2493,10 +2493,10 @@ describe("TaskChatComposer", () => {
         ).find((button) => button.textContent?.trim() === label);
       flushSync(() => byLabel("Staging")?.click());
       await flushAsync();
-      flushSync(() => byLabel("Weiter")?.click());
+      flushSync(() => byLabel("Next")?.click());
       await flushAsync();
       expect(container.textContent).toContain("Anything else?");
-      flushSync(() => byLabel("Überspringen")?.click());
+      flushSync(() => byLabel("Skip")?.click());
       await flushAsync();
       expect(onSubmit).toHaveBeenCalledTimes(1);
       expect(onSubmit.mock.calls[0]?.[0]).toMatchObject({
@@ -2558,7 +2558,7 @@ describe("TaskChatComposer", () => {
       expect(container.textContent).toContain("Anything else?");
 
       // Skip here would send; instead the form goes back and says why.
-      flushSync(() => byLabel("Überspringen")?.click());
+      flushSync(() => byLabel("Skip")?.click());
       await flushAsync();
       expect(onSubmit).not.toHaveBeenCalled();
       expect(container.textContent).toContain("Where?");
@@ -2656,16 +2656,16 @@ describe("TaskChatComposer", () => {
         container.querySelectorAll<HTMLButtonElement>("button"),
       );
       const skip = buttons.find(
-        (button) => button.textContent?.trim() === "Überspringen",
+        (button) => button.textContent?.trim() === "Skip",
       );
       const submit = buttons.find(
-        (button) => button.textContent?.trim() === "Antworten senden",
+        (button) => button.textContent?.trim() === "Submit answers",
       );
       expect(skip).not.toBeUndefined();
       expect(submit).not.toBeUndefined();
       expect(skip?.parentElement).toBe(submit?.parentElement);
       expect(
-        buttons.filter((button) => button.textContent?.trim() === "Überspringen"),
+        buttons.filter((button) => button.textContent?.trim() === "Skip"),
       ).toHaveLength(1);
       const takeoverBody = container.querySelector(
         '[data-testid="task-chat-composer-takeover-body"]',
@@ -2712,7 +2712,7 @@ describe("TaskChatComposer", () => {
         />,
       );
 
-      expect(container.textContent).not.toContain("Überspringen");
+      expect(container.textContent).not.toContain("Skip");
       expect(
         container.querySelector(
           'button[aria-label="Dismiss Review the proposed plan"]',
