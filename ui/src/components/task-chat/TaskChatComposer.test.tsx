@@ -2247,11 +2247,11 @@ describe("TaskChatComposer", () => {
       expect(container.textContent).toContain("Who?");
       expect(onSubmit).not.toHaveBeenCalled();
 
-      // Last page: primary reads Submit answers and sends everything.
+      // Last page: primary reads Submit and sends everything.
       expect(byLabel("Next")).toBeUndefined();
       flushSync(() => byLabel("Me")?.click());
       await flushAsync();
-      flushSync(() => byLabel("Submit answers")?.click());
+      flushSync(() => byLabel("Submit")?.click());
       await flushAsync();
       expect(onSubmit).toHaveBeenCalledTimes(1);
       const response = onSubmit.mock.calls[0]?.[0];
@@ -2311,7 +2311,7 @@ describe("TaskChatComposer", () => {
       flushSync(() => byLabel("Next").click());
       await flushAsync();
       expect(container.textContent).toContain("3 of 3");
-      flushSync(() => byLabel("Submit answers").click());
+      flushSync(() => byLabel("Submit").click());
       await flushAsync();
       expect(onSubmit).toHaveBeenCalledExactlyOnceWith({
         schema: "paperclip.question_response.v1",
@@ -2400,7 +2400,7 @@ describe("TaskChatComposer", () => {
         );
         const radios = () => Array.from(container.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
         act(() => { flushSync(() => radios()[0]!.click()); });
-        act(() => { flushSync(() => buttonByText("Submit answers")!.click()); });
+        act(() => { flushSync(() => buttonByText("Submit")!.click()); });
         await flushAsync();
         expect(onSubmit).toHaveBeenCalledOnce();
         expect(container.textContent).toContain("Network unreachable");
@@ -2615,7 +2615,7 @@ describe("TaskChatComposer", () => {
       expect(onSubmit).not.toHaveBeenCalled();
     });
 
-    it("places Skip beside Submit answers for structured questions", () => {
+    it("places Skip beside Submit for structured questions", () => {
       render(
         <TaskChatComposer
           onAdd={vi.fn()}
@@ -2659,7 +2659,7 @@ describe("TaskChatComposer", () => {
         (button) => button.textContent?.trim() === "Skip",
       );
       const submit = buttons.find(
-        (button) => button.textContent?.trim() === "Submit answers",
+        (button) => button.textContent?.trim() === "Submit",
       );
       expect(skip).not.toBeUndefined();
       expect(submit).not.toBeUndefined();

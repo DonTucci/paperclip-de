@@ -2,6 +2,17 @@ name: Deutscher Fork parallel prüfen
 
 on:
   workflow_dispatch:
+    inputs:
+      test_group:
+        description: "Zu prüfender Bereich"
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - server-1
+          - workspaces-a
+          - serialized-2
   pull_request:
 
 permissions:
@@ -14,28 +25,40 @@ jobs:
       matrix:
         include:
           - name: Server 1
+            id: server-1
             command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 0 --shard-count 5
           - name: Server 2
+            id: server-2
             command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 1 --shard-count 5
           - name: Server 3
+            id: server-3
             command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 2 --shard-count 5
           - name: Server 4
+            id: server-4
             command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 3 --shard-count 5
           - name: Server 5
+            id: server-5
             command: node scripts/run-vitest-stable.mjs --mode general --group general-server --shard-index 4 --shard-count 5
           - name: Workspaces A
+            id: workspaces-a
             command: node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-a
           - name: Workspaces B
+            id: workspaces-b
             command: node scripts/run-vitest-stable.mjs --mode general --group general-workspaces-b
           - name: Serialized 1
+            id: serialized-1
             command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 0 --shard-count 4
           - name: Serialized 2
+            id: serialized-2
             command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 1 --shard-count 4
           - name: Serialized 3
+            id: serialized-3
             command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 2 --shard-count 4
           - name: Serialized 4
+            id: serialized-4
             command: node scripts/run-vitest-stable.mjs --mode serialized --shard-index 3 --shard-count 4
     runs-on: ubuntu-latest
+    if: ${{ inputs.test_group == 'all' || inputs.test_group == matrix.id }}
     timeout-minutes: 180
     name: Tests – ${{ matrix.name }}
     steps:

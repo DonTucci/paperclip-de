@@ -3126,7 +3126,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
         expect(button("Testing…").querySelector("svg.animate-spin")).not.toBeNull();
         expect([...document.body.querySelectorAll('[role="status"]')].some(e => e.textContent === "Testing connection…")).toBe(true);
         expect(document.body.querySelector('[aria-label="Saved subscription"]')).toBeNull();
-        expect(document.body.textContent).not.toContain("Run this in a terminal");
+        expect(document.body.textContent).not.toContain("Open a terminal on this computer.");
         expect(document.body.textContent).not.toContain("Start sign-in again");
       }
 
@@ -3136,7 +3136,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
         const { root, queryClient } = await openStep4({ adapterType });
         try {
           await pickSource(label);
-          expect(document.body.textContent).toContain("Run this in a terminal");
+          expect(document.body.textContent).toContain("Open a terminal on this computer.");
           expect(button("Connect").disabled).toBe(false);
           await detected();
           expectTesting();
@@ -3208,7 +3208,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
           await settle();
           expect(mockAgentsApi.testEnvironment).not.toHaveBeenCalled();
           expect(mockAgentsApi.hire).not.toHaveBeenCalled();
-          expect(document.body.textContent).toContain("Run this in a terminal");
+          expect(document.body.textContent).toContain("Open a terminal on this computer.");
           expect(button("Connect").disabled).toBe(false);
         } finally { await act(async () => root.unmount()); }
       });
@@ -3295,7 +3295,7 @@ describe("OnboardingWizard restore-gate (stale localStorage across accounts)", (
           await pickSource(/OpenAI/);
           await detected();
           expect(button("Connecting…").disabled).toBe(true);
-          expect(document.body.textContent).not.toContain("Run this in a terminal");
+          expect(document.body.textContent).not.toContain("Open a terminal on this computer.");
           await act(async () => saved({ connectionId: "local-connection", grantId: "local-grant" }));
           await settle();
           expectTesting();
