@@ -162,7 +162,7 @@ jobs:
     # npm trusted publishing supports GitHub-hosted runners only.
     name: Publish preview migrator
     needs: [plan_preview, package_preview]
-    if: github.ref == 'refs/heads/master' && needs.plan_preview.outputs.packages == 'true' && needs.package_preview.result == 'success'
+    if: github.repository == 'paperclipai/paperclip' && github.ref == 'refs/heads/master' && needs.plan_preview.outputs.packages == 'true' && needs.package_preview.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # A manual preview and a merge-triggered migrator may compile in parallel.
@@ -337,7 +337,7 @@ jobs:
         run: node scripts/cloud-source-verification.mjs "$SOURCE_SHA"
 
   publish_canary:
-    if: github.event_name == 'push'
+    if: github.repository == 'paperclipai/paperclip' && github.event_name == 'push'
     needs: verify_canary
     runs-on: ubuntu-latest
     timeout-minutes: 150
@@ -595,6 +595,10 @@ jobs:
       needs.select_nightly.outputs.proceed == 'true' &&
       (needs.smoke_nightly.result == 'success' ||
        (needs.smoke_nightly.result == 'skipped' && github.event_name == 'workflow_dispatch' && inputs.dry_run))
+      # The upstream workflow publishes @paperclipai/* through npm trusted
+      # publishing. A fork must never attempt that publication: its GitHub
+      # repository is not an authorized npm publisher for the upstream scope.
+      && github.repository == 'paperclipai/paperclip'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     environment: npm-canary
@@ -857,6 +861,7 @@ jobs:
   publish_beta:
     needs: [select_beta, verify_beta_candidate]
     if: >-
+      github.repository == 'paperclipai/paperclip' &&
       !cancelled() &&
       needs.select_beta.result == 'success' &&
       (needs.verify_beta_candidate.result == 'success' ||
@@ -1282,7 +1287,7 @@ jobs:
           ./scripts/release.sh "${args[@]}"
 
   publish_stable:
-    if: github.event_name == 'workflow_dispatch' && inputs.channel == 'stable' && !inputs.dry_run
+    if: github.repository == 'paperclipai/paperclip' && github.event_name == 'workflow_dispatch' && inputs.channel == 'stable' && !inputs.dry_run
     needs: [preflight_stable, verify_stable]
     runs-on: ubuntu-latest
     timeout-minutes: 150
