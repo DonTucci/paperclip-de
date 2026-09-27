@@ -3625,7 +3625,7 @@ describe("TaskChatThread live transcript", () => {
     );
     await act(async () => option?.click());
     const submit = Array.from(container.querySelectorAll("button")).find(
-      (button) => button.textContent?.trim() === "Submit answers",
+      (button) => button.textContent?.trim() === "Submit",
     );
     await act(async () => submit?.click());
 
