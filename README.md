@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="#quickstart"><strong>Quickstart</strong></a> &middot;
+  <a href="#paperclip-de"><strong>Paperclip DE</strong></a> &middot;
   <a href="https://docs.paperclip.ing"><strong>Docs</strong></a> &middot;
   <a href="https://github.com/paperclipai/paperclip"><strong>GitHub</strong></a> &middot;
   <a href="https://discord.gg/m4HZY7xNG3"><strong>Discord</strong></a> &middot;
@@ -293,6 +294,29 @@ Paperclip is a full control plane, not a wrapper. Before you build any of this y
 | **Not a prompt manager.**    | Agents bring their own prompts, models, and runtimes. Paperclip manages the organization they work in.               |
 | **Not a single-agent tool.** | This is for teams. If you have one agent, you probably don't need Paperclip. If you have twenty — you definitely do. |
 | **Not a code review tool.**  | Paperclip orchestrates work, not pull requests. Bring your own review process.                                       |
+
+<br/>
+
+## Paperclip DE
+
+Paperclip DE ist der deutsche Fork für Windows und eine vollständig lokale
+Paperclip-Installation. Die persönliche Organisation bleibt auf dem eigenen
+Computer; sie wird nicht automatisch nach GitHub übertragen.
+
+Die Erweiterungen umfassen:
+
+- eine visuelle Organisationshierarchie mit Vorgesetzten und Untergebenen;
+- mehrere Untergebene pro Agent bei höchstens einem direkten Vorgesetzten;
+- Verschieben und dauerhafte Anordnung der Agenten in der Hierarchie;
+- Bearbeiten eines Agenten direkt über das Stiftsymbol;
+- deutsche Oberfläche, deutsches Onboarding und eine Windows-EXE.
+
+Die fertige Windows-Installation steht im Bereich
+[Releases](https://github.com/DonTucci/paperclip-de/releases). Lade dort
+`Paperclip-DE-Setup-*.exe` herunter. Der Installer erstellt die
+Desktop-Verknüpfung **Paperclip DE** und richtet die benötigten Komponenten
+automatisch ein. Eine genaue Windows-Anleitung steht in
+[`doc/windows-release.md`](doc/windows-release.md).
 
 <br/>
 
