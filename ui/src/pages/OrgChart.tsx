@@ -1,4 +1,4 @@
-import { tf } from "@/i18n/fork";
+import { t } from "@/i18n";
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "@/lib/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -307,25 +307,25 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       const source = agentMap.get(change.sourceId);
       const target = change.targetId ? agentMap.get(change.targetId) : undefined;
       toastActions?.pushToast({
-        title: tf("orgChart.hierarchySaved"),
+        title: t("orgChart.hierarchySaved", { defaultValue: "Reporting line saved" }),
         body: target
-          ? tf("orgChart.hierarchySavedWithManager", { agent: source?.name ?? "", manager: target.name })
-          : tf("orgChart.hierarchySavedToBoard", { agent: source?.name ?? "" }),
+          ? t("orgChart.hierarchySavedWithManager", { defaultValue: "{{agent}} now reports to {{manager}}.", agent: source?.name ?? "", manager: target.name })
+          : t("orgChart.hierarchySavedToBoard", { defaultValue: "{{agent}} is now at board level.", agent: source?.name ?? "" }),
         tone: "success",
       });
       setPendingHierarchyChange(null);
     },
     onError: (error) => {
       toastActions?.pushToast({
-        title: tf("orgChart.hierarchySaveFailed"),
-        body: error instanceof Error ? error.message : tf("orgChart.hierarchySaveFailedDescription"),
+        title: t("orgChart.hierarchySaveFailed", { defaultValue: "Could not save reporting line" }),
+        body: error instanceof Error ? error.message : t("orgChart.hierarchySaveFailedDescription", { defaultValue: "Please try again." }),
         tone: "error",
       });
     },
   });
 
   useEffect(() => {
-    if (!embedded) setBreadcrumbs([{ label: tf("auto.aab3e6c8a0d87c7d") }]);
+    if (!embedded) setBreadcrumbs([{ label: "Org Chart" }]);
   }, [embedded, setBreadcrumbs]);
 
   // Layout computation
@@ -388,9 +388,9 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [allNodes, bounds]);
 
   const relationshipIssueMessage = useCallback((issue: Exclude<HierarchyChangeIssue, null>) => {
-    if (issue === "self") return tf("orgChart.hierarchyCannotReportToSelf");
-    if (issue === "unchanged") return tf("orgChart.hierarchyAlreadyReportsToManager");
-    return tf("orgChart.hierarchyCannotCreateCycle");
+    if (issue === "self") return t("orgChart.hierarchyCannotReportToSelf", { defaultValue: "An agent cannot be their own manager." });
+    if (issue === "unchanged") return t("orgChart.hierarchyAlreadyReportsToManager", { defaultValue: "This reporting line already exists." });
+    return t("orgChart.hierarchyCannotCreateCycle", { defaultValue: "This connection would create a reporting cycle." });
   }, []);
 
   const proposeHierarchyChange = useCallback((sourceId: string, targetId: string | null) => {
@@ -426,7 +426,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     const { sourceId, targetId } = relationshipDrag;
     setRelationshipDrag(null);
     if (!targetId) {
-      setRelationshipWarning(tf("orgChart.hierarchyDropOnManager"));
+      setRelationshipWarning(t("orgChart.hierarchyDropOnManager", { defaultValue: "Drop the connection on the lower connector of a manager." }));
       return true;
     }
     proposeHierarchyChange(sourceId, targetId);
@@ -614,7 +614,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     : undefined;
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Network} message={tf("auto.8d07c01265ef9637")} />;
+    return <EmptyState icon={Network} message="Select an organization to view the org chart." />;
   }
 
   if (providedOrgTree === undefined && isLoading) {
@@ -622,7 +622,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }
 
   if (orgTree && orgTree.length === 0) {
-    return <EmptyState icon={Network} message={tf("auto.7ac9886550455b61")} />;
+    return <EmptyState icon={Network} message="No organizational hierarchy defined." />;
   }
 
   return (
@@ -637,7 +637,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <Link to="/company/import">
             <Button variant="outline" size="sm">
               <Upload className="mr-1.5 h-3.5 w-3.5" />
-              {tf("auto.837ee932677d818e")}
+              Import organization
             </Button>
           </Link>
         ) : null}
@@ -645,7 +645,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
           <Link to="/company/export">
             <Button variant="outline" size="sm">
               <Download className="mr-1.5 h-3.5 w-3.5" />
-              {tf("auto.38a8481ada8cca1b")}
+              Export organization
             </Button>
           </Link>
         ) : null}
@@ -673,10 +673,10 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
         <div className="absolute left-3 top-3 z-10 max-w-(--sz-calc-20) rounded-md border border-border bg-background/95 px-3 py-2 text-xs shadow-sm">
           <div className="flex items-center gap-1.5 font-medium text-foreground">
             <Link2 className="size-3.5" />
-            {tf("orgChart.hierarchyEditTitle")}
+            {t("orgChart.hierarchyEditTitle", { defaultValue: "Edit reporting lines" })}
           </div>
           <p className={relationshipWarning ? "mt-1 text-destructive" : "mt-1 text-muted-foreground"}>
-            {relationshipWarning ?? tf("orgChart.hierarchyEditHint")}
+            {relationshipWarning ?? t("orgChart.hierarchyEditHint", { defaultValue: "Drag the upper connector from the team member to the lower connector of their manager. Changes are saved only after confirmation." })}
           </p>
         </div>
 
@@ -693,8 +693,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 });
               }
             }}
-            title={tf("auto.0e47f09a748fa132")}
-            aria-label={tf("auto.0e47f09a748fa132")}
+            title="Zoom in"
+            aria-label="Zoom in"
           >
             <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
@@ -709,16 +709,16 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 });
               }
             }}
-            title={tf("auto.bc7b631a689b45ca")}
-            aria-label={tf("auto.bc7b631a689b45ca")}
+            title="Zoom out"
+            aria-label="Zoom out"
           >
             <Minus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
           <button
             className="flex size-9 items-center justify-center rounded border border-border bg-background text-(length:--text-nano) transition-colors hover:bg-accent sm:size-7"
             onClick={fitToScreen}
-            title={tf("auto.32bb0d298ca1545c")}
-            aria-label={tf("auto.3dc2e33313f5cf3c")}
+            title="Fit to screen"
+            aria-label="Fit chart to screen"
           >
             <Maximize2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
           </button>
@@ -813,8 +813,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                   type="button"
                   data-org-report-source
                   className="absolute -top-2 left-1/2 z-10 flex size-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary"
-                  title={tf("orgChart.hierarchyDragHandle")}
-                  aria-label={tf("orgChart.hierarchyDragHandle")}
+                  title={t("orgChart.hierarchyDragHandle", { defaultValue: "Drag this upper connector to the manager's lower connector" })}
+                  aria-label={t("orgChart.hierarchyDragHandle", { defaultValue: "Drag this upper connector to the manager's lower connector" })}
                   onMouseDown={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
@@ -835,8 +835,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                   data-org-manager-port
                   data-agent-id={node.id}
                   className="absolute -bottom-2 left-1/2 z-10 size-4 -translate-x-1/2 rounded-full border-2 border-background bg-muted-foreground shadow-sm"
-                  title={tf("orgChart.hierarchyManagerPort")}
-                  aria-label={tf("orgChart.hierarchyManagerPort")}
+                  title={t("orgChart.hierarchyManagerPort", { defaultValue: "Lower connector for team members" })}
+                  aria-label={t("orgChart.hierarchyManagerPort", { defaultValue: "Lower connector for team members" })}
                 />
                 <div className="flex items-center px-4 py-3 gap-3">
                   {/* Agent icon + status dot */}
@@ -872,8 +872,8 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                     <button
                       type="button"
                       className="flex size-7 shrink-0 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
-                      title={tf("orgChart.hierarchyMoveToBoard")}
-                      aria-label={tf("orgChart.hierarchyMoveToBoard")}
+                      title={t("orgChart.hierarchyMoveToBoard", { defaultValue: "Move to board level" })}
+                      aria-label={t("orgChart.hierarchyMoveToBoard", { defaultValue: "Move to board level" })}
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
@@ -897,22 +897,24 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{tf("orgChart.hierarchyConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogTitle>{t("orgChart.hierarchyConfirmTitle", { defaultValue: "Save reporting line?" })}</AlertDialogTitle>
             <AlertDialogDescription>
               {pendingHierarchyChange?.targetId
-                ? tf("orgChart.hierarchyConfirmManager", {
+                ? t("orgChart.hierarchyConfirmManager", {
+                    defaultValue: "{{agent}} will report to {{manager}} instead of {{previousManager}}.",
                     agent: pendingSource?.name ?? "",
                     manager: pendingTarget?.name ?? "",
-                    previousManager: pendingPreviousManager?.name ?? tf("orgChart.hierarchyBoardLevel"),
+                    previousManager: pendingPreviousManager?.name ?? t("orgChart.hierarchyBoardLevel", { defaultValue: "board level" }),
                   })
-                : tf("orgChart.hierarchyConfirmBoard", {
+                : t("orgChart.hierarchyConfirmBoard", {
+                    defaultValue: "{{agent}} will move from {{previousManager}} to board level.",
                     agent: pendingSource?.name ?? "",
-                    previousManager: pendingPreviousManager?.name ?? tf("orgChart.hierarchyBoardLevel"),
+                    previousManager: pendingPreviousManager?.name ?? t("orgChart.hierarchyBoardLevel", { defaultValue: "board level" }),
                   })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={updateHierarchy.isPending}>{tf("text.Cancel")}</AlertDialogCancel>
+            <AlertDialogCancel disabled={updateHierarchy.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={updateHierarchy.isPending || !pendingHierarchyChange}
               onClick={(event) => {
@@ -920,7 +922,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                 if (pendingHierarchyChange) updateHierarchy.mutate(pendingHierarchyChange);
               }}
             >
-              {updateHierarchy.isPending ? tf("orgChart.hierarchySaving") : tf("text.Confirm")}
+              {updateHierarchy.isPending ? t("orgChart.hierarchySaving", { defaultValue: "Saving..." }) : "Confirm"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
