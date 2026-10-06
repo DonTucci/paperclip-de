@@ -434,6 +434,18 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     return true;
   }, [proposeHierarchyChange, relationshipDrag]);
 
+  const startRelationship = useCallback((sourceId: string, clientX = 0, clientY = 0) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setRelationshipWarning(null);
+    suppressNextCardClick.current = true;
+    setRelationshipDrag({
+      sourceId,
+      pointer: { x: clientX - rect.left, y: clientY - rect.top },
+      targetId: null,
+    });
+  }, []);
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
     // Don't drag if clicking a card
@@ -452,7 +464,10 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [dragging, handleRelationshipMouseMove]);
 
   const handleMouseUp = useCallback(() => {
-    if (handleRelationshipMouseUp()) return;
+    if (handleRelationshipMouseUp()) {
+      suppressNextCardClick.current = false;
+      return;
+    }
     setDragging(false);
   }, [handleRelationshipMouseUp]);
 
@@ -529,6 +544,17 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [pan, zoom]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    if (relationshipDrag && e.touches[0] && containerRef.current) {
+      const touch = e.touches[0];
+      const rect = containerRef.current.getBoundingClientRect();
+      setRelationshipDrag((current) => current ? {
+        ...current,
+        pointer: { x: touch.clientX - rect.left, y: touch.clientY - rect.top },
+        targetId: relationshipTargetAt(touch.clientX, touch.clientY),
+      } : current);
+      e.preventDefault();
+      return;
+    }
     const container = containerRef.current;
     if (!container || !touchGesture.current.mode) return;
 
@@ -576,9 +602,14 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       x: touchGesture.current.startPan.x + dx,
       y: touchGesture.current.startPan.y + dy,
     });
-  }, [pan, zoom]);
+  }, [pan, zoom, relationshipDrag, relationshipTargetAt]);
 
   const handleTouchEnd = useCallback(() => {
+    if (relationshipDrag) {
+      handleRelationshipMouseUp();
+      suppressNextCardClick.current = false;
+      return;
+    }
     if (touchGesture.current.moved) {
       suppressNextCardClick.current = true;
       if (suppressClickTimerRef.current !== null) {
@@ -598,7 +629,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       startCenter: { x: 0, y: 0 },
       moved: false,
     };
-  }, [pan, zoom]);
+  }, [pan, zoom, relationshipDrag, handleRelationshipMouseUp]);
 
   const relationshipSourceNode = relationshipDrag
     ? allNodes.find((node) => node.id === relationshipDrag.sourceId)
@@ -819,25 +850,38 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                   onMouseDown={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    const rect = containerRef.current?.getBoundingClientRect();
-                    if (!rect) return;
-                    setRelationshipWarning(null);
-                    suppressNextCardClick.current = true;
-                    setRelationshipDrag({
-                      sourceId: node.id,
-                      pointer: { x: event.clientX - rect.left, y: event.clientY - rect.top },
-                      targetId: null,
-                    });
+                    startRelationship(node.id, event.clientX, event.clientY);
+                  }}
+                  onTouchStart={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const touch = event.touches[0];
+                    startRelationship(node.id, touch?.clientX ?? 0, touch?.clientY ?? 0);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    startRelationship(node.id);
                   }}
                 >
                   <Link2 className="size-2.5" />
                 </button>
-                <span
+                <button
+                  type="button"
                   data-org-manager-port
                   data-agent-id={node.id}
-                  className="absolute -bottom-2 left-1/2 z-10 size-4 -translate-x-1/2 rounded-full border-2 border-background bg-muted-foreground shadow-sm"
+                  className="absolute -bottom-2 left-1/2 z-10 size-4 -translate-x-1/2 rounded-full border-2 border-background bg-muted-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   title={t("orgChart.hierarchyManagerPort", { defaultValue: "Lower connector for team members" })}
                   aria-label={t("orgChart.hierarchyManagerPort", { defaultValue: "Lower connector for team members" })}
+                  onClick={(event) => {
+                    if (!relationshipDrag) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    proposeHierarchyChange(relationshipDrag.sourceId, node.id);
+                    setRelationshipDrag(null);
+                    suppressNextCardClick.current = false;
+                  }}
                 />
                 <div className="flex items-center px-4 py-3 gap-3">
                   {/* Agent icon + status dot */}
