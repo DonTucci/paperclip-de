@@ -1,3 +1,7 @@
+import { interactionReadinessRefetchInterval } from "@/lib/issue-thread-interactions";
+import { SkillBinaryFile } from "../components/SkillBinaryFile";
+import { SkillSourceProvenance } from "../components/SkillSourceProvenance";
+import { AgentIdentity } from "@/components/AgentIdentity";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -1474,12 +1478,13 @@ function SkillPane({
             ariaLabel="Skill files"
           />
         </div>
+        <SkillSourceProvenance skill={skill} />
         {readOnly && (
           <div className="flex items-start gap-3 border-b border-border bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
             <div className="min-w-0 flex-1">
               <p>
-                {skill.editableReason ?? "This skill is read-only because it comes from an external source."}
+                {skill.metadata?.skillSourceId ? "This skill is synced from GitHub and is read-only." : skill.editableReason ?? "This skill is read-only because it comes from an external source."}
                 {" "}Make an editable copy to change it — the original stays untouched.
               </p>
               <Button
@@ -1489,7 +1494,7 @@ function SkillPane({
                 onClick={onEditACopy}
               >
                 <GitFork className="mr-1.5 h-3.5 w-3.5" />
-                Edit a copy
+                Make a copy
               </Button>
             </div>
           </div>
@@ -1544,7 +1549,7 @@ function SkillPane({
           onPasteCapture={markBodyInteracted}
           onPointerDownCapture={markBodyInteracted}
         >
-          {isMarkdown && markdownBlock ? (
+          {fileQuery.data?.encoding === "base64" ? <SkillBinaryFile file={fileQuery.data} /> : isMarkdown && markdownBlock ? (
             <MarkdownEditor
               key={`body:${selectedFile}`}
               value={markdownBlock.body}
@@ -2958,7 +2963,7 @@ function AgentPicker({
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm">
           {selectedAgent ? (
-            <Identity name={selectedAgent.name} size="xs" />
+            <AgentIdentity agent={selectedAgent} size="xs" />
           ) : (
             <span className="text-muted-foreground">Pick an agent</span>
           )}
@@ -2991,7 +2996,7 @@ function AgentPicker({
                       )}
                       aria-hidden
                     />
-                    <Identity name={agent.name} size="xs" />
+                    <AgentIdentity agent={agent} size="xs" />
                     {!selectable && (
                       <Badge variant="secondary" className="ml-auto">
                         Paused
@@ -3118,7 +3123,7 @@ function RunDetailView({
       <div className="min-h-0 flex-1 space-y-3 overflow-auto p-3">
         <div className="flex flex-wrap items-center gap-2">
           <StatusBadge status={runBadgeStatus(detail.status)} />
-          <Identity name={agentName} size="xs" />
+          <AgentIdentity agent={agent ?? { id: detail.agentId, name: agentName }} size="xs" />
           {removed && <Badge variant="secondary">removed</Badge>}
           <span className="font-mono text-xs text-muted-foreground">
             v{detail.skillVersion.revisionNumber}
@@ -3332,7 +3337,7 @@ function InteractionSection({
     queryKey: ["skill-studio", "interactions", harnessIssueId],
     queryFn: () => issuesApi.listInteractions(harnessIssueId!),
     enabled: Boolean(harnessIssueId && hasInlineAnswerable),
-    refetchInterval: hasInlineAnswerable ? POLL_MS : false,
+    refetchInterval: (query) => interactionReadinessRefetchInterval(query.state.data, hasInlineAnswerable ? POLL_MS : false),
   });
   const fullById = useMemo(
     () => new Map((fullQuery.data ?? []).map((i) => [i.id, i])),
@@ -3443,7 +3448,7 @@ function VersionHistorySheet({
       // Restore = write each file from the chosen version back, then cut a new
       // head version (immutability: never rewrites history).
       for (const file of version.fileInventory) {
-        await companySkillsApi.updateFile(companyId, skillId, file.path, file.content);
+        await companySkillsApi.updateFile(companyId, skillId, file.path, file.content, { encoding: file.encoding, executable: file.executable ?? false });
       }
       return companySkillsApi.createVersion(companyId, skillId, {
         label: `Restore of v${version.revisionNumber}`,
@@ -3458,8 +3463,8 @@ function VersionHistorySheet({
   const left = versions.find((v) => v.id === leftId) ?? null;
   const right = versions.find((v) => v.id === rightId) ?? null;
   const diff = left && right ? buildLineDiff(
-    left.fileInventory.map((f) => `# ${f.path}\n${f.content}`).join("\n\n"),
-    right.fileInventory.map((f) => `# ${f.path}\n${f.content}`).join("\n\n"),
+    left.fileInventory.map((f) => `# ${f.path}${f.executable ? " (executable)" : ""}\n${f.encoding === "base64" ? "[Binary asset]" : f.content}`).join("\n\n"),
+    right.fileInventory.map((f) => `# ${f.path}${f.executable ? " (executable)" : ""}\n${f.encoding === "base64" ? "[Binary asset]" : f.content}`).join("\n\n"),
   ) : null;
 
   return (
@@ -3495,7 +3500,7 @@ function VersionHistorySheet({
                     <Button
                       variant="outline"
                       size="xs"
-                      disabled={restore.isPending}
+                      disabled={restore.isPending || skill.editable === false}
                       onClick={(e) => {
                         e.stopPropagation();
                         restore.mutate(v);

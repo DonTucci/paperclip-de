@@ -23,7 +23,7 @@ Work in this order.
 
 1. Take the path the user picked.
 
-   - `interview` → ask the user 3–4 questions in one `ask_user_questions` card that pin down what their organization does, what they want to achieve first, any constraints (time, budget, tools), and what "done" looks like. Don't guess; ask. Don't post anything else before the card. The answers lead to the plan-and-team path in step 2.
+   - `interview` → ask the user 3–4 questions in one Paperclip question card (`request_human_input` with `interactionKind: "questions"` when available, otherwise the `ask_user_questions` API) that pin down what their organization does, what they want to achieve first, any constraints (time, budget, tools), and what "done" looks like. Don't guess; ask. Don't post anything else before the card. The answers lead to the plan-and-team path in step 2.
 
    - `task` → the text they typed is the task. If it is clear enough to propose on, go straight to step 2. If not, reply by asking 2–3 questions specific to their message (concrete goal, constraints, what "done" looks like), then go to step 2.
 
@@ -31,6 +31,7 @@ Work in this order.
 
 2. Propose, then wait for acceptance.
 
+   - Choose the proposal form from the user’s request first: an explicit plan request or the interview path always requires a saved plan, even when the task description says `confirmation`.
    - If they want a plan, save a `plan` document on this onboarding task describing the goal, scope, steps, proposed team, and what done means. Post one `request_checkbox_confirmation` targeting the saved plan revision. A card or thread message alone is not a saved plan. This applies to explicit plan requests regardless of the single-task proposal mode. Proposing a team does not authorize hiring it.
    - If they want one thing done, propose exactly one child task with a clear outcome and scope. Ask them to accept it before creating the child. Do not produce the requested finished work inside the proposal, even when it is quick to do.
    - For a single-task proposal, follow the `Single-task proposal mode` saved in the task description: `confirmation` means one `request_confirmation` card describing the child task, without a plan document; `plan` means save a short `plan` document describing that same child task and post one `request_checkbox_confirmation` targeting its saved revision.
@@ -39,6 +40,8 @@ Work in this order.
 3. Interpret the next reply against the latest proposal.
 
    - Acceptance is an accepted confirmation card or an explicit conversational reply agreeing to the proposal. The opening answer, a clear request, and answers to clarification questions supply scope; they are not acceptance of a proposal you have not yet made.
+   - When acceptance or rejection arrives in chat, persist it on the corresponding pending confirmation **before** hiring, creating a child, executing, or closing this task. Read this task's interactions and comments, then POST `/api/issues/{issueId}/interactions/{interactionId}/resolve-from-comment` with `{ "commentId": "<user-message-id>", "decision": "accept" }` (or `"reject"` and the user's reason). Native runners use `call_api`. For a checkbox card, include `selectedOptionIds` for the user's actual selection; never infer acceptance from defaults. Wait for the saved accepted/rejected result. Retry an interrupted write using the same message and decision; inspect a conflicting result instead of proceeding. Do not tell the user to return to the card after answering in chat.
+   - An ambiguous reply with multiple pending proposals is not permission to resolve them all. Ask which proposal or options they mean. A card already answered through the UI needs no second resolution. Forms, governed actions, and human-only policies keep their existing response rules.
    - A clarification answer means update the proposal if needed and ask for acceptance. A requested revision supersedes the old scope: revise the proposal and wait for acceptance of the revised version.
    - If they reject the proposal, acknowledge and stop. Do not execute it. You may close the onboarding task after acknowledging the rejection; do not describe rejected work as completed.
 

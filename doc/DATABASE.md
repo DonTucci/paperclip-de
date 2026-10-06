@@ -144,6 +144,63 @@ DATABASE_URL=postgres://postgres.[PROJECT-REF]:[PASSWORD]@...5432/postgres \
 
 See [Supabase pricing](https://supabase.com/pricing) for current details.
 
+## Connection loss and retries
+
+The database client does not replay arbitrary statements after a disconnect.
+PostgreSQL may have committed a statement before the connection loses its
+response. The postgres.js message `write CONNECTION_CLOSED` does not prove
+that the statement was never sent: the driver also uses it when an in-flight
+query loses its connection. SQL text cannot establish replay safety either;
+a `SELECT` can call a function with side effects.
+
+The affected operation fails and a new operation can reconnect through the
+pool. Callers may retry only when the complete operation is idempotent or has
+a durable receipt that prevents duplicate effects. Some transient statement
+failures therefore reach the caller instead of being retried automatically.
+
+When a database connection closes, its transaction fails. Paperclip does not
+replay that transaction. New requests can use a fresh connection from the pool.
+Queries from the failed transaction must keep failing, even after the pool
+reconnects.
+
+Source builds carry `patches/postgres@3.4.9.patch` for this behavior. It rejects
+queued and later queries from a disconnected transaction or reserved connection,
+and prevents a released, closed connection from returning to the open pool.
+The patch covers both ESM and CommonJS. The regression suite terminates real
+PostgreSQL backends and checks rejection, pool recovery, and transaction isolation.
+Remove the patch when an upstream release passes these tests. Installs of the
+unmodified `postgres` package outside this workspace do not include the patch.
+
+Trusted-header actor synchronization retries transient connection failures,
+including `CONNECT_TIMEOUT`, at most twice. This retry applies only to the
+idempotent actor synchronization operations, not arbitrary transactions. A
+persistent outage still fails the request after the bounded retries; each
+connection attempt remains subject to the configured database connect timeout.
+
+The dashboard's company lookup, agent and task counts, pending approval count,
+monthly spend, and run activity aggregate each retry these connection errors
+at most twice. The heartbeat run list and base issue lookup by UUID or identifier
+use the same bounded retries. Each callback is read-only and rebuilds its query
+for each attempt. A failed read does not replay completed reads, the budget
+workflow, or issue label and watchdog enrichment. Missing resources,
+authentication errors, and other database errors retain their usual behavior.
+This does not enable general SQL replay or retry a full request.
+
+The task run list also opts its execution-status projection into these bounded
+retries. Each of its four read-only lookups rebuilds only the failed query;
+completed lookups and the separate liveness backfill are not replayed. Projection
+callers that use a transaction retain single-attempt reads. The opt-in is only
+for a pooled database handle outside a transaction.
+
+## Execution identity row locks
+
+Identity initialization, credential acquisition, and steering reconciliation lock
+the task before its run. These operations use `FOR NO KEY UPDATE`: they change
+identity state, not parent keys. The lock still serializes identity writers and
+blocks concurrent task or run updates. It allows audit inserts to retain their
+foreign-key `KEY SHARE` locks without waiting on identity acquisition. The audit
+foreign keys and their deletion behavior remain enforced.
+
 ## Switching between modes
 
 The database mode is controlled by `DATABASE_URL`:
@@ -175,6 +232,7 @@ When authoring migrations or one-time backfills:
 
 - Create every migration with `pnpm --filter @paperclipai/db generate`. Do not hand-write a snapshot.
 - Do not hand-edit a snapshot to resolve a merge conflict. Renumber your migration and run `generate` again, as `packages/db/.gitattributes` describes.
+- The repo keeps only the newest 5 snapshots. `generate` runs `prune:snapshots` afterwards to delete older ones. Drizzle only reads the newest snapshot, and each snapshot is a full copy of the schema (over 1 MB each). Older snapshots are still in git history.
 - `packages/db/src/migration-snapshot-drift.test.ts` is the enforcement backstop. It repeats the diff that `generate` performs and fails when the newest snapshot no longer matches `packages/db/src/schema/`.
 
 ## Cloud runtime identity singleton
@@ -270,6 +328,15 @@ successor can take the lease immediately only when coordinated handoff or PID
 and process-start evidence proves the prior controller is gone, or when the
 lease expires. Recovery generation changes do not increment the independent
 provider-attempt counter.
+
+## Chat communication snapshots
+
+Chat communication guidance uses two additive columns: endpoint
+`communication_instructions` defaults to empty, and conversation
+`communication_guidance` holds the immutable initial task snapshot. Existing
+conversations retain a null snapshot; there is no backfill that changes an
+ongoing conversation. New Slack tasks receive built-in guidance even when the
+endpoint has no additional instructions.
 
 ## Telegram private draft identities
 
@@ -391,6 +458,41 @@ Hosted AWS provider notes live in [SECRETS-AWS-PROVIDER.md](./SECRETS-AWS-PROVID
 
 Migration `0274_agent_chat.sql` adds conversation identity/state and session generation/boundary columns to `issues`, plus idempotent client request IDs and processed session-boundary generations to `issue_comments`. The company/agent/user unique index resolves concurrent first writes to one issue. A check constraint preserves the assigned-agent identity and prevents terminal conversation status. Comment request IDs are unique per issue and user. There is no separate chat/message store. Provider sessions continue to use `agent_task_sessions`; `/new` removes only the matching conversation session, and session writers fence stale generations against the issue row.
 
+## Resource lifecycle events
+
+`resource_lifecycle_events` records content-free lifecycle hooks in the same
+transaction as the resource change. Hired agents and new projects emit `create`.
+Pending hires emit creation only when `activatePendingApproval` succeeds.
+Rejected hires emit termination without creation. Agents created as terminated
+emit no creation event. Capture is generic and works on self-hosted and managed
+instances; recording an event does not authorize a provider operation.
+
+A partial unique `(company_id, resource_type, resource_id)` index deduplicates
+creation. Each actual agent pause, resume, or termination appends another event,
+including budget actions and generic status updates. The agent row stays locked
+until status and event commit, so concurrent repeat requests emit one hook.
+Project edits and workspace additions, updates, and removals append `update`.
+Repository replacement emits one aggregate update; project creation with repositories
+emits only creation. Project mutations hold the project row lock until their record
+commits. An archive-only change emits nothing and preserves workspace records.
+Termination commits API-key revocation in that same transaction.
+Hire approval and rejection commit with agent activation or termination, so a
+failed event write leaves the decision pending and retryable.
+
+The numeric event ID orders transitions for a resource. Future plugin delivery
+must enforce company scope, preserve resource order, and track acknowledgments
+per plugin. A global high-water mark can skip transactions that have not yet
+committed; it is not a safe delivery cursor. The journal stores only identity,
+action, and timestamps, not repository snapshots, credentials, provider config,
+or resource health. Company deletion cascades to its events. Resource deletion
+retains events, so consumers must revalidate existence and eligibility and load
+current authorized repository data. A termination hook does not authorize
+removing persistent VM or project data.
+
+The migration creates an empty table. It does not scan or backfill existing
+installs. Plugin delivery, retention, retries, and provider integration are
+separate work. This change makes no provider calls and adds no plugin read API.
+
 ## Legacy controller ownership
 
 Legacy run claims atomically record `controller_boot_id`, a database-clock
@@ -401,3 +503,34 @@ cleanup authority; it does not prove that remote inference has stopped. Recovery
 revokes the previous boot identity with a conditional update. Its own claim also
 expires so another sweep can finish cleanup after a restart. Historical rows keep
 null ownership fields and follow the previous recovery path.
+
+## Agent file persistence and legacy revisions
+
+Managed agent files are current filesystem contents, using the same persistent
+instance storage as other workspaces. `agent_instruction_revisions` and
+`agent_instruction_heads` are retained as read-only upgrade input. Their heads
+are adopted once into the managed directory; new saves never append revisions.
+`agent_instruction_working_copies` holds per-run baseline hashes, state, and
+capture receipts. New receipts identify `paperclip.agent-files.v1`; historical
+rows retain the instruction-only format. Completed directory runs discard their
+baseline and private copies. See [Persistent agent files](agent-files.md).
+
+## Large API response snapshots
+
+`assets.byte_size` uses PostgreSQL `bigint` so saved responses and byte ranges can
+exceed 2 GiB. The API and Drizzle mapping continue to expose a JavaScript number;
+response readers validate safe integer offsets. The type-widening migration
+rewrites the asset metadata table and needs an exclusive table lock. File bytes
+remain in local or object storage.
+
+### Runner API response reservations
+
+`runner_api_response_reservations` holds company-scoped API snapshot reservations.
+Before a capture spills, the server locks company admission and counts stored
+`runner-api` assets plus unattached reservations against a 20 GiB default quota.
+A committed asset replaces its reservation in that total. The asset foreign key
+cascades on deletion, while deleting a run sets `run_id` to null so an orphan
+reservation cannot silently disappear. Failed cleanup or an ambiguous storage
+write requires operator reconciliation before an unattached reservation is
+removed. The table stores no response bodies. See `doc/runner-api-tools.md` for
+limits and the operator override.

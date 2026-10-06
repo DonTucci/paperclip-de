@@ -1,6 +1,7 @@
 import { AiConnectionField } from "./ai-connections/AiConnectionField";
-import { aiConnectionBindingSchema } from "@paperclipai/shared";
+import { aiConnectionBindingSchema, aiRuntimeConnectionBindingSchema } from "@paperclipai/shared";
 import { testAgentSetup } from "@/lib/test-agent-setup";
+import { setupEfforts } from "../lib/agent-setup-fields";
 import { RuntimeTestCard } from "./RuntimeTestCard";
 import { useState, useEffect, useRef, useMemo, useCallback, Children, isValidElement, type ReactNode } from "react";
 import type { AdapterConfigSection } from "../adapters/types";
@@ -57,7 +58,7 @@ import {
   resolveManagedSandboxEnvironmentId,
 } from "../lib/adapter-test-environment";
 import { environmentDisplayLabel } from "../lib/managed-sandbox-environment";
-import { extractModelName, extractProviderId } from "../lib/model-utils";
+import { adapterCuratesModelOrder, extractModelName, extractProviderId } from "../lib/model-utils";
 import { queryKeys } from "../lib/queryKeys";
 import { useCompany } from "../context/CompanyContext";
 import {
@@ -1060,12 +1061,13 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
       });
       const adapterConfig = buildAdapterConfigForTest(adapterConfigPatch);
       const agentId = isCreate ? undefined : props.agent.id;
-      const aiConnection = isCreate ? undefined : aiConnectionBindingSchema.safeParse(
+      const aiConnection = isCreate ? undefined : aiRuntimeConnectionBindingSchema.safeParse(
         (overlay.runtime.runtimeConfig as Record<string, unknown> | undefined)?.aiConnection ?? props.agent.runtimeConfig.aiConnection,
       ).data;
       if (props.compactTestFeedback) {
         const providerAdapter = adapterType === "paperclip_runner"
           ? adapterConfig.provider === "codex" ? "codex_local"
+            : adapterConfig.provider === "acpx" && adapterConfig.acpxAgent === "grok" ? "grok_local"
             : adapterConfig.provider === "acpx" && adapterConfig.acpxAgent === "claude" ? "claude_local"
               : adapterType
           : adapterType;
@@ -1268,6 +1270,7 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
         ? "mode"
         : adapterType === "opencode_local"
           ? "variant"
+          : adapterType === "grok_local" ? "reasoningEffort"
           : adapterType === "pi_local" ? "thinking" : "effort";
   const thinkingEffortOptions =
     adapterType === "codex_local"
@@ -1283,7 +1286,12 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
             ? kimiThinkingEffortOptions
             : adapterType === "pi_local"
               ? [{ id: "", label: "Auto" }, ...["off", "minimal", "low", "medium", "high", "xhigh"].map(id => ({ id, label: id }))]
-              : claudeThinkingEffortOptions;
+              : adapterType === "claude_local" || adapterType === "grok_local"
+                ? [{ id: "", label: "Auto" }, ...setupEfforts(adapterType, currentModelId).map((id) => ({
+                    id,
+                    label: id === "xhigh" ? "X-High" : id[0].toUpperCase() + id.slice(1),
+                  }))]
+                : claudeThinkingEffortOptions;
   const currentThinkingEffort = isCreate
     ? val!.thinkingEffort
     : adapterType === "codex_local"
@@ -1650,8 +1658,8 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
             </Field>
           )}
 
-          {!isCreate && selectedCompanyId && <AiConnectionField companyId={selectedCompanyId} agentId={props.agent.id} agentName={props.agent.name} adapterType={adapterType === "paperclip_runner" ? eff("adapterConfig", "provider", config.provider) === "codex" ? "codex_local" : eff("adapterConfig", "provider", config.provider) === "opencode" ? "opencode_local" : eff("adapterConfig", "provider", config.provider) === "acpx" && eff("adapterConfig", "acpxAgent", config.acpxAgent) === "claude" ? "claude_local" : adapterType : adapterType}
-            value={aiConnectionBindingSchema.safeParse((overlay.runtime.runtimeConfig as Record<string, unknown> | undefined)?.aiConnection ?? runtimeConfig.aiConnection).data}
+          {!isCreate && selectedCompanyId && <AiConnectionField companyId={selectedCompanyId} agentId={props.agent.id} agentName={props.agent.name} adapterType={adapterType === "paperclip_runner" ? eff("adapterConfig", "provider", config.provider) === "codex" ? "codex_local" : eff("adapterConfig", "provider", config.provider) === "opencode" ? "opencode_local" : eff("adapterConfig", "provider", config.provider) === "acpx" && eff("adapterConfig", "acpxAgent", config.acpxAgent) === "grok" ? "grok_local" : eff("adapterConfig", "provider", config.provider) === "acpx" && eff("adapterConfig", "acpxAgent", config.acpxAgent) === "claude" ? "claude_local" : adapterType : adapterType}
+            routerAdapterType={adapterType} value={aiRuntimeConnectionBindingSchema.safeParse((overlay.runtime.runtimeConfig as Record<string, unknown> | undefined)?.aiConnection ?? runtimeConfig.aiConnection).data}
             model={String(eff("adapterConfig", "model", config.model) ?? "")} environmentId={currentDefaultEnvironmentId || undefined} legacy
             onChange={binding => mark("runtime", "runtimeConfig", { ...runtimeConfig, aiConnection: binding })} />}
 
@@ -1713,10 +1721,10 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
                 models={models}
                 value={currentModelId}
                 onChange={(v) => {
-                  const supportedEfforts = codexReasoningEffortOptions(v, "Auto");
-                  const clearUnsupportedEffort = adapterType === "codex_local"
+                  const supportedEfforts = setupEfforts(adapterType, v);
+                  const clearUnsupportedEffort = ["codex_local", "claude_local", "grok_local"].includes(adapterType)
                     && Boolean(currentThinkingEffort)
-                    && !supportedEfforts.some((option) => option.value === currentThinkingEffort);
+                    && !supportedEfforts.includes(String(currentThinkingEffort));
                   if (isCreate) {
                     set!({
                       model: v,
@@ -1736,6 +1744,7 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
                 allowDefault={adapterType !== "opencode_local" && adapterType !== "pi_local" && adapterType !== "paperclip_runner"}
                 required={adapterType === "opencode_local" || adapterType === "pi_local"}
                 groupByProvider={adapterType === "opencode_local" || adapterType === "pi_local"}
+                preserveOrder={adapterCuratesModelOrder(adapterType)}
                 creatable
                 detectedModel={detectedModel}
                 detectedModelCandidates={[]}
@@ -2333,6 +2342,12 @@ export function AdapterLoginPanel(props: AdapterLoginPanelProps) {
   return <DisplayedCodeLoginPanel {...props} />;
 }
 
+class AdapterLoginConflictError extends Error {
+  constructor(readonly sessionId: string) {
+    super("Another sign-in attempt is active. Finish or cancel that attempt before starting a new sign-in.");
+  }
+}
+
 function DisplayedCodeLoginPanel({
   companyId,
   adapterType,
@@ -2407,7 +2422,7 @@ function DisplayedCodeLoginPanel({
       try {
         const active = await agentsApi.getActiveAdapterAuthLoginSession(companyId, adapterType);
         if (!active) return null;
-        if ((aiConnection && active.environmentId !== environmentId) || Boolean(active.aiConnection) !== Boolean(aiConnection) || (aiConnection && (active.aiConnection?.provider !== aiConnection.provider || active.aiConnection?.method !== aiConnection.method || active.aiConnection?.connectionId !== aiConnection.connectionId || active.aiConnection?.ownership !== aiConnection.ownership || active.aiConnection?.allAgents !== aiConnection.allAgents || JSON.stringify(active.aiConnection?.agentIds) !== JSON.stringify(aiConnection.agentIds)))) throw new Error("Another sign-in attempt is active. Finish or cancel it in its original account setup before starting this one.");
+        if ((aiConnection && active.environmentId !== environmentId) || Boolean(active.aiConnection) !== Boolean(aiConnection) || (aiConnection && (active.aiConnection?.provider !== aiConnection.provider || active.aiConnection?.method !== aiConnection.method || active.aiConnection?.connectionId !== aiConnection.connectionId || active.aiConnection?.ownership !== aiConnection.ownership || active.aiConnection?.allAgents !== aiConnection.allAgents || JSON.stringify(active.aiConnection?.agentIds) !== JSON.stringify(aiConnection.agentIds)))) throw new AdapterLoginConflictError(active.sessionId);
         return active;
       } catch (error) {
         if (error instanceof ApiError && error.status === 404) return null;
@@ -2513,6 +2528,20 @@ function DisplayedCodeLoginPanel({
   // before the session id lands and start a second login the server would
   // count against the per-owner cap.
   const autoStartedRef = useRef(false);
+  const cancelConflictingLogin = useMutation({
+    mutationFn: async () => {
+      const conflict = activeSessionQuery.error;
+      if (!(conflict instanceof AdapterLoginConflictError)) return;
+      await agentsApi.cancelAdapterAuthLogin(companyId, adapterType, conflict.sessionId);
+    },
+    onSuccess: async () => {
+      autoStartedRef.current = false;
+      resumeAttemptedRef.current = false;
+      setStartError(null);
+      await activeSessionQuery.refetch();
+    },
+    onError: () => setStartError("Could not cancel the previous sign-in. Retry before starting a new one."),
+  });
   const startLoginRef = useRef(startLogin.mutate);
   startLoginRef.current = startLogin.mutate;
   useEffect(() => {
@@ -2609,9 +2638,15 @@ function DisplayedCodeLoginPanel({
         mode="displayed_code"
       >
         {startError ? (
-          <p role="alert" className="pl-2 text-xs text-destructive">
-            {startError}
-          </p>
+          <div>
+            <p role="alert" className="pl-2 text-xs text-destructive">{startError}</p>
+            {activeSessionQuery.error instanceof AdapterLoginConflictError && (
+              <Button type="button" variant="outline" disabled={cancelConflictingLogin.isPending}
+                onClick={() => cancelConflictingLogin.mutate()}>
+                Cancel previous sign-in and retry
+              </Button>
+            )}
+          </div>
         ) : failed ? (
           <p role="alert" className="pl-2 text-xs text-destructive">
             {status === "timed_out"
@@ -3691,6 +3726,7 @@ export function ModelDropdown({
   allowDefault,
   required,
   groupByProvider,
+  preserveOrder,
   creatable,
   detectedModel,
   detectedModelCandidates,
@@ -3709,6 +3745,8 @@ export function ModelDropdown({
   allowDefault: boolean;
   required: boolean;
   groupByProvider: boolean;
+  /** Keep the adapter's list order (curated lists) instead of sorting ungrouped entries by id. */
+  preserveOrder?: boolean;
   creatable?: boolean;
   detectedModel?: string | null;
   detectedModelCandidates?: string[];
@@ -3753,12 +3791,10 @@ export function ModelDropdown({
   }, [models, modelSearch, promotedModelIds]);
   const groupedModels = useMemo(() => {
     if (!groupByProvider) {
-      return [
-        {
-          provider: "models",
-          entries: [...filteredModels].sort((a, b) => a.id.localeCompare(b.id)),
-        },
-      ];
+      // A hand-ordered list (newest release of each family first, older releases at the end) is
+      // shown as the adapter ordered it; a discovered list has no stable order, so sort it.
+      const entries = preserveOrder ? filteredModels : [...filteredModels].sort((a, b) => a.id.localeCompare(b.id));
+      return [{ provider: "models", entries }];
     }
     const map = new Map<string, AdapterModel[]>();
     for (const model of filteredModels) {
@@ -3773,7 +3809,7 @@ export function ModelDropdown({
         provider,
         entries: [...entries].sort((a, b) => a.id.localeCompare(b.id)),
       }));
-  }, [filteredModels, groupByProvider]);
+  }, [filteredModels, groupByProvider, preserveOrder]);
 
   async function handleDetectModel() {
     if (!onDetectModel) return;

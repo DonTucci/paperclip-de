@@ -784,6 +784,23 @@ describe("AgentConfigForm environment selector", () => {
     expect(result.onSave.mock.calls[0][0].adapterConfig.effort).toBeUndefined();
   });
 
+  it("saves Grok 4.7 reasoning effort using the runtime key", async () => {
+    const result = await renderForm([], { adapterType: "grok_local", adapterConfig: { model: "grok-4.7", reasoningEffort: "high" } });
+    roots.push(result.root);
+    const effort = [...result.container.querySelectorAll("button")].find(button => button.textContent?.trim() === "High")!;
+    expect(effort).toBeTruthy();
+    await act(async () => effort.click());
+    await flushReact();
+    const xhigh = [...document.querySelectorAll("button")].find(button => button.textContent?.trim() === "X-Highxhigh")!;
+    expect(xhigh).toBeTruthy();
+    await act(async () => xhigh.click());
+    await flushReact();
+    const save = [...result.container.querySelectorAll("button")].find(button => button.textContent?.trim() === "Save")!;
+    await act(async () => save.click());
+    expect(result.onSave).toHaveBeenCalledWith(expect.objectContaining({ adapterConfig: expect.objectContaining({ reasoningEffort: "xhigh" }) }));
+    expect(result.onSave.mock.calls[0][0].adapterConfig.effort).toBeUndefined();
+  });
+
   it("hides the environment override when Local is the only configured environment", async () => {
     const result = await renderForm([
       makeEnvironment({ id: "local-1", name: "Local", driver: "local" }),
@@ -1704,6 +1721,42 @@ describe("AgentConfigForm environment selector", () => {
     });
 
     expect(mockAgentsApi.cancelAdapterAuthLogin).not.toHaveBeenCalled();
+  });
+
+  it("recovers a previous-environment sign-in only after explicit successful cancellation", async () => {
+    const intent = { provider: "xai", method: "subscription", name: "My Grok subscription", ownership: "personal", agentIds: [], allAgents: true } as const;
+    mockAgentsApi.getActiveAdapterAuthLoginSession.mockResolvedValueOnce({
+      sessionId: "previous-login", environmentId: "previous-sandbox", aiConnection: intent,
+      status: "waiting_for_user", prompt: null,
+    }).mockImplementation(noActiveSession);
+    mockAgentsApi.cancelAdapterAuthLogin.mockRejectedValueOnce(new Error("Network unavailable"));
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const root = createRoot(container); roots.push(root);
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    await act(async () => {
+      root.render(<QueryClientProvider client={queryClient}><ToastProvider><TooltipProvider>
+        <AdapterLoginPanel companyId="company-1" adapterType="grok_local" environmentId="new-sandbox"
+          aiConnection={{ ...intent, agentIds: [] }} chrome="onboarding" autoStart />
+      </TooltipProvider></ToastProvider></QueryClientProvider>);
+    });
+    await flushUntil(() => Boolean(findButton(container, "Cancel previous sign-in and retry")));
+    expect(mockAgentsApi.startAdapterAuthLogin).not.toHaveBeenCalled();
+    expect(mockAgentsApi.cancelAdapterAuthLogin).not.toHaveBeenCalled();
+    await act(async () => findButton(container, "Cancel previous sign-in and retry")!.click());
+    await flushUntil(() => container.textContent?.includes("Could not cancel") ?? false);
+    expect(mockAgentsApi.startAdapterAuthLogin).not.toHaveBeenCalled();
+    let release!: () => void;
+    mockAgentsApi.cancelAdapterAuthLogin.mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve; }));
+    await act(async () => findButton(container, "Cancel previous sign-in and retry")!.click());
+    await flushReact();
+    expect(findButton(container, "Cancel previous sign-in and retry")!.disabled).toBe(true);
+    expect(mockAgentsApi.startAdapterAuthLogin).not.toHaveBeenCalled();
+    await act(async () => release());
+    await flushUntil(() => mockAgentsApi.startAdapterAuthLogin.mock.calls.length === 1);
+    expect(mockAgentsApi.cancelAdapterAuthLogin).toHaveBeenLastCalledWith("company-1", "grok_local", "previous-login");
+    expect(mockAgentsApi.startAdapterAuthLogin).toHaveBeenCalledWith("company-1", "grok_local", { environmentId: "new-sandbox", aiConnection: intent });
+    queryClient.clear();
   });
 
   it("offers no Cancel in the onboarding chrome", async () => {

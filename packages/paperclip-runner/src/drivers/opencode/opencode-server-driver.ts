@@ -73,7 +73,7 @@ import { nativeMcpLaunchBinding } from "../native-mcp.js";
 import { materializeNativeRuntimeSkills } from "../runtime-context-materializer.js";
 
 export const OPENCODE_SERVER_DRIVER_KIND = "opencode_server" as const;
-export const QUALIFIED_OPENCODE_VERSION = "1.18.29" as const;
+export const QUALIFIED_OPENCODE_VERSION = "1.18.34" as const;
 export const QUALIFIED_OPENCODE_MODEL =
   "openrouter/deepseek/deepseek-v4-flash-0731" as const;
 
@@ -85,10 +85,18 @@ type DynamicToolHandler = (call: {
   arguments: unknown;
 }) => Promise<unknown>;
 
+export type OpenCodeCompletionFeedback = (result: PrpStructuredRunResult, call: {
+  tool: string;
+  callId: string;
+  threadId: string;
+  turnId: string;
+}) => Promise<string>;
+
 export interface OpenCodeServerDriverOptions {
   model: string;
   permissionMode?: "allow" | "ask" | "deny";
   taskEnvelope?: CodexTaskEnvelope;
+  conversationMode?: "task" | "prepared";
   runnerInstanceId?: string;
   command?: string;
   /** Inherited runner-owned executable descriptor duplicated into the child. */
@@ -104,6 +112,7 @@ export interface OpenCodeServerDriverOptions {
   environment?: NodeJS.ProcessEnv;
   dynamicTools?: readonly Readonly<Record<string, unknown>>[];
   dynamicToolHandler?: DynamicToolHandler;
+  completionFeedback?: OpenCodeCompletionFeedback;
   onSpawn?: (meta: {
     pid: number;
     processGroupId: number | null;
@@ -133,6 +142,7 @@ interface OpenCodeRuntime {
 
 const CAPABILITIES: NativeSessionCapabilities = {
   resume: true,
+  toolRefreshOnResume: true,
   typedEvents: true,
   typedEventFamilies: providerFamilyCapabilities({
     tool_execution: "available",
@@ -337,10 +347,12 @@ export class OpenCodeServerDriver implements HarnessDriver {
             createCodexTaskEnvelope({
               objective: "Complete the supplied task.",
             }),
+          conversationMode: this.#options.conversationMode,
           systemInstructions:
             this.#options.systemInstructions ??
             CODEX_SKILLLESS_BASE_INSTRUCTIONS,
           dynamicToolHandler: this.#options.dynamicToolHandler,
+          completionFeedback: this.#options.completionFeedback,
           snapshot,
           now: this.#options.now ?? (() => new Date()),
         });
@@ -377,11 +389,18 @@ class OpenCodeHarnessSession implements HarnessSession {
   readonly #taskEnvelope: CodexTaskEnvelope;
   readonly #systemInstructions: string;
   readonly #dynamicToolHandler?: DynamicToolHandler;
+  readonly #completionFeedback?: OpenCodeCompletionFeedback;
   readonly #now: () => Date;
   readonly #events = new AsyncQueue<PrpEvent>();
   readonly #transcript: PrpEvent[] = [];
   readonly #terminalTurns = new Map<string, string>();
   readonly #seenProviderEvents = new Set<string>();
+  // The turn that created each native message. A raw OpenCode frame carries
+  // no turn identity of its own, so this map — not the mutable active-turn
+  // pointer, which can already have moved on to a later turn by the time a
+  // straggling frame for this message arrives — is the source of truth for
+  // which turn a message's content belongs to.
+  readonly #messageTurnIds = new Map<string, string>();
   readonly #messageRoles = new Map<string, string>();
   readonly #pendingMessageParts = new Map<
     string,
@@ -422,8 +441,10 @@ class OpenCodeHarnessSession implements HarnessSession {
   #semanticResultProviderMessageId: string | null = null;
   #lastNonTerminalToolSourceSeq = 0;
   #usage: Record<string, unknown> | null = null;
+  readonly #conversationMode: "task" | "prepared";
   #sendFullContext: boolean;
   #closed = false;
+  #completionSettlement: Promise<void> | null = null;
   #abort = new AbortController();
 
   constructor(input: {
@@ -435,9 +456,11 @@ class OpenCodeHarnessSession implements HarnessSession {
     workingDirectory: string;
     runnerInstanceId: string;
     model: string;
+    conversationMode?: "task" | "prepared";
     taskEnvelope: CodexTaskEnvelope;
     systemInstructions: string;
     dynamicToolHandler?: DynamicToolHandler;
+    completionFeedback?: OpenCodeCompletionFeedback;
     snapshot: PersistedHarnessSession | null;
     now: () => Date;
   }) {
@@ -450,11 +473,13 @@ class OpenCodeHarnessSession implements HarnessSession {
     this.#workingDirectory = input.workingDirectory;
     this.#runnerInstanceId = input.runnerInstanceId;
     this.#model = input.model;
+    this.#conversationMode = input.conversationMode ?? "task";
     this.#taskEnvelope = input.taskEnvelope;
     this.#systemInstructions = input.systemInstructions;
     this.#dynamicToolHandler = input.dynamicToolHandler;
+    this.#completionFeedback = input.completionFeedback;
     this.#now = input.now;
-    this.#sendFullContext = input.snapshot === null;
+    this.#sendFullContext = input.snapshot === null && this.#conversationMode !== "prepared";
     this.#sourceSequence = input.snapshot?.lastSourceSequence ?? 0;
     this.#activeTurnId = input.snapshot?.activeTurnId ?? null;
     const restored = input.snapshot?.semanticResult ?? null;
@@ -462,8 +487,9 @@ class OpenCodeHarnessSession implements HarnessSession {
     this.#resultFingerprint = restored?.fingerprint ?? null;
     this.#resultCallId = restored?.callId ?? null;
     this.#resultTurnId = restored?.turnId ?? null;
-    for (const terminal of input.snapshot?.terminalTurns ?? [])
+    for (const terminal of input.snapshot?.terminalTurns ?? []) {
       this.#terminalTurns.set(terminal.turnId, terminal.fingerprint);
+    }
     if (this.#activeTurnId && this.#terminalTurns.has(this.#activeTurnId)) {
       this.#activeTurnId = null;
     }
@@ -518,6 +544,10 @@ class OpenCodeHarnessSession implements HarnessSession {
     this.#completedTextPartIds.clear();
     this.#completedReasoningPartIds.clear();
     this.#completedTextParts.length = 0;
+    // `#terminalTurns` clears here for its own persisted-snapshot bookkeeping.
+    // The late-frame gate in `#emit` does not depend on this map: it compares
+    // against `#activeTurnId` directly, so a frame for the just-finished turn
+    // stays blocked even after this new run attaches (see `#emit`).
     this.#terminalTurns.clear();
     this.#sendFullContext = false;
     this.#emit("run.attached", { runId: input.runId, sameSession: true });
@@ -596,6 +626,7 @@ class OpenCodeHarnessSession implements HarnessSession {
   }
 
   async interrupt(input: { turnId?: string; reason?: string }): Promise<void> {
+    await this.#completionSettlement;
     if (
       input.turnId &&
       this.#activeTurnId &&
@@ -846,22 +877,52 @@ class OpenCodeHarnessSession implements HarnessSession {
 
   async close(): Promise<void> {
     if (this.#closed) return;
+    // A controller response is authoritative. Settle its tool result before
+    // closing the provider or the event stream, rather than reject after acceptance.
+    await this.#completionSettlement;
+    if (this.#closed) return;
     this.#closed = true;
     this.#abort.abort();
-    for (const { request } of this.#pendingRuntimeRequests.values()) {
-      this.#emit(
-        request.input === undefined
-          ? "runtime_request.cancelled"
-          : "runtime_request.expired",
-        request.input === undefined
-          ? harnessRuntimeRequestOutcome(request, { reason: "session_closed" })
-          : harnessRuntimeInputExpiredOutcome(request, "provider_process_lost"),
-        { turnId: request.turnId, itemId: request.itemId },
-      );
-    }
-    this.#pendingRuntimeRequests.clear();
+    // Settle whatever is still pending, including a request whose turn
+    // already went terminal without the driver observing it (see
+    // `#settlePendingRuntimeRequestsForTurn`). Bypass the terminal-turn
+    // gate so each settlement event still reaches the consumer instead of
+    // getting dropped as a late frame.
+    for (const requestId of [...this.#pendingRuntimeRequests.keys()])
+      this.#settlePendingRuntimeRequest(requestId);
     this.#events.close();
     await this.#runtime.close();
+  }
+
+  // A request can outlive its own turn: the turn can fail or get cancelled
+  // while the request is still pending, which clears `#activeTurnId`
+  // without settling the request. Settle any such request the moment its
+  // owning turn goes terminal, before emitting the terminal turn event
+  // itself, so the settlement event reaches the consumer within the same
+  // turn it belongs to instead of waiting for a later, separate close.
+  #settlePendingRuntimeRequestsForTurn(turnId: string): void {
+    const requestIds = [...this.#pendingRuntimeRequests]
+      .filter(([, pending]) => pending.request.turnId === turnId)
+      .map(([requestId]) => requestId);
+    for (const requestId of requestIds)
+      this.#settlePendingRuntimeRequest(requestId);
+  }
+
+  #settlePendingRuntimeRequest(requestId: string): void {
+    const pending = this.#pendingRuntimeRequests.get(requestId);
+    if (!pending) return;
+    this.#pendingRuntimeRequests.delete(requestId);
+    const { request } = pending;
+    this.#emit(
+      request.input === undefined
+        ? "runtime_request.cancelled"
+        : "runtime_request.expired",
+      request.input === undefined
+        ? harnessRuntimeRequestOutcome(request, { reason: "session_closed" })
+        : harnessRuntimeInputExpiredOutcome(request, "provider_process_lost"),
+      { turnId: request.turnId, itemId: request.itemId },
+      { bypassTerminalTurnGate: true },
+    );
   }
 
   async dispatchTool(call: {
@@ -887,53 +948,91 @@ class OpenCodeHarnessSession implements HarnessSession {
       { turnId, itemId: call.callId },
     );
     if (tool === PRP_COMPLETION_TOOL_NAME || tool === PRP_BLOCK_TOOL_NAME) {
-      const validation = validatePrpStructuredRunResult(call.arguments);
-      if (!validation.ok) throw new Error("Invalid semantic result");
-      if (
-        (tool === PRP_BLOCK_TOOL_NAME &&
-          validation.result.reportedWorkDisposition !== "blocked") ||
-        (tool === PRP_COMPLETION_TOOL_NAME &&
-          validation.result.reportedWorkDisposition === "blocked")
-      )
-        throw new Error(
-          "Semantic result disposition does not match the terminal tool",
-        );
-      if (
-        validation.result.completionClaim.contractRevision !==
-        this.#taskEnvelope.completionContract.revision
-      ) {
-        throw new Error(
-          "Semantic result completion contract revision does not match",
-        );
-      }
-      const fingerprint = canonicalJson(validation.result);
-      if (this.#resultFingerprint && this.#resultFingerprint !== fingerprint)
-        throw new Error("A different semantic result was already committed");
-      if (!this.#resultFingerprint) {
-        this.#result = structuredClone(validation.result);
-        this.#resultFingerprint = fingerprint;
-        this.#resultCallId = call.callId;
-        this.#resultTurnId = turnId;
-        this.#semanticResultTextBoundary = this.#completedTextParts.length;
-        this.#emit("run.result.proposed", validation.result, {
-          turnId,
-          itemId: call.callId,
-        });
-      }
-      this.#emit(
-        "item.completed",
-        {
-          kind: "dynamicToolCall",
-          item: {
-            type: "tool_result",
-            id: call.callId,
-            tool_use_id: call.callId,
-            result: "Semantic completion accepted.",
+      let settle: (() => void) | undefined;
+      try {
+        if (this.#closed || this.#completionSettlement)
+          throw new Error("A completion is already settling or the session is closed");
+        const validation = validatePrpStructuredRunResult(call.arguments);
+        if (!validation.ok) throw new Error("Invalid semantic result");
+        if (
+          (tool === PRP_BLOCK_TOOL_NAME &&
+            validation.result.reportedWorkDisposition !== "blocked") ||
+          (tool === PRP_COMPLETION_TOOL_NAME &&
+            validation.result.reportedWorkDisposition === "blocked")
+        )
+          throw new Error(
+            "Semantic result disposition does not match the terminal tool",
+          );
+        if (
+          validation.result.completionClaim.contractRevision !==
+          this.#taskEnvelope.completionContract.revision
+        ) {
+          throw new Error(
+            "Semantic result completion contract revision does not match",
+          );
+        }
+        const expectedIds = this.#taskEnvelope.completionContract.criteria.map((criterion) => criterion.id);
+        const receivedIds = validation.result.completionClaim.criteria.map((criterion) => criterion.criterionId);
+        if (receivedIds.length !== expectedIds.length || new Set(receivedIds).size !== receivedIds.length || receivedIds.some((id) => !expectedIds.includes(id))) {
+          // Reject at the tool boundary so the provider can repair its claim.
+          // Emitting a bad result here kills runnerd's strict outer validation.
+          throw new Error(`Semantic result criteria must contain exactly these criterionIds, once each: ${JSON.stringify(expectedIds)}. Keep contractRevision ${JSON.stringify(this.#taskEnvelope.completionContract.revision)}.`);
+        }
+        const fingerprint = canonicalJson(validation.result);
+        if (this.#resultFingerprint && this.#resultFingerprint !== fingerprint)
+          throw new Error("A different semantic result was already committed");
+        this.#completionSettlement = new Promise<void>(resolve => { settle = resolve; });
+        // Wait for the bound controller before committing or resolving the
+        // provider call. A rejection remains repairable in this same turn.
+        const feedback = this.#completionFeedback
+          ? await this.#completionFeedback(validation.result, {
+              tool, callId: call.callId, threadId: this.#providerSessionId, turnId,
+            })
+          : "Semantic completion accepted.";
+        if (typeof feedback !== "string" || !feedback.trim())
+          throw new Error("Completion feedback omitted its response text");
+        if (this.#resultFingerprint && this.#resultFingerprint !== fingerprint)
+          throw new Error("A different semantic result was already committed");
+        if (!this.#resultFingerprint) {
+          this.#result = structuredClone(validation.result);
+          this.#resultFingerprint = fingerprint;
+          this.#resultCallId = call.callId;
+          this.#resultTurnId = turnId;
+          this.#semanticResultTextBoundary = this.#completedTextParts.length;
+          this.#emit("run.result.proposed", validation.result, {
+            turnId,
+            itemId: call.callId,
+          });
+        }
+        this.#emit(
+          "item.completed",
+          {
+            kind: "dynamicToolCall",
+            item: {
+              type: "tool_result",
+              id: call.callId,
+              tool_use_id: call.callId,
+              result: feedback,
+            },
           },
-        },
-        { turnId, itemId: call.callId },
-      );
-      return { accepted: true };
+          { turnId, itemId: call.callId },
+        );
+        return { accepted: true, feedback };
+      } catch (error) {
+        // A rejected semantic call still completes its tool activity item.
+        // Otherwise a later question can appear to have an in-flight tool.
+        this.#emit("item.completed", {
+          kind: "dynamicToolCall",
+          item: { type: "tool_result", id: call.callId, tool_use_id: call.callId,
+            is_error: true, error: error instanceof Error ? error.message : String(error) },
+        }, { turnId, itemId: call.callId });
+        throw error;
+      } finally {
+        if (settle) {
+          this.#completionSettlement = null;
+          settle();
+        }
+      }
     }
     if (!this.#dynamicToolHandler)
       throw new Error("Unsupported Paperclip operation");
@@ -1217,6 +1316,16 @@ class OpenCodeHarnessSession implements HarnessSession {
             }
             throw error;
           }
+          const type = text(record(event).type);
+          const properties = record(record(event).properties);
+          if (type === "session.idle" || type === "session.error"
+            || (type === "session.status" && text(record(record(event).properties).status && record(record(record(event).properties).status).type) === "idle")) {
+            // Do not seal the turn while its bound controller is deciding a
+            // finishing call. Acceptance/rejection and the tool result must
+            // precede the provider's terminal event.
+            await this.#completionSettlement;
+            if (this.#closed) return;
+          }
           this.#mapProviderEvent(event, frameId);
         }
         throw new Error(
@@ -1226,6 +1335,8 @@ class OpenCodeHarnessSession implements HarnessSession {
         if (this.#closed || this.#abort.signal.aborted) return;
         attempts += 1;
         if (attempts > 3) {
+          await this.#completionSettlement;
+          if (this.#closed) return;
           this.#emit("harness.diagnostic", {
             code: "opencode_sse_failed",
             message: redact(String(error), this.#runtime.sensitiveValues),
@@ -1352,7 +1463,7 @@ class OpenCodeHarnessSession implements HarnessSession {
         "runtime_request.resolved",
         harnessRuntimeRequestOutcome(pending.request, { action }),
         {
-          turnId,
+          turnId: pending.request.turnId,
           itemId: pending.request.itemId,
         },
       );
@@ -1379,16 +1490,21 @@ class OpenCodeHarnessSession implements HarnessSession {
             ? { action: "submit", response: pending.submittedResponse }
             : { reason: "provider_rejected" },
         ),
-        { turnId, itemId: pending.request.itemId },
+        { turnId: pending.request.turnId, itemId: pending.request.itemId },
       );
       return;
     }
-    if (type === "message.part.updated" && turnId) {
+    if (type === "message.part.updated") {
       const part = record(properties.part);
       const messageId = text(part.messageID, text(part.messageId));
       if (!messageId) return;
+      // Resolve the turn this message actually belongs to, not whichever
+      // turn is active right now. A straggling part for an earlier message
+      // must stay attributed to the turn that created that message.
+      const owningTurnId = this.#messageTurnIds.get(messageId) ?? turnId;
+      if (!owningTurnId) return;
       const role = this.#messageRoles.get(messageId);
-      if (role === "assistant") this.#emitAssistantPart(part, turnId);
+      if (role === "assistant") this.#emitAssistantPart(part, owningTurnId);
       else if (role === undefined) {
         const pending = this.#pendingMessageParts.get(messageId) ?? [];
         if (pending.length < 100) pending.push(part);
@@ -1396,19 +1512,29 @@ class OpenCodeHarnessSession implements HarnessSession {
       }
       return;
     }
-    if (type === "message.updated" && turnId) {
+    if (type === "message.updated") {
       const info = record(properties.info);
       const messageId = text(
         info.id,
         text(info.messageID, text(info.messageId)),
       );
       const role = text(info.role);
+      // Record the message's owning turn at the moment OpenCode first
+      // reports it. A later turn that reuses the same native message id
+      // legitimately reclaims ownership; a stale message never sees this
+      // branch again, so its recorded owner never changes.
+      if (messageId && role && turnId) this.#messageTurnIds.set(messageId, turnId);
+      const owningTurnId = messageId
+        ? (this.#messageTurnIds.get(messageId) ?? turnId)
+        : turnId;
+      if (!owningTurnId) return;
       if (messageId && role) {
         this.#messageRoles.set(messageId, role);
         const pending = this.#pendingMessageParts.get(messageId) ?? [];
         this.#pendingMessageParts.delete(messageId);
         if (role === "assistant")
-          for (const part of pending) this.#emitAssistantPart(part, turnId);
+          for (const part of pending)
+            this.#emitAssistantPart(part, owningTurnId);
       }
       const tokens = record(info.tokens);
       if (
@@ -1434,7 +1560,7 @@ class OpenCodeHarnessSession implements HarnessSession {
           this.#emit(
             "item.completed",
             { kind: "usage", usage: this.#usage, usageMessageId: messageId },
-            { turnId, itemId: `${turnId}:usage` },
+            { turnId: owningTurnId, itemId: `${owningTurnId}:usage` },
           );
         }
       }
@@ -1459,9 +1585,15 @@ class OpenCodeHarnessSession implements HarnessSession {
           { ...workspace, complete: true },
           { turnId, itemId: `${turnId}:workspace` },
         );
-      this.#activeTurnId = null;
+      // Settle any request this turn never answered before the terminal
+      // event, so a consumer that stops reading at that terminal event still
+      // observes the settlement.
+      this.#settlePendingRuntimeRequestsForTurn(turnId);
+      // Emit while this turn is still `#activeTurnId`; the gate in `#emit`
+      // drops any frame whose turnId is not the active turn, so nulling it
+      // first would make `#emit` drop this very event.
       this.#emit("turn.completed", { status: "completed" }, { turnId });
-      this.#events.close();
+      this.#activeTurnId = null;
       return;
     }
     if (type === "session.error" && turnId) {
@@ -1479,7 +1611,10 @@ class OpenCodeHarnessSession implements HarnessSession {
         // card. Preserve the provider fact as a cancelled terminal event; the
         // native session loop independently commits the authoritative yielded
         // result when this abort followed a governed wait.
-        this.#activeTurnId = null;
+        // Settle any request this turn never answered before the terminal
+        // event, so a consumer that stops reading at that terminal event
+        // still observes the settlement.
+        this.#settlePendingRuntimeRequestsForTurn(turnId);
         this.#emit(
           "turn.cancelled",
           {
@@ -1489,7 +1624,7 @@ class OpenCodeHarnessSession implements HarnessSession {
           { turnId },
         );
         this.#terminalTurns.set(turnId, canonicalJson({ status: "cancelled" }));
-        this.#events.close();
+        this.#activeTurnId = null;
         return;
       }
       this.#emit(
@@ -1509,14 +1644,17 @@ class OpenCodeHarnessSession implements HarnessSession {
         },
         { turnId, itemId: `${turnId}:session-error` },
       );
-      this.#activeTurnId = null;
+      // Settle any request this turn never answered before the terminal
+      // event, so a consumer that stops reading at that terminal event still
+      // observes the settlement.
+      this.#settlePendingRuntimeRequestsForTurn(turnId);
       this.#emit(
         "turn.failed",
         { status: "failed", error: bounded(properties.error ?? properties) },
         { turnId },
       );
       this.#terminalTurns.set(turnId, canonicalJson({ status: "failed" }));
-      this.#events.close();
+      this.#activeTurnId = null;
     }
   }
 
@@ -1780,7 +1918,32 @@ class OpenCodeHarnessSession implements HarnessSession {
     eventType: PrpEvent["eventType"],
     payload: Record<string, unknown>,
     refs: { turnId?: string; itemId?: string } = {},
+    options?: { bypassTerminalTurnGate?: boolean },
   ): void {
+    if (
+      !options?.bypassTerminalTurnGate &&
+      eventType !== "harness.diagnostic" &&
+      refs.turnId !== undefined &&
+      refs.turnId !== this.#activeTurnId
+    ) {
+      // The provider sent this frame for a turn that is not the current
+      // active turn, so that turn already reached a terminal state: turns
+      // run strictly one at a time (`startTurn` and `attachRun` both refuse
+      // to proceed while `#activeTurnId` is set), and a turn id is never
+      // reused. Comparing directly against `#activeTurnId` needs no history
+      // of past turns, so the gate stays correct and its memory stays O(1)
+      // no matter how many turns a long-lived session runs. The queue stays
+      // open across turns, so a silent drop here would let a stale frame
+      // reach the next turn's consumer. Report it instead of discarding it
+      // without a trace.
+      this.#emit("harness.diagnostic", {
+        code: "opencode_late_terminal_turn_event_dropped",
+        message: `OpenCode sent a ${eventType} event for a turn that already reached a terminal state.`,
+        droppedEventType: eventType,
+        turnId: refs.turnId,
+      });
+      return;
+    }
     const sourceSeq = ++this.#sourceSequence;
     const event: PrpEvent = {
       schema: "paperclip.prp.event.v1",

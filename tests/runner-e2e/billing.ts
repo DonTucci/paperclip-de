@@ -40,6 +40,14 @@ export interface CampaignBillingSummary {
   testsWithCompleteBilling: number;
 }
 
+/** Render observed subtotals without presenting absent measurements as zero. */
+export function billingCoverageLabel(value: string, covered: number, total: number): string {
+  if (!Number.isInteger(covered) || !Number.isInteger(total) || covered <= 0 || total <= 0 || covered > total) {
+    return "Unavailable";
+  }
+  return covered < total ? `${value} (partial: ${covered}/${total} runs)` : value;
+}
+
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
@@ -249,7 +257,7 @@ export function fallbackRuntimeUsage(
 export function summarizeExecutionBilling(
   result: Pick<
     RunnerE2EResult,
-    "runIds" | "usage" | "environmentId" | "durationMs" | "runtimeUsage" | "firstTaskQuality"
+    "runIds" | "usage" | "environmentId" | "durationMs" | "runtimeUsage" | "firstTaskQuality" | "completionQuality"
   >,
 ): RunnerE2EBillingSummary {
   const requestedRunCount = Math.max(result.runIds?.length ?? 0, 1);
@@ -298,7 +306,9 @@ export function summarizeExecutionBilling(
           : "unavailable";
   const runtime = fallbackRuntimeUsage(result);
   const estimatedRuntimeCostUsd = runtime.estimatedListCostUsd ?? 0;
-  const quality = result.firstTaskQuality;
+  const judgments = [...(result.firstTaskQuality ? [result.firstTaskQuality] : []), ...(result.completionQuality ?? [])];
+  const sumKnown = (key: "inputTokens" | "outputTokens" | "estimatedCostUsd") => judgments.some(q => q[key] === null) ? null : judgments.reduce((sum, q) => sum + (q[key] ?? 0), 0);
+  const quality = judgments.length ? { inputTokens: sumKnown("inputTokens"), outputTokens: sumKnown("outputTokens"), estimatedCostUsd: sumKnown("estimatedCostUsd"), reservedCostUsd: judgments.reduce((sum, q) => sum + q.reservedCostUsd, 0) } : undefined;
   const complete =
     (!quality || quality.estimatedCostUsd !== null) &&
     runsWithTokenUsage === runCount &&

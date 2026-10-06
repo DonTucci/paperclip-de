@@ -21,7 +21,9 @@ import {
   nativeRuntimePromptDigest,
   type NativeRuntimeContextSnapshot,
 } from "../../contracts/runtime-context.js";
+import { createCodexTaskEnvelope } from "../../contracts/codex.js";
 import { localIntegrityBoundaryGolden } from "../../../test-support/local-integrity-boundary-golden.js";
+import type { PrpEvent } from "../../protocol/replay-contract.js";
 import {
   OpenCodeServerDriver,
   openCodeServerDriverInternals,
@@ -29,6 +31,29 @@ import {
 
 const roots: string[] = [];
 const fixture = resolve("test/fixtures/fake-opencode-server.mjs");
+
+const TURN_TERMINAL_EVENT_TYPES = new Set([
+  "turn.completed",
+  "turn.failed",
+  "turn.interrupted",
+  "turn.cancelled",
+]);
+
+/**
+ * The session event stream stays open past a turn boundary so a session can
+ * run more turns. Read one turn's events by stopping at its terminal event,
+ * the same rule the production consumer applies.
+ */
+async function collectTurnEvents(
+  events: AsyncIterable<PrpEvent>,
+): Promise<PrpEvent[]> {
+  const collected: PrpEvent[] = [];
+  for await (const event of events) {
+    collected.push(event);
+    if (TURN_TERMINAL_EVENT_TYPES.has(event.eventType)) break;
+  }
+  return collected;
+}
 
 function runtimeContext(
   skillRoot: string,
@@ -308,7 +333,7 @@ describe("OpenCodeServerDriver", () => {
           headers: { "Content-Type": "application/json" },
         });
       if (url.pathname === "/global/health")
-        return json({ healthy: true, version: "1.18.29" });
+        return json({ healthy: true, version: "1.18.34" });
       if (url.pathname === "/event") {
         return new Response(
           new ReadableStream<Uint8Array>({
@@ -396,6 +421,7 @@ describe("OpenCodeServerDriver", () => {
       const next = await iterator.next();
       if (next.done) break;
       events.push(next.value);
+      if (TURN_TERMINAL_EVENT_TYPES.has(next.value.eventType)) break;
     }
     await session.close({ reason: "boundary-golden-test" });
 
@@ -622,8 +648,7 @@ describe("OpenCodeServerDriver", () => {
     const turn = await session.startTurn({
       message: { role: "user", text: "finish" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     expect(events.map((event) => event.eventType)).toContain("turn.completed");
     expect(events).toContainEqual(
       expect.objectContaining({ eventType: "run.result.proposed" }),
@@ -680,7 +705,7 @@ describe("OpenCodeServerDriver", () => {
       output: 2,
       costUsd: 0.001,
       provider: "openrouter",
-      driverVersion: "1.18.29",
+      driverVersion: "1.18.34",
     });
     await session.interrupt?.({ turnId: turn.turnId });
     const snapshot = await session.snapshot();
@@ -789,14 +814,420 @@ describe("OpenCodeServerDriver", () => {
     await session.startTurn({
       message: { role: "user", text: "session-aborted" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     expect(events.map((event) => event.eventType)).toContain("turn.cancelled");
     expect(events.map((event) => event.eventType)).not.toContain("turn.failed");
     expect(events.map((event) => event.eventType)).not.toContain(
       "provider.notice.recorded",
     );
     await session.close({ reason: "test" });
+  });
+
+  it("runs two consecutive turns on one session and delivers exactly one terminal event per turn", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(join(tmpdir(), "paperclip-opencode-multi-turn-"));
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-multi-turn-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-multi-turn",
+      normalizedSessionId: "multi-turn",
+      workingDirectory: workspace,
+    });
+
+    const firstTurn = await session.startTurn({
+      message: { role: "user", text: "finish" },
+    });
+    const firstTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      firstTurnEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: firstTurn.turnId }]);
+    expect(
+      firstTurnEvents.find(
+        (event) =>
+          event.eventType === "item.completed" &&
+          event.payload.kind === "agentMessage",
+      )?.payload,
+    ).toMatchObject({ text: "done [guide](guide.md)" });
+
+    const secondTurn = await session.startTurn({
+      message: { role: "user", text: "finish" },
+    });
+    expect(secondTurn.turnId).not.toBe(firstTurn.turnId);
+    const secondTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      secondTurnEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: secondTurn.turnId }]);
+    expect(
+      secondTurnEvents.find(
+        (event) =>
+          event.eventType === "item.completed" &&
+          event.payload.kind === "agentMessage",
+      )?.payload,
+    ).toMatchObject({ text: "done [guide](guide.md)" });
+    expect(
+      secondTurnEvents.some((event) => event.turnId === firstTurn.turnId),
+    ).toBe(false);
+    expect(
+      secondTurnEvents.some((event) => event.eventType === "harness.diagnostic"),
+    ).toBe(false);
+
+    await session.close({ reason: "test" });
+  });
+
+  it("drops a distinct late frame for a completed turn instead of attributing it to the next turn", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-late-frame-"),
+    );
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-late-frame-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-late-frame",
+      normalizedSessionId: "late-frame",
+      workingDirectory: workspace,
+    });
+
+    const firstTurn = await session.startTurn({
+      message: { role: "user", text: "late-straggler-source" },
+    });
+    const firstTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      firstTurnEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: firstTurn.turnId }]);
+
+    // The fixture holds a distinct frame for the first turn's message and
+    // delivers it only once this second turn's prompt has been accepted,
+    // simulating a provider frame that arrives after its own turn is
+    // already sealed.
+    const secondTurn = await session.startTurn({
+      message: { role: "user", text: "finish" },
+    });
+    expect(secondTurn.turnId).not.toBe(firstTurn.turnId);
+    const secondTurnEvents = await collectTurnEvents(session.events());
+
+    expect(
+      secondTurnEvents.some((event) =>
+        JSON.stringify(event.payload).includes(
+          "late straggler text must not reach the next turn",
+        ),
+      ),
+    ).toBe(false);
+    expect(
+      secondTurnEvents.some((event) => event.turnId === firstTurn.turnId),
+    ).toBe(false);
+    expect(
+      secondTurnEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: secondTurn.turnId }]);
+    expect(
+      secondTurnEvents.find(
+        (event) => event.eventType === "harness.diagnostic",
+      )?.payload,
+    ).toMatchObject({
+      code: "opencode_late_terminal_turn_event_dropped",
+      turnId: firstTurn.turnId,
+    });
+
+    await session.close({ reason: "test" });
+  });
+
+  it("keeps rejecting a late frame for a sealed turn no matter how many later turns have already sealed", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-sealed-many-turns-"),
+    );
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-sealed-many-turns-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-sealed-many-turns",
+      normalizedSessionId: "sealed-many-turns",
+      workingDirectory: workspace,
+    });
+
+    // Turn A schedules its own late frame to arrive four prompts later, so
+    // it lands only after three more turns have sealed. The late-frame gate
+    // in `#emit` compares directly against the current active turn, not a
+    // bounded history, so it must still reject this frame no matter how
+    // many turns sealed in between.
+    const turnA = await session.startTurn({
+      message: { role: "user", text: "late-straggler-source-delay-4" },
+    });
+    await collectTurnEvents(session.events());
+
+    for (let index = 0; index < 3; index += 1) {
+      await session.startTurn({ message: { role: "user", text: "finish" } });
+      await collectTurnEvents(session.events());
+    }
+
+    // This turn's prompt request is what finally delivers turn A's scheduled
+    // late frame, well after turn A's own turn sealed.
+    const turnE = await session.startTurn({
+      message: { role: "user", text: "finish" },
+    });
+    const turnEEvents = await collectTurnEvents(session.events());
+
+    expect(
+      turnEEvents.some((event) =>
+        JSON.stringify(event.payload).includes(
+          "late straggler text must not reach the next turn",
+        ),
+      ),
+    ).toBe(false);
+    expect(turnEEvents.some((event) => event.turnId === turnA.turnId)).toBe(
+      false,
+    );
+    expect(
+      turnEEvents.find((event) => event.eventType === "harness.diagnostic")
+        ?.payload,
+    ).toMatchObject({
+      code: "opencode_late_terminal_turn_event_dropped",
+      turnId: turnA.turnId,
+    });
+    expect(
+      turnEEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: turnE.turnId }]);
+
+    await session.close({ reason: "test" });
+  });
+
+  it("delivers the settlement event for a runtime request whose turn fails through the same single-pass consumer that reads the turn", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-pending-then-fail-"),
+    );
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-pending-then-fail-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-pending-then-fail",
+      normalizedSessionId: "pending-then-fail",
+      workingDirectory: workspace,
+    });
+
+    const { turnId } = await session.startTurn({
+      message: { role: "user", text: "pending-request-then-turn-fails" },
+    });
+    // The fixture asks a native question, which leaves a runtime request
+    // pending, then fails the same turn through `session.error` without
+    // ever resolving that request. `collectTurnEvents` reads exactly one
+    // pass and stops at the turn's terminal event, the same rule the
+    // production consumer applies (see its doc comment above). The
+    // settlement event must arrive inside that same pass: a production
+    // consumer that stops at `turn.failed` never opens a second read
+    // afterward, so a settlement event that only `close()` produced later
+    // would never reach it.
+    const turnEvents = await collectTurnEvents(session.events());
+    expect(
+      turnEvents.some(
+        (event) => event.eventType === "runtime_request.created",
+      ),
+    ).toBe(true);
+    const settlementIndex = turnEvents.findIndex(
+      (event) => event.eventType === "runtime_request.expired",
+    );
+    const terminalIndex = turnEvents.findIndex(
+      (event) => event.eventType === "turn.failed",
+    );
+    expect(settlementIndex).toBeGreaterThanOrEqual(0);
+    expect(terminalIndex).toBeGreaterThanOrEqual(0);
+    // The settlement fact must precede the turn's terminal event, or a
+    // consumer that stops reading at that terminal event misses it.
+    expect(settlementIndex).toBeLessThan(terminalIndex);
+    expect(turnEvents[settlementIndex]).toMatchObject({
+      turnId,
+      itemId: "question-native-1",
+    });
+    expect(turnEvents[terminalIndex]).toMatchObject({ turnId });
+    expect(
+      turnEvents.some(
+        (event) =>
+          event.eventType === "harness.diagnostic" &&
+          event.payload.code === "opencode_late_terminal_turn_event_dropped" &&
+          event.payload.turnId === turnId,
+      ),
+    ).toBe(false);
+    // The request already settled with the turn; nothing is left pending
+    // for `close()` to settle a second time.
+    expect(session.pendingRuntimeRequests?.()).toHaveLength(0);
+
+    await session.close({ reason: "test" });
+    const closeEvents = await collectTurnEvents(session.events());
+    expect(
+      closeEvents.some((event) =>
+        ["runtime_request.expired", "runtime_request.cancelled"].includes(
+          event.eventType,
+        ),
+      ),
+    ).toBe(false);
+  });
+
+  it("keeps the session usable after a cancelled turn so the next turn on the same session still completes", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-cancel-then-finish-"),
+    );
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-cancel-then-finish-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-cancel-then-finish",
+      normalizedSessionId: "cancel-then-finish",
+      workingDirectory: workspace,
+    });
+
+    const cancelledTurn = await session.startTurn({
+      message: { role: "user", text: "session-aborted" },
+    });
+    const cancelledTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      cancelledTurnEvents.filter(
+        (event) => event.eventType === "turn.cancelled",
+      ),
+    ).toMatchObject([{ turnId: cancelledTurn.turnId }]);
+
+    const secondTurn = await session.startTurn({
+      message: { role: "user", text: "finish" },
+    });
+    const secondTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      secondTurnEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: secondTurn.turnId }]);
+    expect(
+      secondTurnEvents.some((event) => event.turnId === cancelledTurn.turnId),
+    ).toBe(false);
+
+    await session.close({ reason: "test" });
+  });
+
+  it("keeps the session usable after a failed turn so the next turn on the same session still completes", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-fail-then-finish-"),
+    );
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-fail-then-finish-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-fail-then-finish",
+      normalizedSessionId: "fail-then-finish",
+      workingDirectory: workspace,
+    });
+
+    const failedTurn = await session.startTurn({
+      message: { role: "user", text: "session-failed" },
+    });
+    const failedTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      failedTurnEvents.filter((event) => event.eventType === "turn.failed"),
+    ).toMatchObject([{ turnId: failedTurn.turnId }]);
+
+    const secondTurn = await session.startTurn({
+      message: { role: "user", text: "finish" },
+    });
+    const secondTurnEvents = await collectTurnEvents(session.events());
+    expect(
+      secondTurnEvents.filter((event) => event.eventType === "turn.completed"),
+    ).toMatchObject([{ turnId: secondTurn.turnId }]);
+    expect(
+      secondTurnEvents.some((event) => event.turnId === failedTurn.turnId),
+    ).toBe(false);
+
+    await session.close({ reason: "test" });
+  });
+
+  it("still ends the event stream once the session closes", async () => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-close-ends-stream-"),
+    );
+    const workspace = await mkdtemp(
+      join(tmpdir(), "paperclip-opencode-close-ends-stream-workspace-"),
+    );
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731",
+      runtimeDirectory: root,
+      command: fixture,
+      environment: {
+        PATH: process.env.PATH,
+        OPENROUTER_API_KEY: "fixture-key",
+      },
+    });
+    const session = await driver.openSession({
+      runId: "run-close-ends-stream",
+      normalizedSessionId: "close-ends-stream",
+      workingDirectory: workspace,
+    });
+
+    await session.startTurn({ message: { role: "user", text: "finish" } });
+    await collectTurnEvents(session.events());
+    await session.close({ reason: "test" });
+
+    const eventsAfterClose: PrpEvent[] = [];
+    for await (const event of session.events()) eventsAfterClose.push(event);
+    expect(eventsAfterClose).toEqual([]);
   });
 
   it("keeps OpenCode in an outer supervisor process group when requested", async () => {
@@ -1455,6 +1886,27 @@ describe("OpenCodeServerDriver", () => {
     ).resolves.toMatchObject({ ok: true });
   });
 
+  it.each(["wrong", "missing", "duplicate"])("returns a repairable tool error for %s criteria without committing a bad semantic result", async (mode) => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(join(tmpdir(), "paperclip-opencode-criteria-"));
+    const workspace = await mkdtemp(join(tmpdir(), "paperclip-opencode-workspace-"));
+    roots.push(root, workspace);
+    const driver = new OpenCodeServerDriver({ model: "openrouter/deepseek/deepseek-v4-flash-0731", runtimeDirectory: root, command: fixture, environment: { PATH: process.env.PATH, OPENROUTER_API_KEY: "fixture-key" }, taskEnvelope: createCodexTaskEnvelope({ objective: "Apply the accepted decision", contractRevision: "approval-v2", criteria: [{ id: "human_response", requirement: "Apply the approved response" }] }) });
+    const session = await driver.openSession({ runId: "criteria-repair", normalizedSessionId: "criteria-repair", workingDirectory: workspace });
+    await session.startTurn({ message: { role: "user", text: `repair-criteria-${mode}` } });
+    const events = await collectTurnEvents(session.events());
+    const results = events.filter((event) => event.eventType === "run.result.proposed");
+    expect(results).toHaveLength(1);
+    expect(events.some((event) => event.eventType === "item.completed" &&
+      (event.payload as { item?: { is_error?: boolean } }).item?.is_error === true)).toBe(true);
+    expect(results[0].payload).toMatchObject({ completionClaim: { criteria: [{ criterionId: "human_response" }] } });
+    const files = await readdir(root, { recursive: true });
+    const evidence = files.find((name) => name.endsWith("fake-criteria-repair.json"));
+    expect(evidence).toBeDefined();
+    expect(JSON.parse(await readFile(join(root, evidence!), "utf8"))).toMatchObject({ result: { isError: true, content: [{ text: expect.stringContaining('"human_response"') }] } });
+    await session.close({ reason: "test" });
+  });
+
   it("normalizes a structured block result", async () => {
     await chmod(fixture, 0o755);
     const root = await mkdtemp(join(tmpdir(), "paperclip-opencode-driver-"));
@@ -1479,8 +1931,7 @@ describe("OpenCodeServerDriver", () => {
     await session.startTurn({
       message: { role: "user", text: "block-result" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     expect(
       events.find((event) => event.eventType === "run.result.proposed")
         ?.payload,
@@ -1515,8 +1966,7 @@ describe("OpenCodeServerDriver", () => {
     await session.startTurn({
       message: { role: "user", text: "text-before-finish" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     const finalMessages = events.filter(
       (event) =>
         event.eventType === "item.completed" &&
@@ -1561,8 +2011,7 @@ describe("OpenCodeServerDriver", () => {
     await session.startTurn({
       message: { role: "user", text: "commentary-only-before-work" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     expect(
       events.filter(
         (event) =>
@@ -1606,8 +2055,7 @@ describe("OpenCodeServerDriver", () => {
     await session.startTurn({
       message: { role: "user", text: "correlated-final-message" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     const finalMessages = events.filter(
       (event) =>
         event.eventType === "item.completed" &&
@@ -1691,8 +2139,7 @@ describe("OpenCodeServerDriver", () => {
     await session.startTurn({
       message: { role: "user", text: "final-after-tool-commentary" },
     });
-    const events = [];
-    for await (const event of session.events()) events.push(event);
+    const events = await collectTurnEvents(session.events());
     const finalMessages = events.filter(
       (event) =>
         event.eventType === "item.completed" &&
@@ -1704,6 +2151,86 @@ describe("OpenCodeServerDriver", () => {
       "This is the complete substantive answer emitted after the accepted completion tool call.",
     );
     await session.close({ reason: "test" });
+  });
+
+  it.each(["session.idle", "session.status", "session.error", "aborted"])("settles accepted completion before a racing %s event", async terminalType => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(join(tmpdir(), "paperclip-opencode-completion-race-"));
+    const workspace = await mkdtemp(join(tmpdir(), "paperclip-opencode-completion-race-workspace-"));
+    roots.push(root, workspace);
+    let stream: ReadableStreamDefaultController<Uint8Array>;
+    let releaseFeedback!: () => void;
+    let feedbackStarted!: () => void;
+    const started = new Promise<void>(resolve => { feedbackStarted = resolve; });
+    const release = new Promise<void>(resolve => { releaseFeedback = resolve; });
+    const feedback = "Accepted. Keep the exact saved document link in the final response.";
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731", runtimeDirectory: root, command: fixture,
+      environment: { PATH: process.env.PATH, OPENROUTER_API_KEY: "fixture-key" },
+      fetch: async (input, init) => String(input).endsWith("/event")
+        ? new Response(new ReadableStream<Uint8Array>({ start(controller) { stream = controller; } }), { headers: { "Content-Type": "text/event-stream" } })
+        : fetch(input, init),
+      completionFeedback: async () => { feedbackStarted(); await release; return feedback; },
+    });
+    const session = await driver.openSession({ runId: "completion-race", normalizedSessionId: "completion-race", workingDirectory: workspace });
+    try {
+      const events = collectTurnEvents(session.events());
+      await session.startTurn({ message: { role: "user", text: "completion-feedback" } });
+      await started;
+      stream!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: terminalType === "aborted" ? "session.error" : terminalType, id: "terminal-during-feedback", properties: { sessionID: session.ids().providerSessionId, status: { type: "idle" }, error: terminalType === "aborted" ? { name: "MessageAbortedError", data: { message: "Aborted" } } : { name: "FixtureError", message: "Provider ended during feedback." } } })}\n\n`));
+      // Drain the queued SSE frame before releasing the controller response.
+      await new Promise<void>(resolve => setImmediate(resolve));
+      releaseFeedback();
+      const observed = await events;
+      const proposed = observed.findIndex(event => event.eventType === "run.result.proposed");
+      const completed = observed.findIndex(event => event.eventType === "item.completed" && event.payload.kind === "dynamicToolCall" && (event.payload.item as { result?: unknown })?.result === feedback);
+      const terminal = observed.findIndex(event => TURN_TERMINAL_EVENT_TYPES.has(event.eventType));
+      expect(proposed).toBeGreaterThanOrEqual(0);
+      expect(completed).toBeGreaterThan(proposed);
+      expect(terminal).toBeGreaterThan(completed);
+      expect(observed.filter(event => event.eventType === "run.result.proposed")).toHaveLength(1);
+      expect((await session.snapshot()).semanticResult).not.toBeNull();
+      const sessionRoots = (await readdir(root, { withFileTypes: true })).filter(entry => entry.isDirectory());
+      await expect.poll(async () => JSON.parse(await readFile(join(root, sessionRoots[0]!.name, "data/fake-completion-feedback.json"), "utf8"))).toMatchObject([
+        { result: { content: [{ text: expect.stringContaining(feedback) }] } },
+      ]);
+    } finally {
+      releaseFeedback();
+      await session.close({ reason: "test complete" });
+    }
+  });
+
+  it.each(["close", "interrupt"] as const)("settles bound completion before explicit %s", async operation => {
+    await chmod(fixture, 0o755);
+    const root = await mkdtemp(join(tmpdir(), "paperclip-opencode-completion-stop-"));
+    const workspace = await mkdtemp(join(tmpdir(), "paperclip-opencode-completion-stop-workspace-"));
+    roots.push(root, workspace);
+    let releaseFeedback!: () => void, feedbackStarted!: () => void;
+    const started = new Promise<void>(resolve => { feedbackStarted = resolve; });
+    const release = new Promise<void>(resolve => { releaseFeedback = resolve; });
+    const driver = new OpenCodeServerDriver({
+      model: "openrouter/deepseek/deepseek-v4-flash-0731", runtimeDirectory: root, command: fixture,
+      environment: { PATH: process.env.PATH, OPENROUTER_API_KEY: "fixture-key" },
+      completionFeedback: async () => { feedbackStarted(); await release; return "Accepted completion."; },
+    });
+    const session = await driver.openSession({ runId: "completion-stop", normalizedSessionId: "completion-stop", workingDirectory: workspace });
+    try {
+      await session.startTurn({ message: { role: "user", text: "finish" } });
+      await started;
+      let stopped = false;
+      const stop = session[operation]({ reason: "fixture stop" }).then(() => { stopped = true; });
+      await new Promise<void>(resolve => setImmediate(resolve));
+      expect(stopped).toBe(false);
+      releaseFeedback();
+      await stop;
+      expect((await session.snapshot()).semanticResult).not.toBeNull();
+      const transcript = await session.transcript();
+      expect(transcript.events.filter(event => event.eventType === "run.result.proposed")).toHaveLength(1);
+      expect(transcript.events.some(event => event.eventType === "item.completed" && (event.payload.item as { is_error?: boolean })?.is_error)).toBe(false);
+    } finally {
+      releaseFeedback();
+      await session.close({ reason: "test complete" });
+    }
   });
 
   it("rejects malformed and oversized SSE frames", async () => {

@@ -1,3 +1,5 @@
+import { connectionAgentInstructionsSchema } from "../connection-instructions.js";
+import { isRemoteMcpConnectorMethod } from "../remote-mcp-connectors.js";
 import { z } from "zod";
 import {
   CONNECTION_TOKEN_ISSUANCE_PATHS,
@@ -177,6 +179,7 @@ export const updateToolApplicationSchema = createToolApplicationSchema.partial()
 export type UpdateToolApplication = z.infer<typeof updateToolApplicationSchema>;
 
 export const createToolConnectionSchema = z.object({
+  agentInstructions: connectionAgentInstructionsSchema.nullable().optional(),
   applicationId: z.string().guid().optional(),
   applicationName: z.string().trim().min(1).max(160).optional(),
   name: z.string().trim().min(1).max(160),
@@ -406,6 +409,7 @@ function rejectUnsafeHeaderCredentials(
 }
 
 export const connectToolAppSchema = z.object({
+  agentInstructions: connectionAgentInstructionsSchema.nullable().optional(),
   galleryKey: z.string().trim().min(1).max(120).optional(),
   connectionMethodKey: z.string().trim().min(1).max(120).optional(),
   link: z.string().trim().url().max(2000).optional(),
@@ -419,6 +423,7 @@ export const connectToolAppSchema = z.object({
   resumeConnectionId: z.string().guid().optional(),
   /** Exact configured connection to reauthorize without replacing its identity. */
   reconnectConnectionId: z.string().guid().optional(),
+  saveDraft: z.boolean().optional(),
   authMode: genericMcpAuthModeSchema.optional(),
   oauthClient: genericMcpOAuthClientSchema.optional(),
   credentialSource: z.enum(["paperclip_vault", "vercel_connect"]).optional(),
@@ -438,7 +443,10 @@ export const connectToolAppSchema = z.object({
   if ((value.grantKind === "agent") !== Boolean(value.subjectAgentId)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["subjectAgentId"], message: "subjectAgentId is required exactly for an agent grant" });
   }
-  if (value.authMode && value.galleryKey) {
+  if (value.saveDraft && !isRemoteMcpConnectorMethod(value.galleryKey, value.connectionMethodKey)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["saveDraft"], message: "Draft saving requires a remote MCP connector" });
+  }
+  if (value.authMode && value.galleryKey && !isRemoteMcpConnectorMethod(value.galleryKey, value.connectionMethodKey)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["authMode"],
@@ -483,6 +491,7 @@ export const reconnectToolAppSchema = z.object({
 export type ReconnectToolApp = z.infer<typeof reconnectToolAppSchema>;
 
 export const finishToolAppSchema = z.object({
+  agentInstructions: connectionAgentInstructionsSchema.nullable().optional(),
   /** Task setup adds access while preserving existing assignments and action policies. */
   preserveExistingAccess: z.boolean().optional(),
   enabledCatalogEntryIds: z.array(z.string().guid()).max(500).default([]),
@@ -490,7 +499,8 @@ export const finishToolAppSchema = z.object({
   reviewedCatalogEntryIds: z.array(z.string().guid()).max(500).optional(),
   access: z.union([
     z.literal("all_agents"),
-    z.object({ agentIds: z.array(z.string().guid()).min(1).max(250) }),
+    // Choosing specific agents may intentionally leave the connection unassigned.
+    z.object({ agentIds: z.array(z.string().guid()).max(250) }),
   ]),
 });
 

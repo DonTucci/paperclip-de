@@ -166,6 +166,38 @@ done`,
   }
 }
 
+function managedAiHomeEnvironment(home: string): Record<string, string> {
+  const providerHome = path.join(home, "provider");
+  return {
+    HOME: home,
+    XDG_CONFIG_HOME: path.join(home, "config"),
+    XDG_DATA_HOME: path.join(home, "data"),
+    CODEX_HOME: providerHome,
+    GROK_HOME: providerHome,
+    CLAUDE_CONFIG_DIR: providerHome,
+  };
+}
+
+/** Only the server-created credential home is volatile; retain all other config. */
+export function managedAiSessionFingerprintConfig(
+  config: Record<string, unknown>,
+  managedHome: string | undefined,
+): Record<string, unknown> {
+  if (!managedHome) return config;
+  const env = { ...(config.env as Record<string, unknown> | undefined) };
+  const stable = managedAiHomeEnvironment("<managed-ai-home>");
+  for (const [key, value] of Object.entries(managedAiHomeEnvironment(managedHome))) {
+    if (env[key] === value) env[key] = stable[key];
+  }
+  const managed = config.managedAiConnection as Record<string, unknown> | undefined;
+  if (managed?.sessionIdentity) {
+    for (const key of ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "OPENAI_API_KEY", "CODEX_API_KEY", "OPENROUTER_API_KEY", "XAI_API_KEY", "GROK_API_KEY", "OPENCODE_AUTH_JSON", "OPENCODE_CONFIG_CONTENT"]) {
+      if (env[key]) env[key] = "<managed-ai-credential>";
+    }
+  }
+  return { ...config, env, ...(managed?.sessionIdentity ? { managedAiConnection: { ...managed, identity: managed.sessionIdentity } } : {}) };
+}
+
 export async function prepareManagedAiRuntime(
   db: Db,
   input: {
@@ -225,7 +257,14 @@ export async function prepareManagedAiRuntime(
       throw unprocessable(
         "The selected default changed. Retry this execution.",
       );
+    const credentialRef = selection.grant.credentialSecretRefs.find((ref) => ref.configPath === "ai.credential");
+    if (!credentialRef) throw unprocessable("The selected AI credential is unavailable");
+    const readFreshness = async () => (await db.select({ epoch: companySecrets.aiSessionEpoch, version: companySecrets.latestVersion })
+      .from(companySecrets).where(and(eq(companySecrets.companyId, input.companyId), eq(companySecrets.id, credentialRef.secretId))).limit(1))[0];
+    const freshness = await readFreshness();
     const value = await service.credential(selection);
+    const afterRead = await readFreshness();
+    if (!freshness || freshness.version !== afterRead?.version || freshness.epoch !== afterRead.epoch) throw unprocessable("The AI credential changed during preparation; retry this execution");
     home = await mkdtemp(
       path.join(
         os.tmpdir(),
@@ -237,12 +276,7 @@ export async function prepareManagedAiRuntime(
     const env: Record<string, unknown> = {
       ...stripAiAuthBindings(input.config.env),
       ...Object.fromEntries(AI_AUTH_ENV_KEYS.map((key) => [key, ""])),
-      HOME: home,
-      XDG_CONFIG_HOME: path.join(home, "config"),
-      XDG_DATA_HOME: path.join(home, "data"),
-      CODEX_HOME: providerHome,
-      GROK_HOME: providerHome,
-      CLAUDE_CONFIG_DIR: providerHome,
+      ...managedAiHomeEnvironment(home),
     };
     const capability =
       AI_CONNECTION_CAPABILITIES[input.binding.provider].methods[
@@ -277,16 +311,19 @@ export async function prepareManagedAiRuntime(
       .digest("hex")
       .slice(0, 16);
     const identity = `${selection.grant.id}:${input.responsibleUserId ?? "shared"}:${generation}`;
+    const sessionIdentity = `${selection.grant.id}:${input.responsibleUserId ?? "shared"}:${credentialRef.secretId}:${freshness.epoch}`;
     return {
+      sessionIdentity,
       config: {
         ...input.config,
         env,
-        managedAiConnection: { ...selection.attribution, identity },
+        managedAiConnection: { ...selection.attribution, identity, sessionIdentity },
       },
       attribution: selection.attribution,
       accountName: selection.connection.name,
       accountOwnerUserId: selection.grant.subjectUserId,
       identity,
+      home,
       cleanup: async () => {
         try {
           if (subscriptionFile) {
@@ -345,7 +382,7 @@ export async function prepareManagedAiRuntime(
                 if (decision !== 10) return;
                 await secretService(tx).rotate(
                   ref.secretId,
-                  { value: refreshed },
+                  { value: refreshed, preserveAiSessionEpoch: true },
                   { userId: grant.subjectUserId },
                 );
                 await tx

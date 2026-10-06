@@ -1,11 +1,11 @@
 /**
  * Catalog of the redesign's motion tokens. This mirrors the `--motion-*`
- * custom properties declared in ui/src/index.css :root, and is the list the dev
+ * custom properties declared in ui/src/index.css and its motion token import, and is the list the dev
  * tweak panel renders controls from.
  *
- * A finish-line test parses index.css for `--motion-*` declarations and asserts
+ * A finish-line test parses the token layer for `--motion-*` declarations and asserts
  * this catalog is 1:1 with them, so the two can never silently drift: add a
- * token to index.css and you must add it here (and vice-versa).
+ * shared --motion-* token to the token layer and you must add it here (and vice-versa).
  */
 
 export type MotionTokenKind = "time" | "easing";
@@ -64,6 +64,8 @@ export const MOTION_TOKENS: MotionTokenDef[] = [
   { name: "--motion-interstitial-dwell", group: "States", kind: "time", min: 0, max: 10000, step: 100 },
   { name: "--motion-scroll-pill-enter", group: "States", kind: "time", min: 0, max: 1500, step: 10 },
   { name: "--motion-scroll-pill-exit", group: "States", kind: "time", min: 0, max: 1500, step: 10 },
+  { name: "--motion-mobile-nav-enter", group: "States", kind: "time", min: 0, max: 1500, step: 10 },
+  { name: "--motion-mobile-nav-exit", group: "States", kind: "time", min: 0, max: 1500, step: 10 },
   { name: "--motion-scrollbar-idle-delay", group: "States", kind: "time", min: 0, max: 2000, step: 10 },
   { name: "--motion-pane-glide", group: "States", kind: "time", min: 0, max: 1500, step: 10 },
   { name: "--motion-side-panel-tab", group: "States", kind: "time", min: 0, max: 1500, step: 10 },

@@ -59,6 +59,16 @@ The additive `ai_provider_defaults` table preserves the legacy per-method prefer
 Revocation retains the unavailable default; connecting another account does not
 silently replace it. Change it explicitly on the account detail page.
 
+Agent settings offer **Reconnect account** when the current personal default
+needs attention. This repairs the same connection and keeps its default and
+agent access. **Connect another account** states that the new account will
+become the user's provider default. It selects the returned grant before
+adopting the binding and retains the actual sign-in method. A failed default
+update stays visible and can be retried without another login. New account
+setup shows an agent-access checkbox, enabled for all company agents by default
+for connection managers. The owner can limit access to the current agent. This access applies only to
+the owner's tasks. Reconnect never expands existing access.
+
 ## Storage and API
 
 AI connections pair `connectionPurpose: ai` with `transport: runtime_auth`.
@@ -77,8 +87,10 @@ and authentication paths are never account labels.
 
 Company-scoped `/api/companies/:companyId/ai-connections` operations provide list,
 API-key creation/reconnect, personal defaults, completed login references, and
-active-run attribution. Existing Connections operations handle naming, access,
-and revocation. Mutation authorization is enforced server-side. OpenAPI documents the new board-only
+active-run attribution. The list includes `canManageConnections`, evaluated by
+the same server permission check as creation, including custom
+`tools:manage_connections` grants. Existing Connections operations handle naming,
+access, and revocation. Mutation authorization is enforced server-side. OpenAPI documents the new board-only
 operations. Agent-originated configuration and environment tests resolve the
 authenticated request’s responsible user; an agent ID is never a personal-account
 owner. A missing responsible identity blocks personal-default resolution.
@@ -90,9 +102,169 @@ save a healthy connection. Reconnect preserves the connection ID, bindings,
 customized name, and access settings. A completed connection remains even if
 subsequent agent creation fails or is cancelled.
 
+Account adoption during Save and the agent runtime test use the selected agent
+environment, or the instance default when no override is set. An unavailable
+remote environment blocks validation rather than probing the server host. The
+runtime test accepts the form’s prospective adapter selection before it is saved.
+For a saved-agent test, omitting `environmentId` uses the agent’s saved override.
+Sending `environmentId: null` tests a change back to the instance default.
+
+## On-demand usage limits
+
+The AI account detail has **Check usage**. It reads the selected account only
+when requested; opening the account, listing connections, and starting either
+runner do not invoke this probe. There is no scheduling, provider selection,
+quota enforcement, credit purchase, or automatic retry attached to it.
+
+`aiConnectionService(db).probeUsage(companyId, userId, connectionId, grantId?)`
+is the common server operation for legacy and native runner connections.
+`GET /api/companies/:companyId/ai-connections/:connectionId/usage?grantId=...`
+exposes it to board users. The UI client calls `aiConnectionsApi.probeUsage`.
+The optional grant ID must belong to this connection; omit it only when exactly
+one authorized grant exists. The company membership, personal owner/shared human
+audience, connection lifecycle, and credential ownership checks run before any
+provider request. Agent API keys cannot call this board endpoint. Internal
+execution callers must also use the normal runner connection selection checks
+for agent installation and responsible-user authority before using its result.
+
+The returned `AiConnectionUsage` contains a timestamp and probe status (`ok`,
+`unsupported`, `unavailable`, or `error`), provider/source, every reported limit
+window, model/feature scope, exact window duration when known, reset time,
+utilization/remaining percentage, absolute allowance when reported, and overage
+settings/balance. The list summary advertises `usageProbeSupported`.
+`limitReached` describes that window; `allowed` preserves explicit provider
+admission for its limit group. A model-specific exhausted window must not be
+treated as an account-wide denial. Codex workspace spend controls are also
+returned when present. Percentages remain provider percentages: 0.5 means 0.5%,
+99.99 stays below exhaustion, and values above 100 remain visible.
+
+Capability means the provider has a probe implementation, not that every token
+has permission to read it. Claude `setup-token` credentials characterized in
+this repo request only `user:inference`; the provider can require `user:profile`
+for [usage access](https://github.com/anthropics/claude-code/issues/13724).
+A 403 returns `permission_denied` with no limits, distinct from expired
+authentication or exhausted capacity. Minting another inference-only token
+does not establish usage access. This probe cannot add scopes to a stored token.
+
+| Connection | Read-only source | Observations |
+| --- | --- | --- |
+| Codex subscription | `GET https://chatgpt.com/backend-api/wham/usage` with stored access token and account ID | Primary/secondary windows, additional feature/model limits, provider admission, workspace spend control, credit balance |
+| Claude subscription | `GET https://api.anthropic.com/api/oauth/usage`, with stored OAuth token and `anthropic-beta: oauth-2025-04-20` | Legacy and structured session/weekly/scoped windows, monthly extra usage, structured spend when legacy extra usage is absent |
+| Grok subscription | `GET https://cli-chat-proxy.grok.com/v1/billing?format=credits`, with stored token and `x-xai-token-auth: xai-grok-cli` | Included-plan utilization/period when reported, separately reported on-demand allowance and prepaid balance in USD cents |
+| OpenRouter API key | `GET https://openrouter.ai/api/v1/key` | Key credit cap, reset cadence, free-model daily request cap when returned |
+| Other API-key methods | No supported single-key allowance endpoint | Explicit `unsupported`; no provider or secret read |
+
+These subscription sources are provider-client endpoints, not a promise of a
+stable public API. Codex's current endpoint/shape is grounded in the official
+[backend client](https://github.com/openai/codex/blob/main/codex-rs/backend-client/src/client.rs)
+and [response models](https://github.com/openai/codex/blob/main/codex-rs/codex-backend-openapi-models/src/models/rate_limit_status_payload.rs).
+Claude uses the same OAuth endpoint as the existing adapter probe; official
+[usage documentation](https://code.claude.com/docs/en/costs) describes plan windows,
+extra usage, and usage-check rate limiting. Grok's endpoint, optional fields, and
+USD-cent units follow its official
+[billing implementation](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-shell/src/extensions/billing.rs).
+It prefers `creditUsagePercent` and `currentPeriod`, with `used`/`monthlyLimit`
+as the legacy included-allowance fallback. The official
+[Grok commands](https://docs.x.ai/build/modes-and-commands) describe its usage screen.
+OpenRouter documents its
+[key limits endpoint](https://openrouter.ai/docs/api/reference/limits).
+
+Unknown values are `null`, never assumed zero. A present Grok `Cent` message `{}`
+means zero under its documented proto3 encoding; an absent message or omitted
+included-usage percentage remains unknown. Claude's `is_active` dashboard flag
+does not establish whether requests are allowed. Named Claude limit groups keep
+their own identities and scopes, including `session` and `weekly_all` groups.
+They do not replace the legacy account-wide windows. An enabled extra-usage switch or remaining
+spend allowance does not establish a funded usable balance; overage `available`
+stays unknown unless the provider confirms it or reports it disabled/exhausted.
+An unlimited OpenRouter key does not establish account balance. A Grok reset
+timestamp alone does not establish weekly/monthly cadence. API rate limiting
+of the *probe* is an error, not an exhausted subscription. Malformed/empty
+responses and network failures return no fresh limits. Responses are `no-store`,
+bounded to 256 KiB and 15 seconds, use fixed endpoints with redirects disabled,
+and contain neither credentials nor raw provider errors. Expired credentials
+report `authentication_required`; the probe does not exchange refresh tokens
+or change connection health.
+
+Verification:
+
+```sh
+pnpm exec vitest run server/src/services/ai-connection-usage.test.ts server/src/__tests__/ai-connections.test.ts ui/src/components/ai-connections/AiConnectionUsagePanel.test.tsx server/src/__tests__/openapi-routes.test.ts
+pnpm check:token-gates
+```
+
+Fixtures prove normalization, credential isolation and manual UI behavior. Live
+provider/account entitlement qualification is separate; provider-side omissions
+remain unknown and must not be used downstream as proof of available capacity.
+On 2026-10-02, a real local Codex access token was saved to an encrypted,
+disposable test connection. The actual connection usage HTTP route returned 200
+with `status: ok`, a weekly window at 100% used, its reset time, denied included
+usage, and available overage credits. The same stored connection passed selection
+checks for both `codex_local` and `paperclip_runner` with the native Codex provider.
+This verifies the connection API/vault/provider path and both selection paths;
+it does not claim a live runner turn or browser acceptance test. The disposable
+database and vault home were removed after verification.
+After the operator signed in again on 2026-10-02, real Claude Keychain and Grok
+file credentials were saved to encrypted disposable connections. Both the
+provider requests and actual connection usage HTTP route returned 200 with
+`status: ok`. Selection checks passed for `claude_local`, native Claude,
+ACP Claude, `grok_local`, and ACP Grok through `paperclip_runner`.
+Claude returned session and weekly usage at 0%, a scoped weekly window, and
+enabled extra usage. Grok returned a weekly period and zero on-demand allowance
+and prepaid balance, but omitted included-plan usage; it remains unknown rather
+than being reported as 0% or available capacity. The live shapes prompted
+regressions for Claude structured limits/spend and Grok legacy usage, monetary
+units, absent percentages, and proto3 zero messages. The disposable database
+and encrypted vault were removed. These checks started no provider turn and
+exchanged no refresh tokens.
+
 ## Runtime isolation
 
+Provider authentication failures, including `acpx_auth_required`, adapter login
+requirements, and expired/invalidated refresh tokens, create an AI connection
+card as the failed run is finalized. The card names the provider and uses the
+same inline connection/reconnect controls as missing-account setup. Pending
+cards are deduplicated. Creating a repair card persists a blocked run classification
+that suppresses immediate and periodic generic retries until the responsible user
+repairs the connection. Unsupported providers and failures that could not create
+a card retain their existing recovery path. Tool permission errors and provider quota failures do not
+request model authentication.
+
+An attributed managed credential is marked as needing reauthorization only if
+its stored generation still matches the failed run. Late failures cannot
+invalidate a refreshed or reconnected credential. Repair preserves the selected
+account and its permissions when the same sign-in method is selected. The card
+also lets the user switch between API key and subscription authentication for
+providers that support both. Switching creates a separate account, then selects
+it as the user's provider default or validates and updates the agent's explicit
+account binding. The original account is retained. Accepting the card resumes with a fresh session
+through the existing durable continuation delivery.
+
+For compatible legacy agents, the card offers the responsible person's provider
+connection without changing authentication automatically. After connecting,
+**Use connection and continue** checks agent-update permissions and validates in
+the agent's execution environment before committing the agent binding, connection
+install, audit, and card completion in one transaction. A failed validation or
+completion leaves the request pending and the old agent configuration and access
+intact. Unsupported harness/provider routes are not guessed.
+
+Codex ACP terminal failures with category `limit` and explicit usage-exhaustion
+wording enter provider-quota recovery. A supported reset clock uses the existing
+Codex parser; when none is available, recovery uses its existing quota backoff.
+Context, turn, rate, storage-capacity and configured-budget limits retain their
+existing handling. The adapter inspects bounded provider text only in memory
+and retains recovery labels and a parsed timestamp, without copying the text to
+run results or logs. A historical generic terminal-limit message alone does not
+establish quota exhaustion.
+
 `prepareManagedAiRuntime` is shared by runs, environment tests, and adoption.
+Test and Save mark the tested account as needing attention when its provider
+hello test rejects authentication or its API-key check returns 401 or 403.
+Network, quota, runtime, and environment failures
+do not change credential health. The same generation check protects a newer
+reconnect from a late test result. Claude ACP's typed `access` failure is its
+provider `auth_required` signal and enters the existing sign-in recovery path,
+including when only the generic terminal-access fallback message is available.
 Claude ACP validates working directories on the selected execution target. A
 sandbox directory does not need to exist on the Paperclip server. When the agent
 has no configured directory, the test uses the remote target's working directory.
@@ -135,9 +307,33 @@ Already-started native sessions retain their existing same-run recovery path;
 they must not be replaced by a fresh execution with a pre-provider receipt.
 
 Session reuse includes grant identity, responsible user, and credential
-generation. A changed identity starts a fresh provider session. Managed native
-executions use per-turn lifecycle cleanup; a suspended native execution whose
-credential identity changed must restart as a new execution.
+generation. A changed identity starts a fresh provider session. Native Codex
+(`paperclip_runner`) honors the configured warm lifecycle. It copies refreshed
+credentials back to the current invocation before deleting that invocation's
+private home. The session-owned credential stays private until idle timeout or
+explicit closure. Each follow-up rechecks current authorization and account
+identity before reusing the session; changing identity retires the previous owner.
+Other managed harnesses retain per-turn cleanup. A suspended native execution
+whose credential identity changed must restart as a new execution.
+
+After a verified provider resume, plain-text Slack follow-ups send the new
+authorized message delta instead of repeating the full task framing. The saved
+run and current message identities and bodies must match. Actual brief edits
+still arrive; historical Slack task titles are not repeated as new directions.
+Attachments, omitted input, questions, approvals, and recovery retain their full
+framing. A fresh provider session always receives the complete bootstrap.
+Retained sandbox runner binaries are reused only after an exact SHA-256 match
+with the controller artifact and the normal capability checks. Run-scoped
+credential changes still require provider process rotation.
+
+
+Warm sandbox execution requires both `reuseLease: true` and
+`runnerLifecycleMode: "warm"` on the environment. `runnerIdleTimeoutMs` bounds
+idle process retention. Chat tasks without a project reuse a sandbox only within
+the same company, environment, task, agent, and runtime configuration. They do
+not need an artificial project workspace. Other tasks, other agents, and ad-hoc
+connection tests cannot claim that retained sandbox. Daytona verifies a matching
+workspace sentinel before accepting either a workspace-scoped or task-scoped lease.
 
 Revocation blocks new invocations and refresh persistence. A running provider
 process may already hold credentials. The revoke confirmation lists attributed
@@ -284,7 +480,10 @@ Native Codex and ACPX/Claude provider selections follow the same compatibility r
 Hiring may succeed before that personal account exists or while it needs repair,
 including hires awaiting board approval. The first assigned task then shows an AI
 connection card. First-time setup presents the provider's subscription/API controls
-inside the task. Connecting installs access for that agent and resumes the pending
+inside the task. The inline form omits the connection name field and names new
+accounts from the user's display name, provider, and selected authentication
+method (for example, `dotta's Claude API account`). Reconnecting preserves the
+existing account name. Connecting installs access for that agent and resumes the pending
 work automatically. Explicit incompatible bindings and shared-account permission
 denials still fail; hiring never expands a restricted shared account's audience.
 
@@ -303,3 +502,13 @@ boundaries, and concurrent runs of one subscription for both providers. The opt-
 [`tests/hiring-ai-connections/README.md`](../../tests/hiring-ai-connections/README.md)
 describes real browser hiring, subtask, connection, and automatic-resume checks on
 local and Daytona environments, plus the production component Storybook checks.
+
+### Managed session compatibility
+
+Resume checks compare the selected account identity with the server-owned
+metadata in the saved task session. Read this metadata before decoding the
+adapter session: adapter codecs intentionally discard unknown fields. A missing
+identity, a different grant or responsible user, or a changed credential generation
+requires a fresh session. The metadata is removed before passing session params
+to an adapter. Temporary authentication-home paths do not change the configuration
+fingerprint. These checks do not relax current connection authorization.

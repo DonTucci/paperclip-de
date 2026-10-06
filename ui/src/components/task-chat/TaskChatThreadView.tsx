@@ -1,3 +1,4 @@
+import { TaskBrowserActivity } from "../task-side-panel/TaskBrowserActivity";
 import { TaskChatProjectCreatedCard } from "./TaskChatProjectCreatedCard";
 import { TaskChatSkillCreatedCard } from "./TaskChatSkillCreatedCard";
 import { useMemo, type ReactNode } from "react";
@@ -74,6 +75,7 @@ interface TaskChatThreadViewProps {
   scroll?: boolean;
   attachments?: IssueAttachment[];
   onOpenSkill?: (skillId: string, name: string) => void;
+  onOpenBrowser?: (browserId: string) => void;
 }
 
 function renderItem(
@@ -95,8 +97,10 @@ function renderItem(
   retryFailedRunId?: string | null,
   attachments: IssueAttachment[] = [],
   onOpenSkill?: (skillId: string, name: string) => void,
+  onOpenBrowser?: (browserId: string) => void,
 ) {
   switch (item.kind) {
+    case "browser": return <TaskBrowserActivity browser={item.browser} label={item.label} onOpen={onOpenBrowser} />;
     case "project_created": return <TaskChatProjectCreatedCard item={item} />;
     case "skill_created": return <TaskChatSkillCreatedCard item={item} onOpen={onOpenSkill} />;
     case "message": {
@@ -111,6 +115,7 @@ function renderItem(
             ...item.attachedTurn,
             agentName: item.attachedTurn.agentName ?? item.authorName,
             agentIcon: item.attachedTurn.agentIcon ?? item.agentIcon,
+            agent: item.attachedTurn.agent ?? item.agent,
           }
         : item.attachedTurn;
       const turn = attachedTurnItem ? (
@@ -137,6 +142,7 @@ function renderItem(
               undefined,
               attachments,
               onOpenSkill,
+              onOpenBrowser,
             )
           }
         />
@@ -171,7 +177,7 @@ function renderItem(
         <TaskChatMarker
           item={item}
           onTryAgain={
-            item.id === retryableMarkerId
+            item.id === retryableMarkerId && item.retryable !== false
               ? item.runId && onRetryFailedRun
                 ? () => onRetryFailedRun(item.runId!)
                 : onTryAgainNoLiveExecutionPath
@@ -241,6 +247,7 @@ function renderItem(
               undefined,
               attachments,
               onOpenSkill,
+              onOpenBrowser,
             )
           }
         />
@@ -307,6 +314,7 @@ export function TaskChatThreadView({
   scroll = true,
   attachments = EMPTY_ATTACHMENTS,
   onOpenSkill,
+  onOpenBrowser,
 }: TaskChatThreadViewProps) {
   const streamlined = useStreamlinedTaskChatPresentation();
   const retryableMarkerId =
@@ -343,6 +351,7 @@ export function TaskChatThreadView({
               retryFailedRunId,
               attachments,
               onOpenSkill,
+              onOpenBrowser,
             ),
           }))
           .filter((entry) => entry.content !== null)
@@ -401,6 +410,8 @@ export function TaskChatThreadView({
                   onRetryFailedRun,
                   retryFailedRunId,
                   attachments,
+                  onOpenSkill,
+                  onOpenBrowser,
                 )}
               </div>
             ))}
@@ -410,7 +421,7 @@ export function TaskChatThreadView({
     items, streamlined, onApprovalDecision, onRuntimeRequestDecision,
     renderInteraction, renderBrief, renderMessageActions, renderQueuedAction,
     onTryAgainNoLiveExecutionPath, tryAgainNoLiveExecutionPathPending,
-    retryableMarkerId, onRetryFailedRun, retryFailedRunId, attachments, onOpenSkill,
+    retryableMarkerId, onRetryFailedRun, retryFailedRunId, attachments, onOpenSkill, onOpenBrowser,
   ]);
   const body = (
     <div

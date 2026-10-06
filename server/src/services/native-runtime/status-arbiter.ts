@@ -1,6 +1,7 @@
 import type { NativeEvidenceAssessment } from "./evidence-classifier.js";
+import { NATIVE_MODEL_REJECTION_MESSAGE } from "./native-provider-failure.js";
 
-export const NATIVE_STATUS_ARBITER_POLICY_VERSION = "phase6-v6";
+export const NATIVE_STATUS_ARBITER_POLICY_VERSION = "phase6-v8";
 
 export type NativeAuthoritativeIssueStatus =
   | "backlog"
@@ -110,9 +111,13 @@ export function arbitrateNativeStatus(input: {
     "authorized" | "revoked" | "not_applicable";
   boardResponseWaitAuthorized?: boolean;
   boardResponseWaitOrigin?: boolean;
+  isConversation?: boolean;
+  hasActivePauseHold?: boolean;
   reviewOwnerUserId?: string | null;
   /** Review decisions own task state; a reviewer's finish report cannot override them. */
   nativeReviewOutcome?: "resolved" | "pending" | "stale";
+  /** Re-derived from the committed runner terminal and pinned execution identity. */
+  providerModelRejected?: boolean;
   agentId: string;
   priorIssueStatus: NativeAuthoritativeIssueStatus;
 }): NativeStatusDecision {
@@ -142,6 +147,31 @@ export function arbitrateNativeStatus(input: {
           agentId: input.agentId,
         },
       ],
+    };
+  }
+  if (input.providerModelRejected && input.terminalState === "failed" &&
+      input.nativeReviewOutcome !== "stale" && input.nativeReviewOutcome !== "resolved") {
+    if (input.nativeReviewOutcome === "pending") {
+      // The pending review is bound to the worker's status decision and
+      // version. Preserve that authority so an explicit retry after a
+      // configuration repair can resolve the same review. In particular,
+      // do not create the normal unresolved-review recovery action.
+      return {
+        policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,
+        statusAction: "preserve",
+        toStatus: input.priorIssueStatus,
+        reasonCode: "native_provider_model_rejected",
+        unblockDescriptor: null,
+        effects: [{ kind: "release_checkout" }],
+      };
+    }
+    return {
+      policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,
+      statusAction: "blocked",
+      toStatus: "blocked",
+      reasonCode: "native_provider_model_rejected",
+      unblockDescriptor: { owner: "board", action: NATIVE_MODEL_REJECTION_MESSAGE },
+      effects: [{ kind: "bind_blocker", owner: "board", action: NATIVE_MODEL_REJECTION_MESSAGE }],
     };
   }
   if (input.nativeReviewOutcome) {
@@ -246,9 +276,15 @@ export function arbitrateNativeStatus(input: {
       effects: [],
     };
   }
+  const unfinishedResponseWait =
+    !input.isConversation &&
+    !["authorized", "revoked"].includes(input.externalChatResponseWaitAuthorization ?? "") &&
+    input.assessment.reportedDisposition === "yielded" &&
+    input.assessment.continuation?.kind === "response_wake" &&
+    input.assessment.hasBlockingRemainingWork;
   if (
     input.hasUnresolvedIssueBlockers === true &&
-    ["done", "blocked"].includes(input.assessment.reportedDisposition)
+    (["done", "blocked"].includes(input.assessment.reportedDisposition) || unfinishedResponseWait)
   ) {
     const owner = input.assessment.blocker?.boardOwned
       ? ("board" as const)
@@ -404,10 +440,21 @@ export function arbitrateNativeStatus(input: {
       effects: [],
     };
   }
+  if (unfinishedResponseWait && input.hasActivePauseHold) {
+    return {
+      policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,
+      statusAction: "preserve",
+      toStatus: input.priorIssueStatus,
+      reasonCode: "response_wait_pause_preserved",
+      unblockDescriptor: null,
+      effects: [],
+    };
+  }
   if (
     input.assessment.reportedDisposition === "yielded" &&
     input.assessment.continuation?.kind === "response_wake" &&
-    input.boardResponseWaitAuthorized === true
+    input.boardResponseWaitAuthorized === true &&
+    !unfinishedResponseWait
   ) {
     return {
       policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,
@@ -423,7 +470,8 @@ export function arbitrateNativeStatus(input: {
   if (
     input.assessment.reportedDisposition === "yielded" &&
     input.assessment.continuation?.kind === "response_wake" &&
-    input.boardResponseWaitOrigin
+    input.boardResponseWaitOrigin &&
+    !input.boardResponseWaitAuthorized
   ) {
     return {
       policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,
@@ -436,7 +484,8 @@ export function arbitrateNativeStatus(input: {
   }
   if (
     input.assessment.reportedDisposition === "yielded" &&
-    input.assessment.continuation
+    input.assessment.continuation &&
+    !unfinishedResponseWait
   ) {
     return {
       policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,
@@ -455,6 +504,8 @@ export function arbitrateNativeStatus(input: {
       ],
     };
   }
+  // A current response that admits blocking work must use the server's bounded
+  // repair path, not a passive wait or a model-chosen continuation retry key.
   if (input.allowIncompleteContinuation === false) {
     return {
       policyVersion: NATIVE_STATUS_ARBITER_POLICY_VERSION,

@@ -38,6 +38,7 @@ import {
   createSandboxCallbackBridgeToken,
   DEFAULT_SANDBOX_CALLBACK_BRIDGE_MAX_BODY_BYTES,
   HTTP2_SANDBOX_CALLBACK_BRIDGE_ROUTE_ALLOWLIST,
+  runSandboxBridgeControlCommand,
   SANDBOX_CALLBACK_BRIDGE_ENTRYPOINT,
   SANDBOX_CALLBACK_BRIDGE_HTTP2_MODE,
   sandboxCallbackBridgeDirectories,
@@ -267,6 +268,7 @@ export interface PreparedAdapterExecutionTargetRuntime {
     baseline: DirectorySnapshot;
     gitSnapshot: GitWorkspaceSnapshot | null;
   } | null;
+  cleanupWorkspaceSnapshot?(): Promise<void>;
   restoreWorkspace(onProgress?: RuntimeProgressSink): Promise<void>;
 }
 
@@ -279,6 +281,9 @@ export interface AdapterExecutionTargetProcessOptions {
   onLog: (stream: "stdout" | "stderr", chunk: string) => Promise<void>;
   onRuntimeProgress?: RuntimeStatusSink;
   onSpawn?: (meta: { pid: number; processGroupId: number | null; startedAt: string }) => Promise<void>;
+  /** Trusted invocation observation, not a turn completion callback. Called only
+   * after local child close or a remotely observed exit, including nonzero exits. */
+  onProcessStopped?: () => void;
   terminalResultCleanup?: TerminalResultCleanupOptions;
   /**
    * Sandbox-only: factory from the Paperclip bridge handle that streams the
@@ -368,13 +373,9 @@ export interface AdapterExecutionTargetProcessSessionBridgeHandle {
 
 export { sanitizeRemoteExecutionEnv } from "./remote-execution-env.js";
 
-// 4-hour wall-clock backstop for sandbox-backed adapter runs. This is a
-// last-resort kill switch, not the primary hang detector: genuinely hung runs
-// are caught much earlier by the adapters' output-inactivity monitors (e.g.
-// codex-local's 7-minute monitor). The value intentionally matches the
-// recovery watchdog's ACTIVE_RUN_OUTPUT_CRITICAL_THRESHOLD_MS (4h) in
-// server/src/services/recovery/service.ts so healthy long runs are never
-// killed by the adapter before the watchdog would even consider them stuck.
+// Four-hour wall-clock backstop for sandbox-backed adapter runs. Keep this
+// execution limit independent of the earlier informational silence warnings
+// and the short deadlines for bridge control operations.
 export const DEFAULT_REMOTE_SANDBOX_ADAPTER_TIMEOUT_SEC = 14_400;
 
 function parseObject(value: unknown): Record<string, unknown> {
@@ -893,6 +894,7 @@ export async function runAdapterExecutionTargetProcess(
       // after the clean process completion cannot latch a false mid-run loss. A
       // control channel that died before this clean completion still fails the
       // run closed.
+      if (!result.timedOut && typeof result.exitCode === "number" && Number.isInteger(result.exitCode) && result.exitCode >= 0) options.onProcessStopped?.();
       const settled = applyRunDispositionSeam(result, options.settleRunDisposition);
       if (runLogTail) {
         await runLogTail.finish({ stdout: result.stdout, stderr: result.stderr });
@@ -911,7 +913,7 @@ export async function runAdapterExecutionTargetProcess(
       ? sanitizeRemoteExecutionEnv(options.env)
       : options.env;
 
-  return await runChildProcess(runId, command, args, {
+  const result = await runChildProcess(runId, command, args, {
     cwd: options.cwd,
     env,
     stdin: options.stdin,
@@ -923,6 +925,13 @@ export async function runAdapterExecutionTargetProcess(
     localProcessSandbox: target?.kind === "local" || !target ? options.localProcessSandbox : null,
     remoteExecution: adapterExecutionTargetToRemoteSpec(target),
   });
+  // Closing an SSH client on timeout/disconnect does not prove the remote
+  // provider exited. SSH status 255 is transport failure, never a stop receipt.
+  if (!target || target.kind === "local" ||
+      (!result.timedOut && !result.signal && result.exitCode !== null && result.exitCode >= 0 && result.exitCode < 255)) {
+    options.onProcessStopped?.();
+  }
+  return result;
 }
 
 export async function runAdapterExecutionTargetShellCommand(
@@ -1425,6 +1434,8 @@ export async function prepareAdapterExecutionTargetRuntime(input: {
   workspaceBaseline?: DirectorySnapshot;
   workspaceGitSnapshot?: GitWorkspaceSnapshot | null;
   workspaceExclude?: string[];
+  /** Plain persistent directories include all files, independent of Git and task cache exclusions. */
+  workspaceFileMode?: "all";
   preserveAbsentOnRestore?: string[];
   assets?: AdapterManagedRuntimeAsset[];
   /** Referenced (additional) projects to stage into the sandbox as plain, read-only trees. */
@@ -1466,6 +1477,8 @@ export async function prepareAdapterExecutionTargetRuntime(input: {
       workspaceLocalDir: input.workspaceLocalDir,
       workspaceRemoteDir: input.workspaceRemoteDir,
       syncWorkspace: input.syncWorkspace,
+      workspaceFileMode: input.workspaceFileMode,
+      workspaceExclude: input.workspaceExclude,
       assets: input.assets,
       additionalSources: input.additionalSources,
       onProgress: input.onProgress,
@@ -1505,6 +1518,7 @@ export async function prepareAdapterExecutionTargetRuntime(input: {
     workspaceBaseline: input.workspaceBaseline,
     workspaceGitSnapshot: input.workspaceGitSnapshot,
     workspaceExclude: input.workspaceExclude,
+    workspaceFileMode: input.workspaceFileMode,
     preserveAbsentOnRestore: input.preserveAbsentOnRestore,
     assets: input.assets,
     additionalSources: input.additionalSources,
@@ -1522,6 +1536,7 @@ export async function prepareAdapterExecutionTargetRuntime(input: {
     additionalSourceDirs: prepared.additionalSourceDirs,
     additionalSourceFailures: prepared.additionalSourceFailures,
     workspaceSyncSnapshot: prepared.workspaceSyncSnapshot,
+    cleanupWorkspaceSnapshot: prepared.cleanupWorkspaceSnapshot,
     restoreWorkspace: prepared.restoreWorkspace,
   };
 }
@@ -1972,6 +1987,11 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
 
   const target = input.target;
   const onLog = input.onLog ?? (async () => {});
+  // Failure diagnostics are best effort: stalled or failed run-log persistence
+  // must not prevent sending shutdown or removing the bridge's session files.
+  const logFailureWithoutWaiting = (message: string) => {
+    void Promise.resolve().then(() => onLog("stderr", message)).catch(() => undefined);
+  };
   const runner = requireSandboxRunner(target);
   // Run one unit of run-time work under its named wrapper span when a span
   // runner is injected. Without a runner, run the work under the current run
@@ -2036,13 +2056,45 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
     // is not reclassified as ambient merely because it equals the host value.
     env: sanitizeRemoteExecutionEnv(launchEnv, {}),
   }), "utf8").toString("base64");
+  // Base64 plus JSON escaping can push an otherwise valid child environment
+  // past Linux's per-argument/per-variable exec limit. Keep small launches on
+  // the existing path; upload larger envelopes in bounded chunks instead.
+  const commandEnv: Record<string, string> = {};
+  if (commandPayload.length <= 64 * 1024) {
+    commandEnv.PAPERCLIP_PROCESS_SESSION_COMMAND_B64 = commandPayload;
+  } else {
+    const payloadPath = path.posix.join(sessionDir, "command.b64");
+    const runPayloadSetup = async (script: string) => {
+      const result = await runSandboxBridgeControlCommand(runner, {
+        command: shellCommand,
+        args: shellCommandArgs(script),
+        cwd: target.remoteCwd,
+        timeoutMs,
+        bypassSession: true,
+      });
+      if (result.timedOut || result.exitCode !== 0) {
+        throw new Error("Failed to stage sandbox process session command payload.");
+      }
+    };
+    try {
+      // The envelope can contain credentials. Its upload intermediates stay
+      // inside a private session directory, and the wrapper deletes it before
+      // spawning the child. Teardown removes it if the wrapper cannot start.
+      await runPayloadSetup(`umask 077 && mkdir -m 700 ${shellQuote(sessionDir)}`);
+      await client.writeTextFile(payloadPath, commandPayload);
+      await runPayloadSetup(`chmod 600 ${shellQuote(payloadPath)}`);
+    } catch (error) {
+      await client.remove(sessionDir).catch(() => undefined);
+      throw error;
+    }
+  }
 
   // Legacy poll path: background the wrapper with `nohup` and read its output
   // event files with the host poll below. The streamed path launches the wrapper
   // as one foreground session command further down instead, so skip this.
   if (!streamOutput) {
     await onLog("stdout", `[paperclip] Starting ACP process session bridge in sandbox (${target.providerKey ?? "provider"}).\n`);
-    const startResult = await runner.execute({
+    const startResult = await runSandboxBridgeControlCommand(runner, {
       command: shellCommand,
       args: shellCommandArgs(
         [
@@ -2050,7 +2102,7 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
           // I3: no numeric process identifier anywhere. Background the
           // wrapper and let it go; do not capture `$!`.
           `PAPERCLIP_PROCESS_SESSION_DIR=${shellQuote(sessionDir)} ` +
-            `PAPERCLIP_PROCESS_SESSION_COMMAND_B64=${shellQuote(commandPayload)} ` +
+            Object.entries(commandEnv).map(([key, value]) => `${key}=${shellQuote(value)} `).join("") +
             `nohup node ${shellQuote(remoteScriptPath)} >/dev/null 2>&1 < /dev/null &`,
         ].join("\n"),
       ),
@@ -2062,8 +2114,12 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
       // The wrapper launch is bridge plumbing. Keep it off the persistent
       // session so it never queues behind an in-run session command.
       bypassSession: true,
+    }).catch(async (error) => {
+      await client.remove(sessionDir).catch(() => undefined);
+      throw error;
     });
     if (startResult.timedOut || (startResult.exitCode ?? 1) !== 0) {
+      await client.remove(sessionDir).catch(() => undefined);
       throw new Error(`Failed to start sandbox ACP process session bridge: ${startResult.stderr || startResult.stdout}`);
     }
   }
@@ -2086,6 +2142,28 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
   // a big earlier chunk, so the wrapper reads the stdin bytes out of order and
   // corrupts a large prompt on the stdin path.
   let stdinWriteChain: Promise<void> = Promise.resolve();
+  let stdinDeliveryFailed = false;
+  const writeStdinFile = async (filePath: string, body: string) => {
+    // Retry the same sequence, never the ACP request or the tool itself. Each
+    // upload uses private temporary paths, and the wrapper drops sequences it
+    // already consumed when a provider loses the final rename's response.
+    for (let attempt = 1; ; attempt += 1) {
+      try {
+        await client.writeTextFile(filePath, body);
+        return;
+      } catch (error) {
+        // Plugin RPC preserves provider messages but not HTTP error classes.
+        // Match the Daytona SDK and Cloudflare bridge's gateway diagnostics
+        // exactly; shell failures and auth errors must still fail immediately.
+        const gatewayFailure = error instanceof Error && (
+          /^Request failed with status code (502|503|504)$/.test(error.message) ||
+          /^Cloudflare sandbox bridge request failed with HTTP (502|503|504)\.$/.test(error.message)
+        );
+        if (!gatewayFailure || attempt >= 3) throw error;
+        await new Promise((resolve) => setTimeout(resolve, attempt * 250));
+      }
+    }
+  };
   let pollTimer: NodeJS.Timeout | null = null;
   const pendingRemoteEvents: Array<{
     type?: string;
@@ -2217,19 +2295,24 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
           // Chain this write after the previous one, so the atomic rename for
           // file N finishes before the write for file N+1 starts. Keep the
           // per-message `sandbox.agentSession.sendInput` span inside the chain.
-          const write = stdinWriteChain.then(() =>
-            runRuntimeWork(AGENT_SESSION_SEND_INPUT_SPAN, () =>
-              client.writeTextFile(filePath, jsonLine(stdinPayload)),
-            ),
-          );
-          // The next message chains after this write on success or failure, so a
-          // failed write never blocks the chain. This mirrors the wrapper
-          // `writeChain` pattern for its event files.
-          stdinWriteChain = write.then(() => undefined, () => undefined);
-          // Keep the failure behavior: send one error line, then destroy the socket.
-          write.catch((error) => {
-            nextSocket.write(jsonLine({ type: "error", message: error instanceof Error ? error.message : String(error) }));
-            nextSocket.destroy();
+          stdinWriteChain = stdinWriteChain.then(async () => {
+            if (stdinDeliveryFailed) return;
+            try {
+              await runRuntimeWork(AGENT_SESSION_SEND_INPUT_SPAN, () =>
+                writeStdinFile(filePath, jsonLine(stdinPayload)),
+              );
+            } catch {
+              stdinDeliveryFailed = true;
+              stopping = true;
+              const message = "ACP process session input delivery failed.";
+              // Flush the diagnostic before closing; destroy() can discard it
+              // and leave only ACP's generic connection_close error. Do not
+              // expose provider error text, which may contain a command payload.
+              nextSocket.end(jsonLine({ type: "error", message }));
+              // stop() awaits this input chain before sending shutdown. Run-log
+              // persistence must not hold teardown open when it stalls or fails.
+              logFailureWithoutWaiting(`[paperclip] ${message}\n`);
+            }
           });
         }
       }
@@ -2329,16 +2412,6 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
       for (const line of text.split(/\n/)) parseFrameLine(line);
     };
 
-    const launchEnvForStream =
-      typeof input.env === "function" ? await input.env() : input.env;
-    const streamCommandPayload = Buffer.from(JSON.stringify({
-      command: input.command,
-      args: input.args,
-      cwd: input.cwd || target.remoteCwd,
-      // Same provenance-clean contract as the polled payload above. Preserve
-      // every explicit identity override even when it equals the host value.
-      env: sanitizeRemoteExecutionEnv(launchEnvForStream, {}),
-    }), "utf8").toString("base64");
     await onLog(
       "stdout",
       `[paperclip] Starting streamed ACP process session bridge in sandbox (${target.providerKey ?? "provider"}).\n`,
@@ -2377,7 +2450,7 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
             cwd: target.remoteCwd,
             env: {
               PAPERCLIP_PROCESS_SESSION_DIR: sessionDir,
-              PAPERCLIP_PROCESS_SESSION_COMMAND_B64: streamCommandPayload,
+              ...commandEnv,
               PAPERCLIP_SANDBOX_EXEC_CHANNEL: "bridge",
             },
             timeoutMs,
@@ -2388,6 +2461,9 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
           });
           ingestFinalText(result.stdout);
           if (!sawTerminal && !stopping) {
+            // A shell can fail before the wrapper emits any frames. Preserve
+            // that launch diagnostic instead of reporting only its exit code.
+            if (result.stderr) await onLog("stderr", result.stderr);
             deliverRemoteEvent({
               type: "exit",
               code: typeof result.exitCode === "number" ? result.exitCode : null,
@@ -2507,10 +2583,9 @@ export async function startAdapterExecutionTargetProcessSessionBridge(input: {
       ]);
       stopReadingForShutdownAck = true;
       if (!acknowledgedInTime) {
-        await onLog(
-          "stderr",
+        logFailureWithoutWaiting(
           `[paperclip] ACP process session wrapper did not acknowledge shutdown within ${DEFAULT_PROCESS_SESSION_SHUTDOWN_WAIT_MS}ms; removing the session directory anyway.\n`,
-        ).catch(() => undefined);
+        );
       }
       // Unconditional: this removal runs whether or not the wrapper
       // acknowledged, and whether or not any event (real or forged) arrived
@@ -2533,7 +2608,18 @@ let buffer = "";
 let exiting = false;
 
 function send(message) {
+  if (exiting) return;
   socket.write(JSON.stringify({ token, ...message }) + "\\n");
+}
+
+function finish(code) {
+  if (exiting) return;
+  exiting = true;
+  process.exitCode = code;
+  // ACP keeps stdin open while waiting for a reply. Release that handle when
+  // the remote process stops, but let pending stdout/stderr writes drain.
+  process.stdin.destroy();
+  socket.end();
 }
 
 socket.on("connect", () => send({ type: "hello" }));
@@ -2554,13 +2640,9 @@ socket.on("data", (chunk) => {
       (message.stream === "stderr" ? process.stderr : process.stdout).write(out);
     } else if (message.type === "error") {
       process.stderr.write(String(message.message || "Process session bridge failed.") + "\\n");
-      exiting = true;
-      process.exitCode = 1;
-      socket.end();
+      finish(1);
     } else if (message.type === "exit") {
-      exiting = true;
-      process.exitCode = typeof message.code === "number" ? message.code : 1;
-      socket.end();
+      finish(typeof message.code === "number" ? message.code : 1);
     }
   }
 });
@@ -2934,6 +3016,14 @@ async function pollStdin() {
     for (const name of entries) {
       if (shuttingDown) break;
       const entrySeq = Number.parseInt(name, 10);
+      const file = path.posix.join(stdinDir, name);
+      // A successful publication can be retried after its provider response
+      // was lost, even after we consumed it. Never send those bytes twice or
+      // move the expected sequence backwards. This also handles late uploads.
+      if (Number.isFinite(entrySeq) && entrySeq < stdinExpectedSeq) {
+        await fs.rm(file, { force: true }).catch(() => undefined);
+        continue;
+      }
       // Hold the send order when an earlier file has not appeared. Do not consume
       // this later file: wait for the missing file on a later cycle, bounded by
       // the retry budget. After the budget, fail loud and advance past the gap,
@@ -2952,7 +3042,6 @@ async function pollStdin() {
         stdinGapRetries = 0;
         stdinExpectedSeq = entrySeq;
       }
-      const file = path.posix.join(stdinDir, name);
       let message;
       try {
         // Hardening (I3): open with O_NOFOLLOW where the platform defines it,
@@ -3020,6 +3109,34 @@ await captureSessionIdentity();
 void pollStdin().catch((error) => void writeEvent({ type: "error", message: error instanceof Error ? error.message : String(error) }));
 `;
 
+// Shared by both wrappers. Refuse a symlink and remove the private envelope
+// before creating the child; no launch payload file belongs to the agent.
+const PROCESS_SESSION_READ_COMMAND = `
+let config;
+try {
+  let commandPayload = process.env.PAPERCLIP_PROCESS_SESSION_COMMAND_B64;
+  if (!commandPayload) {
+    const payloadPath = path.posix.join(sessionDir, "command.b64");
+    const handle = await fs.open(payloadPath, fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
+    try {
+      commandPayload = await handle.readFile("utf8");
+    } finally {
+      await handle.close();
+      await fs.rm(payloadPath, { force: true });
+    }
+  }
+  config = JSON.parse(Buffer.from(commandPayload, "base64").toString("utf8"));
+} catch {
+  // No child exists yet. Emit a terminal event on both transports and attest
+  // shutdown, instead of letting a detached polled wrapper fail silently.
+  // Parse errors can quote credential bytes, so use a fixed diagnostic.
+  await writeEvent({ type: "error", message: "Failed to read sandbox process session command payload." });
+  await writeEvent({ type: "shutdownAck" });
+  await new Promise((resolve) => process.stdout.write("", resolve));
+  process.exit(1);
+}
+`;
+
 // Streamed variant: the wrapper writes each output frame as one newline-
 // delimited JSON line to its stdout. The host runs this wrapper as one
 // long-lived session command and reads the frames from the session log stream,
@@ -3033,8 +3150,7 @@ import { promises as fs, constants as fsConstants } from "node:fs";
 import path from "node:path";
 
 const sessionDir = process.env.PAPERCLIP_PROCESS_SESSION_DIR;
-const commandPayload = process.env.PAPERCLIP_PROCESS_SESSION_COMMAND_B64;
-if (!sessionDir || !commandPayload) throw new Error("Missing process session bridge env.");
+if (!sessionDir) throw new Error("Missing process session bridge env.");
 
 const stdinDir = path.posix.join(sessionDir, "stdin");
 let seq = 0;
@@ -3043,7 +3159,6 @@ let shuttingDown = false;
 let terminated = false;
 let killTimer = null;
 
-const config = JSON.parse(Buffer.from(commandPayload, "base64").toString("utf8"));
 await fs.mkdir(stdinDir, { recursive: true });
 
 // One newline-delimited JSON frame per event. Node keeps process.stdout writes
@@ -3070,6 +3185,8 @@ if ((await isSymbolicLink(sessionDir)) || (await isSymbolicLink(stdinDir))) {
   process.exitCode = 1;
   process.exit(1);
 }
+
+${PROCESS_SESSION_READ_COMMAND}
 
 // Hardening (I3, not containment): the wrapper's own launch env carries the
 // session dir and the command payload. Scrub both keys before they reach the
@@ -3116,8 +3233,7 @@ import { promises as fs, constants as fsConstants } from "node:fs";
 import path from "node:path";
 
 const sessionDir = process.env.PAPERCLIP_PROCESS_SESSION_DIR;
-const commandPayload = process.env.PAPERCLIP_PROCESS_SESSION_COMMAND_B64;
-if (!sessionDir || !commandPayload) throw new Error("Missing process session bridge env.");
+if (!sessionDir) throw new Error("Missing process session bridge env.");
 
 const stdinDir = path.posix.join(sessionDir, "stdin");
 const eventsDir = path.posix.join(sessionDir, "events");
@@ -3127,7 +3243,6 @@ let shuttingDown = false;
 let terminated = false;
 let killTimer = null;
 
-const config = JSON.parse(Buffer.from(commandPayload, "base64").toString("utf8"));
 await fs.mkdir(stdinDir, { recursive: true });
 await fs.mkdir(eventsDir, { recursive: true });
 
@@ -3161,6 +3276,8 @@ if ((await isSymbolicLink(sessionDir)) || (await isSymbolicLink(stdinDir))) {
   process.exitCode = 1;
   process.exit(1);
 }
+
+${PROCESS_SESSION_READ_COMMAND}
 
 // Hardening (I3, not containment): the wrapper's own launch env carries the
 // session dir and the command payload. Scrub both keys before they reach the

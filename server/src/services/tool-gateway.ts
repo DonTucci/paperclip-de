@@ -1,6 +1,22 @@
+import { composeConnectionInstructions } from "./connection-instructions.js";
+import { isInsufficientConnectionScope, INSUFFICIENT_CONNECTION_SCOPE_MESSAGE } from "./connection-permission-errors.js";
+import { boundedMcpToolName } from "./mcp-tool-names.js";
+import { browserUseService } from "./browser-use.js";
+import { isBrowserUseConnection } from "./browser-use-client.js";
+import { COGNEE_STDIO_TEMPLATE, cogneeCloudUrl, callCogneeCloud } from "./cognee-connection.js";
+import { HttpError } from "../errors.js";
+import { claimSlackRateLimitRetry } from "./connectors/slack-retry.js";
+import { resolveSlackTaskAuthority } from "./connectors/slack-authority.js";
+import { SLACK_TOOLS } from "@paperclipai/shared";
+import { slackToolsForSession } from "./connectors/slack-catalog.js";
+import { executeSlackTool } from "./connectors/slack.js";
+import { githubGuestBotConnectionForSession, githubBotToolsForSession } from "./chat-github-tools.js";
+import { githubChatReviewService } from "./chat-github-reviews.js";
 import { runIdentityContexts } from "@paperclipai/db";
 import { captureRunIdentity } from "./run-identity.js";
+import { emitConnectionInvoked } from "./connector-telemetry.js";
 import { resolveManagedGitHubIdentitySelection } from "./git-credentials.js";
+import { extractRemoteMcpPending } from "./remote-mcp-pending.js";
 import { logger } from "../middleware/logger.js";
 import { spawn } from "node:child_process";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
@@ -63,6 +79,7 @@ import type {
   ToolAccessDecision,
   ToolAccessDecisionInput,
   ToolConnectionTestCallStatus,
+  ToolUpstreamPending,
   ToolConnectionTestCallStatusPhase,
   ToolCredentialSecretRef,
   ToolMcpGateway,
@@ -85,10 +102,15 @@ import type {
 } from "./plugin-tool-dispatcher.js";
 import { logActivity, type LogActivityInput } from "./activity-log.js";
 import { secretService } from "./secrets.js";
+import { connectionGrantCredentialRef, resolveConnectionGrantSecret } from "./connection-credentials.js";
 import { railwayCommandBudgetMs, createRailwayClient, isRailwayConnection, isRailwayEndpoint, isRailwayToolBlocked, normalizeRailwayToolName, RAILWAY_API_URL, RAILWAY_TOOL_PREFIX, RailwayError } from "./railway.js";
 import { RAILWAY_SSH_SECRET_PATH, runRailwaySshCommand } from "./railway-ssh.js";
 import {
   initializeMcpHttpSession,
+  getMcpHttpSession,
+  forgetMcpHttpSessions,
+  readMcpHttpResponse,
+  McpHttpResponseError,
   mcpHttpRequestHeaders,
   parseMcpHttpResponseBody,
 } from "./mcp-http.js";
@@ -97,6 +119,7 @@ import {
   projectedConnectionToolArguments,
   projectedConnectionToolInputSchema,
 } from "./tool-access.js";
+import { assertGoogleChatToolArgumentsSupported, googleChatToolDescription } from "./google-chat-tool-policy.js";
 import { parseRemoteHttpEndpoint } from "./remote-http-endpoint-guard.js";
 import {
   guardedRemoteHttpFetch,
@@ -106,7 +129,13 @@ import {
   REMOTE_URL_SECRET_CONFIG_PATH,
   remoteUrlCredentialMatchesPublicUrl,
 } from "./remote-url-credentials.js";
-import { toolAccessPolicyService } from "./tool-access-policy.js";
+import {
+  createToolAccessDecisionCache,
+  runContextSnapshotString,
+  toolAccessPolicyService,
+  type ToolAccessDecisionCache,
+} from "./tool-access-policy.js";
+import { toolDiscoveryScheduler, ToolDiscoveryBusyError } from "./tool-discovery-scheduler.js";
 import { commitToolActionReview } from "./tool-action-review.js";
 import { issueThreadInteractionService } from "./issue-thread-interactions.js";
 import {
@@ -116,11 +145,7 @@ import {
   type ToolRuntimeSlotView,
 } from "./tool-runtime-supervisor.js";
 import { recordToolRuntimeAuditWriteFailure } from "./tool-runtime-metrics.js";
-import {
-  composioChildConfig,
-  createComposioSessionManager,
-} from "./composio-session-manager.js";
-import type { ComposioClient } from "./composio.js";
+import { isRetiredComposioConnection, RETIRED_COMPOSIO_MESSAGE } from "@paperclipai/shared";
 import {
   createPaperclipCloudConnector,
   isPaperclipCloudConnectorStrategy,
@@ -200,6 +225,10 @@ const ACTION_REQUEST_EXECUTION_WAIT_MS = APPROVED_EXECUTION_TIMEOUT_MS + 5_000;
 // create) so a live create keeps its own row.
 const MAX_REMOTE_MCP_RESPONSE_BYTES = 1_000_000;
 const ACTIVE_GATEWAY_RUN_STATUSES = new Set(["running"]);
+// A tool listing decides access for every tool in the company. The decisions
+// of one listing share a read cache, so this cap only limits how many of them
+// (and their uncached reads, such as rate-limit counters) run at the same time.
+const LISTING_DECISION_CONCURRENCY = 16;
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -236,11 +265,14 @@ const TOOL_APPROVAL_DESCRIPTION_SUFFIX =
 export type ToolGatewayProviderType =
   | "mcp_http_fixture"
   | "mcp_stdio_fixture"
+  | "provider_rest"
   | "mcp_remote_http"
   | "mcp_local_stdio"
   | "paperclip_self"
   | "paperclip_plugin"
-  | "paperclip_virtual";
+  | "paperclip_virtual"
+  | "paperclip_github_chat"
+  | "paperclip_slack_chat";
 
 export interface ConnectedMcpGatewayMetadata {
   applicationId: string;
@@ -248,7 +280,7 @@ export interface ConnectedMcpGatewayMetadata {
   applicationDisplayName: string;
   connectionId: string;
   catalogEntryId: string;
-  transport: "mcp_remote" | "local_stdio";
+  transport: "mcp_remote" | "local_stdio" | "rest_api";
   gatewayToolName: string;
   upstreamToolName: string;
   catalogName: string;
@@ -296,6 +328,10 @@ export interface ToolGatewaySession {
   responsibleUserId?: string | null;
   /** Captured by the controller for this request, never accepted from tool arguments. */
   identityContextId?: string | null;
+  /** Set only after verifying the signed approved action. */
+  approvedSlackInvocationId?: string;
+  /** Set only after the signed review is verified. */
+  approvedInvocationId?: string;
   createdAt: Date;
   expiresAt: Date;
 }
@@ -407,6 +443,7 @@ const BUILTIN_LOCAL_STDIO_RUNTIME_TEMPLATES: Record<
   string,
   Omit<LocalStdioRuntimeTemplate, "templateId">
 > = {
+  "paperclip.cognee-cloud": COGNEE_STDIO_TEMPLATE,
   "paperclip.google-sheets": {
     command: "paperclip-google-sheets-mcp-server",
     args: [],
@@ -431,6 +468,40 @@ const BUILTIN_LOCAL_STDIO_RUNTIME_TEMPLATES: Record<
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
+}
+
+async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  concurrency: number,
+  mapper: (item: T) => Promise<R>,
+  signal?: AbortSignal,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  let failed = false;
+
+  async function worker() {
+    while (!failed && nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      try {
+        signal?.throwIfAborted();
+        results[index] = await mapper(items[index]!);
+      } catch (error) {
+        // The batch fails with this error, so the other workers stop.
+        failed = true;
+        throw error;
+      }
+    }
+  }
+
+  const workers = await Promise.allSettled(
+    Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
+  );
+  const failure = workers.find((result) => result.status === "rejected");
+  if (failure?.status === "rejected") throw failure.reason;
+  signal?.throwIfAborted();
+  return results;
 }
 
 const sensitivePassthroughHeaderPattern =
@@ -1015,8 +1086,6 @@ export function createToolGatewayService(
     onToolActionSettled?: (actionRequestId: string) => Promise<unknown>;
     /** Test seam for deterministic remote MCP protocol fixtures. */
     remoteHttpRequest?: (url: string, init: RequestInit) => Promise<Response>;
-    /** Test seam for Composio session creation without vendor traffic. */
-    composioClientFactory?: (apiKey: string) => ComposioClient;
     /** Test seam for refreshing personal Gmail grants. */
     paperclipCloudConnector?: PaperclipCloudConnector | null;
     /** @deprecated Use paperclipCloudConnector. */
@@ -1049,6 +1118,28 @@ export function createToolGatewayService(
     now?: () => number;
   } = {},
 ) {
+  // Authorization links can contain one-time codes. Keep them briefly in memory;
+  // persist only the redacted request and execution identifiers for recovery.
+  const upstreamHandoffs = new Map<string, { pending: ToolUpstreamPending; expires: number }>();
+  async function retainUpstreamHandoff(invocationId: string, pending: ToolUpstreamPending) {
+    for (const [id, value] of upstreamHandoffs) if (value.expires <= Date.now()) upstreamHandoffs.delete(id);
+    while (upstreamHandoffs.size >= 256) upstreamHandoffs.delete(upstreamHandoffs.keys().next().value!);
+    upstreamHandoffs.set(invocationId, { pending, expires: Date.now() + 15 * 60_000 });
+    const summary = validateToolContent({
+      value: { upstreamPending: { ...pending, links: [] } }, direction: "result", sensitiveMode: "redact", promptInjectionMode: "ignore",
+    }).summary;
+    await db.update(toolInvocations).set({ resultSummary: summary }).where(eq(toolInvocations.id, invocationId));
+  }
+  function recoverUpstreamHandoff(invocation: typeof toolInvocations.$inferSelect): ToolUpstreamPending | undefined {
+    if (invocation.errorCode !== "provider_interaction_required") return undefined;
+    const cached = upstreamHandoffs.get(invocation.id);
+    if (cached && cached.expires > Date.now()) return cached.pending;
+    upstreamHandoffs.delete(invocation.id);
+    const stored = asRecord(storedInvocationResult(invocation));
+    const pending = asRecord(stored?.upstreamPending);
+    if (!pending || !["approval", "authorization"].includes(String(pending.kind))) return undefined;
+    return { ...pending, links: [] } as unknown as ToolUpstreamPending;
+  }
   const runtimeSupervisor = createToolRuntimeSupervisor(db, {
     deploymentMode: options.deploymentMode,
     deploymentExposure: options.deploymentExposure,
@@ -1091,10 +1182,6 @@ export function createToolGatewayService(
     options.vercelConnectClient === undefined
       ? createVercelConnectClient()
       : options.vercelConnectClient;
-  const composioSessions = createComposioSessionManager(db, {
-    composioClientFactory: options.composioClientFactory,
-    now: options.now ? () => new Date(options.now!()) : undefined,
-  });
   const protocolLimits = mcpGatewayProtocolLimits(
     options.mcpGatewayProtocolLimits,
   );
@@ -1175,54 +1262,99 @@ export function createToolGatewayService(
     return [...BUILTIN_TOOLS, ...pluginTools()];
   }
 
+  function connectedMcpConnectionFilter(companyId: string) {
+    return and(
+      eq(toolConnections.companyId, companyId),
+      inArray(toolConnections.transport, ["mcp_remote", "local_stdio", "rest_api"]),
+      eq(toolConnections.status, "active"),
+      eq(toolConnections.enabled, true),
+      // A personal connection has no company-level credential to probe. A
+      // credential-less health sweep can therefore mark it as errored even
+      // while the responsible user's grant is valid. Keep its cached active
+      // catalog discoverable; execution resolves and validates that user's
+      // grant, and a successful call restores the shared health indicator.
+      or(
+        inArray(toolConnections.healthStatus, ["ok", "healthy"]),
+        eq(toolConnections.credentialPolicy, "per_user"),
+      ),
+      eq(toolApplications.companyId, companyId),
+      inArray(toolApplications.type, ["mcp_http", "mcp_stdio", "rest_api"]),
+      eq(toolApplications.status, "active"),
+    );
+  }
+
   async function connectedMcpToolsForCompany(
     companyId: string,
   ): Promise<ToolGatewayDescriptor[]> {
-    const rows = await db
-      .select({
-        catalogEntry: toolCatalogEntries,
-        connection: toolConnections,
-        application: toolApplications,
-      })
-      .from(toolCatalogEntries)
-      .innerJoin(
-        toolConnections,
-        eq(toolCatalogEntries.connectionId, toolConnections.id),
-      )
-      .innerJoin(
-        toolApplications,
-        eq(toolConnections.applicationId, toolApplications.id),
-      )
-      .where(
-        and(
-          eq(toolCatalogEntries.companyId, companyId),
-          eq(toolCatalogEntries.entryKind, "tool"),
-          eq(toolCatalogEntries.status, "active"),
-          isNull(toolCatalogEntries.quarantinedAt),
-          eq(toolConnections.companyId, companyId),
-          inArray(toolConnections.transport, ["mcp_remote", "local_stdio"]),
-          eq(toolConnections.status, "active"),
-          eq(toolConnections.enabled, true),
-          // A personal connection has no company-level credential to probe. A
-          // credential-less health sweep can therefore mark it as errored even
-          // while the responsible user's grant is valid. Keep its cached active
-          // catalog discoverable; execution resolves and validates that user's
-          // grant, and a successful call restores the shared health indicator.
-          or(
-            inArray(toolConnections.healthStatus, ["ok", "healthy"]),
-            eq(toolConnections.credentialPolicy, "per_user"),
+    // Read each connection and application row once. Selecting them in the
+    // catalog join repeats the full connection row (config included) for
+    // every tool, and one connection can expose hundreds of tools. Both reads
+    // share one read-only snapshot, so they agree like a single join, and the
+    // second read gets only the connections that have listed tools.
+    const { connectionRows, catalogRows } = await db.transaction(
+      async (tx) => {
+        const catalogRows = await tx
+          .select({ catalogEntry: toolCatalogEntries })
+          .from(toolCatalogEntries)
+          .innerJoin(
+            toolConnections,
+            eq(toolCatalogEntries.connectionId, toolConnections.id),
+          )
+          .innerJoin(
+            toolApplications,
+            eq(toolConnections.applicationId, toolApplications.id),
+          )
+          .where(
+            and(
+              eq(toolCatalogEntries.companyId, companyId),
+              eq(toolCatalogEntries.entryKind, "tool"),
+              eq(toolCatalogEntries.status, "active"),
+              isNull(toolCatalogEntries.quarantinedAt),
+              connectedMcpConnectionFilter(companyId),
+            ),
+          )
+          .orderBy(toolConnections.name, toolCatalogEntries.name);
+        const connectionIds = [
+          ...new Set(
+            catalogRows.map(({ catalogEntry }) => catalogEntry.connectionId),
           ),
-          eq(toolApplications.companyId, companyId),
-          inArray(toolApplications.type, ["mcp_http", "mcp_stdio"]),
-          eq(toolApplications.status, "active"),
-        ),
-      )
-      .orderBy(toolConnections.name, toolCatalogEntries.name);
+        ];
+        if (connectionIds.length === 0)
+          return { connectionRows: [], catalogRows };
+        const connectionRows = await tx
+          .select({
+            connection: toolConnections,
+            application: toolApplications,
+          })
+          .from(toolConnections)
+          .innerJoin(
+            toolApplications,
+            eq(toolConnections.applicationId, toolApplications.id),
+          )
+          .where(
+            and(
+              inArray(toolConnections.id, connectionIds),
+              connectedMcpConnectionFilter(companyId),
+            ),
+          );
+        return { connectionRows, catalogRows };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+    const connectionRowsById = new Map(
+      connectionRows.map((row) => [row.connection.id, row]),
+    );
+    const rows = catalogRows.flatMap(({ catalogEntry }) => {
+      const connectionRow = connectionRowsById.get(catalogEntry.connectionId);
+      return connectionRow ? [{ catalogEntry, ...connectionRow }] : [];
+    });
 
     const eligibleRows = rows.filter(
       ({ catalogEntry, connection, application }) =>
+        !isRetiredComposioConnection(connection) &&
         !(isRailwayEndpoint(connection.config.url) && (isRailwayToolBlocked(catalogEntry.toolName) || (normalizeRailwayToolName(catalogEntry.toolName).startsWith(RAILWAY_TOOL_PREFIX) && connection.config.railwayApiStatus !== "available"))) &&
-        ((connection.transport === "mcp_remote" &&
+        ((isBrowserUseConnection(connection) && application.type === "rest_api") ||
+        (connection.transport === "mcp_remote" &&
           application.type === "mcp_http") ||
         (connection.transport === "local_stdio" &&
           application.type === "mcp_stdio")),
@@ -1232,7 +1364,7 @@ export function createToolGatewayService(
         const applicationKey = application.applicationKey ?? null;
         const connectionNamespace = `${slugSegment(applicationKey ?? connection.name ?? application.name, "mcp")}-${shortStableId(connection.id)}`;
         const toolSlug = slugSegment(catalogEntry.toolName, "tool");
-        return `mcp.${connectionNamespace}:${toolSlug}`;
+        return `${connection.transport === "rest_api" ? "app" : "mcp"}.${connectionNamespace}:${toolSlug}`;
       },
     );
     const baseNameCounts = baseNames.reduce<Map<string, number>>(
@@ -1247,21 +1379,26 @@ export function createToolGatewayService(
       ({ catalogEntry, connection, application }, index) => {
         if (
           connection.transport !== "mcp_remote" &&
-          connection.transport !== "local_stdio"
+          connection.transport !== "local_stdio" && !isBrowserUseConnection(connection)
         ) {
           throw new Error(
             `Non-MCP connection ${connection.id} cannot be exposed through the MCP gateway`,
           );
         }
         const baseName = baseNames[index]!;
-        const gatewayToolName =
+        const unboundedGatewayToolName =
           baseNameCounts.get(baseName)! > 1
             ? `${baseName}-${shortStableId(catalogEntry.id)}`
             : baseName;
+        const gatewayToolName = boundedMcpToolName(unboundedGatewayToolName, [
+          connection.id, application.id, catalogEntry.toolName,
+          ...(baseNameCounts.get(baseName)! > 1 ? [catalogEntry.id] : []),
+        ]);
         const applicationKey = application.applicationKey ?? null;
         const inputSchema = projectedConnectionToolInputSchema(
           connection,
           catalogEntry.inputSchema ?? {},
+          catalogEntry.toolName,
         );
         const outputSchema = catalogEntry.outputSchema ?? null;
         const annotations = catalogEntry.annotations ?? {};
@@ -1273,7 +1410,7 @@ export function createToolGatewayService(
           applicationDisplayName: application.name,
           connectionId: connection.id,
           catalogEntryId: catalogEntry.id,
-          transport: connection.transport,
+          transport: connection.transport as ConnectedMcpGatewayMetadata["transport"],
           gatewayToolName,
           upstreamToolName: catalogEntry.toolName,
           catalogName: catalogEntry.name,
@@ -1292,12 +1429,12 @@ export function createToolGatewayService(
           name: gatewayToolName,
           displayName: catalogEntry.title ?? catalogEntry.toolName,
           description:
-            catalogEntry.description ??
+            googleChatToolDescription(connection, catalogEntry.toolName, catalogEntry.description) ??
             `Connected MCP tool ${catalogEntry.toolName} from ${connection.name}.`,
           parametersSchema: inputSchema,
           pluginId: `mcp:${applicationKey ?? application.id}`,
           providerType:
-            connection.transport === "local_stdio"
+            connection.transport === "rest_api" ? "provider_rest" : connection.transport === "local_stdio"
               ? "mcp_local_stdio"
               : "mcp_remote_http",
           risk,
@@ -1475,7 +1612,8 @@ export function createToolGatewayService(
         companyId: heartbeatRuns.companyId,
         agentId: heartbeatRuns.agentId,
         status: heartbeatRuns.status,
-        contextSnapshot: heartbeatRuns.contextSnapshot,
+        issueId: runContextSnapshotString("issueId"),
+        projectId: runContextSnapshotString("projectId"),
       })
       .from(heartbeatRuns)
       .where(eq(heartbeatRuns.id, input.runId))
@@ -1499,9 +1637,8 @@ export function createToolGatewayService(
       throw new ToolGatewayHttpError(403, "Run is not active", "run_inactive");
     }
 
-    const snapshot = asRecord(run.contextSnapshot);
-    const snapshotIssueId = stringValue(snapshot?.issueId);
-    const snapshotProjectId = stringValue(snapshot?.projectId);
+    const snapshotIssueId = stringValue(run.issueId);
+    const snapshotProjectId = stringValue(run.projectId);
     if (
       (input.issueId && snapshotIssueId && input.issueId !== snapshotIssueId) ||
       (input.projectId &&
@@ -1597,6 +1734,10 @@ export function createToolGatewayService(
               ? "failure"
               : "success";
     try {
+      const tokenId = input.session?.gatewayTokenId && uuidPattern.test(input.session.gatewayTokenId)
+        ? input.session.gatewayTokenId
+        : typeof input.details.gatewayTokenId === "string" && uuidPattern.test(input.details.gatewayTokenId)
+          ? input.details.gatewayTokenId : null;
       await db.insert(toolAccessAuditEvents).values({
         companyId: input.companyId,
         gatewayId:
@@ -1605,14 +1746,12 @@ export function createToolGatewayService(
           uuidPattern.test(input.details.gatewayId)
             ? input.details.gatewayId
             : null),
-        gatewayTokenId:
-          input.session?.gatewayTokenId &&
-          uuidPattern.test(input.session.gatewayTokenId)
-            ? input.session.gatewayTokenId
-            : typeof input.details.gatewayTokenId === "string" &&
-                uuidPattern.test(input.details.gatewayTokenId)
-              ? input.details.gatewayTokenId
-              : null,
+        // Cleanup can remove a token after request admission. Resolve the FK
+        // inside this INSERT and lock a surviving row until the statement ends.
+        // A plain existence read before insertion still races with deletion.
+        gatewayTokenId: tokenId ? sql`(select ${toolMcpGatewayTokens.id} from ${toolMcpGatewayTokens}
+          where ${toolMcpGatewayTokens.id} = ${tokenId} and ${toolMcpGatewayTokens.companyId} = ${input.companyId}
+          for key share)` : null,
         gatewayPublicId:
           typeof input.details.gatewayPublicId === "string"
             ? input.details.gatewayPublicId
@@ -2190,6 +2329,7 @@ export function createToolGatewayService(
           updatedAt: new Date(),
         })
         .where(eq(toolInvocations.id, input.invocation.id));
+      void emitConnectionInvoked(db, input.invocation.id);
       await writeToolCallEvent({
         invocationId: input.invocation.id,
         actionRequestId: input.actionRequest?.id ?? null,
@@ -2227,6 +2367,7 @@ export function createToolGatewayService(
           updatedAt: new Date(),
         })
         .where(eq(toolInvocations.id, input.invocation.id));
+      void emitConnectionInvoked(db, input.invocation.id);
       throw new ToolGatewayHttpError(
         500,
         "Approval request was not created",
@@ -2276,6 +2417,7 @@ export function createToolGatewayService(
             updatedAt: new Date(),
           })
           .where(eq(toolInvocations.id, input.invocation.id));
+        void emitConnectionInvoked(db, input.invocation.id);
         throw new ToolGatewayHttpError(
           500,
           error.message,
@@ -2442,6 +2584,7 @@ export function createToolGatewayService(
           updatedAt: new Date(),
         })
         .where(eq(toolInvocations.id, input.invocation.id));
+      void emitConnectionInvoked(db, input.invocation.id);
       throw new ToolGatewayHttpError(
         409,
         "The approval request was resolved before it could be signed",
@@ -2585,6 +2728,23 @@ export function createToolGatewayService(
     };
   }
 
+  /**
+   * Decides access for each tool of one listing. All decisions of the listing
+   * share one actor and run context, so they share one read cache: a listing
+   * reads the agent, run, profiles and policies once, not once per tool.
+   */
+  async function decideToolsForListing<T extends ToolGatewayDescriptor>(
+    tools: readonly T[],
+    inputForTool: (tool: T) => ToolAccessDecisionInput,
+    cache: ToolAccessDecisionCache = createToolAccessDecisionCache(),
+    signal?: AbortSignal,
+  ): Promise<Array<{ tool: T; decision: ToolAccessDecision }>> {
+    return mapWithConcurrency(tools, LISTING_DECISION_CONCURRENCY, async (tool) => ({
+      tool,
+      decision: await policyService.decide(inputForTool(tool), { cache }),
+    }), signal);
+  }
+
   function policyErrorStatus(decision: ToolAccessDecision) {
     if (decision.decision === "rate_limited") return 429;
     return 403;
@@ -2610,7 +2770,8 @@ export function createToolGatewayService(
     const connectedTools = await connectedMcpToolsForCompany(session.companyId);
     const hasOnDemandTargets = connectedTools.some(isOnDemandRemoteTool);
     const virtualTools = hasOnDemandTargets ? VIRTUAL_TOOLS : [];
-    const tool = [...allTools(), ...connectedTools, ...virtualTools]
+    const githubBotTools = await githubBotToolsForSession(db, session);
+    const tool = [...allTools(), ...connectedTools, ...virtualTools, ...githubBotTools, ...await slackToolsForSession(db, session)]
       .filter(
         (candidate) =>
           session.agentId ||
@@ -2626,6 +2787,9 @@ export function createToolGatewayService(
         { tool: toolName },
       );
     }
+    const guestBotConnection = await githubGuestBotConnectionForSession(db, session);
+    if (guestBotConnection && tool.connectionId && (tool.connectionId !== guestBotConnection || tool.providerType !== "paperclip_github_chat"))
+      throw new ToolGatewayHttpError(403, "Sponsored GitHub runs can only use their bot's governed connection; sponsorship does not grant personal credentials", "guest_connection_denied");
     if (session.identityContextId && session.agentId && tool.connectionId) {
       const [connection] = await db
         .select()
@@ -2757,13 +2921,8 @@ export function createToolGatewayService(
     const tools = (await connectedMcpToolsForCompany(session.companyId)).filter(
       isOnDemandRemoteTool,
     );
-    const decisions = await Promise.all(
-      tools.map(async (tool) => ({
-        tool,
-        decision: await policyService.decide(
-          policyInputForTool({ session, tool }),
-        ),
-      })),
+    const decisions = await decideToolsForListing(tools, (tool) =>
+      policyInputForTool({ session, tool }),
     );
     return decisions
       .filter(
@@ -2815,30 +2974,55 @@ export function createToolGatewayService(
 
   async function listToolsForContext(
     session: ToolGatewaySession,
+    signal?: AbortSignal,
   ): Promise<ToolGatewayDescriptor[]> {
+    try {
+      return await toolDiscoveryScheduler.run(() => buildToolsForContext(session, signal), signal);
+    } catch (error) {
+      if (error instanceof ToolDiscoveryBusyError) {
+        throw new ToolGatewayHttpError(503, error.message, "tool_discovery_busy");
+      }
+      throw error;
+    }
+  }
+
+  /** Shared connection descriptors and task restrictions; no provider calls. */
+  async function connectionToolsForContext(session: ToolGatewaySession): Promise<ToolGatewayDescriptor[]> {
+    const guestBotConnection = await githubGuestBotConnectionForSession(db, session);
+    const connectedTools = (await connectedMcpToolsForCompany(session.companyId))
+      .filter(tool => !guestBotConnection || !tool.connectionId || (tool.connectionId === guestBotConnection && tool.providerType === "paperclip_github_chat"));
+    return [
+      ...await githubBotToolsForSession(db, session),
+      ...await slackToolsForSession(db, session),
+      ...connectedTools,
+    ];
+  }
+
+  async function buildToolsForContext(
+    session: ToolGatewaySession,
+    signal?: AbortSignal,
+  ): Promise<ToolGatewayDescriptor[]> {
+    signal?.throwIfAborted();
     if (session.agentId) {
       await assertAgentInCompany(session.companyId, session.agentId);
     }
-    const allConnectedTools = await connectedMcpToolsForCompany(
-      session.companyId,
-    );
-    const onDemandTargets = allConnectedTools.filter(isOnDemandRemoteTool);
+    const connectionTools = await connectionToolsForContext(session);
+    const onDemandTargets = connectionTools.filter(isOnDemandRemoteTool);
     const tools = [
       ...allTools(),
-      ...allConnectedTools.filter((tool) => !isOnDemandRemoteTool(tool)),
+      ...connectionTools.filter((tool) => !isOnDemandRemoteTool(tool)),
     ].filter(
       (tool) =>
         session.agentId ||
         (tool.providerType !== "paperclip_self" &&
           tool.providerType !== "paperclip_plugin"),
     );
-    const decisions = await Promise.all(
-      tools.map(async (tool) => {
-        const decision = await policyService.decide(
-          policyInputForTool({ session, tool }),
-        );
-        return { tool, decision };
-      }),
+    const decisionCache = createToolAccessDecisionCache();
+    const decisions = await decideToolsForListing(
+      tools,
+      (tool) => policyInputForTool({ session, tool }),
+      decisionCache,
+      signal,
     );
     const visibleTools = decisions
       .filter(
@@ -2859,13 +3043,11 @@ export function createToolGatewayService(
           : tool,
       );
     if (onDemandTargets.length > 0) {
-      const targetDecisions = await Promise.all(
-        onDemandTargets.map(async (tool) => {
-          const decision = await policyService.decide(
-            policyInputForTool({ session, tool }),
-          );
-          return { tool, decision };
-        }),
+      const targetDecisions = await decideToolsForListing(
+        onDemandTargets,
+        (tool) => policyInputForTool({ session, tool }),
+        decisionCache,
+        signal,
       );
       if (
         targetDecisions.some(
@@ -2883,9 +3065,27 @@ export function createToolGatewayService(
     session: ToolGatewaySession,
     tool: ToolGatewayDescriptor,
     parameters: unknown,
+    invocationId?: string,
   ) {
     const params = asRecord(parameters) ?? {};
 
+    if (tool.providerType === "paperclip_slack_chat") {
+      if (!session.agentId || !session.runId || !session.issueId) throw new ToolGatewayHttpError(403, "Slack task binding required", "slack_task_required");
+      try {
+      const data = await executeSlackTool(db, { companyId: session.companyId, agentId: session.agentId, runId: session.runId, issueId: session.issueId, endpointId: String(asRecord(tool.providerMetadata)?.endpointId ?? ""), identityContextId: session.identityContextId, approvedInvocationId: session.approvedSlackInvocationId }, tool.upstreamToolName ?? "", parameters, fetch, invocationId);
+      return { content: JSON.stringify(data), data };
+      } catch (error) {
+        if (error instanceof HttpError) {
+          const details = asRecord(error.details) ?? {};
+          throw new ToolGatewayHttpError(error.status, error.message, typeof details.code === "string" ? details.code : "slack_operation_rejected", details);
+        }
+        throw error;
+      }
+    }
+    if (tool.providerType === "paperclip_github_chat") {
+      const data = await githubChatReviewService(db).execute(session, tool.upstreamToolName ?? "", parameters, invocationId);
+      return { content: JSON.stringify(data), data };
+    }
     if (tool.name === "mcp-remote-fixture:echo") {
       return {
         content: String(params.message ?? ""),
@@ -3116,7 +3316,6 @@ export function createToolGatewayService(
       connection,
       grant,
       grantRef,
-      REMOTE_URL_SECRET_CONFIG_PATH,
     );
     if (!remoteUrlCredentialMatchesPublicUrl(publicEndpoint, value)) {
       throw new ToolGatewayHttpError(
@@ -3458,11 +3657,7 @@ export function createToolGatewayService(
     grant: typeof connectionGrants.$inferSelect,
     ref: McpConnectionCredentialRef,
   ): ToolCredentialSecretRef | undefined {
-    return grant.credentialSecretRefs.find(
-      (candidate) =>
-        candidate.configPath === ref.name ||
-        candidate.configPath === `credentials.${ref.name}`,
-    );
+    return connectionGrantCredentialRef(grant, ref);
   }
 
   async function resolveGrantSecretValue(
@@ -3470,91 +3665,18 @@ export function createToolGatewayService(
     connection: typeof toolConnections.$inferSelect,
     grant: typeof connectionGrants.$inferSelect,
     ref: ToolCredentialSecretRef,
-    configPath = ref.configPath,
   ): Promise<string> {
-    const accessContext = {
-      consumerType: "tool_connection" as const,
-      consumerId: connection.id,
-      configPath,
-      actorType: "system" as const,
-      actorId: session.agentId,
-      responsibleUserId: grant.subjectUserId,
-      issueId: session.issueId,
-      heartbeatRunId: session.runId,
-    };
-    if (grant.kind !== "user") {
-      return secrets.resolveSecretValue(
-        connection.companyId,
-        ref.secretId,
-        ref.versionSelector ?? "latest",
-        { accessContext },
-      );
+    try {
+      return (await resolveConnectionGrantSecret(db, connection, grant, ref, {
+        consumerType: "tool_connection", consumerId: connection.id,
+        actorType: "system", actorId: session.agentId,
+        responsibleUserId: grant.subjectUserId, issueId: session.issueId, heartbeatRunId: session.runId,
+      })).value;
+    } catch (error) {
+      if (error instanceof HttpError) throw new ToolGatewayHttpError(error.status, error.message,
+        String(asRecord(error.details)?.code ?? "mcp_remote_missing_secret"), asRecord(error.details) ?? {});
+      throw error;
     }
-    if (!grant.subjectUserId) {
-      throw new ToolGatewayHttpError(
-        422,
-        "Personal authorization has no owner",
-        "grant_owner_missing",
-        {
-          connectionId: connection.id,
-          grantId: grant.id,
-        },
-      );
-    }
-    const [secret] = await db
-      .select({
-        scope: companySecrets.scope,
-        ownerUserId: companySecrets.ownerUserId,
-        userSecretDefinitionId: companySecrets.userSecretDefinitionId,
-      })
-      .from(companySecrets)
-      .where(
-        and(
-          eq(companySecrets.id, ref.secretId),
-          eq(companySecrets.companyId, connection.companyId),
-        ),
-      )
-      .limit(1);
-    if (
-      !secret ||
-      secret.scope !== "user" ||
-      secret.ownerUserId !== grant.subjectUserId ||
-      !secret.userSecretDefinitionId
-    ) {
-      throw new ToolGatewayHttpError(
-        422,
-        "Personal authorization has an invalid credential",
-        "grant_credential_invalid",
-        {
-          connectionId: connection.id,
-          grantId: grant.id,
-          credential: configPath,
-        },
-      );
-    }
-    const resolved = await secrets.resolveUserSecretValue(
-      connection.companyId,
-      {
-        definitionId: secret.userSecretDefinitionId,
-        responsibleUserId: grant.subjectUserId,
-        version: ref.versionSelector ?? "latest",
-        required: ref.required ?? true,
-      },
-      accessContext,
-    );
-    if (!resolved) {
-      throw new ToolGatewayHttpError(
-        422,
-        "Personal credential is not configured",
-        "user_secret_missing",
-        {
-          connectionId: connection.id,
-          grantId: grant.id,
-          credential: configPath,
-        },
-      );
-    }
-    return resolved.value;
   }
 
   async function maybeRefreshPaperclipCloudGrant(
@@ -4034,20 +4156,15 @@ export function createToolGatewayService(
           connection,
           grant,
           grantRef,
-          // OAuth grants declare their canonical oauth.* path. Treating
-          // this header projection as a generic credentials.* binding loses
-          // the personal secret declaration created by the OAuth callback.
-          grantRef.configPath.startsWith("oauth.")
-            ? grantRef.configPath
-            : `credentials.${ref.name}`,
         );
         headers[ref.key] = `${ref.prefix ?? ""}${value}`;
-      } catch {
+      } catch (error) {
         await markRemoteConnectionHealth(
           connection,
           "missing_secret",
           "A configured credential secret could not be resolved.",
         );
+        if (error instanceof ToolGatewayHttpError && error.reasonCode === "grant_credential_invalid") throw error;
         throw new ToolGatewayHttpError(
           422,
           "A configured credential secret could not be resolved.",
@@ -4068,12 +4185,13 @@ export function createToolGatewayService(
           oauthAccessRef,
         );
         headers.Authorization = `Bearer ${value}`;
-      } catch {
+      } catch (error) {
         await markRemoteConnectionHealth(
           connection,
           "missing_secret",
           "A configured credential secret could not be resolved.",
         );
+        if (error instanceof ToolGatewayHttpError && error.reasonCode === "grant_credential_invalid") throw error;
         throw new ToolGatewayHttpError(
           422,
           "A configured credential secret could not be resolved.",
@@ -4155,7 +4273,7 @@ export function createToolGatewayService(
       const configPath =
         typedRef.placement === "url"
           ? REMOTE_URL_SECRET_CONFIG_PATH
-          : `credentials.${typedRef.name}`;
+          : grantRef.configPath;
       headerCredentialVersions.push(
         await resolveConnectedCredentialVersion(connection, {
           secretId: grantRef.secretId,
@@ -4293,6 +4411,7 @@ export function createToolGatewayService(
   async function resolveConnectionGrant(
     session: ToolGatewaySession,
     connection: typeof toolConnections.$inferSelect,
+    allowInteraction = true,
   ): Promise<typeof connectionGrants.$inferSelect> {
     const [run] =
       session.runId && !session.identityContextId
@@ -4597,7 +4716,7 @@ export function createToolGatewayService(
         );
     if (resolution === "user" && userGrant) return userGrant;
     if (resolution === "user_authorization_required") {
-      if (actingUserId)
+      if (actingUserId && allowInteraction)
         await createUserAuthorizationInteraction(
           session,
           connection,
@@ -4621,7 +4740,7 @@ export function createToolGatewayService(
     tool: ToolGatewayDescriptor,
   ) {
     if (
-      tool.providerType !== "mcp_remote_http" ||
+      (tool.providerType !== "mcp_remote_http" && tool.providerType !== "provider_rest") ||
       !tool.connectionId ||
       !tool.catalogEntryId
     ) {
@@ -4658,12 +4777,15 @@ export function createToolGatewayService(
         ),
       )
       .limit(1);
-    if (!connection || connection.transport !== "mcp_remote") {
+    if (!connection || (connection.transport !== "mcp_remote" && !isBrowserUseConnection(connection))) {
       throw new ToolGatewayHttpError(
         404,
         `Tool "${tool.name}" not found`,
         "tool_not_found",
       );
+    }
+    if (isRetiredComposioConnection(connection)) {
+      throw new ToolGatewayHttpError(422, RETIRED_COMPOSIO_MESSAGE, "composio_broker_retired");
     }
     if (!connection.enabled || connection.status !== "active") {
       throw new ToolGatewayHttpError(
@@ -4686,9 +4808,9 @@ export function createToolGatewayService(
     tool: ToolGatewayDescriptor,
     parameters: unknown,
   ): Promise<unknown> {
-    if (tool.providerType !== "mcp_remote_http") return parameters;
-    const { connection } = await resolveConnectedRemoteTool(session, tool);
-    return projectedConnectionToolArguments(connection, parameters);
+    if (tool.providerType !== "mcp_remote_http" && tool.providerType !== "provider_rest") return parameters;
+    const { connection, entry } = await resolveConnectedRemoteTool(session, tool);
+    return projectedConnectionToolArguments(connection, parameters, entry.toolName, entry.inputSchema ?? {});
   }
 
   async function approvedManagedArgumentsRemainCurrent(
@@ -4754,6 +4876,9 @@ export function createToolGatewayService(
         `Tool "${tool.name}" not found`,
         "tool_not_found",
       );
+    }
+    if (isRetiredComposioConnection(connection)) {
+      throw new ToolGatewayHttpError(422, RETIRED_COMPOSIO_MESSAGE, "composio_broker_retired");
     }
     if (!connection.enabled || connection.status !== "active") {
       throw new ToolGatewayHttpError(
@@ -4867,6 +4992,12 @@ export function createToolGatewayService(
         );
       }
     }
+    if (template.templateId === "paperclip.cognee-cloud") {
+      try { cogneeCloudUrl(env.COGNEE_BASE_URL ?? ""); }
+      catch {
+        throw new ToolGatewayHttpError(422, "Reconnect Cognee with the tenant API Base URL from its API Keys page.", "cognee_cloud_url_invalid");
+      }
+    }
     return env;
   }
 
@@ -4892,6 +5023,27 @@ export function createToolGatewayService(
     protocolParams?: Record<string, unknown>;
     timeoutMs: number;
   }): Promise<unknown> {
+    if (input.template.templateId === "paperclip.cognee-cloud") {
+      if (input.protocolMethod === "resources/list") return { resources: [] };
+      if (input.protocolMethod === "prompts/list") return { prompts: [] };
+      if (input.protocolMethod && input.protocolMethod !== "tools/call") {
+        throw stdioProtocolError("Cognee does not expose this context operation");
+      }
+      return callCogneeCloud({
+        baseUrl: input.env.COGNEE_BASE_URL ?? "", apiKey: input.env.COGNEE_API_KEY ?? "",
+        tool: input.entry?.toolName ?? "", parameters: asRecord(input.parameters) ?? {},
+        signal: AbortSignal.timeout(input.timeoutMs),
+        request: async (url, init) => {
+          const response = await guardedRemoteHttpFetch(url, init, remoteHttpFetchOptions());
+          const body = await readBoundedRemoteResponse(response);
+          if (!response.ok) throw new ToolGatewayHttpError(502,
+            `Cognee Cloud request failed (HTTP ${response.status}).`, "cognee_api_error");
+          if (!body) return { status: "success" };
+          try { return JSON.parse(body); }
+          catch { throw new ToolGatewayHttpError(502, "Cognee Cloud returned invalid JSON.", "cognee_api_error"); }
+        },
+      });
+    }
     if (!input.template.command) {
       throw new ToolGatewayHttpError(
         501,
@@ -5217,6 +5369,10 @@ export function createToolGatewayService(
       template,
       grant,
     );
+    if (template.templateId === "paperclip.cognee-cloud") {
+      return callLocalStdioMcp({ connection: input.connection, template, env,
+        protocolMethod: input.method, protocolParams: input.params ?? {}, timeoutMs: DEFAULT_TOOL_TIMEOUT_MS });
+    }
     return runtimeSupervisor.useConnectionSlot(
       {
         companyId: input.session.companyId,
@@ -5386,8 +5542,13 @@ export function createToolGatewayService(
     tool: ToolGatewayDescriptor,
     options: { requireResolvedCredentials?: boolean } = {},
   ): Promise<Record<string, unknown> | null> {
+    if (tool.providerType === "paperclip_slack_chat") {
+      if (!session.agentId || !session.runId || !session.issueId) throw new ToolGatewayHttpError(403, "Slack task binding required", "slack_task_required");
+      const authority = await resolveSlackTaskAuthority(db, { companyId: session.companyId, agentId: session.agentId, runId: session.runId, issueId: session.issueId, endpointId: String(asRecord(tool.providerMetadata)?.endpointId ?? ""), identityContextId: session.identityContextId, approvedInvocationId: session.approvedSlackInvocationId });
+      return { endpointId: authority.endpoint.id, userId: authority.userId, revision: authority.revision, identityContextId: authority.identityContextId };
+    }
     if (
-      tool.providerType !== "mcp_remote_http" ||
+      (tool.providerType !== "mcp_remote_http" && tool.providerType !== "provider_rest") ||
       !tool.connectionId ||
       !tool.catalogEntryId
     ) {
@@ -5444,6 +5605,7 @@ export function createToolGatewayService(
       credentialSecretRefsHash: stableHash(
         row.connection.credentialSecretRefs ?? [],
       ),
+      ...(isBrowserUseConnection(row.connection) ? { browserSettingsHash: stableHash(await browserUseService(db).getSettings(session.companyId, grant.id)) } : {}),
       credentialGrantId: grant.id,
       credentialGrantRefsHash: stableHash(grant.credentialSecretRefs ?? []),
       headerCredentialVersions: credentialVersions.headerCredentialVersions,
@@ -5710,7 +5872,7 @@ export function createToolGatewayService(
 
   function normalizeMcpToolResult(
     result: unknown,
-    transport: "mcp_http" | "local_stdio" = "mcp_http",
+    transport: "mcp_http" | "local_stdio" | "cognee_cloud" = "mcp_http",
     spawnedLocalProcess = false,
     sourceTemplateKey?: string | null,
   ) {
@@ -5753,25 +5915,22 @@ export function createToolGatewayService(
       session,
       tool,
     );
+    // Recheck immediately before dispatch, including previously approved calls
+    // and connections whose stored grant/catalog predates scope reduction.
+    assertGoogleChatToolArgumentsSupported(connection, entry.toolName, parameters);
     if (useDefaultTimeout && isRailwayConnection(connection) && entry.toolName === `${RAILWAY_TOOL_PREFIX}run-command`) {
       ms = railwayCommandBudgetMs(parameters);
     }
     const grant = await resolveConnectionGrant(session, connection);
-    const composioScopeRevision = `${grant.id}:${grant.status}:${grant.updatedAt.toISOString()}`;
-    const composioChild = composioChildConfig(connection);
-    let composioSession = composioChild
-      ? await composioSessions.ensureSession(connection.id, {
-          tools: [entry.toolName],
-          scopeRevision: composioScopeRevision,
-        })
-      : null;
-    let endpoint =
-      composioSession?.url ??
-      (await resolvedRemoteEndpoint(session, connection, grant));
+    if (isBrowserUseConnection(connection)) {
+      const data = await browserUseService(db, options.remoteHttpRequest).execute(session, grant, invocationId!, entry.toolName, parameters);
+      return { result: { content: JSON.stringify(data), data: { structuredContent: data, transport: "rest_api" } } };
+    }
+    const endpoint = await resolvedRemoteEndpoint(session, connection, grant);
     // Method-defined headers are trusted catalog configuration. Treat them as
     // managed headers so callers cannot override the scope that was reviewed
     // during tools/list. Credentials remain authoritative on collisions.
-    let credentialHeaders = composioSession?.headers ?? {
+    let credentialHeaders = {
       ...projectedConnectionHeaders(connection),
       ...(await resolveCredentialHeaders(session, connection, grant)),
     };
@@ -5789,9 +5948,7 @@ export function createToolGatewayService(
       request: {
         protocol: "MCP JSON-RPC 2.0",
         httpMethod: "POST",
-        endpoint: composioChild
-          ? `${new URL(endpoint).origin}/[composio-session]`
-          : auditSafeEndpoint(endpoint),
+        endpoint: auditSafeEndpoint(endpoint),
         mcpMethod: "tools/call",
         requestId,
         upstreamToolName: entry.toolName,
@@ -5843,7 +6000,8 @@ export function createToolGatewayService(
       }
       let requestHeaders = headers;
       if (connection.config.mcpSessionRequired === true) {
-        requestHeaders = await initializeMcpHttpSession({
+        requestHeaders = await getMcpHttpSession({
+          scope: `${connection.id}:grant:${grant.id}:actor:${session.agentId}:${endpoint}`,
           send: (init) =>
             dispatchRemote(endpoint, {
               ...init,
@@ -5876,27 +6034,10 @@ export function createToolGatewayService(
         }),
       };
       let response = await dispatchRemote(endpoint, requestInit);
-      if (response.status === 401 && composioChild) {
-        composioSession = await composioSessions.ensureSession(connection.id, {
-          tools: [entry.toolName],
-          scopeRevision: composioScopeRevision,
-          force: true,
-        });
-        endpoint = composioSession.url;
-        credentialHeaders = composioSession.headers;
-        builtHeaders = buildRemoteHeaders({
-          session,
-          connection,
-          credentialHeaders,
-          callerHeaders,
-        });
-        headers = builtHeaders.headers;
-        headerSummary = builtHeaders.summary;
-        const retryInit = {
-          ...requestInit,
-          headers: mcpHttpRequestHeaders(headers),
-        };
-        response = await dispatchRemote(endpoint, retryInit);
+      if (isInsufficientConnectionScope(response)) {
+        await response.body?.cancel().catch(() => undefined);
+        await markRemoteConnectionHealth(connection, "degraded", INSUFFICIENT_CONNECTION_SCOPE_MESSAGE);
+        throw new ToolGatewayHttpError(403, INSUFFICIENT_CONNECTION_SCOPE_MESSAGE, "oauth_insufficient_scope", { connectionId: connection.id });
       }
       const oauth = asRecord(asRecord(connection.config)?.oauth);
       if (
@@ -6004,7 +6145,32 @@ export function createToolGatewayService(
           headers: mcpHttpRequestHeaders(headers),
         });
       }
-      const body = await readBoundedRemoteResponse(response);
+      const sessionExpired = response.status === 404 && new Headers(requestHeaders).has("mcp-session-id");
+      if (sessionExpired) {
+        // The next explicit call initializes again. Never replay a tools/call
+        // automatically: the failed call may have changed app data.
+        forgetMcpHttpSessions(connection.id);
+      }
+      const body = response.ok
+        ? JSON.stringify(await readMcpHttpResponse(response, requestId, {
+            maxBytes: MAX_REMOTE_MCP_RESPONSE_BYTES,
+            onRequest: async (message) => {
+              const pending = extractRemoteMcpPending(message);
+              if (pending) {
+                await retainUpstreamHandoff(invocationId, pending);
+                // Defer this interaction to the user. Do not claim that consent
+                // was granted or repeat a potentially state-changing tool call.
+                await dispatchRemote(endpoint, {
+                  method: "POST", headers: mcpHttpRequestHeaders(requestHeaders),
+                  body: JSON.stringify({ jsonrpc: "2.0", id: message.id, result: { action: "cancel" } }),
+                });
+                throw new ToolGatewayHttpError(409, "This tool needs authorization in the provider.", "provider_interaction_required", { upstreamPending: pending, invocationId });
+              }
+              const request = extractMcpElicitationRequest(message);
+              if (request) await requestElicitationForRecordedToolCall({ session, tool, invocationId, request });
+            },
+          }))
+        : await readBoundedRemoteResponse(response);
       execution.response = {
         httpStatus: response.status,
         contentType: response.headers.get("content-type"),
@@ -6014,18 +6180,25 @@ export function createToolGatewayService(
           response.headers.get("x-zapier-request-id") ??
           response.headers.get("traceparent"),
       };
+      if (isInsufficientConnectionScope(response, body)) {
+        await markRemoteConnectionHealth(connection, "degraded", INSUFFICIENT_CONNECTION_SCOPE_MESSAGE);
+        throw new ToolGatewayHttpError(403, INSUFFICIENT_CONNECTION_SCOPE_MESSAGE, "oauth_insufficient_scope", {
+          connectionId: connection.id, catalogEntryId: entry.id,
+        });
+      }
       if (!response.ok) {
-        await markRemoteConnectionHealth(
-          connection,
-          "error",
-          "Remote MCP server returned an HTTP error.",
-        );
+        // Session expiration is recoverable on an explicit retry. Marking the
+        // connection unhealthy here would hide every tool and prevent it.
+        if (!sessionExpired) {
+          await markRemoteConnectionHealth(connection, "error", "Remote MCP server returned an HTTP error.");
+        }
         throw new ToolGatewayHttpError(
           502,
-          "Remote MCP server returned an HTTP error",
+          sessionExpired ? "Remote MCP session expired. Retry the action explicitly to start a new session." : "Remote MCP server returned an HTTP error",
           "mcp_remote_status",
           {
             status: response.status,
+            ...(sessionExpired ? { sessionExpired: true } : {}),
             connectionId: connection.id,
             catalogEntryId: entry.id,
             execution,
@@ -6034,10 +6207,7 @@ export function createToolGatewayService(
       }
       let payload: unknown;
       try {
-        payload = parseMcpHttpResponseBody(
-          body,
-          response.headers.get("content-type"),
-        );
+        payload = JSON.parse(body);
       } catch {
         await markRemoteConnectionHealth(
           connection,
@@ -6057,6 +6227,11 @@ export function createToolGatewayService(
       }
       const payloadRecord = asRecord(payload);
       if (!payloadRecord) throw malformedRemoteMcpResponse();
+      const upstreamPending = extractRemoteMcpPending(payloadRecord, String(connection.config.sourceTemplateKey ?? ""), entry.toolName);
+      if (upstreamPending) {
+        await retainUpstreamHandoff(invocationId, upstreamPending);
+        throw new ToolGatewayHttpError(409, "Complete the provider's authorization or approval before continuing. The original call has not been replayed.", "provider_interaction_required", { upstreamPending, invocationId });
+      }
       const topLevelElicitation = extractMcpElicitationRequest(payloadRecord);
       if (topLevelElicitation) {
         await requestElicitationForRecordedToolCall({
@@ -6117,6 +6292,15 @@ export function createToolGatewayService(
       );
       return { result, headerSummary, execution };
     } catch (error) {
+      if (error instanceof McpHttpResponseError) {
+        const failure = error.reason === "too_large" ? responseTooLargeError()
+          : error.reason === "malformed_response" ? malformedRemoteMcpResponse()
+          : new ToolGatewayHttpError(502, "Remote MCP server returned invalid JSON", "mcp_remote_invalid_json");
+        await markRemoteConnectionHealth(connection, "error", failure.message);
+        throw new ToolGatewayHttpError(failure.status, failure.message, failure.reasonCode, {
+          connectionId: connection.id, catalogEntryId: entry.id, execution,
+        });
+      }
       if (error instanceof RailwayError) {
         throw new ToolGatewayHttpError(error.status, error.message, error.code, { connectionId: connection.id, catalogEntryId: entry.id, execution });
       }
@@ -6173,6 +6357,7 @@ export function createToolGatewayService(
     tool: ToolGatewayDescriptor,
     parameters: unknown,
     ms: number,
+    useProviderDefaultTimeout = false,
   ): Promise<RemoteHttpExecutionResult> {
     const { entry, connection } = await resolveConnectedLocalStdioTool(
       session,
@@ -6186,7 +6371,13 @@ export function createToolGatewayService(
       template,
       grant,
     );
-    const result = await runtimeSupervisor.useConnectionSlot(
+    const invoke = () => callLocalStdioMcp({ connection, entry, template, env, parameters,
+      timeoutMs: useProviderDefaultTimeout && template.templateId === "paperclip.cognee-cloud" ? 60_000 : ms });
+    // Cognee is a bundled HTTP client. Provider failures are tool failures, not
+    // crashed local processes, and must never consume slots or restart budgets.
+    const result = template.templateId === "paperclip.cognee-cloud"
+      ? await invoke()
+      : await runtimeSupervisor.useConnectionSlot(
       {
         companyId: session.companyId,
         applicationId: tool.applicationId ?? null,
@@ -6205,18 +6396,11 @@ export function createToolGatewayService(
       },
       async (handle) => {
         handle.appendLog("stdout", `calling ${entry.toolName}`);
-        return callLocalStdioMcp({
-          connection,
-          entry,
-          template,
-          env,
-          parameters,
-          timeoutMs: ms,
-        });
+        return invoke();
       },
     );
     return {
-      result: normalizeMcpToolResult(result, "local_stdio", true),
+      result: normalizeMcpToolResult(result, template.templateId === "paperclip.cognee-cloud" ? "cognee_cloud" : "local_stdio", template.templateId !== "paperclip.cognee-cloud"),
     };
   }
 
@@ -6821,7 +7005,45 @@ export function createToolGatewayService(
         clientMetadata,
       });
     }
-    let agentId = row.gateway.agentId;
+    const nativeMetadata = row.gateway.metadata;
+    const [profile] = await db.select({
+      profileKey: toolProfiles.profileKey,
+      status: toolProfiles.status,
+      source: sql<string | null>`${toolProfiles.metadata}->>'source'`,
+      agentId: sql<string | null>`${toolProfiles.metadata}->>'agentId'`,
+      assignmentDigest: sql<string | null>`${toolProfiles.metadata}->>'assignmentDigest'`,
+    }).from(toolProfiles).where(and(
+      eq(toolProfiles.id, row.gateway.profileId),
+      eq(toolProfiles.companyId, row.gateway.companyId),
+    )).limit(1);
+    // The immutable native profile also identifies legacy assignments when an
+    // update has cleared the gateway metadata. Missing metadata must fail closed.
+    const nativeAssignment = Object.hasOwn(nativeMetadata ?? {}, "nativeRuntimeAssignmentDigest") ||
+      profile?.profileKey.startsWith("native:") || profile?.source === "paperclip_runner";
+    const nativeOwner = nativeMetadata?.agentId;
+    if (nativeAssignment && (
+      typeof nativeOwner !== "string" || !uuidPattern.test(nativeOwner) ||
+      typeof nativeMetadata?.nativeRuntimeAssignmentDigest !== "string" ||
+      !/^[a-f0-9]{64}$/.test(nativeMetadata.nativeRuntimeAssignmentDigest) ||
+      (row.gateway.agentId && row.gateway.agentId !== nativeOwner) ||
+      row.token.subjectType !== "heartbeat_run"
+    )) {
+      return recordNamedGatewayAuthFailure({
+        gatewayId: input.gatewayId, gatewayPublicId: input.gatewayPublicId,
+        bearerToken, reasonCode: "gateway_token_run_context_invalid", clientMetadata,
+      });
+    }
+    if (nativeAssignment) {
+      if (profile?.status !== "active" || profile.source !== "paperclip_runner" ||
+          profile.agentId !== nativeOwner ||
+          profile.assignmentDigest !== nativeMetadata!.nativeRuntimeAssignmentDigest) {
+        return recordNamedGatewayAuthFailure({
+          gatewayId: input.gatewayId, gatewayPublicId: input.gatewayPublicId,
+          bearerToken, reasonCode: "gateway_token_run_context_invalid", clientMetadata,
+        });
+      }
+    }
+    let agentId = row.gateway.agentId ?? (nativeAssignment ? nativeOwner as string : null);
     let runId: string | null = null;
     let responsibleUserId: string | null = null;
     let issueId = row.gateway.issueId;
@@ -6865,7 +7087,7 @@ export function createToolGatewayService(
           clientMetadata,
         });
       }
-      if (row.gateway.agentId && row.gateway.agentId !== run.agentId) {
+      if (agentId && agentId !== run.agentId) {
         return recordNamedGatewayAuthFailure({
           gatewayId: input.gatewayId,
           gatewayPublicId: input.gatewayPublicId,
@@ -7014,7 +7236,7 @@ export function createToolGatewayService(
     try {
       const executionTimeoutMs = timeoutMs(args.timeoutMs);
       const connectedMcpExecution =
-        args.tool.providerType === "mcp_remote_http"
+        (args.tool.providerType === "mcp_remote_http" || args.tool.providerType === "provider_rest")
           ? await executeRemoteHttpTool(
               args.session,
               args.tool,
@@ -7030,6 +7252,7 @@ export function createToolGatewayService(
                 args.tool,
                 args.parameters,
                 executionTimeoutMs,
+                args.timeoutMs === undefined,
               )
             : null;
       if (!connectedMcpExecution) {
@@ -7049,6 +7272,11 @@ export function createToolGatewayService(
         sensitiveMode: "redact",
         promptInjectionMode: "block",
       });
+      const providerResult = asRecord(resultValidation.value);
+      if (providerResult?.error) {
+        throw new ToolGatewayHttpError(502, String(providerResult.content || providerResult.error),
+          "tool_error", { execution: connectedMcpExecution.execution });
+      }
       await db
         .update(toolInvocations)
         .set({
@@ -7101,6 +7329,10 @@ export function createToolGatewayService(
           execution: connectedMcpExecution.execution,
         },
       });
+      // After the bookkeeping above: a throw there is caught below, overwrites
+      // the row to failed, and emits — an earlier success emit would make one
+      // execution report both outcomes.
+      void emitConnectionInvoked(db, args.invocationId);
       return {
         decision: "allowed" as const,
         invocationId: args.invocationId,
@@ -7130,6 +7362,7 @@ export function createToolGatewayService(
           updatedAt: new Date(),
         })
         .where(eq(toolInvocations.id, args.invocationId));
+      void emitConnectionInvoked(db, args.invocationId);
       await writeToolCallEvent({
         invocationId: args.invocationId,
         session: args.session,
@@ -7181,6 +7414,9 @@ export function createToolGatewayService(
         decision: "allowed" as const,
         invocationId: args.invocationId,
         error: { message, reasonCode },
+        ...(err instanceof ToolGatewayHttpError && err.reasonCode === "provider_interaction_required"
+          ? { upstreamPending: err.details.upstreamPending as ToolUpstreamPending }
+          : {}),
       };
     }
   }
@@ -7241,6 +7477,7 @@ export function createToolGatewayService(
           updatedAt: new Date(),
         })
         .where(eq(toolInvocations.id, invocation.id));
+      void emitConnectionInvoked(db, invocation.id);
       await reflectToolActionInteractionLifecycle({
         actionRequestId,
         status: "failed",
@@ -7284,6 +7521,7 @@ export function createToolGatewayService(
           updatedAt: new Date(),
         })
         .where(eq(toolInvocations.id, invocation.id));
+      void emitConnectionInvoked(db, invocation.id);
       await reflectToolActionInteractionLifecycle({
         actionRequestId,
         status: "failed",
@@ -7449,6 +7687,7 @@ export function createToolGatewayService(
       return true;
     });
     if (!settled) return { reasonCode, message, settled: false };
+    void emitConnectionInvoked(db, input.invocationId);
     await reflectToolActionInteractionLifecycle({
       actionRequestId: input.actionRequestId,
       status: "failed",
@@ -7501,6 +7740,7 @@ export function createToolGatewayService(
         updatedAt: now,
       })
       .where(eq(toolInvocations.id, input.invocationId));
+    void emitConnectionInvoked(db, input.invocationId);
     await reflectToolActionInteractionLifecycle({
       actionRequestId: expired.id,
       status: "expired",
@@ -7701,6 +7941,8 @@ export function createToolGatewayService(
         session,
         signedPayload.identityContextId,
       );
+      session.approvedInvocationId = invocation.id;
+      session.approvedSlackInvocationId = invocation.id;
       tool = await findToolForSession(session, invocation.toolName);
       liveApprovalSnapshot = await connectedRemoteApprovalSnapshot(
         session,
@@ -7840,7 +8082,7 @@ export function createToolGatewayService(
     try {
       const executionTimeoutMs = timeoutMs(APPROVED_EXECUTION_TIMEOUT_MS);
       const result =
-        tool.providerType === "mcp_remote_http"
+        (tool.providerType === "mcp_remote_http" || tool.providerType === "provider_rest")
           ? (
               await executeRemoteHttpTool(
                 session,
@@ -7861,7 +8103,7 @@ export function createToolGatewayService(
               ).result
             : tool.providerType !== "paperclip_plugin"
               ? await runWithTimeout(
-                  executeBuiltinTool(session, tool, parameters),
+                  executeBuiltinTool(session, tool, parameters, invocation.id),
                   executionTimeoutMs,
                 )
               : (() => {
@@ -7896,6 +8138,7 @@ export function createToolGatewayService(
           updatedAt: now,
         })
         .where(eq(toolInvocations.id, invocation.id));
+      void emitConnectionInvoked(db, invocation.id);
       await db
         .update(toolActionRequests)
         .set({ status: "executed", resolvedAt: now, updatedAt: now })
@@ -7977,12 +8220,14 @@ export function createToolGatewayService(
             "executing",
             "rejected",
             "executed",
+            "failed",
           ]),
         ),
       )
       .orderBy(desc(toolActionRequests.createdAt))
       .limit(1);
     if (!match) return null;
+    if (match.actionRequest.status === "failed" && match.invocation.errorCode !== "provider_interaction_required") return null;
     // The gateway builds an ask-first request in two steps inside one call: it
     // inserts the row with a null signature and a null expiry, then signs the
     // row and sets the expiry. A concurrent matching call can observe the row in
@@ -8041,6 +8286,14 @@ export function createToolGatewayService(
     const match = await matchingAgentActionRequest(input);
     if (!match) return null;
     const { actionRequest, invocation } = match;
+    if (actionRequest.status === "failed") {
+      throw new ToolGatewayHttpError(409,
+        "The provider is waiting for authorization or approval. Continue the existing execution; do not repeat the original call.",
+        "provider_interaction_required", {
+          invocationId: invocation.id, actionRequestId: actionRequest.id,
+          upstreamPending: recoverUpstreamHandoff(invocation),
+        });
+    }
     if (actionRequest.status === "pending") {
       await throwApprovalRequired({
         invocationId: invocation.id,
@@ -8126,7 +8379,7 @@ export function createToolGatewayService(
       phase = "expired";
     } else if (
       actionRequest.status === "approved" ||
-      actionRequest.status === "executed"
+      actionRequest.status === "executed" || actionRequest.status === "failed"
     ) {
       phase = invocationDone ? "done" : "running";
     } else {
@@ -8200,6 +8453,7 @@ export function createToolGatewayService(
       parameters,
       ...(result !== undefined ? { result } : {}),
       ...(error ? { error } : {}),
+      ...(recoverUpstreamHandoff(invocation) ? { upstreamPending: recoverUpstreamHandoff(invocation) } : {}),
       durationMs,
       requestedAt: actionRequest.createdAt.toISOString(),
       resolvedAt: actionRequest.resolvedAt
@@ -8607,7 +8861,9 @@ export function createToolGatewayService(
       gatewayPublicId?: string | null;
       bearerToken: string;
       callerHeaders?: Record<string, string | string[] | undefined>;
+      signal?: AbortSignal;
     }): Promise<ToolGatewayDescriptor[]> {
+      input.signal?.throwIfAborted();
       const session = await namedGatewaySessionFromBearer({
         gatewayId: input.gatewayId ?? null,
         gatewayPublicId: input.gatewayPublicId ?? null,
@@ -8616,7 +8872,7 @@ export function createToolGatewayService(
         callerHeaders: input.callerHeaders,
       });
       await assertGatewayTokenAction(session, "tools/list");
-      const tools = await listToolsForContext(session);
+      const tools = await listToolsForContext(session, input.signal);
       await writeAudit({
         session,
         companyId: session.companyId,
@@ -8628,7 +8884,7 @@ export function createToolGatewayService(
           decision: "allow",
           reasonCode: "named_gateway_discovery_filtered",
           visibleToolCount: tools.length,
-          visibleTools: tools.map((tool) => tool.name),
+          visibleToolsHash: createHash("sha256").update(JSON.stringify(tools.map((tool) => tool.name).sort())).digest("hex"),
         },
       });
       return tools;
@@ -8707,9 +8963,11 @@ export function createToolGatewayService(
 
     async listToolsForSession(
       sessionToken: string,
+      options: { signal?: AbortSignal } = {},
     ): Promise<ToolGatewayDescriptor[]> {
+      options.signal?.throwIfAborted();
       const session = await getActiveSession(sessionToken);
-      const tools = await listToolsForContext(session);
+      const tools = await listToolsForContext(session, options.signal);
       await writeAudit({
         session,
         companyId: session.companyId,
@@ -8721,7 +8979,7 @@ export function createToolGatewayService(
           decision: "allow",
           reasonCode: "discovery_filtered",
           visibleToolCount: tools.length,
-          visibleTools: tools.map((tool) => tool.name),
+          visibleToolsHash: createHash("sha256").update(JSON.stringify(tools.map((tool) => tool.name).sort())).digest("hex"),
         },
       });
       return tools;
@@ -8732,16 +8990,11 @@ export function createToolGatewayService(
       agentId: string;
     }): Promise<AgentToolDescriptor[]> {
       await assertAgentInCompany(input.companyId, input.agentId);
-      const decisions = await Promise.all(
-        pluginTools().map(async (tool) => {
-          const decision = await policyService.decide(
-            policyInputForAgentTool({
-              companyId: input.companyId,
-              agentId: input.agentId,
-              tool,
-            }),
-          );
-          return { tool, decision };
+      const decisions = await decideToolsForListing(pluginTools(), (tool) =>
+        policyInputForAgentTool({
+          companyId: input.companyId,
+          agentId: input.agentId,
+          tool,
         }),
       );
       return decisions
@@ -8759,6 +9012,73 @@ export function createToolGatewayService(
         });
     },
 
+    async browserUseSessionAuthorized(binding: { companyId: string; agentId: string; runId: string; issueId: string; connectionId: string; grantId: string; invocationId: string }) {
+      const [connection] = await db.select().from(toolConnections).where(and(eq(toolConnections.companyId, binding.companyId), eq(toolConnections.id, binding.connectionId)));
+      const [invocation] = await db.select().from(toolInvocations).where(and(eq(toolInvocations.companyId, binding.companyId), eq(toolInvocations.id, binding.invocationId)));
+      if (!connection || !invocation || !connection.enabled || connection.status !== "active") return false;
+      const [issue] = await db.select({ projectId: issues.projectId }).from(issues).where(and(eq(issues.companyId, binding.companyId), eq(issues.id, binding.issueId)));
+      const session: ToolGatewaySession = { ...binding, id: randomUUID(), token: "", projectId: issue?.projectId ?? null, createdAt: new Date(), expiresAt: new Date(Date.now() + 60000) };
+      try {
+        const grant = await resolveConnectionGrant(session, connection, false);
+        if (grant.id !== binding.grantId) return false;
+        const tool = (await connectedMcpToolsForConnection(binding.companyId, binding.connectionId)).find(t => t.name === invocation.toolName);
+        if (!tool) return false;
+        const decision = await policyService.decide(policyInputForTool({ session, tool, consumeRateLimit: false }));
+        return decision.allowed || decision.decision === "require_approval";
+      } catch { return false; }
+    },
+
+    /** Standing instructions use exactly the same authorization as tool discovery. */
+    async resolveConnectionInstructionsForRun(binding: { companyId: string; agentId: string; runId: string }) {
+      const candidates = await db.select().from(toolConnections).where(and(
+        eq(toolConnections.companyId, binding.companyId), eq(toolConnections.enabled, true),
+        eq(toolConnections.status, "active"), sql`${toolConnections.agentInstructions}->>'enabled' = 'true'`,
+      ));
+      if (!candidates.length) return null;
+      const runContext = await resolveRunContext(binding);
+      const session = await captureSessionIdentity({
+        ...binding, ...runContext, id: randomUUID(), token: "", createdAt: new Date(), expiresAt: new Date(Date.now() + 60_000),
+      });
+      await assertAgentInCompany(binding.companyId, binding.agentId);
+      const candidateIds = new Set(candidates.map((connection) => connection.id));
+      // Prompt assembly needs authorization, not a full discovery listing. Share
+      // descriptors and policy decisions, but only authorize candidate sources;
+      // discovery admission pressure must not remove guidance or reset sessions.
+      const tools = (await connectionToolsForContext(session))
+        .filter((tool) => tool.connectionId && candidateIds.has(tool.connectionId));
+      const decisions = await decideToolsForListing(tools, (tool) => policyInputForTool({ session, tool }));
+      const visible = new Set(decisions.flatMap(({ tool, decision }) =>
+        (decision.allowed || decision.decision === "require_approval") && tool.connectionId ? [tool.connectionId] : [],
+      ));
+      const sources: Parameters<typeof composeConnectionInstructions>[0] = [];
+      for (const connection of candidates) {
+        if (!visible.has(connection.id)) continue;
+        try {
+          const grant = await resolveConnectionGrant(session, connection, false);
+          sources.push({ connection, grantId: grant.id });
+        } catch (error) {
+          // A missing/revoked identity makes this connection unavailable, without
+          // opening an interaction or blocking unrelated work at prompt assembly.
+          if (!(error instanceof ToolGatewayHttpError) && !(error instanceof HttpError)) throw error;
+          if (error.status >= 500) throw error;
+        }
+      }
+      return composeConnectionInstructions(sources);
+    },
+
+    async browserUseResources(binding: { companyId: string; agentId: string; runId?: string; issueId?: string }) {
+      if (!binding.runId || !binding.issueId) return [];
+      const session: ToolGatewaySession = { ...binding, runId: binding.runId, issueId: binding.issueId, id: randomUUID(), token: "", projectId: null, createdAt: new Date(), expiresAt: new Date(Date.now() + 60000) };
+      const tools = (await listToolsForContext(session)).filter(t => t.providerType === "provider_rest");
+      const resources: Array<{ id: string; label: string; connectionId: string }> = [];
+      for (const connectionId of new Set(tools.map(t => t.connectionId!))) {
+        const [connection] = await db.select().from(toolConnections).where(and(eq(toolConnections.companyId, binding.companyId), eq(toolConnections.id, connectionId)));
+        if (!connection || !isBrowserUseConnection(connection)) continue;
+        try { await resolveConnectionGrant(session, connection, false); resources.push({ id: connectionId, connectionId, label: "Browser Use Cloud" }); } catch { /* Unavailable grants do not contribute a runtime skill. */ }
+      }
+      return resources;
+    },
+
     async summarizeConnectionAccessForAgent(input: {
       companyId: string;
       connectionId: string;
@@ -8769,33 +9089,32 @@ export function createToolGatewayService(
         input.companyId,
         input.connectionId,
       );
-      const decisions = await Promise.all(
-        tools.map(async (tool) => {
-          const decision = await policyService.decide(
-            policyInputForAgentTool({
-              companyId: input.companyId,
-              agentId: input.agentId,
-              tool,
-            }),
-          );
-          const testDecision =
-            decision.decision === "require_approval"
-              ? "ask_first"
-              : decision.allowed
-                ? "allowed"
-                : "off";
-          return {
-            toolName: tool.upstreamToolName ?? tool.name,
-            gatewayToolName: tool.name,
-            displayName: tool.displayName,
-            risk: tool.risk,
-            decision: testDecision,
-            reasonCode: decision.reasonCode,
-            matchedPolicyIds: decision.matchedPolicyIds,
-            effectiveProfileIds: decision.effectiveProfileIds,
-          };
-        }),
-      );
+      const decisions = (
+        await decideToolsForListing(tools, (tool) =>
+          policyInputForAgentTool({
+            companyId: input.companyId,
+            agentId: input.agentId,
+            tool,
+          }),
+        )
+      ).map(({ tool, decision }) => {
+        const testDecision =
+          decision.decision === "require_approval"
+            ? "ask_first"
+            : decision.allowed
+              ? "allowed"
+              : "off";
+        return {
+          toolName: tool.upstreamToolName ?? tool.name,
+          gatewayToolName: tool.name,
+          displayName: tool.displayName,
+          risk: tool.risk,
+          decision: testDecision,
+          reasonCode: decision.reasonCode,
+          matchedPolicyIds: decision.matchedPolicyIds,
+          effectiveProfileIds: decision.effectiveProfileIds,
+        };
+      });
       const lastChange = await summarizeAccessLastChange({
         companyId: input.companyId,
         connectionId: input.connectionId,
@@ -8954,6 +9273,7 @@ export function createToolGatewayService(
                 updatedAt: new Date(),
               })
               .where(eq(toolInvocations.id, invocationId));
+            void emitConnectionInvoked(db, invocationId);
             throw new ToolGatewayHttpError(
               500,
               error.message,
@@ -9026,6 +9346,9 @@ export function createToolGatewayService(
       }
 
       if (!accessDecision.allowed) {
+        // recordInvocation inserted this row already terminal (denied or
+        // rate_limited), so this is its only completion boundary.
+        void emitConnectionInvoked(db, invocationId);
         await writeAudit({
           session,
           companyId: input.companyId,
@@ -9225,6 +9548,7 @@ export function createToolGatewayService(
               updatedAt: now,
             })
             .where(eq(toolInvocations.id, row.invocationId));
+          void emitConnectionInvoked(db, row.invocationId);
           await reflectToolActionInteractionLifecycle({
             actionRequestId: row.id,
             status,
@@ -9450,6 +9774,7 @@ export function createToolGatewayService(
           session,
           signedPayload.identityContextId,
         );
+        session.approvedSlackInvocationId = invocation.id;
         const tool = await findToolForSession(session, invocation.toolName);
         if (
           !approvalSnapshotsMatch(
@@ -9606,6 +9931,18 @@ export function createToolGatewayService(
         }
       }
       let tool = await findToolForSession(session, input.tool);
+      if (tool.providerType === "paperclip_slack_chat") {
+        const definition = SLACK_TOOLS.find(t => t.name === tool.upstreamToolName);
+        const args = definition?.schema.parse(input.parameters ?? {}) as Record<string, unknown> | undefined;
+        if (!args) throw new ToolGatewayHttpError(403, "Unknown Slack operation", "slack_task_required");
+        if (typeof args.idempotencyKey === "string") {
+          const key = `slack:${tool.connectionId}:${session.issueId}:${session.responsibleUserId}:${args.idempotencyKey}`;
+          const [prior] = await db.select().from(toolInvocations).where(and(eq(toolInvocations.companyId, session.companyId), eq(toolInvocations.idempotencyKey, key)));
+          const currentHash = validateToolContent({ value: args, direction: "arguments", sensitiveMode: "redact", promptInjectionMode: "ignore" }).summary.sha256;
+          if (prior && (prior.toolName !== tool.name || prior.argumentsHash !== currentHash)) throw new ToolGatewayHttpError(409, "Idempotency key belongs to a different Slack operation", "slack_idempotency_conflict");
+          input = { ...input, idempotencyKey: key };
+        }
+      }
       let virtualToolName: string | null = null;
       let requestedParameters: unknown = input.parameters ?? {};
 
@@ -10128,14 +10465,20 @@ export function createToolGatewayService(
           idempotencyKey: input.idempotencyKey,
           consumeRateLimit: true,
         });
-        const accessDecision = await policyService.decide(decisionInput);
+        let accessDecision = await policyService.decide(decisionInput);
+        if (accessDecision.allowed && tool.providerType === "paperclip_slack_chat" && SLACK_TOOLS.some(t => t.name === tool.upstreamToolName && t.risk === "approval")) {
+          accessDecision = { ...accessDecision, allowed: false, decision: "require_approval", reasonCode: "requires_approval_policy", explanation: "Slack destructive actions, channel creation and invitations require approval." };
+        }
         const recorded = await policyService.recordInvocation(
           decisionInput,
           accessDecision,
         );
         await policyService.writeAudit(decisionInput, accessDecision);
         invocationId = recorded.invocation.id;
-        if (recorded.replayed) {
+        const retryingSlackRateLimit = recorded.replayed && accessDecision.allowed && tool.providerType === "paperclip_slack_chat" && session.agentId && session.runId && session.issueId
+          ? await claimSlackRateLimitRetry(db, { companyId: session.companyId, agentId: session.agentId, runId: session.runId, issueId: session.issueId, endpointId: String(asRecord(tool.providerMetadata)?.endpointId ?? ""), identityContextId: session.identityContextId }, invocationId)
+          : false;
+        if (recorded.replayed && !retryingSlackRateLimit) {
           await writeAudit({
             session,
             companyId: session.companyId,
@@ -10171,6 +10514,9 @@ export function createToolGatewayService(
           });
         }
         if (!accessDecision.allowed) {
+          // recordInvocation inserted this row already terminal (denied or
+          // rate_limited), so this is its only completion boundary.
+          void emitConnectionInvoked(db, invocationId);
           await writeAudit({
             session,
             companyId: session.companyId,
@@ -10248,7 +10594,7 @@ export function createToolGatewayService(
           );
         }
         const connectedMcpExecution =
-          tool.providerType === "mcp_remote_http"
+          (tool.providerType === "mcp_remote_http" || tool.providerType === "provider_rest")
             ? await executeRemoteHttpTool(
                 session,
                 tool,
@@ -10264,6 +10610,7 @@ export function createToolGatewayService(
                   tool,
                   effectiveParameters,
                   executionTimeoutMs,
+                  input.timeoutMs === undefined,
                 )
               : null;
         const result = connectedMcpExecution
@@ -10283,7 +10630,7 @@ export function createToolGatewayService(
                 executionTimeoutMs,
               )
             : await runWithTimeout(
-                executeBuiltinTool(session, tool, effectiveParameters),
+                executeBuiltinTool(session, tool, effectiveParameters, invocationId),
                 executionTimeoutMs,
               );
 
@@ -10294,6 +10641,17 @@ export function createToolGatewayService(
           promptInjectionMode: "block",
         });
         const completedAt = new Date();
+        const validatedMcpResult = connectedMcpExecution
+          ? asRecord(resultValidation.value)
+          : null;
+        if (validatedMcpResult?.error) {
+          throw new ToolGatewayHttpError(
+            502,
+            String(validatedMcpResult.content || validatedMcpResult.error),
+            "tool_error",
+            { execution: connectedMcpExecution?.execution },
+          );
+        }
         await db
           .update(toolInvocations)
           .set({
@@ -10375,6 +10733,10 @@ export function createToolGatewayService(
             execution: connectedMcpExecution?.execution ?? undefined,
           },
         });
+        // After the bookkeeping above: a throw there is caught below, overwrites
+        // the row to failed, and emits — an earlier success emit would make one
+        // execution report both outcomes.
+        void emitConnectionInvoked(db, invocationId);
         return {
           invocationId,
           status: "completed" as const,
@@ -10431,6 +10793,7 @@ export function createToolGatewayService(
             updatedAt: completedAt,
           })
           .where(eq(toolInvocations.id, invocationId));
+        void emitConnectionInvoked(db, invocationId);
         if (input.approvedActionRequestId) {
           const [failedRequest] = await db
             .update(toolActionRequests)
@@ -10612,6 +10975,9 @@ export function createToolGatewayService(
       }
 
       if (!accessDecision.allowed) {
+        // recordInvocation inserted this row already terminal (denied or
+        // rate_limited), so this is its only completion boundary.
+        void emitConnectionInvoked(db, invocationId);
         await writeAudit({
           session: sessionLike,
           companyId: input.runContext.companyId,
@@ -10726,6 +11092,10 @@ export function createToolGatewayService(
             resultSummary: resultValidation.summary,
           },
         });
+        // After the bookkeeping above: a throw there is caught below, overwrites
+        // the row to failed, and emits — an earlier success emit would make one
+        // execution report both outcomes.
+        void emitConnectionInvoked(db, invocationId);
         return resultValidation.value as typeof result;
       } catch (err) {
         const status = err instanceof ToolGatewayHttpError ? err.status : 502;
@@ -10746,6 +11116,7 @@ export function createToolGatewayService(
             updatedAt: new Date(),
           })
           .where(eq(toolInvocations.id, invocationId));
+        void emitConnectionInvoked(db, invocationId);
         await writeToolCallEvent({
           invocationId,
           session: sessionLike,
@@ -10862,6 +11233,16 @@ export function createToolGatewayService(
 
     async cleanupExpiredSessions(input: { now?: Date } = {}) {
       const now = input.now ?? new Date();
+      const expiredTokens = await db.select({ id: toolMcpGatewayTokens.id })
+        .from(toolMcpGatewayTokens)
+        .where(lte(toolMcpGatewayTokens.expiresAt, now))
+        .orderBy(asc(toolMcpGatewayTokens.expiresAt), asc(toolMcpGatewayTokens.id))
+        .limit(500);
+      if (expiredTokens.length > 0) {
+        await db.delete(toolMcpGatewayTokens)
+            .where(and(inArray(toolMcpGatewayTokens.id, expiredTokens.map((token) => token.id)), lte(toolMcpGatewayTokens.expiresAt, now)))
+            .returning({ id: toolMcpGatewayTokens.id });
+      }
       const rows = await db
         .delete(toolGatewaySessions)
         .where(lte(toolGatewaySessions.expiresAt, now))

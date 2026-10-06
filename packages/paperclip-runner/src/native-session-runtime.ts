@@ -23,6 +23,8 @@ import {
   NativeSessionCloseUnrecoverableError,
   NativeSessionCleanupQuarantinedError,
   NativeSessionProtocolIntegrityError,
+  isNativeRestartInterruption,
+  nativeRestartInterruptedTurnId,
 } from "./contracts/native-session-backend.js";
 import {
   validatePrpStructuredRunResult,
@@ -184,6 +186,10 @@ export interface NativeSessionGoalControl {
 }
 
 export interface ExecuteNativeSessionOptions {
+  /** The control plane proved the old local runner stopped and charged a recovery attempt. */
+  resumeInterruptedTurn?: boolean;
+  /** Read bounded task history only after recovery requires a fresh conversation. */
+  getFreshSessionHandoff?: () => Promise<string | null>;
   /** Durable launch intent, after cleanup admission and before provider calls. */
   onSessionAdmission?: () => Promise<void>;
   input: NativeExecutionInput;
@@ -220,6 +226,9 @@ export interface ExecuteNativeSessionOptions {
    * carries required persistence (for example, a remote runner checkpoint).
    */
   requireSessionCloseBeforeReturn?: boolean;
+  /** Trusted cleanup observer, called only after the owned close completes.
+   * Requires requireSessionCloseBeforeReturn; never called for a live warm session. */
+  onSessionClosed?: () => Promise<void>;
   onCheckpoint?: (
     snapshot: PersistedNativeSession,
     options?: CheckpointControlPlaneSessionOptions,
@@ -860,6 +869,7 @@ async function consumeTurn(
     requestId: string;
   },
   initialGoal?: HarnessThreadGoal | null,
+  resumeInterruptedTurn?: (event: PrpEvent, signal: AbortSignal) => Promise<boolean>,
 ) {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const appendAbort = new AbortController();
@@ -1169,6 +1179,8 @@ async function consumeTurn(
       }
       if (isTurnTerminal(event)) {
         if (providerFailure) throw providerFailure;
+        if (semanticResultProposal === null && governedResult === null &&
+            inputTimers.size === 0 && await resumeInterruptedTurn?.(event, appendAbort.signal)) continue;
         return {
           event,
           eventCount,
@@ -1866,6 +1878,12 @@ export async function executeNativeSession(
     previousProviderSessionId: string | null;
   } | null = null;
   let reconciledRecoveryCheckpoint: PersistedNativeSession | null = null;
+  const checkpointedInterruption = persistedSession && nativeRestartInterruptedTurnId(persistedSession);
+  if (checkpointedInterruption && persistedSession) {
+    // The turn failed because its process vanished; the conversation is still
+    // usable. Keep its terminal fingerprint so replay cannot execute it twice.
+    persistedSession = { ...persistedSession, terminal: null };
+  }
   await options.onSessionAdmission?.();
   if (options.existingSession) {
     if (options.existingSession.attachRun === undefined) {
@@ -2120,7 +2138,7 @@ export async function executeNativeSession(
   let goalCheckpointRequiresSuspension = Boolean(
     options.sessionGoalControl || options.resumeSessionGoalHeartbeat || persistedSession?.goal,
   );
-  let protocolIntegrityFailure: NativeSessionProtocolIntegrityError | null = null;
+  let executionFailure: { error: unknown } | null = null;
   try {
     // Ownership publication is part of the execution-owned lifetime. If the
     // callback fails, the finally block below still quarantines and closes the
@@ -2152,6 +2170,42 @@ export async function executeNativeSession(
       await persistCheckpoint(snapshot, signal);
     };
     const recoveredSnapshot = await session.snapshot();
+    const restartContinuation = () => ({
+      message: { role: "user" as const, text: JSON.stringify({
+        schema: "paperclip.native-continuation.v1",
+        events: [
+          "Paperclip restarted and restored this same conversation. The previous turn was interrupted.",
+          "Continue the current user request from the recorded progress and preserved workspace.",
+          "Reconcile any unfinished tool or command before proceeding: inspect its current state and recorded outcomes.",
+          "Do not repeat completed work or blindly rerun an action whose outcome is unknown. If an external action cannot be reconciled, report the specific blocker.",
+        ].join("\n"),
+        completion: {
+          revision: input.completionContract.contract.revision,
+          criterionIds: input.completionContract.contract.criteria.map(criterion => criterion.id),
+        },
+      }) },
+      continuation: true as const,
+      requestedCollaborationMode: "executionMode" in input ? input.executionMode : "default" as const,
+    });
+    let restartContinuationStarted = false;
+    const resumeInterruptedTurn = async (event: PrpEvent, signal: AbortSignal) => {
+      if (restartContinuationStarted || !recovered || !options.resumeInterruptedTurn ||
+          input.provider.kind !== "codex" || options.sessionGoalControl || options.resumeSessionGoalHeartbeat ||
+          recoveredSnapshot.goal || persistedSession?.semanticResult || persistedSession?.pendingRuntimeRequests?.length ||
+          event.eventType !== "turn.failed" || !isNativeRestartInterruption(event.payload.error) ||
+          event.turnId !== persistedSession?.activeTurnId) return false;
+      const snapshot = await session.snapshot();
+      signal.throwIfAborted();
+      if (nativeRestartInterruptedTurnId(snapshot) !== event.turnId || snapshot.pendingRuntimeRequests?.length) return false;
+      restartContinuationStarted = true;
+      // Persist the old terminal before launching. Recovery inspects provider
+      // history to adopt an accepted continuation if its checkpoint was lost.
+      await persistCheckpoint(snapshot, signal);
+      signal.throwIfAborted();
+      await session.startTurn(restartContinuation());
+      await checkpoint(signal);
+      return true;
+    };
     const recoveredActiveTurnId = recovered
       ? (recoveredSnapshot.activeTurnId ?? null)
       : (persistedSession?.activeTurnId ?? null);
@@ -2289,6 +2343,7 @@ export async function executeNativeSession(
                   }
                 : undefined,
               recoveredSnapshot.goal,
+              resumeInterruptedTurn,
             )
           : Promise.resolve({
               event: recoveryTerminal,
@@ -2328,8 +2383,18 @@ export async function executeNativeSession(
             await session.goal({ action: "get", requestId });
           }
           await checkpoint();
+        } else if (shouldStartFreshTurn && recovered && checkpointedInterruption) {
+          restartContinuationStarted = true;
+          await session.startTurn(restartContinuation());
+          await checkpoint();
         } else if (shouldStartFreshTurn) {
-          const modelEnvelope = buildNativeModelEnvelope(input);
+          let modelEnvelope = recovered
+            ? buildNativeModelEnvelope(input, { resumedSession: true })
+            : buildNativeModelEnvelope(input);
+          if (!recovered && options.getFreshSessionHandoff && "task" in modelEnvelope) {
+            const handoff = await options.getFreshSessionHandoff();
+            if (handoff) modelEnvelope.task.prompt = `${handoff}\n\n${modelEnvelope.task.prompt}`;
+          }
           const dispositionOnlyRecovery = Boolean(
             recovered &&
             !recoveredSnapshot.semanticResult &&
@@ -2346,6 +2411,10 @@ export async function executeNativeSession(
                 })
               : false;
           if (dispositionOnlyRecovery && !effectFreeInitialAcpxTurn) {
+            modelEnvelope = buildNativeModelEnvelope(input);
+            // Source references cannot resolve after replacing the task prompt.
+            modelEnvelope.completionContract = structuredClone(input.completionContract.contract);
+            if ("requestedSkills" in modelEnvelope) modelEnvelope.requestedSkills = [];
             modelEnvelope.task.prompt = [
               "Paperclip semantic-result recovery for a prior completed provider turn.",
               "The prior turn already performed the work and its user-facing final answer is recorded.",
@@ -2353,8 +2422,13 @@ export async function executeNativeSession(
               "Use the existing session context to invoke exactly one paperclip_finish or paperclip_block with the accurate current disposition, then stop without additional user-facing prose.",
             ].join("\n");
           }
+          if (!(dispositionOnlyRecovery && !effectFreeInitialAcpxTurn) && "requestedSkills" in modelEnvelope && options.backend.preparedTaskConstraints) {
+            modelEnvelope.constraints = [...options.backend.preparedTaskConstraints];
+          }
           await session.startTurn({
             message: { role: "user", text: JSON.stringify(modelEnvelope) },
+            ...(recovered && modelEnvelope.schema === "paperclip.native-continuation.v1"
+              ? { continuation: true as const } : {}),
             requestedCollaborationMode:
               "executionMode" in input ? input.executionMode : "default",
           });
@@ -2716,9 +2790,7 @@ export async function executeNativeSession(
     executionSucceeded = true;
     return { ...durableExecutionResult, ...enrichment };
   } catch (error) {
-    if (error instanceof NativeSessionProtocolIntegrityError) {
-      protocolIntegrityFailure = error;
-    }
+    executionFailure = { error };
     throw error;
   } finally {
     const shouldClose =
@@ -2743,8 +2815,22 @@ export async function executeNativeSession(
           // The exact cleanup owner remains retained/quarantined above. Its
           // rejection must not turn permanent integrity failure into a
           // generic retryable transport failure at the control-plane boundary.
-          throw protocolIntegrityFailure ?? closeError;
+          if (executionFailure !== null) {
+            // Keep the original identity/classification (including arbitrary
+            // thrown values). Cleanup remains inspectable without replacing
+            // the initiating failure with a generic shutdown timeout.
+            if (executionFailure.error instanceof Error) {
+              try {
+                Object.defineProperty(executionFailure.error, "cleanupError", {
+                  value: closeError, configurable: true,
+                });
+              } catch { /* Frozen errors still retain their original identity. */ }
+            }
+            throw executionFailure.error;
+          }
+          throw closeError;
         }
+        await options.onSessionClosed?.();
       }
     } else if (shouldClose && !failedCleanupDeferred) {
       // A provider that ignores close must not keep execution pending forever.

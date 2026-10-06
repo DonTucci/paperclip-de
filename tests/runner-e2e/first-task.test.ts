@@ -2,6 +2,7 @@ import { captureFirstTaskAttachments } from "./first-task-attachments.js";
 import type { RunnerApi } from "./api.js";
 import { renderRunnerE2EDashboard } from "./dashboard.js";
 import { waitForFirstTaskReply } from "./first-task-replies.js";
+import { firstTaskRejectionReplyRecorded, isFirstTaskRejectionCancellation } from "./first-task-rejection.js";
 import { createIssueThreadInteractionSchema } from "../../packages/shared/src/validators/issue.js";
 import { renderInteractionCard } from "./interaction-report.js";
 import { main as judgeCommand } from "./first-task-judge.js";
@@ -20,6 +21,7 @@ import {
   digestText,
   snapshotInstruction,
   gradeFirstTask,
+  gradeNativeSessionContinuity,
   firstTaskCompletionSettled,
   type FirstTaskEvidence,
   type FirstTaskCheckpoint,
@@ -142,6 +144,33 @@ function recording(caseId = "task-reply-accept"): FirstTaskEvidence {
     checks: [],
   };
 }
+/** Reduced lifecycle evidence from gha-36307603818-1 / reject-no-execution.
+ * The decision checkpoint models the repaired capture order, not a historical regrade. */
+function rejectionRecording(): FirstTaskEvidence {
+  const e = recording("reject-no-execution");
+  const rejected = e.checkpoints[2];
+  rejected.phase = "rejected";
+  rejected.comments[rejected.comments.length - 1] = {
+    id: "no", issueId: "onboarding", authorUserId: "board",
+    body: firstTaskScenario(e.caseId, e.nonce).rejection,
+    createdAt: "2026-09-15T00:02:00.100Z",
+  };
+  const last = e.checkpoints[3];
+  last.tasks = [{ ...last.tasks[0], status: "cancelled" }];
+  last.documents = [];
+  last.runs = [...rejected.runs, {
+    id: "refusal-run", agentId: "agent", status: "cancelled", errorCode: "cancelled",
+    error: "Cancelled by control plane", startedAt: "2026-09-15T00:02:01Z", finishedAt: "2026-09-15T00:02:15Z",
+    contextSnapshot: { issueId: "onboarding", commentId: "no", wakeCommentId: "no" },
+  }];
+  last.comments = [...rejected.comments, {
+    id: "ack", issueId: "onboarding", authorAgentId: "agent", createdByRunId: "refusal-run",
+    body: "Understood. Stopped at your request. No welcome note or child task was created.",
+    createdAt: "2026-09-15T00:02:15.100Z",
+  }];
+  return e;
+}
+
 function result(e = recording()): RunnerE2EResult {
   return {
     schema: "paperclip.runner-e2e.result/v2",
@@ -880,11 +909,9 @@ Accept the card above and I write it. This task stays in review until then.`;
     expect(failed(e)).toContain("durable-completion");
   });
   it("allows closing a rejected unexecuted task, but not earlier completion or output", () => {
-    const e = recording("reject-no-execution");
-    e.checkpoints[2].phase = "rejected";
-    e.checkpoints[3].tasks = [{ ...e.checkpoints[3].tasks[0], status: "done" }];
-    e.checkpoints[3].documents = [];
-    e.checkpoints[3].runs = [{ id: "parent-run", status: "succeeded" }];
+    const e = rejectionRecording();
+    e.checkpoints[3].tasks[0].status = "done";
+    e.checkpoints[3].runs.at(-1)!.status = "succeeded";
     expect(failed(e)).toEqual([]);
     e.checkpoints[1].tasks[0].status = "done";
     expect(failed(e)).toContain("no-premature-work");
@@ -1214,5 +1241,122 @@ describe("accept-while-running overlap evidence", () => {
     const check = gradeFirstTask(e).find(c => c.id === "accepted-while-running")!;
     expect(check.passed).toBe(overlap);
     expect(Boolean(check.notReached)).toBe(!overlap);
+  });
+});
+
+
+describe("native provider session continuity", () => {
+  const row = (id: string) => ({ id, nativeIssueId: "parent", nativeSessionId: "native", usageJson: { sessionReused: true }, runnerProfileJson: { sessionCheckpoint: { providerSessionId: "provider" }, nativeExecutionInput: { binding: { executionWorkspaceId: "workspace" } } } });
+  it("accepts stable parent identity, deduplicates checkpoints, and excludes children", () => {
+    expect(gradeNativeSessionContinuity([row("one"), row("one"), row("two"), { ...row("child"), nativeIssueId: "child", nativeSessionId: "different" }], "parent").passed).toBe(true);
+  });
+  it("rejects a fresh provider despite generic sessionReused metadata", () => {
+    const next = row("two"); next.runnerProfileJson.sessionCheckpoint.providerSessionId = "fresh";
+    expect(gradeNativeSessionContinuity([row("one"), next], "parent").passed).toBe(false);
+    expect(gradeNativeSessionContinuity([row("one")], "parent").passed).toBe(false);
+  });
+});
+
+it("allows first-response native question waits but never treats unfinished journeys as successful", () => {
+  const e = recording("interview-first-response");
+  const last = e.checkpoints.at(-1)!;
+  last.runs = [{ id: "native-wait", status: "running" }];
+  last.interactions.push({ id: "native-card", kind: "ask_user_questions", status: "pending", sourceRunId: "native-wait", payload: { runtimeRequestId: "request" } });
+  const providerPassed = () => gradeFirstTask(e).find(c => c.id === "provider-runs-succeeded")?.passed;
+  expect(providerPassed()).toBe(true);
+  e.caseId = "interview-plan-accept";
+  expect(providerPassed()).toBe(false);
+  e.caseId = "interview-first-response";
+  last.interactions.at(-1)!.status = "answered";
+  expect(providerPassed()).toBe(false);
+  last.interactions.at(-1)!.status = "pending";
+  last.runs[0].status = "failed";
+  expect(providerPassed()).toBe(false);
+});
+
+it("retains suppressed unstarted wakes without failing successful execution", () => {
+  const e = recording();
+  const last = e.checkpoints.at(-1)!;
+  const wake = { id: "blocked-wake", status: "cancelled", errorCode: "issue_dependencies_blocked", startedAt: null as string | null };
+  last.runs.push(wake);
+  const passed = () => gradeFirstTask(e).find(c => c.id === "provider-runs-succeeded")?.passed;
+  expect(passed()).toBe(true);
+  wake.startedAt = "2026-09-18";
+  expect(passed()).toBe(false);
+});
+
+it("ignores an obsolete unstarted wake but still requires successful execution and approved output", () => {
+  const e = recording();
+  const last = e.checkpoints.at(-1)!;
+  last.runs.push({ id: "obsolete", status: "cancelled", errorCode: "issue_terminal_status",
+    startedAt: null, contextSnapshot: { issueId: "child" } });
+  expect(failed(e)).toEqual([]);
+  // The old harness aborted here while another provider run was still active.
+  last.runs[1].status = "running";
+  expect(failed(e)).toContain("provider-runs-succeeded");
+  last.runs[1].status = "cancelled";
+  last.runs[1].errorCode = "cancelled";
+  expect(failed(e)).toContain("provider-runs-succeeded");
+  last.runs[1].status = "succeeded";
+  last.documents = [];
+  expect(failed(e)).toContain("durable-completion");
+  last.tasks[1].assigneeAgentId = null;
+  expect(failed(e)).toContain("one-scoped-subtask");
+});
+
+describe("recorded refusal cancellation", () => {
+  it("waits for the refusal run's persisted reply even when it arrives after cancellation", () => {
+    const e = rejectionRecording();
+    const last = e.checkpoints.at(-1)!;
+    const run = last.runs.at(-1)!;
+    expect(isFirstTaskRejectionCancellation(run, e, last.tasks)).toBe(true);
+    const reply = last.comments.pop()!;
+    expect(firstTaskRejectionReplyRecorded(e, last.comments, last.runs)).toBe(false);
+    expect(failed(e)).toEqual(["rejection-respected", "provider-runs-succeeded"]);
+    last.comments.push(reply);
+    expect(failed(e)).toEqual([]);
+  });
+
+  it.each([
+    ["missing decision checkpoint", (e: FirstTaskEvidence) => { e.checkpoints[2].phase = "response"; }],
+    ["acceptance rather than refusal", (e: FirstTaskEvidence) => { e.checkpoints[2].comments.at(-1)!.body = "Yes, proceed"; }],
+    ["agent-authored refusal", (e: FirstTaskEvidence) => { e.checkpoints[2].comments.at(-1)!.authorAgentId = e.agentId; }],
+    ["no user attribution", (e: FirstTaskEvidence) => { delete e.checkpoints[2].comments.at(-1)!.authorUserId; }],
+    ["stale refusal", (e: FirstTaskEvidence) => { e.checkpoints[2].comments.at(-1)!.createdAt = "2026-09-15T00:00:00Z"; }],
+    ["unrelated task", (e: FirstTaskEvidence) => { e.checkpoints[3].runs.at(-1)!.contextSnapshot.issueId = "other"; }],
+    ["unrelated wake", (e: FirstTaskEvidence) => { e.checkpoints[3].runs.at(-1)!.contextSnapshot = { issueId: "onboarding", commentId: "old", wakeCommentId: "old" }; }],
+    ["operator cleanup", (e: FirstTaskEvidence) => { e.checkpoints[3].runs.at(-1)!.error = "Cancelled by a board operator"; }],
+    ["provider failure", (e: FirstTaskEvidence) => { e.checkpoints[3].runs.at(-1)!.status = "failed"; }],
+    ["provider timeout", (e: FirstTaskEvidence) => { e.checkpoints[3].runs.at(-1)!.status = "timed_out"; }],
+    ["unfinished task", (e: FirstTaskEvidence) => { e.checkpoints[3].tasks[0].status = "in_progress"; }],
+    ["missing execution timestamp", (e: FirstTaskEvidence) => { e.checkpoints[3].runs.at(-1)!.startedAt = null; }],
+  ])("does not exempt %s", (_name, mutate) => {
+    const e = rejectionRecording();
+    mutate(e);
+    const last = e.checkpoints.at(-1)!;
+    expect(isFirstTaskRejectionCancellation(last.runs.at(-1)!, e, last.tasks)).toBe(false);
+    expect(failed(e)).toContain("provider-runs-succeeded");
+  });
+
+  it.each([
+    { authorAgentId: "other" }, { createdByRunId: "parent-run" },
+    { createdAt: "2026-09-15T00:01:00Z" }, { body: " " }, { deletedAt: "2026-09-15T00:02:20Z" },
+  ])("does not accept unrelated or missing reply evidence: %j", patch => {
+    const e = rejectionRecording();
+    Object.assign(e.checkpoints[3].comments.at(-1)!, patch);
+    expect(failed(e)).toEqual(["rejection-respected", "provider-runs-succeeded"]);
+  });
+
+  it("keeps unauthorized work and active runs red despite an acknowledged cancellation", () => {
+    for (const kind of ["task", "document", "attachment", "agent", "run"]) {
+      const e = rejectionRecording();
+      const last = e.checkpoints[3];
+      if (kind === "task") last.tasks.push({ id: "unauthorized-child", status: "done" });
+      if (kind === "document") last.documents.push({ id: "output", key: "welcome", body: "Completed note" });
+      if (kind === "attachment") last.attachments = [{ id: "output", filename: "welcome.md" }];
+      if (kind === "agent") last.agents.push({ id: "unapproved-hire" });
+      if (kind === "run") last.runs.push({ id: "active", status: "running" });
+      expect(failed(e), kind).toContain(kind === "agent" ? "no-premature-work" : "rejection-respected");
+    }
   });
 });

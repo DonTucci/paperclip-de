@@ -21,11 +21,14 @@ import {
   type AiConnectionLoginIntent,
   type AiProvider,
   type AiConnectionBinding,
+  type AiConnectionList,
+  aiConnectionPoolConfigSchema,
 } from "@paperclipai/shared";
 import { assertBoard, assertCompanyAccess, getActorInfo } from "./authz.js";
 import { forbidden, notFound, unprocessable } from "../errors.js";
 import { accessService } from "../services/access.js";
 import { logActivity } from "../services/activity-log.js";
+import { aiConnectionRouterService } from "../services/ai-connection-router.js";
 import { aiConnectionService } from "../services/ai-connections.js";
 import { validate } from "../middleware/validate.js";
 
@@ -34,6 +37,14 @@ export function responsibleUserForAiRequest(req: Request): string | null {
   return req.actor.type === "agent"
     ? req.actor.onBehalfOfUserId ?? null
     : getActorInfo(req).actorId;
+}
+
+async function canManageAiConnections(db: Db, req: Request, companyId: string): Promise<boolean> {
+  const membership = req.actor.memberships?.find((m) => m.companyId === companyId && m.status === "active");
+  if (membership?.membershipRole === "viewer") return false;
+  return req.actor.source === "local_implicit" || Boolean(req.actor.isInstanceAdmin)
+    || membership?.membershipRole === "owner" || membership?.membershipRole === "admin"
+    || await accessService(db).hasPermission(companyId, "user", getActorInfo(req).actorId, "tools:manage_connections");
 }
 
 export async function assertAiConnectionCreateAccess(
@@ -76,17 +87,7 @@ export async function assertAiConnectionCreateAccess(
   const membership = req.actor.memberships?.find(
     (m) => m.companyId === companyId && m.status === "active",
   );
-  const manager =
-    req.actor.source === "local_implicit" ||
-    req.actor.isInstanceAdmin ||
-    membership?.membershipRole === "owner" ||
-    membership?.membershipRole === "admin" ||
-    (await accessService(db).hasPermission(
-      companyId,
-      "user",
-      userId,
-      "tools:manage_connections",
-    ));
+  const manager = await canManageAiConnections(db, req, companyId);
   if (
     !input.connectionId &&
     !manager &&
@@ -155,7 +156,7 @@ export async function validateAiApiKey(
           : { Authorization: `Bearer ${key}` },
     });
   } catch {
-    throw unprocessable("Could not verify the account. Try again.");
+    throw unprocessable("Could not verify the account. Try again.", { code: "ai_connection_verification_failed" });
   }
   await response.body?.cancel();
   if (!response.ok)
@@ -163,6 +164,7 @@ export async function validateAiApiKey(
       response.status === 401 || response.status === 403
         ? "The provider rejected this API key."
         : "The provider could not verify this account. Try again.",
+      { code: response.status === 401 || response.status === 403 ? "ai_connection_api_key_rejected" : "ai_connection_verification_failed" },
     );
 }
 
@@ -173,6 +175,36 @@ export function aiConnectionRoutes(db: Db, options: Parameters<typeof supportsLo
   const router = Router();
   const service = aiConnectionService(db);
   const localLogin = localAiLoginService(db);
+  const pools = aiConnectionRouterService(db);
+  router.get("/companies/:companyId/ai-connection-pools", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    assertBoard(req); assertCompanyAccess(req, companyId);
+    if (!(await canManageAiConnections(db, req, companyId))) throw forbidden("Manage connections permission is required");
+    res.setHeader("Cache-Control", "no-store");
+    res.json(await pools.list(companyId));
+  });
+  router.get("/companies/:companyId/ai-connection-pools/:poolId/inspection", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    assertBoard(req); assertCompanyAccess(req, companyId);
+    if (!(await canManageAiConnections(db, req, companyId))) throw forbidden("Manage connections permission is required");
+    res.setHeader("Cache-Control", "no-store");
+    res.json(await pools.inspect(companyId, z.string().uuid().parse(req.params.poolId), getActorInfo(req).actorId));
+  });
+  router.post("/companies/:companyId/ai-connection-pools", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    assertBoard(req); assertCompanyAccess(req, companyId);
+    if (!(await canManageAiConnections(db, req, companyId))) throw forbidden("Manage connections permission is required");
+    const body = z.object({ pluginKey: z.string().min(1).max(160), id: z.string().uuid().optional(), expectedRevision: z.number().int().positive().optional(), config: aiConnectionPoolConfigSchema }).strict().parse(req.body);
+    res.json(await pools.save(body.pluginKey, { ...body, companyId }, getActorInfo(req).actorId));
+  });
+  router.delete("/companies/:companyId/ai-connection-pools/:poolId", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    assertBoard(req); assertCompanyAccess(req, companyId);
+    if (!(await canManageAiConnections(db, req, companyId))) throw forbidden("Manage connections permission is required");
+    const poolId = z.string().uuid().parse(req.params.poolId);
+    const { expectedRevision } = z.object({ expectedRevision: z.number().int().positive() }).strict().parse(req.body);
+    res.json(await pools.remove(companyId, poolId, expectedRevision, getActorInfo(req).actorId));
+  });
   function assertLocalOperator(req: Request) {
     assertBoard(req);
     assertCompanyAccess(req, req.params.companyId as string);
@@ -216,13 +248,28 @@ export function aiConnectionRoutes(db: Db, options: Parameters<typeof supportsLo
       throw unprocessable("Invalid agent ID");
     res.json({
       currentUserId,
+      pools: await pools.selectable(companyId, currentUserId),
+      canManageConnections: await canManageAiConnections(db, req, companyId),
       connections: await service.list(
         companyId,
         currentUserId,
         agentId as string | undefined,
       ),
-    });
+    } satisfies AiConnectionList);
   });
+  router.get(
+    "/companies/:companyId/ai-connections/:connectionId/usage",
+    async (req, res) => {
+      const companyId = req.params.companyId as string;
+      assertBoard(req);
+      assertCompanyAccess(req, companyId);
+      const connectionId = z.string().uuid().safeParse(req.params.connectionId);
+      const grantId = z.string().uuid().optional().safeParse(req.query.grantId);
+      if (!connectionId.success || !grantId.success) throw unprocessable("Invalid connection or grant ID");
+      res.setHeader("Cache-Control", "no-store");
+      res.json(await service.probeUsage(companyId, getActorInfo(req).actorId, connectionId.data, grantId.data));
+    },
+  );
   router.get(
     "/companies/:companyId/ai-connections/:connectionId/active-runs",
     async (req, res) => {

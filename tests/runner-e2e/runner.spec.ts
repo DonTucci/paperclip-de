@@ -1,9 +1,33 @@
+import { runPlanTaskFlow } from "./plan-task-flow.js";
+import { assertNativeCompletionSelection, NATIVE_COMPLETION_PREFLIGHT_ENV, verifyNativeCompletionPreflight } from "./native-completion-admission.js";
+import { assertNativeInstructionSelection, verifyNativeInstructionPreflight, NATIVE_INSTRUCTION_PREFLIGHT_ENV, NATIVE_INSTRUCTION_SUITE, NATIVE_INSTRUCTION_DEFAULT_SHA256 } from "./native-instruction-consolidation.js";
+import { captureNativeDefault, gradeNativeDefault, nativeCompletionWorkspaceDigest } from "./native-completion-defaults.js";
+import { gradeNativeCompletion, gradeNativeCompletionFinalAnswer } from "./native-completion-scoring.js";
+import { assertNativeBlockerReply } from "./native-blocker-visible.js";
+import { warmManagedFileEvidence } from "./warm-managed-files.js";
+import { gitFinalizationEvidence, gitStreamingEvidence, setupGitStreamingWorkspace } from "./daytona-git-streaming.js";
+import { runsCompletionUpdateProbe, completionQualityControls, completionQualityStatus, judgeCompletionQuality, reserveCompletionQuality, type CompletionQualityRecord } from "./completion-quality.js";
+import { completionDelivery, type CompletionObservation } from "./completion-updates.js";
+import { runInstructionPersistenceFlow } from "./instruction-persistence.js";
+import { gradeApiResponsePaging, readResponseProof, responseEvidenceDescription } from "./api-response-reading.js";
+import { runBlockerFlow } from "./blocker-flow.js";
+import { largeJournalEvidence } from "./journal-evidence.js";
+import { observeBrowserBootstrap } from "./browser-bootstrap-diagnostics.js";
+import { runAccountingFlow } from "./accounting-flow.js";
+import type { Issue } from "../../packages/shared/src/types/issue.js";
+import { lifecycleLiveCase, gradeLifecycleRepair } from "./lifecycle-live-cases.js";
 import { runContinuationFlow } from "./continuation-flow.js";
 import { runEverydayFlow } from "./everyday-flow.js";
+import { gradeTaskTitle } from "./task-titles.js";
+import { runContextIntegrityFlow } from "./context-integrity-flow.js";
+import { captureStockHarness, gradeStockHarness, gradeStockHire } from "./stock-harness.js";
+import { verifyStockHarnessPreflight, STOCK_PREFLIGHT_ENV } from "./stock-harness-admission.js";
 import { createTaskThroughUi, submitTaskReply } from "./user-actions.js";
 
 import { runFirstTaskFlow, setupFirstTaskFixtures } from "./first-task-flow.js";
 import { runChatFlow } from "./chat-flow.js";
+import { restartChatServer } from "./chat-restart.js";
+import { matchesRunCount, minimumRunCount } from "./run-count.js";
 import { createHash, randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -15,15 +39,17 @@ import { classifyFailure } from "./failure-classifier.js";
 import { runnerE2EServerControlPaths } from "./harness-env.js";
 import { setupConnectionReview } from "./connection-reviews.js";
 import { setupLiveFixtures, type LiveFixtureValues } from "./live-fixtures.js";
-import { evaluateMatcher, type MatcherResult } from "./matchers.js";
+import { evaluateMatcher, persistedFinalRunMessage, type MatcherResult } from "./matchers.js";
 import {
   acceptedPlanSessionResetFailures,
+  collectRunEvents,
   hasTerminalMalformedPlanConfirmation,
   isControlPlaneGovernedResponseWait,
   isNonExecutingReviewFenceRun,
   isOpenRouterDeepSeekHelloTerminalVariance,
   numberedPlanStepCount,
   providerSessionContinuityFailures,
+  reasoningProjectionFailures,
 } from "./run-observations.js";
 import { resolveRunnerE2ESource } from "./source.js";
 import { isValidNativePrpEnvelope } from "./native-event-envelope.js";
@@ -43,6 +69,7 @@ import {
   type FailureClass,
   type RunnerE2EResult,
 } from "./types.js";
+import { assertRunnerE2EPrerequisites } from "./prerequisites.js";
 
 interface IssueRecord {
   id: string;
@@ -57,6 +84,8 @@ interface IssueRecord {
   executionWorkspaceId?: string | null;
   executionRunId?: string | null;
   checkoutRunId?: string | null;
+  scheduledRetry?: unknown;
+  monitorNextCheckAt?: string | null;
 }
 
 interface CommentRecord {
@@ -64,6 +93,7 @@ interface CommentRecord {
   body?: string | null;
   authorType?: string | null;
   authorAgentId?: string | null;
+  authorUserId?: string | null;
   createdByRunId?: string | null;
   createdAt?: string;
 }
@@ -266,6 +296,9 @@ const executionIds = (() => {
   return [single];
 })();
 const executions = executionIds.map(runnerExecutionById);
+// Direct Playwright invocation must enforce the same admission boundary as
+// launch.ts before reading any provider credential from the environment.
+assertRunnerE2EPrerequisites(executions);
 const attempt = Number(process.env.PAPERCLIP_RUNNER_E2E_ATTEMPT ?? "1");
 const temporaryRoot = process.env.PAPERCLIP_RUNNER_E2E_TEMP_ROOT;
 const privateRoot = process.env.PAPERCLIP_RUNNER_E2E_PRIVATE_DIR;
@@ -523,19 +556,60 @@ for (const execution of executions) {
     const nonce = `${randomBytes(6).toString("hex")}-${attempt}`;
     const marker = execution.task.buildVisibleMarker(nonce);
     const title = execution.task.buildTitle(nonce);
-    const prompt = execution.task.buildPrompt(nonce);
+    let prompt = execution.task.buildPrompt(nonce);
+    let apiResponseSourceId: string | undefined;
+    let titleCreation: { issue: unknown; submitted: unknown } | undefined;
+    let lifecycleBlockerId: string | null = null;
+    if (execution.suite.id === "native-completion") {
+      assertNativeCompletionSelection([execution]);
+      verifyNativeCompletionPreflight(process.env[NATIVE_COMPLETION_PREFLIGHT_ENV]);
+    }
+    if (execution.suite.id === NATIVE_INSTRUCTION_SUITE) {
+      assertNativeInstructionSelection([execution]);
+      verifyNativeInstructionPreflight(process.env[NATIVE_INSTRUCTION_PREFLIGHT_ENV]);
+    }
     const credentials = credentialValues();
     const secrets = normalizedSecrets(Object.values(credentials));
     const api = new RunnerApi(request);
-    const companyRunFlow = ["continuation", "agent_chat", "everyday_workflow", "first_task"].includes(execution.task.flow);
+    const companyRunFlow = execution.suite.id === "task-titles" || ["plan_task_guidance", "blocker_guidance", "continuation_accounting", "continuation", "context_integrity", "agent_chat", "everyday_workflow", "first_task", "instruction_persistence"].includes(execution.task.flow);
     const consoleDiagnostics: Array<Record<string, unknown>> = [];
     const networkDiagnostics: Array<Record<string, unknown>> = [];
+    const pageLifecycleDiagnostics: Array<Record<string, unknown>> = [];
+    const browserBootstrap = observeBrowserBootstrap(page);
+    let nativeInitial: { issueIds: string[]; agentIds: string[]; workspaceDigest: string | null } | undefined;
+    const nativeWorkspaceDigest = () => execution.task.id === "native-blocked-report"
+      ? nativeCompletionWorkspaceDigest(workspacePath!) : Promise.resolve(null);
     let fixtures: LiveFixtureValues | undefined;
     let reviewProvider: Awaited<ReturnType<typeof setupConnectionReview>> | undefined;
     let issue: IssueRecord | undefined;
     let selectedRuns: RunRecord[] = [];
     let runtimeLeases: EnvironmentLeaseRecord[] = [];
     let matcherResults: MatcherResult[] = [];
+    let downloadedResponseProof: Awaited<ReturnType<typeof readResponseProof>> | undefined;
+    const completionQuality: CompletionQualityRecord[] = [];
+    const completionEvidence = async (name: string, data: unknown) => {
+      await writeSanitizedJson(snapshotsDir, name, data, secrets);
+      if (!["completion-updates", "confirmation-replies"].includes(execution.suite.id) || !name.endsWith("completion-update.json")) return;
+      const probe = data as { observation?: CompletionObservation };
+      if (!probe.observation || !completionDelivery(probe.observation).checks.every(c => c.passed)) return;
+      if (!credentials.OPENAI_API_KEY) {
+        await writeSanitizedJson(snapshotsDir, "completion-quality-unqualified.json", { reason: "Judge credential unavailable in this provider-scoped job; run the separate judge against retained evidence." }, secrets);
+        return;
+      }
+      const samples = [{ name, purpose: "product" as const, expectedPass: true, observation: probe.observation },
+        ...(execution.profile.id === "runner-codex" && execution.task.id === "handoff-completion-idle" ? completionQualityControls(probe.observation).map(c => ({ ...c, purpose: "calibration" as const, name: `${name}-${c.name}` })) : [])];
+      for (const sample of samples) {
+        const pending = { ...reserveCompletionQuality(sample.observation, 0.50, secrets), name: sample.name, purpose: sample.purpose, expectedPass: sample.expectedPass };
+        completionQuality.push(pending);
+        // Persist reservation and exact input before the one paid request. A crash
+        // leaves usage unknown, never zero, and the next campaign is a new attempt.
+        await writeSanitizedJson(snapshotsDir, `${sample.name}.quality-input.json`, sample, secrets);
+        await writeSanitizedJson(snapshotsDir, "completion-quality-ledger.json", completionQuality, secrets);
+        const result = await judgeCompletionQuality(sample.observation, pending, credentials.OPENAI_API_KEY ?? "", undefined, { approvedFixture: true, secrets });
+        completionQuality[completionQuality.length - 1] = { ...result, name: sample.name, purpose: sample.purpose, expectedPass: sample.expectedPass };
+        await writeSanitizedJson(snapshotsDir, "completion-quality-ledger.json", completionQuality, secrets);
+      }
+    };
     let firstTaskEvidence: RunnerE2EResult["firstTask"];
     let turnTimings: NonNullable<RunnerE2EResult["turnTimings"]> | undefined;
     const turnSubmissionTimesMs: number[] = [];
@@ -685,14 +759,17 @@ for (const execution of executions) {
       const runEvidence = await Promise.all(
         detailedRuns.map(async (candidate) => ({
           runId: candidate.id,
+          workspaceOperations: await capture(() =>
+            api.get<unknown>(`/api/heartbeat-runs/${candidate.id}/workspace-operations`),
+          ),
           log: await capture(() =>
             api.get<unknown>(
               `/api/heartbeat-runs/${candidate.id}/log?limitBytes=1048576`,
             ),
           ),
           events: await capture(() =>
-            api.get<RunEventRecord[]>(
-              `/api/heartbeat-runs/${candidate.id}/events?limit=1000`,
+            collectRunEvents<RunEventRecord>((afterSeq, limit) =>
+              api.get(`/api/heartbeat-runs/${candidate.id}/events?afterSeq=${afterSeq}&limit=${limit}`),
             ),
           ),
         })),
@@ -721,6 +798,22 @@ for (const execution of executions) {
         });
       }
     });
+    page.on("pageerror", (error) => {
+      pageLifecycleDiagnostics.push({
+        type: "pageerror",
+        message: error.message,
+        stack: error.stack ?? null,
+        url: page.url(),
+      });
+    });
+    page.on("framenavigated", (frame) => {
+      if (frame === page.mainFrame())
+        pageLifecycleDiagnostics.push({
+          type: "navigation",
+          url: frame.url(),
+          at: new Date().toISOString(),
+        });
+    });
     page.on("requestfailed", (requestEvent) => {
       networkDiagnostics.push({
         method: requestEvent.method(),
@@ -740,6 +833,10 @@ for (const execution of executions) {
     });
 
     try {
+      if (execution.suite.id === "stock-harness") {
+        const receipt = verifyStockHarnessPreflight(process.env[STOCK_PREFLIGHT_ENV]);
+        await writeSanitizedJson(snapshotsDir, "stock-harness-preflight.json", receipt, secrets);
+      }
       const experimental = await api.patch<{
         enableNativeRunner: boolean;
       }>("/api/instance/settings/experimental", {
@@ -754,6 +851,9 @@ for (const execution of executions) {
       });
       expect(experimental.enableNativeRunner).toBe(true);
 
+      if (execution.suite.id === "daytona-git-streaming") {
+        await setupGitStreamingWorkspace(workspacePath);
+      }
       fixtures = execution.task.flow === "first_task"
         ? await setupFirstTaskFixtures({ page, api, execution, nonce, credentials, observe: value => { fixtures = value; } })
         : await setupLiveFixtures({
@@ -765,11 +865,55 @@ for (const execution of executions) {
         daytonaImage: process.env.PAPERCLIP_E2E_DAYTONA_IMAGE,
       });
 
+      if (["native-completion", NATIVE_INSTRUCTION_SUITE].includes(execution.suite.id)) {
+        const receipt = await captureNativeDefault({ api, agentId: fixtures.agent.id, companyId: fixtures.company.id });
+        const grade = gradeNativeDefault(receipt, execution.suite.id === NATIVE_INSTRUCTION_SUITE ? NATIVE_INSTRUCTION_DEFAULT_SHA256 : undefined);
+        await writeSanitizedJson(snapshotsDir, "native-default-before-execution.json", { receipt, grade }, secrets);
+        if (!grade.passed) throw new Error("Native production-default hire admission failed before execution");
+        const [issues, agents, workspaceDigest] = await Promise.all([
+          api.get<Array<{ id: string }>>(`/api/companies/${fixtures.company.id}/issues?limit=100`),
+          api.get<Array<{ id: string }>>(`/api/companies/${fixtures.company.id}/agents`), nativeWorkspaceDigest(),
+        ]);
+        nativeInitial = { issueIds: issues.map(value => value.id), agentIds: agents.map(value => value.id), workspaceDigest };
+      }
+
+      if (execution.suite.id === "stock-harness") {
+        const hire = await captureStockHarness({ api, companyId: fixtures.company.id,
+          agentId: fixtures.agent.id, generation: execution.profile.generation, runIds: [] });
+        const checks = gradeStockHire(hire);
+        await writeSanitizedJson(snapshotsDir, "stock-harness-hire.json", {
+          capturePhase: "before-provider", ...hire, checks,
+        }, secrets);
+        const failed = checks.filter(check => !check.passed);
+        if (failed.length) throw new Error(`Stock hire matcher failures: ${failed.map(check => check.id).join(", ")}`);
+
+      }
+
+      if (execution.suite.id === "api-response-reading") {
+        const source = await api.post<{ id: string }>(`/api/companies/${fixtures.company.id}/issues`, {
+          title: `Synthetic diagnostic evidence ${nonce}`,
+          description: responseEvidenceDescription(nonce), status: "backlog",
+        });
+        apiResponseSourceId = source.id;
+        prompt = prompt.replaceAll("{{API_RESPONSE_SOURCE_ID}}", source.id);
+      }
+
+      if (execution.suite.id === "lifecycle-baseline" && lifecycleLiveCase(execution.task.id)?.family === "blocker") {
+        const prerequisite = await api.post<{ id: string }>(`/api/companies/${fixtures.company.id}/issues`, {
+          title: `Supply dataset ${nonce}`,
+          description: "Fixture operator prerequisite: dataset has not been supplied.",
+          status: "backlog",
+        });
+        lifecycleBlockerId = prerequisite.id;
+        prompt = prompt.replaceAll("{{LIFECYCLE_BLOCKER_ID}}", prerequisite.id);
+      }
+
       await writeSanitizedJson(
         snapshotsDir,
         "fixtures.json",
         {
           executionId: execution.id,
+          lifecycleBlockerId,
           companyId: fixtures.company.id,
           environmentId: fixtures.environment.id,
           agentId: fixtures.agent.id,
@@ -789,9 +933,51 @@ for (const execution of executions) {
         secrets,
       );
 
-      if (execution.task.flow === "continuation") {
+      if (execution.task.flow === "plan_task_guidance") {
+        const planning = await runPlanTaskFlow({ page, api, fixtures, execution, nonce, workspacePath,
+          deadlineAt: startedAtMs + deadlineMs - 30_000,
+          observe: (currentIssue, currentRuns, checks) => {
+            issue = currentIssue as IssueRecord; selectedRuns = currentRuns as RunRecord[];
+            matcherResults = checks.map(check => ({ matcher: { kind: "json_path" as const, path: `planning.${check.id}`, expected: true }, passed: check.passed, detail: check.detail }));
+          }, capture: captureScreenshot, evidence: (name, data) => writeSanitizedJson(snapshotsDir, name, data, secrets),
+        });
+        issue = planning.issue as IssueRecord; selectedRuns = planning.runs as RunRecord[];
+      } else if (execution.task.flow === "blocker_guidance") {
+        const blocker = await runBlockerFlow({ page, api, fixtures, execution, nonce, workspacePath,
+          deadlineAt: startedAtMs + deadlineMs - 30_000,
+          observe: (currentIssue, currentRuns, checks) => {
+            issue = currentIssue; selectedRuns = currentRuns;
+            matcherResults = checks.map(check => ({ matcher: { kind: "json_path" as const, path: `blocker.${check.id}`, expected: true }, passed: check.passed, detail: check.detail }));
+          },
+          capture: captureScreenshot,
+          evidence: (name, data) => writeSanitizedJson(snapshotsDir, name, data, secrets),
+        });
+        issue = blocker.issue as IssueRecord; selectedRuns = blocker.runs as RunRecord[];
+      } else if (execution.task.flow === "continuation_accounting") {
+        const accounting = await runAccountingFlow({
+          page, api, fixtures, execution, nonce, deadlineAt: startedAtMs + deadlineMs - 60_000,
+          restart: () => restartIsolatedPaperclipServer({ api, requestId: `accounting-${nonce}`, deadlineAt: startedAtMs + deadlineMs }),
+          observe: (currentIssue, currentRuns, checks) => {
+            issue = currentIssue; selectedRuns = currentRuns;
+            matcherResults = checks.map(check => ({ matcher: { kind: "json_path" as const, path: `accounting.${check.id}`, expected: true }, passed: check.passed, detail: check.detail }));
+          },
+          capture: captureScreenshot,
+          evidence: (name, data) => writeSanitizedJson(snapshotsDir, name, data, secrets),
+        });
+        issue = accounting.issue as IssueRecord; selectedRuns = accounting.runs as RunRecord[];
+      } else if (execution.task.flow === "instruction_persistence") {
+        const story = await runInstructionPersistenceFlow({
+          page, api, fixtures, execution, nonce, secrets, deadlineAt: startedAtMs + deadlineMs,
+          restart: () => restartIsolatedPaperclipServer({ api, requestId: `instructions-${nonce}`, deadlineAt: startedAtMs + deadlineMs }),
+          observe: (currentIssue, currentRuns) => { issue = currentIssue as IssueRecord; selectedRuns = currentRuns as RunRecord[]; },
+          capture: captureScreenshot,
+          evidence: (name, data) => writeSanitizedJson(snapshotsDir, name, data, secrets),
+        });
+        issue = story.issue as IssueRecord; selectedRuns = story.runs as RunRecord[];
+        matcherResults = story.checks.map(check => ({ matcher: { kind: "json_path" as const, path: `instructions.${check.id}`, expected: true }, passed: check.passed, detail: check.detail }));
+      } else if (execution.task.flow === "continuation") {
         const continuation = await runContinuationFlow({
-          page, api, fixtures, execution, nonce, workspacePath, deadlineAt: startedAtMs + deadlineMs - 60_000,
+          page, api, fixtures, execution, nonce, secrets, workspacePath, deadlineAt: startedAtMs + deadlineMs - 60_000,
           restart: () => restartIsolatedPaperclipServer({ api, requestId: `continuation-${nonce}`, deadlineAt: startedAtMs + deadlineMs }),
           observe: (currentIssue, currentRuns, checks) => {
             issue = currentIssue; selectedRuns = currentRuns;
@@ -812,16 +998,30 @@ for (const execution of executions) {
         });
         issue = story.issue; selectedRuns = story.runs;
         matcherResults = story.evidence.checks.map(check => ({ matcher: { kind: "json_path" as const, path: check.id, expected: true }, passed: check.passed, detail: check.detail }));
-      } else if (execution.task.flow === "agent_chat") {
-        const chat = await runChatFlow({
-          page, api, fixtures, execution, nonce,
-          restart: () => restartIsolatedPaperclipServer({ api, requestId: `chat-${nonce}`, deadlineAt: startedAtMs + deadlineMs }),
-          observe: (chatIssue, chatRuns) => { issue = chatIssue; selectedRuns = chatRuns; },
+      } else if (execution.task.flow === "context_integrity") {
+        const contextIntegrity = await runContextIntegrityFlow({
+          page, api, fixtures, execution, nonce, deadlineAt: startedAtMs + deadlineMs,
           capture: captureScreenshot,
           evidence: (name, data) => writeSanitizedJson(snapshotsDir, name, data, secrets),
+          observe: (currentIssue, currentRuns, checks) => {
+            issue = currentIssue as unknown as IssueRecord;
+            selectedRuns = currentRuns as unknown as RunRecord[];
+            matcherResults = checks.map(check => ({ matcher: { kind: "json_path" as const, path: `contextIntegrity.${check.id}`, expected: true }, passed: check.passed, detail: check.detail }));
+          },
+        });
+        issue = contextIntegrity.issue as unknown as IssueRecord;
+        selectedRuns = contextIntegrity.runs as unknown as RunRecord[];
+      } else if (execution.task.flow === "agent_chat") {
+        const chat = await runChatFlow({
+          page, api, fixtures, execution, nonce, workspacePath,
+          restart: () => restartChatServer(page, () => restartIsolatedPaperclipServer({ api, requestId: `chat-${nonce}`, deadlineAt: startedAtMs + deadlineMs })),
+          observe: (chatIssue, chatRuns) => { issue = chatIssue; selectedRuns = chatRuns; },
+          capture: captureScreenshot,
+          evidence: completionEvidence,
+          check: (id, passed, detail) => matcherResults.push({ matcher: { kind: "json_path", path: `chat.${id}`, expected: true }, passed, detail }),
         });
         issue = chat.issue; selectedRuns = chat.runs;
-        matcherResults = [{ matcher: { kind: "issue_status", expected: "in_review" }, passed: true, detail: "Chat workflow and durable handoff/session assertions passed" }];
+        if (matcherResults.length === 0) matcherResults = [{ matcher: { kind: "issue_status", expected: "in_review" }, passed: true, detail: "Chat workflow and durable handoff/session assertions passed" }];
       } else if (execution.task.flow === "first_task") {
         const firstTask = await runFirstTaskFlow({
           page, api, fixtures, execution, nonce, secrets,
@@ -837,7 +1037,7 @@ for (const execution of executions) {
             return created;
           },
           capture: captureScreenshot,
-          evidence: (name, data) => writeSanitizedJson(snapshotsDir, name, data, secrets),
+          evidence: completionEvidence,
         });
         issue = firstTask.issue as IssueRecord; selectedRuns = firstTask.runs as RunRecord[];
       } else {
@@ -849,6 +1049,14 @@ for (const execution of executions) {
       if (execution.task.flow === "governed_tool_review") {
         reviewProvider = await setupConnectionReview({ page, api, prefix: issuePrefix, companyId: fixtures.company.id, agentId: fixtures.agent.id, marker });
       }
+      // Capture the actual creation response: a generated title can change before
+      // a later list query, and the initial provisional state is part of the oracle.
+      const titleCreationResponse = execution.suite.id === "task-titles"
+        ? page.waitForResponse(response => response.request().method() === "POST"
+          && new URL(response.url()).pathname === `/api/companies/${fixtures!.company.id}/issues`,
+          { timeout: Math.max(1, startedAtMs + deadlineMs - Date.now()) })
+          .catch((cause: unknown) => new Error("Could not capture task creation response", { cause }))
+        : null;
       turnSubmissionTimesMs.push(
         await createTaskThroughUi({
           page,
@@ -862,7 +1070,14 @@ for (const execution of executions) {
       );
 
       const deadlineAt = startedAtMs + deadlineMs;
-      issue = await pollUntil({
+      if (titleCreationResponse) {
+        const response = await titleCreationResponse;
+        if (response instanceof Error) throw response;
+        expect(response.status()).toBe(201);
+        issue = await response.json() as IssueRecord;
+        titleCreation = { issue, submitted: response.request().postDataJSON() };
+        await writeSanitizedJson(snapshotsDir, "task-title-creation.json", titleCreation, secrets);
+      } else issue = await pollUntil({
         label: `UI-created issue ${title}`,
         deadlineAt,
         load: async () => {
@@ -1394,6 +1609,17 @@ for (const execution of executions) {
                 ? `warm turn ${completedTurn} dispatched duplicate runs`
                 : undefined),
           });
+          if (execution.suite.id === "daytona-git-streaming") {
+            await writeSanitizedJson(snapshotsDir, `git-copyback-turn-${completedTurn}.json`, await gitStreamingEvidence(workspacePath, completedTurn), secrets);
+            const finalization = await gitFinalizationEvidence(api, issue.id, waitingState.taskRuns.map(run => run.id));
+            await writeSanitizedJson(snapshotsDir, `git-finalization-turn-${completedTurn}.json`, finalization, secrets);
+            expect(finalization.passed, finalization.failures.join("; ")).toBe(true);
+          }
+          if (execution.suite.id === "daytona-warm-continuity") {
+            const evidence = await warmManagedFileEvidence(api, fixtures.agent.id, sortRunsChronologically(waitingState.taskRuns).at(-1)!.id, completedTurn, nonce, execution.profile.generation === "native");
+            await writeSanitizedJson(snapshotsDir, `managed-warm-turn-${completedTurn}.json`, evidence, secrets);
+            expect(evidence.passed, JSON.stringify(evidence.checks)).toBe(true);
+          }
           const expectedPrefix = `${Array.from(
             { length: completedTurn },
             (_, index) => `T${index + 1}-${nonce}`,
@@ -1493,7 +1719,19 @@ for (const execution of executions) {
               `Warm turn ${completedTurn} replaced its Daytona sandbox`,
             );
           }
+          const journalEvidence = execution.suite.id === "daytona-journal-continuity" && completedTurn === 1
+            ? await largeJournalEvidence({
+                stateRoot: path.join(process.env.PAPERCLIP_HOME!, "instances", process.env.PAPERCLIP_INSTANCE_ID!, "runtime", "paperclip-runner", "durable-sessions"),
+                runId: chronologicalRuns.at(-1)!.id,
+                minimumBytes: 2 * 1024 * 1024,
+                minimumCompletedStimulusCalls: 240,
+              })
+            : undefined;
+          if (journalEvidence) {
+            await writeSanitizedJson(snapshotsDir, "large-journal-boundary.json", journalEvidence, secrets);
+          }
           turnEvidence.push({
+            ...(journalEvidence ? { journalEvidence } : {}),
             turn: completedTurn,
             issue: waitingState.currentIssue,
             run: chronologicalRuns.at(-1),
@@ -1531,7 +1769,7 @@ for (const execution of executions) {
         load: loadTaskState,
         accept: ({ currentIssue, taskRuns }) =>
           currentIssue.status === execution.task.expectedTerminalState.issue &&
-          taskRuns.length >= execution.task.expectedRunCount &&
+          taskRuns.length >= minimumRunCount(execution.task) &&
           taskRuns.every((run) => TERMINAL_RUN_STATUSES.has(run.status)),
         reject: ({ taskRuns }) => definitiveRunFailure(taskRuns),
       });
@@ -1548,7 +1786,7 @@ for (const execution of executions) {
           deadlineAt: Math.min(deadlineAt, Date.now() + 30_000),
           load: loadTaskState,
           accept: ({ taskRuns, comments }) => {
-            if (taskRuns.length !== execution.task.expectedRunCount) {
+            if (!matchesRunCount(execution.task, taskRuns.length)) {
               return false;
             }
             const finalRun = sortRunsChronologically(taskRuns).at(-1);
@@ -1564,13 +1802,18 @@ for (const execution of executions) {
 
       issue = terminal.currentIssue;
       selectedRuns = terminal.taskRuns;
+      if (lifecycleBlockerId && execution.profile.expectedRuntimeMode === "legacy") {
+        const blockedIssue = await api.get<Pick<Issue, "blockedBy">>(`/api/issues/${issue.id}`);
+        expect(blockedIssue.blockedBy?.map((blocker) => blocker.id)).toEqual([lifecycleBlockerId]);
+        expect((await api.get<{ status: string }>(`/api/issues/${lifecycleBlockerId}`)).status).toBe("backlog");
+      }
       if (reviewProvider) {
         expect(reviewProvider.invocationCount()).toBe(execution.task.toolReviewDecision === "decline" ? 0 : execution.task.toolReviewDecision === "always" ? 2 : 1);
         const pending = await api.get<{ actionRequests: unknown[] }>(`/api/companies/${fixtures.company.id}/tools/action-requests?status=pending`);
         expect(pending.actionRequests).toHaveLength(0);
         await writeSanitizedJson(snapshotsDir, "connection-review.json", { source: "local MCP fixture", connectionId: reviewProvider.connectionId, providerCalls: reviewProvider.invocationCount(), decision: execution.task.toolReviewDecision, issueId: issue.id }, secrets);
       }
-      if (selectedRuns.length !== execution.task.expectedRunCount) {
+      if (!matchesRunCount(execution.task, selectedRuns.length)) {
         const runLogs = await Promise.all(
           selectedRuns.map(async (candidate) => ({
             runId: candidate.id,
@@ -1591,7 +1834,7 @@ for (const execution of executions) {
           secrets,
         );
         throw new Error(
-          `Expected exactly ${execution.task.expectedRunCount} task heartbeat run(s); observed ${selectedRuns.length}`,
+          `Expected ${minimumRunCount(execution.task)}..${execution.task.expectedRunCount} task heartbeat run(s); observed ${selectedRuns.length}`,
         );
       }
       // The company run-list endpoint intentionally returns only a compact,
@@ -1603,6 +1846,23 @@ for (const execution of executions) {
         ),
       );
       selectedRuns = sortRunsChronologically(selectedRuns);
+      if (execution.suite.id === "daytona-git-streaming") {
+        await writeSanitizedJson(snapshotsDir, "git-copyback-turn-3.json", await gitStreamingEvidence(workspacePath, 3), secrets);
+        const finalization = await gitFinalizationEvidence(api, issue.id, selectedRuns.map(run => run.id));
+        await writeSanitizedJson(snapshotsDir, "git-finalization-turn-3.json", finalization, secrets);
+        expect(finalization.passed, finalization.failures.join("; ")).toBe(true);
+      }
+      const lifecycleProbe = execution.suite.id === "lifecycle-baseline" ? lifecycleLiveCase(execution.task.id) : undefined;
+      if (lifecycleProbe?.family === "repair") {
+        const grade = gradeLifecycleRepair({ runs: selectedRuns, comments: terminal.comments,
+          agentId: fixtures.agent.id, narrative: lifecycleProbe.narrative });
+        await writeSanitizedJson(snapshotsDir, "lifecycle-repair.json", { grade, runs: selectedRuns, comments: terminal.comments }, secrets);
+        expect(grade.passed, grade.detail).toBe(true);
+        expect(terminal.currentIssue.scheduledRetry).toBeNull();
+        expect(terminal.currentIssue.monitorNextCheckAt).toBeNull();
+        expect(terminal.interactions.filter(i => i.status === "pending")).toHaveLength(0);
+      }
+
       if (execution.task.flow === "warm_three_turn") {
         turnTimings = selectedRuns.map((candidate, index) => {
           const submittedAtMs = turnSubmissionTimesMs[index]!;
@@ -1642,6 +1902,11 @@ for (const execution of executions) {
           };
         });
       }
+      if (execution.suite.id === "daytona-warm-continuity") {
+        const evidence = await warmManagedFileEvidence(api, fixtures.agent.id, selectedRuns.at(-1)!.id, 3, nonce, execution.profile.generation === "native");
+        await writeSanitizedJson(snapshotsDir, "managed-warm-turn-3.json", evidence, secrets);
+        expect(evidence.passed, JSON.stringify(evidence.checks)).toBe(true);
+      }
       const finalRun = selectedRuns.at(-1)!;
       const run =
         selectedRuns.find(
@@ -1673,8 +1938,8 @@ for (const execution of executions) {
             try {
               return {
                 runId: candidate.id,
-                events: await api.get<RunEventRecord[]>(
-                  `/api/heartbeat-runs/${candidate.id}/events?limit=1000`,
+                events: await collectRunEvents<RunEventRecord>((afterSeq, limit) =>
+                  api.get(`/api/heartbeat-runs/${candidate.id}/events?afterSeq=${afterSeq}&limit=${limit}`),
                 ),
                 error: null,
               };
@@ -1707,14 +1972,13 @@ for (const execution of executions) {
       const message = agentComments
         .map((comment) => comment.body ?? "")
         .join("\n");
-      const finalRunMessage = agentComments
-        .filter((comment) => comment.createdByRunId === finalRun.id)
-        .map((comment) => comment.body ?? "")
-        .join("\n");
+      const finalRunMessage = persistedFinalRunMessage(agentComments, finalRun);
       const pendingInteractions = terminal.interactions.filter(
         (interaction) => interaction.status === "pending",
       );
-      const invariantFailures: string[] = [];
+      const invariantFailures: string[] = reasoningProjectionFailures(
+        runEventsByRun.flatMap((entry) => entry.events),
+      );
       if (pendingInteractions.length > 0)
         invariantFailures.push(
           `expected no unresolved interaction; observed ${pendingInteractions.length}`,
@@ -1820,6 +2084,23 @@ for (const execution of executions) {
         }
       }
 
+      if (execution.suite.id === "api-response-reading") {
+        const paging = gradeApiResponsePaging(runEventsByRun.flatMap(captured => captured.events), apiResponseSourceId ?? "");
+        await writeSanitizedJson(snapshotsDir, "api-response-pagination.json", paging, secrets);
+        if (!paging.passed) invariantFailures.push(`Bounded response paging was not proven: ${paging.failure}`);
+      }
+      if (execution.suite.id === "task-titles") {
+        const titleEvidence = gradeTaskTitle({
+          initial: titleCreation?.issue, submitted: titleCreation?.submitted,
+          final: issue, prompt, explicitTitle: title, agentId: fixtures.agent.id,
+          runId: selectedRuns[0]!.id,
+          events: runEventsByRun.find(captured => captured.runId === selectedRuns[0]!.id)?.events ?? [],
+          activity: await api.get<unknown[]>(`/api/issues/${issue.id}/activity`),
+        });
+        await writeSanitizedJson(snapshotsDir, "task-title.json", titleEvidence, secrets);
+        invariantFailures.push(...titleEvidence.checks.filter(check => !check.passed).map(check => `${check.id}: ${check.detail}`));
+      }
+
       const context = record(run.contextSnapshot);
       const environmentContext = record(context.paperclipEnvironment);
       const workspaceContext = record(context.paperclipWorkspace);
@@ -1873,6 +2154,11 @@ for (const execution of executions) {
             ]),
         ),
       );
+      if (execution.suite.id === "api-response-reading") {
+        downloadedResponseProof = await readResponseProof(api, issue.id, run.id);
+        fileObservations["api-response-proof.txt"] = downloadedResponseProof.content;
+        await writeSanitizedJson(snapshotsDir, "downloaded-response-proof.json", downloadedResponseProof, secrets);
+      }
       matcherResults = await Promise.all(
         taskMatchers.map((matcher) =>
           evaluateMatcher(matcher, {
@@ -2333,23 +2619,50 @@ for (const execution of executions) {
       const visibleAgentReplies = page
         .getByTestId("task-chat-thread")
         .getByTestId("task-chat-agent-bubble");
-      const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const terminalAgentReplies = visibleAgentReplies.filter({
-        hasText: new RegExp(`^\\s*${escapedMarker}\\s*$`),
-      });
-      await expect(terminalAgentReplies).toHaveCount(1, { timeout: 30_000 });
-      await expect(terminalAgentReplies.first()).toBeVisible();
-      // A string-valued toHaveText assertion compares the complete rendered
-      // text while normalizing ordinary DOM whitespace. This keeps Markdown
-      // layout differences harmless without allowing prefixed, suffixed, or
-      // substituted provider prose to masquerade as the requested response.
-      await expect(terminalAgentReplies.first()).toHaveText(marker, {
-        useInnerText: true,
-      });
+      if (execution.suite.id === "task-titles") {
+        await expect(page.getByRole("heading", { name: issue.title.trim(), exact: true })).toBeVisible();
+      }
+      if (execution.suite.id === "api-response-reading") {
+        // File delivery renders a card instead of an exact summary bubble.
+        // Prove the visible link points to the same independently checked bytes.
+        const proofLink = page.getByRole("link", { name: "Open api-response-proof.txt", exact: true }).first();
+        await expect(proofLink).toBeVisible({ timeout: 30_000 });
+        await expect(proofLink).toHaveAttribute("href", `/api/attachments/${downloadedResponseProof!.attachmentId}/content`);
+      } else if (execution.suite.id === "task-titles") {
+        await expect(visibleAgentReplies.filter({ hasText: marker }).last()).toBeVisible({ timeout: 30_000 });
+      } else if (["native-completion", NATIVE_INSTRUCTION_SUITE].includes(execution.suite.id) && execution.task.id === "native-blocked-report") {
+        await assertNativeBlockerReply(visibleAgentReplies, marker);
+      } else if (execution.task.flow === "warm_three_turn") {
+        // Prove the persisted user-facing response is visible, independently
+        // of the byte-for-byte workspace checks and lease continuity checks.
+        expect(finalRunMessage.trim()).not.toBe("");
+        await expect(visibleAgentReplies.filter({ hasText: finalRunMessage }).last())
+          .toBeVisible({ timeout: 30_000 });
+      } else {
+        const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const terminalAgentReplies = visibleAgentReplies.filter({
+          hasText: new RegExp(`^\\s*${escapedMarker}\\s*$`),
+        });
+        await expect(terminalAgentReplies).toHaveCount(1, { timeout: 30_000 });
+        await expect(terminalAgentReplies.first()).toBeVisible();
+        // A string-valued toHaveText assertion compares the complete rendered
+        // text while normalizing ordinary DOM whitespace. This keeps Markdown
+        // layout differences harmless without allowing prefixed, suffixed, or
+        // substituted provider prose to masquerade as the requested response.
+        await expect(terminalAgentReplies.first()).toHaveText(marker, {
+          useInnerText: true,
+        });
+      }
+      // The fixture owns the expected disposition; blocked workflows must prove
+      // their Blocked UI rather than inheriting the completion-only Done check.
+      const expectedStatus = execution.task.expectedTerminalState.issue;
+      const expectedStatusLabel = expectedStatus.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
       await expect(
         page.getByTestId("issue-detail-header").getByRole("button", {
-          name: "Change status (current: Done)",
-          exact: true,
+          // Blocked includes the live blocker-attention explanation in its
+          // accessible name. The exact persisted status is asserted separately.
+          name: `Change status (current: ${expectedStatusLabel}${expectedStatus === "blocked" ? "" : ")"}`,
+          exact: expectedStatus !== "blocked",
         }),
       ).toBeVisible({ timeout: 30_000 });
       if (execution.task.flow === "warm_three_turn") {
@@ -2377,6 +2690,66 @@ for (const execution of executions) {
           `Runtime invariant failure: ${invariantFailures.join("; ")}`,
         );
       }
+      }
+      if (["native-completion", NATIVE_INSTRUCTION_SUITE].includes(execution.suite.id)) {
+        if (!issue || !nativeInitial) throw new Error("Missing native qualification issue or pre-execution receipt");
+        const [currentIssue, companyRuns, issues, agents, comments, documents, interactions, workspaceDigest] = await Promise.all([
+          api.get<IssueRecord>(`/api/issues/${issue.id}`),
+          api.get<RunRecord[]>(`/api/companies/${fixtures.company.id}/heartbeat-runs?limit=100`),
+          api.get<Array<{ id: string }>>(`/api/companies/${fixtures.company.id}/issues?limit=100`),
+          api.get<Array<{ id: string }>>(`/api/companies/${fixtures.company.id}/agents`),
+          api.get<CommentRecord[]>(`/api/issues/${issue.id}/comments`),
+          api.get<IssueDocumentRecord[]>(`/api/issues/${issue.id}/documents`),
+          api.get<InteractionRecord[]>(`/api/issues/${issue.id}/interactions`), nativeWorkspaceDigest(),
+        ]);
+        const detailedRuns = await Promise.all(companyRuns.map(candidate => api.get<RunRecord>(`/api/heartbeat-runs/${candidate.id}`)));
+        selectedRuns = detailedRuns; issue = currentIssue;
+        const events = detailedRuns.length === 1 ? await collectRunEvents<RunEventRecord>((afterSeq, limit) => api.get(`/api/heartbeat-runs/${detailedRuns[0]!.id}/events?afterSeq=${afterSeq}&limit=${limit}`)) : [];
+        const observation = { caseId: execution.task.id as "assigned-skill-explicit-invocation" | "native-blocked-report",
+          companyId: fixtures.company.id, agentId: fixtures.agent.id, issue: currentIssue as unknown as Record<string, unknown>,
+          runs: detailedRuns as unknown as Record<string, unknown>[], comments: comments as unknown as Record<string, unknown>[], events: events as unknown as Record<string, unknown>[],
+          initial: nativeInitial, state: { issueIds: issues.map(value => value.id), agentIds: agents.map(value => value.id), documentCount: documents.length, interactionCount: interactions.length },
+          workspaceChanged: workspaceDigest !== nativeInitial.workspaceDigest, marker,
+          documentLinkContext: { appOrigin: new URL(page.url()).origin, issuePrefix: fixtures.company.issuePrefix ?? "",
+            issueIdentifier: currentIssue.identifier ?? "", documents } };
+        const grade = execution.suite.id === NATIVE_INSTRUCTION_SUITE
+          ? gradeNativeCompletionFinalAnswer(observation) : gradeNativeCompletion(observation);
+        const integrity = detailedRuns.flatMap(candidate => nativeRunEventIntegrityFailures(candidate, events));
+        await writeSanitizedJson(snapshotsDir, "native-completion.json", { observation, grade, integrity }, secrets);
+        matcherResults.push(...grade.checks.map(check => ({ matcher: { kind: "json_path" as const, path: `nativeCompletion.${check.id}`, expected: true }, passed: check.passed, detail: check.detail })));
+        if (!grade.passed || integrity.length) throw new Error(`Native completion matcher failure: ${[...grade.checks.filter(check => !check.passed).map(check => check.id), ...integrity].join("; ")}`);
+        if (execution.suite.id === NATIVE_INSTRUCTION_SUITE && execution.task.id === "assigned-skill-explicit-invocation") {
+          const document = documents[0]!;
+          const href = `/${encodeURIComponent(fixtures.company.issuePrefix!)}/issues/${encodeURIComponent(currentIssue.identifier!)}#document-${encodeURIComponent(document.key)}`;
+          let opened = false;
+          try {
+            const link = page.getByTestId("task-chat-agent-bubble").locator(`a[href=${JSON.stringify(href)}]`).last();
+            await expect(link).toBeVisible({ timeout: 30_000 });
+            await link.click();
+            await expect(page).toHaveURL(new URL(href, observation.documentLinkContext.appOrigin).href);
+            const target = page.locator([
+              `[id=${JSON.stringify(`document-${document.key}`)}]:visible`,
+              `[id=${JSON.stringify(`side-panel-content-document:${document.key}`)}]:visible`,
+            ].join(", "));
+            await expect(target).toHaveCount(1);
+            await expect(target).toBeVisible();
+            await expect(target).toContainText(marker);
+            opened = true;
+            await captureScreenshot("document-final-link", "Final reply link opens the saved document", "document-final-link.png");
+          } finally {
+            matcherResults.push({ matcher: { kind: "json_path", path: "nativeCompletion.visible-document-navigation", expected: true }, passed: opened,
+              detail: "The rendered final reply link opens this task's saved document and shows its original content marker." });
+            await writeSanitizedJson(snapshotsDir, "native-document-navigation.json", { href, documentKey: document.key, revisionId: document.latestRevisionId, opened }, secrets);
+          }
+        }
+      }
+      if (runsCompletionUpdateProbe(execution) && credentials.OPENAI_API_KEY) {
+        const qualification = completionQualityStatus(completionQuality);
+        if (qualification === "unqualified") {
+          failureClassOverride = "permanent_infrastructure";
+          throw new Error("Completion accuracy is unqualified: missing, invalid, or miscalibrated judge evidence");
+        }
+        expect(qualification, "completion reply accuracy").toBe("passed");
       }
     } catch (error) {
       primaryError = error;
@@ -2424,6 +2797,8 @@ for (const execution of executions) {
           {
             console: consoleDiagnostics,
             network: networkDiagnostics,
+            lifecycle: pageLifecycleDiagnostics,
+            bootstrap: await browserBootstrap.snapshot(),
           },
           secrets,
         );
@@ -2434,6 +2809,7 @@ for (const execution of executions) {
         );
         failureClassOverride = "secret_leak";
       }
+      browserBootstrap.dispose();
       if (fixtures) {
         await captureRuntimeLeases().catch((error) => {
           networkDiagnostics.push({
@@ -2447,6 +2823,24 @@ for (const execution of executions) {
             const companyRuns = await api.get<RunRecord[]>(`/api/companies/${fixtures.company.id}/heartbeat-runs?limit=100`);
             selectedRuns = await Promise.all(companyRuns.map(run => api.get<RunRecord>(`/api/heartbeat-runs/${run.id}`)));
             await writeSanitizedJson(snapshotsDir, execution.task.flow === "first_task" ? "first-task-final-run-ledger.json" : "chat-final-run-ledger.json", selectedRuns, secrets);
+          }
+          if (execution.suite.id === "stock-harness") {
+            try {
+              const stock = await captureStockHarness({ api, companyId: fixtures.company.id,
+                agentId: fixtures.agent.id, generation: execution.profile.generation,
+                runIds: selectedRuns.map(run => run.id) });
+              const checks = gradeStockHarness(stock);
+              matcherResults.push(...checks.map(check => ({ matcher: { kind: "json_path" as const,
+                path: `stockHarness.${check.id}`, expected: true }, passed: check.passed, detail: check.detail })));
+              await writeSanitizedJson(snapshotsDir, "stock-harness.json", { ...stock, checks }, secrets);
+              const failures = checks.filter(check => !check.passed);
+              if (failures.length && !primaryError) primaryError = new Error(`Stock harness matcher failures: ${failures.map(check => check.id).join(", ")}`);
+            } catch (error) {
+              await writeSanitizedJson(snapshotsDir, "stock-harness-evidence-error.json", {
+                error: error instanceof Error ? error.message : String(error),
+              }, secrets);
+              if (!primaryError) primaryError = error;
+            }
           }
           await fixtures.teardown();
           cleanup = "passed";
@@ -2526,6 +2920,7 @@ for (const execution of executions) {
         provider: execution.profile.provider,
         model: firstTaskEvidence ? firstTaskEvidence.observedModels[0] ?? firstTaskEvidence.configuredModel ?? "provider-default (unreported)" : execution.profile.model,
         ...(firstTaskEvidence ? { firstTask: firstTaskEvidence } : {}),
+        ...(completionQuality.length ? { completionQuality } : {}),
         runtimeMode: execution.profile.expectedRuntimeMode,
         issueId: issue?.id,
         issueIdentifier: issue?.identifier ?? null,

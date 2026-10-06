@@ -13,6 +13,9 @@ import { createHttpLogger } from "../middleware/logger.js";
 
 describe("HTTP logger redaction", () => {
   it.each([
+    { method: "POST", path: "/api/routine-triggers/public/private-url-canary/fire" },
+    { method: "PUT", path: "/api/routine-triggers/public/private-url-canary/fire" },
+
     {
       method: "POST",
       path: "http://provider.invalid/api/chat-webhooks/../private-url-canary",
@@ -95,7 +98,7 @@ describe("HTTP logger redaction", () => {
       const log = JSON.parse(output.trim());
       expect(log.req).toMatchObject({
         method,
-        url: "/api/chat-webhooks/:publicId/:provider",
+        url: path.includes("routine-triggers") ? "/api/routine-triggers/public/:publicId/fire" : "/api/chat-webhooks/:publicId/:provider",
       });
       expect(log.reqBody).toBe("[REDACTED]");
       expect(log.err.message).toBe("Chat webhook request failed");
@@ -394,6 +397,87 @@ describe("HTTP logger redaction", () => {
       "[Redacted]",
     );
     expect(log.res.headers["set-cookie"]).toBe("[Redacted]");
+  });
+
+  it.each([200, 403, 500])("redacts runtime GitHub capabilities from HTTP %i logs", async (status) => {
+    const capability = "runtime-github-capability-canary";
+    const chunks: string[] = [];
+    const stream = new Writable({
+      write(chunk, _encoding, callback) {
+        chunks.push(chunk.toString());
+        callback();
+      },
+    });
+    const app = express();
+    app.use(createHttpLogger(pino({ redact: [...HTTP_LOG_REDACT_PATHS] }, stream)));
+    app.post("/runtime-tools/github/credentials", (_req, res) => {
+      res.status(status).json({ status });
+    });
+
+    await request(app)
+      .post("/runtime-tools/github/credentials")
+      .set("X-Paperclip-Github-Capability", capability)
+      .send({})
+      .expect(status);
+
+    const output = chunks.join("");
+    expect(output).not.toContain(capability);
+    const log = JSON.parse(output.trim());
+    expect(log.req.headers["x-paperclip-github-capability"]).toBe("[Redacted]");
+    expect(log.req.url).toBe("/runtime-tools/github/credentials");
+    expect(log.res.statusCode).toBe(status);
+  });
+
+  it.each([200, 403, 500])("redacts cloud credentials and assertions from HTTP %i logs", async (status) => {
+    const headers = {
+      "X-Paperclip-Cloud-Tenant-Token": "cloud-tenant-token-canary",
+      "X-Paperclip-Cloud-Session-Id": "cloud-session-id-canary",
+      "X-Paperclip-Cloud-Runtime-Identity": "cloud-runtime-identity-canary",
+      "X-Paperclip-Cloud-Control": "cloud-control-canary",
+    };
+    const chunks: string[] = [];
+    const stream = new Writable({
+      write(chunk, _encoding, callback) {
+        chunks.push(chunk.toString());
+        callback();
+      },
+    });
+    const app = express();
+    app.use(createHttpLogger(pino({ redact: [...HTTP_LOG_REDACT_PATHS] }, stream)));
+    app.get("/api/companies", (_req, res, next) => {
+      if (status === 403) {
+        next(new HttpError(403, "Cloud tenant authentication required"));
+        return;
+      }
+      if (status === 500) {
+        next(new Error("Synthetic cloud request failure"));
+        return;
+      }
+      res.status(status).json({ status });
+    });
+    app.use(errorHandler);
+
+    const response = await request(app).get("/api/companies").set(headers).expect(status);
+    if (status === 403) {
+      expect(response.body).toEqual({ error: "Cloud tenant authentication required" });
+    } else if (status === 500) {
+      expect(response.body).toEqual({ error: "Internal server error" });
+    }
+
+    const output = chunks.join("");
+    const log = JSON.parse(output.trim());
+    for (const [header, secret] of Object.entries(headers)) {
+      expect(output).not.toContain(secret);
+      expect(log.req.headers[header.toLowerCase()]).toBe("[Redacted]");
+    }
+    expect(log.req.method).toBe("GET");
+    expect(log.req.url).toBe("/api/companies");
+    expect(log.res.statusCode).toBe(status);
+    expect(log.level).toBe(status === 500 ? 50 : status === 403 ? 40 : 30);
+    if (status === 500) {
+      expect(log.errorContext.message).toBe("Synthetic cloud request failure");
+      expect(log.err.message).toBe("Synthetic cloud request failure");
+    }
   });
 
   it("drops OAuth callback query data from the message and structured request", async () => {

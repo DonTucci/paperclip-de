@@ -1,6 +1,10 @@
+import { isBlockedUnstartedWake, isTerminalUnstartedWake } from "./non-execution-wake.js";
+import { firstTaskRejection, firstTaskRejectionReplyRecorded, isFirstTaskRejectionCancellation } from "./first-task-rejection.js";
+import { answerableRuntimeRunIds } from "./runtime-question-readiness.js";
 import { sanitizeJson } from "./redaction.js";
 import { createHash } from "node:crypto";
 import { firstTaskScenario } from "./first-task-cases.js";
+import { completionDelivery } from "./completion-updates.js";
 export type Row = { id: string; [key: string]: any };
 export interface FirstTaskCheckpoint {
   id: string;
@@ -179,6 +183,23 @@ function isPlanningAttachment(a: Row): boolean {
 function verifiedFirstTaskOutputs(checkpoint: FirstTaskCheckpoint): Row[] {
   return [...checkpoint.documents, ...(checkpoint.attachments ?? []).filter(isVerifiedAttachment).map(attachmentDocument)];
 }
+/** Provider identities, not generic sessionReused flags, prove continuity. */
+export function gradeNativeSessionContinuity(runs: Row[], issueId: string): FirstTaskCheck {
+  const parent = [...new Map(runs.filter((run) => run.nativeIssueId === issueId).map((run) => [run.id, run])).values()];
+  const identities = parent.map((run) => ({
+    run: run.id,
+    session: run.nativeSessionId,
+    provider: run.runnerProfileJson?.sessionCheckpoint?.providerSessionId,
+    workspace: run.runnerProfileJson?.nativeExecutionInput?.binding?.executionWorkspaceId,
+  }));
+  const passed = parent.length >= 2 && ["session", "provider", "workspace"].every((key) =>
+    identities.every((identity) => typeof identity[key as "session"] === "string" && identity[key as "session"].length > 0) &&
+    new Set(identities.map((identity) => identity[key as "session"])).size === 1,
+  );
+  return { id: "native-session-continuity", passed, evidence: ["finished"],
+    detail: `Same-task follow-ups must retain native/provider/workspace identities: ${JSON.stringify(identities)}` };
+}
+
 export function gradeFirstTask(e: FirstTaskEvidence): FirstTaskCheck[] {
   const scenario = firstTaskScenario(e.caseId, e.nonce);
   const checks: FirstTaskCheck[] = [];
@@ -200,7 +221,7 @@ export function gradeFirstTask(e: FirstTaskEvidence): FirstTaskCheck[] {
   const last = e.checkpoints.at(-1);
   const approval = e.checkpoints.find((c) => c.phase === "accepted");
   const rejection =
-    e.caseId === "reject-no-execution"
+    firstTaskRejection(e)
       ? e.checkpoints.find((c) => c.phase === "rejected")
       : undefined;
   const extras = (c: FirstTaskCheckpoint) =>
@@ -424,11 +445,12 @@ export function gradeFirstTask(e: FirstTaskEvidence): FirstTaskCheck[] {
   if (e.caseId === "reject-no-execution")
     add(
       "rejection-respected",
-      extras(last).length === 0 &&
+      firstTaskRejectionReplyRecorded(e, last.comments, last.runs) &&
+        extras(last).length === 0 &&
         last.documents.every(isPlanningDocument) &&
         (last.attachments ?? []).every(isPlanningAttachment) &&
         activeRuns(last.runs).length === 0,
-      "Rejected work never executes",
+      "Persisted refusal receives a response without execution tasks, finished output, or remaining runs",
       [last.id],
       rejection
         ? undefined
@@ -436,9 +458,23 @@ export function gradeFirstTask(e: FirstTaskEvidence): FirstTaskCheck[] {
     );
   add(
     "provider-runs-succeeded",
-    last.runs.length > 0 && last.runs.every((r) => r.status === "succeeded"),
-    "All observed provider runs settled successfully",
+    last.runs.length > 0 && last.runs.every((r) => r.status === "succeeded" || isBlockedUnstartedWake(r) ||
+      isTerminalUnstartedWake(r, last.tasks) ||
+      (isFirstTaskRejectionCancellation(r, e, last.tasks) && firstTaskRejectionReplyRecorded(e, last.comments, [r])) ||
+      (scenario.firstResponseOnly && r.status === "running" && answerableRuntimeRunIds(last.interactions).has(r.id))),
+    "Runs succeeded, were suppressed before execution, stopped with a recorded refusal response, or paused on an answerable first-response native question",
     [last.id],
   );
+  if (e.runtimeSettings?.adapterType === "paperclip_runner" &&
+    ["task-reply-accept", "task-card-accept"].includes(e.caseId) && last.phase === "finished") {
+    checks.push({ ...gradeNativeSessionContinuity(e.checkpoints.flatMap((checkpoint) => checkpoint.runs), e.onboardingIssueId), evidence: [last.id] });
+  }
+  if (e.runtimeSettings?.completionDeliveryProbe && last) {
+    const worker = last.tasks.find(t => t.parentId === e.onboardingIssueId) ?? {};
+    checks.push(...completionDelivery({ sourceId: e.onboardingIssueId, worker, documents: last.documents,
+      comments: last.comments, runs: last.runs, marker: scenario.marker,
+      renderedLinks: e.runtimeSettings.completionRenderedLinks as Array<{ commentId: string; href: string }> | undefined,
+    }).checks.map(check => ({ ...check, evidence: [last.id] })));
+  }
   return checks;
 }

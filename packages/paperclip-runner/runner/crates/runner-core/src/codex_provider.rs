@@ -24,7 +24,7 @@ use crate::qualified_launch::verify_launch_artifact;
 use crate::question_response::validate_question_response;
 
 pub const CODEX_APP_SERVER_MAX_FRAME_BYTES: usize = 4 * 1024 * 1024;
-const QUALIFIED_OPENCODE_VERSION: &str = "1.18.29";
+const QUALIFIED_OPENCODE_VERSION: &str = "1.18.34";
 const DEFAULT_PROVIDER_TRACE_MAX_BYTES: usize = 64 * 1024 * 1024;
 const MAX_BUFFERED_MESSAGES: usize = 1_024;
 const MAX_BUFFERED_MESSAGE_BYTES: usize = 16 * 1024 * 1024;
@@ -356,6 +356,9 @@ pub struct CodexProviderConfig {
     // Older persisted configurations deliberately retain the provider default.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub include_skill_instructions: Option<bool>,
+    // Older sessions retain their standalone task envelope.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_mode: Option<String>,
 }
 
 /// Explicit per-turn skill selection. The controller resolves assigned skill
@@ -399,6 +402,14 @@ impl CodexProviderConfig {
     }
 
     pub fn validate(&self) -> Result<(), LocalRunnerError> {
+        if !matches!(
+            self.conversation_mode.as_deref(),
+            None | Some("task" | "prepared")
+        ) {
+            return Err(LocalRunnerError::invalid(
+                "unsupported provider context mode",
+            ));
+        }
         if !matches!(
             (self.provider.as_str(), self.driver.as_str()),
             ("codex", "codex_app_server") | ("opencode", "opencode_server")
@@ -1027,12 +1038,19 @@ impl CodexProvider {
                 "model": config.model,
                 "approvalPolicy": config.approval_policy,
                 "runtimeWorkspaceRoots": [config.cwd],
-                "baseInstructions": config.instructions,
                 "dynamicTools": dynamic_tools,
             });
             let params_object = params
                 .as_object_mut()
                 .expect("Codex thread parameters are an object");
+            // Codex's baseInstructions replaces its stock prompt. OpenCode
+            // uses the same protocol facade but keeps its existing contract.
+            let instruction_field = if config.provider == "codex" {
+                "developerInstructions"
+            } else {
+                "baseInstructions"
+            };
+            params_object.insert(instruction_field.to_owned(), json!(config.instructions));
             if provider.permission_profile == "paperclip-runner-external-sandbox" {
                 // The execution target (for example Daytona) is the OS sandbox.
                 // Codex must not try to create nested user/network namespaces,
@@ -1042,6 +1060,9 @@ impl CodexProvider {
                 params_object.insert("permissions".to_owned(), json!(provider.permission_profile));
             }
             if config.provider == "opencode" {
+                if let Some(mode) = &config.conversation_mode {
+                    params_object.insert("conversationMode".to_owned(), json!(mode));
+                }
                 if let Some(contract) = provider.completion_contract.as_ref() {
                     params_object.insert(
                         "completionContract".to_owned(),
@@ -1260,6 +1281,9 @@ impl CodexProvider {
                             | "thread/goal/updated"
                             | "thread/goal/cleared"
                             | "thread/tokenUsage/updated"
+                            // poll() normalizes usage from this settled turn.
+                            // It remains an accounting snapshot, not new work.
+                            | "paperclip/resumeUsageSnapshot"
                             | "thread/status/changed"
                             | "turn/diff/updated"
                             | "turn/plan/updated"
@@ -1978,6 +2002,31 @@ impl CodexProvider {
         Ok(())
     }
 
+    fn reject_descendant_request(
+        &mut self,
+        rpc_id: Value,
+        method: &str,
+    ) -> Result<Option<CodexProviderEvent>, LocalRunnerError> {
+        // A recognized helper is part of the provider conversation, but has no
+        // Paperclip task binding. Reject its RPC without borrowing root authority
+        // or quarantining the root run. Unknown foreign threads still fail closed.
+        let message = "Paperclip tools are authorized only for the parent task. Return your findings to the parent agent; it must perform Paperclip coordination and ask the user questions.";
+        let response = if method == "item/tool/call" {
+            json!({"id": rpc_id, "result": codex_tool_failure(message)})
+        } else {
+            json!({"id": rpc_id, "error": {"code": -32000, "message": message}})
+        };
+        self.send_frame(&response)?;
+        if self.notification_identity_diagnostics >= 32 {
+            return Ok(None);
+        }
+        self.notification_identity_diagnostics += 1;
+        Ok(Some(CodexProviderEvent::Notification {
+            method: "warning".to_owned(),
+            params: json!({"message": message, "providerMethod": bounded_method(method)}),
+        }))
+    }
+
     fn reject_post_terminal_request(
         &mut self,
         rpc_id: Value,
@@ -2275,6 +2324,13 @@ impl CodexProvider {
             if method == "item/tool/call" {
                 let params = message.get("params").cloned().unwrap_or(Value::Null);
                 if params.get("threadId").and_then(Value::as_str) != Some(self.thread_id.as_str()) {
+                    if params
+                        .get("threadId")
+                        .and_then(Value::as_str)
+                        .is_some_and(|id| self.descendant_thread_ids.contains(id))
+                    {
+                        return self.reject_descendant_request(rpc_id, method);
+                    }
                     return Ok(Some(self.identity_failure(
                         method,
                         &params,
@@ -2399,6 +2455,13 @@ impl CodexProvider {
                     && params.get("threadId").and_then(Value::as_str)
                         != Some(self.thread_id.as_str())
                 {
+                    if params
+                        .get("threadId")
+                        .and_then(Value::as_str)
+                        .is_some_and(|id| self.descendant_thread_ids.contains(id))
+                    {
+                        return self.reject_descendant_request(rpc_id, method);
+                    }
                     return Ok(Some(self.identity_failure(
                         method,
                         &params,
@@ -3341,8 +3404,18 @@ fn classify_notification_thread(
             "Codex notification has malformed turn identity",
         ));
     }
-    // This connection-level notification carries no task authority. Codex can
-    // emit it while loading skills during the first turn.
+    // Account and skill updates describe the provider connection, not a task.
+    // Codex can emit them during startup or credential refresh without thread
+    // or turn IDs. Never let them acquire execution authority or expose their
+    // account payload as task output.
+    if matches!(method, "account/updated" | "account/login/completed") {
+        if contains_provider_work_binding(params) {
+            return Err(LocalRunnerError::invalid(
+                "Codex account notification contains execution identity",
+            ));
+        }
+        return Ok(NotificationThread::UnrelatedInformation);
+    }
     if method == "skills/changed" && !contains_provider_work_binding(params) {
         return Ok(NotificationThread::UnrelatedInformation);
     }
@@ -3406,6 +3479,9 @@ fn classify_notification_thread(
             | "configWarning"
             | "guardianWarning"
             | "deprecationNotice"
+            // Child MCP startup can precede thread/started and its lineage.
+            // It is diagnostic information, not root execution authority.
+            | "mcpServer/startupStatus/updated"
     ) {
         return Ok(NotificationThread::UnrelatedInformation);
     }
@@ -3718,11 +3794,17 @@ fn codex_question_set(
                 }
                 let option_id = format!("option-{}", index + 1);
                 labels.insert(option_id.clone(), label.chars().take(240).collect());
-                Some(json!({
+                let mut canonical_option = json!({
                     "id": option_id,
                     "label": label.chars().take(240).collect::<String>(),
-                    "description": option.get("description").and_then(Value::as_str).map(|value| value.chars().take(1000).collect::<String>()),
-                }))
+                });
+                // Native descriptions are optional/nullable. Canonical input
+                // permits an omitted description or a string, never null.
+                if let Some(description) = option.get("description").and_then(Value::as_str) {
+                    canonical_option["description"] =
+                        json!(description.chars().take(1000).collect::<String>());
+                }
+                Some(canonical_option)
             })
             .collect::<Vec<_>>();
         if !options.is_empty() && canonical_options.len() != options.len() {
@@ -3974,6 +4056,7 @@ done
             approval_policy: "never".to_owned(),
             externally_sandboxed: false,
             include_skill_instructions: None,
+            conversation_mode: None,
         };
         let mut provider = CodexProvider::start(&config, None).unwrap();
         provider.start_turn("First turn", &config.cwd).unwrap();
@@ -3986,6 +4069,31 @@ done
             }
         }
         provider
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn warm_attachment_accepts_normalized_usage_for_the_completed_turn() {
+        let mut provider = completion_tail_provider();
+        provider
+            .restore_completed_turn_authority(true, Some(1), Some("reader-tail-1"))
+            .unwrap();
+        provider.active_provider_turn_id = None;
+        provider
+            .pending_messages
+            .push_back(BufferedProviderMessage {
+                value: json!({
+                    "method": "thread/tokenUsage/updated",
+                    "params": {"threadId": "reader-tail-thread", "turnId": "reader-tail-1",
+                        "tokenUsage": {"total": {"inputTokens": 120, "outputTokens": 12}}}
+                }),
+                trace_frame_id: None,
+            });
+        // poll() normalizes settled-turn usage to paperclip/resumeUsageSnapshot.
+        // That accounting fact is not new work and must not force replacement.
+        let result = provider.drain_completed_turn_tail_for_warm_attachment();
+        provider.shutdown().unwrap();
+        result.expect("historical usage must not break provider continuity");
     }
 
     #[cfg(unix)]
@@ -4335,6 +4443,7 @@ done
             approval_policy: "never".to_owned(),
             externally_sandboxed: false,
             include_skill_instructions: None,
+            conversation_mode: None,
         };
         let mut spawned = None;
         let mut failure = None;
@@ -4419,6 +4528,24 @@ done
     }
 
     #[test]
+    fn preserves_prepared_context_in_the_durable_provider_config() {
+        let config: CodexProviderConfig = serde_json::from_value(json!({
+            "provider": "opencode", "driver": "opencode_server",
+            "providerVersion": QUALIFIED_OPENCODE_VERSION, "command": "node",
+            "cwd": "/workspace", "model": "openrouter/model",
+            "conversationMode": "prepared"
+        }))
+        .unwrap();
+        let stored = serde_json::to_value(config).unwrap();
+        assert_eq!(stored["conversationMode"], "prepared");
+        let restored: CodexProviderConfig = serde_json::from_value(stored).unwrap();
+        assert_eq!(
+            serde_json::to_value(restored).unwrap()["conversationMode"],
+            "prepared"
+        );
+    }
+
+    #[test]
     fn admits_only_exact_local_facade_provider_driver_pairs() {
         let mut config = CodexProviderConfig {
             provider: "opencode".to_owned(),
@@ -4436,6 +4563,7 @@ done
             approval_policy: "never".to_owned(),
             externally_sandboxed: false,
             include_skill_instructions: None,
+            conversation_mode: None,
         };
         config.include_skill_instructions = Some(true);
         assert_eq!(
@@ -4511,6 +4639,44 @@ done
             codex_permission_profile("opencode", true),
             "paperclip-runner-workspace-only"
         );
+    }
+
+    #[test]
+    fn codex_optional_option_descriptions_produce_schema_valid_resolvable_input() {
+        let (_, question_set, option_labels) = codex_question_set(
+            &json!(42),
+            &json!({"questions":[{
+                "id":"environment", "question":"Where?",
+                "options":[
+                    {"label":"Staging"},
+                    {"label":"Production", "description":null},
+                    {"label":"Preview", "description":"Temporary deployment"}
+                ]
+            }]}),
+        )
+        .unwrap();
+        let options = question_set["questions"][0]["options"].as_array().unwrap();
+        assert!(options[0].get("description").is_none());
+        assert!(options[1].get("description").is_none());
+        assert_eq!(options[2]["description"], "Temporary deployment");
+        let pending = PendingRuntimeRequest {
+            rpc_id: json!(42),
+            turn_id: "turn-1".to_owned(),
+            method: "item/tool/requestUserInput".to_owned(),
+            params: Value::Null,
+            question_set,
+            option_labels,
+            retained_bytes: 0,
+        };
+        for (index, label) in ["Staging", "Production", "Preview"].iter().enumerate() {
+            // The canonical response validator also validates the retained
+            // question-set schema, just as durable presentation does.
+            let native = codex_question_response(&pending, &json!({
+                "schema":"paperclip.question_response.v1",
+                "answers":{"environment":{"selectedOptionIds":[format!("option-{}", index + 1)]}}
+            })).unwrap();
+            assert_eq!(native["answers"]["environment"]["answers"], json!([label]));
+        }
     }
 
     #[test]
@@ -4914,6 +5080,72 @@ mod notification_identity_tests {
             )
             .is_err());
         }
+    }
+
+    #[test]
+    fn account_notifications_are_connection_information_without_execution_authority() {
+        for (method, params) in [
+            (
+                "account/updated",
+                json!({"authMode":"chatgpt", "planType":"pro"}),
+            ),
+            (
+                "account/login/completed",
+                json!({"loginId":null, "success":true, "error":null}),
+            ),
+        ] {
+            assert_eq!(
+                classify_notification_thread(method, "root", &BTreeSet::new(), &params).unwrap(),
+                NotificationThread::UnrelatedInformation
+            );
+            for invalid in [
+                json!({"threadId":"other"}),
+                json!({"turnId":"unbound"}),
+                json!({"itemId":"unbound"}),
+                json!({"nested":{"request":{"id":"unbound"}}}),
+                json!({"threadId":7}),
+                json!({"threadId":"root", "thread":{"id":"other"}}),
+            ] {
+                assert!(
+                    classify_notification_thread(method, "root", &BTreeSet::new(), &invalid)
+                        .is_err()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn child_mcp_startup_before_lineage_has_no_execution_authority() {
+        let params =
+            json!({"threadId": "not-yet-known-child", "name": "paperclip", "status": "starting"});
+        assert_eq!(
+            classify_notification_thread(
+                "mcpServer/startupStatus/updated",
+                "root",
+                &BTreeSet::new(),
+                &params
+            )
+            .unwrap(),
+            NotificationThread::UnrelatedInformation
+        );
+        assert!(
+            classify_notification_thread("turn/completed", "root", &BTreeSet::new(), &params)
+                .is_err()
+        );
+        assert!(classify_notification_thread(
+            "paperclip/runResult",
+            "root",
+            &BTreeSet::new(),
+            &params
+        )
+        .is_err());
+        assert!(classify_notification_thread(
+            "mcpServer/startupStatus/updated",
+            "root",
+            &BTreeSet::new(),
+            &json!({"threadId": "child", "thread": {"id": "different"}}),
+        )
+        .is_err());
     }
 
     #[test]

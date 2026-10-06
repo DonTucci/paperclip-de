@@ -1,3 +1,4 @@
+import { recoverLegacyUnsafeWorkspaceExports } from "./native-workspace-export-recovery.js";
 import { dismissAutomaticCompletionReviews, decisionHasRetiredAutomaticReview } from "./automatic-completion-reviews.js";
 import { logger } from "../../middleware/logger.js";
 import { createHash, randomUUID } from "node:crypto";
@@ -239,7 +240,7 @@ export function reconcileRetainedNativeSessionCleanups(
             ),
             // The accepted-result projector preserves a recovered close failure
             // privately after clearing the visible successful run's stale error.
-            sql`coalesce(${heartbeatRuns.errorCode}, ${heartbeatRuns.resultJson}->'recoveredExecutionFailure'->>'errorCode') = 'adapter_failed'`,
+            sql`coalesce(${heartbeatRuns.errorCode}, ${heartbeatRuns.resultJson}->'recoveredExecutionFailure'->>'errorCode') in ('adapter_failed', 'provider_transport_failed')`,
             sql`coalesce(${heartbeatRuns.error}, ${heartbeatRuns.resultJson}->'recoveredExecutionFailure'->>'error') = 'provider_transport_failed: runner did not durably suspend before checkpoint'`,
             sql`not (${nativeRunFinalizations.recoveryHistory} @> '[{"kind":"native_cleanup_runner_epoch"}]'::jsonb)`,
             sql`not (${nativeRunFinalizations.recoveryHistory} @> '[{"kind":"native_cleanup_source_archive","phase":"operator_required"}]'::jsonb)`,
@@ -546,6 +547,9 @@ export async function reconcileNativeFinalizations(
     }) => Promise<void>;
   } = {},
 ) {
+  await recoverLegacyUnsafeWorkspaceExports(db, runIds).catch((err) => {
+    logger.warn({ err }, "Historical unsafe export recovery remains pending");
+  });
   await dismissObsoleteNativePolicyReviews(db, runIds).catch((err) => {
     logger.warn({ err }, "Obsolete native policy review lookup failed; continuing native reconciliation");
   });
@@ -855,6 +859,8 @@ export async function reconcileNativeFinalizations(
         runId: row.runId,
         environmentRuntime: options.environmentRuntime,
       });
+      // Busy is ownership, not another failed export or retry-budget debit.
+      if (!operation) continue;
       const workspaceFinalizeStatus =
         operation.status === "succeeded" ? "succeeded" : "failed";
       if (workspaceFinalizeStatus === "failed") {
