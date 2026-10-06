@@ -604,9 +604,17 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
     });
   }, [pan, zoom, relationshipDrag, relationshipTargetAt]);
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     if (relationshipDrag) {
-      handleRelationshipMouseUp();
+      const touch = e.changedTouches[0];
+      const targetId = touch ? relationshipTargetAt(touch.clientX, touch.clientY) : null;
+      const sourceId = relationshipDrag.sourceId;
+      setRelationshipDrag(null);
+      if (targetId) {
+        proposeHierarchyChange(sourceId, targetId);
+      } else {
+        setRelationshipWarning(t("orgChart.hierarchyDropOnManager", { defaultValue: "Drop the connection on the lower connector of a manager." }));
+      }
       suppressNextCardClick.current = false;
       return;
     }
@@ -629,7 +637,15 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       startCenter: { x: 0, y: 0 },
       moved: false,
     };
-  }, [pan, zoom, relationshipDrag, handleRelationshipMouseUp]);
+  }, [pan, zoom, relationshipDrag, proposeHierarchyChange, relationshipTargetAt]);
+
+  const handleTouchCancel = useCallback(() => {
+    setRelationshipDrag(null);
+    setRelationshipWarning(null);
+    suppressNextCardClick.current = false;
+    touchGesture.current.mode = null;
+    touchGesture.current.moved = false;
+  }, []);
 
   const relationshipSourceNode = relationshipDrag
     ? allNodes.find((node) => node.id === relationshipDrag.sourceId)
@@ -700,7 +716,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
       >
         <div className="absolute left-3 top-3 z-10 max-w-(--sz-calc-20) rounded-md border border-border bg-background/95 px-3 py-2 text-xs shadow-sm">
           <div className="flex items-center gap-1.5 font-medium text-foreground">

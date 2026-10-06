@@ -10,6 +10,7 @@ import { hierarchyChangeIssue, OrgChart } from "./OrgChart";
 const navigateMock = vi.fn();
 const orgMock = vi.fn();
 const listMock = vi.fn();
+const updateMock = vi.fn();
 
 vi.mock("@/lib/router", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
@@ -28,7 +29,7 @@ vi.mock("../api/agents", () => ({
   agentsApi: {
     org: () => orgMock(),
     list: () => listMock(),
-    update: vi.fn(),
+    update: updateMock,
   },
 }));
 
@@ -262,6 +263,19 @@ describe("OrgChart mobile gestures", () => {
     });
 
     expect(navigateMock).toHaveBeenCalledWith("/agents/ceo");
+  });
+
+  it("cancels a touch hierarchy drag without opening a save dialog", async () => {
+    const { viewport } = await renderOrgChart();
+    const source = container.querySelector("[data-org-report-source]") as HTMLButtonElement;
+
+    await act(async () => {
+      source.dispatchEvent(createTouchEvent("touchstart", [{ clientX: 100, clientY: 100 }]));
+      viewport.dispatchEvent(createTouchEvent("touchcancel", []));
+    });
+
+    expect(container.textContent).not.toContain("Save reporting line?");
+    expect(updateMock).not.toHaveBeenCalled();
   });
   it("pinch-zooms toward the touch center", async () => {
     const { viewport, layer } = await renderOrgChart();
