@@ -516,6 +516,14 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
   }, [bounds]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    // A new touch gesture is an intentional user action. Clear suppression
+    // left behind when the previous pan produced no synthetic click.
+    if (suppressClickTimerRef.current !== null) {
+      window.clearTimeout(suppressClickTimerRef.current);
+      suppressClickTimerRef.current = null;
+    }
+    suppressNextCardClick.current = false;
+
     if (e.touches.length >= 2 && containerRef.current) {
       const [first, second] = [e.touches[0]!, e.touches[1]!];
       touchGesture.current = {
@@ -626,7 +634,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       suppressClickTimerRef.current = window.setTimeout(() => {
         suppressNextCardClick.current = false;
         suppressClickTimerRef.current = null;
-      }, 0);
+      }, 400);
     }
     touchGesture.current = {
       mode: null,

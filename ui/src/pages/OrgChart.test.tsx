@@ -252,6 +252,19 @@ describe("OrgChart mobile gestures", () => {
     expect(navigateMock).not.toHaveBeenCalled();
   });
 
+  it("suppresses a delayed click after a touch pan from an agent card", async () => {
+    const { viewport } = await renderOrgChart();
+    const card = container.querySelector("[data-org-card]") as HTMLDivElement;
+    await act(async () => {
+      card.dispatchEvent(createTouchEvent("touchstart", [{ clientX: 100, clientY: 100 }]));
+      viewport.dispatchEvent(createTouchEvent("touchmove", [{ clientX: 130, clientY: 145 }]));
+      viewport.dispatchEvent(createTouchEvent("touchend", []));
+    });
+    await new Promise((resolve) => window.setTimeout(resolve, 10));
+    await act(async () => { card.click(); });
+    expect(navigateMock).not.toHaveBeenCalled();
+  });
+
   it("allows card navigation after a touch tap without movement", async () => {
     const { viewport } = await renderOrgChart();
     const card = container.querySelector("[data-org-card]") as HTMLDivElement;
@@ -309,13 +322,18 @@ describe("OrgChart mobile gestures", () => {
       button.dispatchEvent(createTouchEvent("touchstart", [{ clientX: 100, clientY: 100 }]));
       viewport.dispatchEvent(createTouchEvent("touchmove", [{ clientX: 130, clientY: 145 }]));
       viewport.dispatchEvent(createTouchEvent("touchend", []));
-      button.click();
     });
+
+    await new Promise((resolve) => window.setTimeout(resolve, 10));
+    await act(async () => { button.click(); });
     expect(document.body.textContent).not.toContain("Save reporting line?");
     expect(updateMock).not.toHaveBeenCalled();
     expect(navigateMock).not.toHaveBeenCalled();
 
-    await flushReact();
+    await act(async () => {
+      button.dispatchEvent(createTouchEvent("touchstart", [{ clientX: 100, clientY: 100 }]));
+      viewport.dispatchEvent(createTouchEvent("touchend", []));
+    });
     await act(async () => { button.click(); });
     expect(document.body.textContent).toContain("Save reporting line?");
   });
