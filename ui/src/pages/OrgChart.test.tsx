@@ -302,6 +302,20 @@ describe("OrgChart mobile gestures", () => {
     expect(document.body.textContent).not.toContain("Save reporting line?");
   });
 
+  it("does not open a board confirmation after panning from its button", async () => {
+    const { viewport } = await renderOrgChart();
+    const button = container.querySelector('[aria-label="Move to board level"]') as HTMLButtonElement;
+    await act(async () => {
+      button.dispatchEvent(createTouchEvent("touchstart", [{ clientX: 100, clientY: 100 }]));
+      viewport.dispatchEvent(createTouchEvent("touchmove", [{ clientX: 130, clientY: 145 }]));
+      viewport.dispatchEvent(createTouchEvent("touchend", []));
+      button.click();
+    });
+    expect(document.body.textContent).not.toContain("Save reporting line?");
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(navigateMock).not.toHaveBeenCalled();
+  });
+
   it("rejects a cyclic connection selected with the keyboard", async () => {
     await renderOrgChart();
     const source = container.querySelector('[data-agent-id="agent-1"] [data-org-report-source]')!;

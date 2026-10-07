@@ -850,7 +850,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
                   navigate(agent ? agentUrl(agent) : `/agents/${node.id}`);
                 }}
                 onClickCapture={(e) => {
-                  if ((e.target as HTMLElement).closest("button")) return;
+                  if (relationshipDrag && (e.target as HTMLElement).closest("[data-org-manager-port]")) return;
                   if (!suppressNextCardClick.current) return;
                   suppressNextCardClick.current = false;
                   e.preventDefault();
