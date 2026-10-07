@@ -626,7 +626,7 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
       suppressClickTimerRef.current = window.setTimeout(() => {
         suppressNextCardClick.current = false;
         suppressClickTimerRef.current = null;
-      }, 400);
+      }, 0);
     }
     touchGesture.current = {
       mode: null,

@@ -314,6 +314,10 @@ describe("OrgChart mobile gestures", () => {
     expect(document.body.textContent).not.toContain("Save reporting line?");
     expect(updateMock).not.toHaveBeenCalled();
     expect(navigateMock).not.toHaveBeenCalled();
+
+    await flushReact();
+    await act(async () => { button.click(); });
+    expect(document.body.textContent).toContain("Save reporting line?");
   });
 
   it("rejects a cyclic connection selected with the keyboard", async () => {
