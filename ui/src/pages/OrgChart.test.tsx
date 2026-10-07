@@ -277,6 +277,43 @@ describe("OrgChart mobile gestures", () => {
     expect(container.textContent).not.toContain("Save reporting line?");
     expect(updateMock).not.toHaveBeenCalled();
   });
+
+  it("saves only after confirming a move to board level", async () => {
+    await renderOrgChart();
+    updateMock.mockResolvedValue(agents[1]);
+    await act(async () => {
+      (container.querySelector('[aria-label="Move to board level"]') as HTMLButtonElement).click();
+    });
+    expect(updateMock).not.toHaveBeenCalled();
+    const confirm = Array.from(document.querySelectorAll("button")).find((button) => button.textContent === "Confirm")!;
+    await act(async () => { confirm.click(); });
+    await flushReact();
+    expect(updateMock).toHaveBeenCalledWith("agent-2", { reportsTo: null }, "company-1");
+  });
+
+  it("does not save a cancelled confirmation", async () => {
+    await renderOrgChart();
+    await act(async () => {
+      (container.querySelector('[aria-label="Move to board level"]') as HTMLButtonElement).click();
+    });
+    const cancel = Array.from(document.querySelectorAll("button")).find((button) => button.textContent === "Cancel")!;
+    await act(async () => { cancel.click(); });
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(document.body.textContent).not.toContain("Save reporting line?");
+  });
+
+  it("rejects a cyclic connection selected with the keyboard", async () => {
+    await renderOrgChart();
+    const source = container.querySelector('[data-agent-id="agent-1"] [data-org-report-source]')!;
+    const target = container.querySelector('[data-org-manager-port][data-agent-id="agent-2"]') as HTMLButtonElement;
+    await act(async () => {
+      source.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    });
+    await act(async () => { target.click(); });
+    expect(updateMock).not.toHaveBeenCalled();
+    expect(document.body.textContent).not.toContain("Save reporting line?");
+    expect(container.textContent).toContain("reporting cycle");
+  });
   it("pinch-zooms toward the touch center", async () => {
     const { viewport, layer } = await renderOrgChart();
 
