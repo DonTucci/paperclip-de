@@ -804,18 +804,17 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
         {relationshipDrag && relationshipSourceNode ? (
           <svg className="absolute inset-0 pointer-events-none" style={{ width: "100%", height: "100%" }}>
             <line
+              className="org-chart-drag-indicator-line"
               x1={pan.x + zoom * (relationshipSourceNode.x + CARD_W / 2)}
               y1={pan.y + zoom * relationshipSourceNode.y}
               x2={relationshipDrag.pointer.x}
               y2={relationshipDrag.pointer.y}
               stroke={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
-              strokeWidth="var(--org-chart-drag-line-width)"
-              strokeDasharray="var(--org-chart-drag-line-dash)"
             />
             <circle
+              className="org-chart-drag-indicator-handle"
               cx={relationshipDrag.pointer.x}
               cy={relationshipDrag.pointer.y}
-              r="var(--org-chart-drag-handle-radius)"
               fill={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
             />
           </svg>
