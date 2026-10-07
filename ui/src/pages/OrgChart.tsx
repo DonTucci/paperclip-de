@@ -809,13 +809,13 @@ export function OrgChart({ orgTree: providedOrgTree, agents: providedAgents, emb
               x2={relationshipDrag.pointer.x}
               y2={relationshipDrag.pointer.y}
               stroke={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
-              strokeWidth={2}
-              strokeDasharray="6 4"
+              strokeWidth="var(--org-chart-drag-line-width)"
+              strokeDasharray="var(--org-chart-drag-line-dash)"
             />
             <circle
               cx={relationshipDrag.pointer.x}
               cy={relationshipDrag.pointer.y}
-              r={5}
+              r="var(--org-chart-drag-handle-radius)"
               fill={relationshipDragIssue ? "var(--destructive)" : "var(--primary)"}
             />
           </svg>

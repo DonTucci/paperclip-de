@@ -29,7 +29,7 @@ vi.mock("../api/agents", () => ({
   agentsApi: {
     org: () => orgMock(),
     list: () => listMock(),
-    update: updateMock,
+    update: (...args: unknown[]) => updateMock(...args),
   },
 }));
 

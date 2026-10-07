@@ -99,6 +99,9 @@
   --native-select-caret-inset: calc(var(--spacing) * 3);
   --native-select-caret-stroke: 1.5px;
   --native-select-end-padding: calc(var(--spacing) * 9);
+  --org-chart-drag-line-width: 2;
+  --org-chart-drag-line-dash: 6 4;
+  --org-chart-drag-handle-radius: 5;
   --radius: 0.5rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
